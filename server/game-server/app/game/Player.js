@@ -2,7 +2,7 @@
  * Created by bot.su on 2017/4/11.
  */
 
-var cc = require("./cc");
+var cc = require("./util/cc");
 module.exports = cc.Class.extend({
     _data : null,
     ctor:function (uid) {

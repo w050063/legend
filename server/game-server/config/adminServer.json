@@ -1,8 +1,8 @@
 [{
-    "type": "connector",
+    "type": "conn",
     "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
 }, {
-    "type": "chat",
+    "type": "work",
     "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
 },{
     "type": "gate",
