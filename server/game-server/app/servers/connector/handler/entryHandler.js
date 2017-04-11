@@ -35,10 +35,18 @@ Handler.prototype.enter = function(msg, session, next) {
 			console.error('set uid for session service failed! error is : %j', err.stack);
 		}
 	});
+
+    session.set('mapIndex', Math.floor(Math.random()*3));
+    session.push('mapIndex', function(err) {
+        if(err) {
+            console.error('set mapIndex for session service failed! error is : %j', err.stack);
+        }
+    });
 	
 	session.on('closed', onUserLeave.bind(null, self.app));
 
 	//put user into channel
+    console.log("serverId:"+self.app.get('serverId'));
 	self.app.rpc.chat.chatRemote.add(session, uid, self.app.get('serverId'), function(users){
 		next(null, {
 			users:users

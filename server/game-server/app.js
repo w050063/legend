@@ -4,7 +4,7 @@ var JsUtil = require('./app/util/JsUtil').JsUtil;
  * Init app for client.
  */
 var app = pomelo.createApp();
-app.set('name', 'chatofpomelo-websocket');
+app.set('name', 'server');
 
 // app configuration
 app.configure('production|development', 'connector', function(){
@@ -27,16 +27,17 @@ app.configure('production|development', 'gate', function(){
 
 // app configure
 app.configure('production|development', function() {
-	// route configures
-	app.route('chat', function(session, msg, app, cb) {
-	var chatServers = app.getServersByType('chat');
-	var res = JsUtil.dispatch(session.get("uid"), chatServers);
+    // route configures
+    app.route('chat', function(session, msg, app, cb) {
+        //根据玩家所在地图决定访问哪个服务器！
+        var chatServers = app.getServersByType('chat');
+        var mapIndex = session.get("mapIndex");
+        var res = chatServers[(mapIndex || mapIndex==0)?mapIndex:0];
+        cb(null, res.id);
+    });
 
-	cb(null, res.id);
-});
-
-	// filter configures
-	app.filter(pomelo.timeout());
+    // filter configures
+    app.filter(pomelo.timeout());
 });
 
 // start app

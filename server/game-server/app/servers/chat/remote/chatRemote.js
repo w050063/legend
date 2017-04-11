@@ -1,4 +1,6 @@
 var JsUtil = require('../../../util/JsUtil').JsUtil;
+var BattleLogic = require("../../../game/BattleLogic");
+
 
 module.exports = function(app) {
 	return new ChatRemote(app);
@@ -29,7 +31,7 @@ ChatRemote.prototype.add = function(uid, sid, cb) {
 	if( !! channel) {
 		channel.add(uid, sid);
 	}
-
+    BattleLogic.addPlayer(uid);
 	cb(this.get());
 };
 
@@ -56,7 +58,7 @@ ChatRemote.prototype.get = function() {
  *
  */
 ChatRemote.prototype.kick = function(uid, sid, cb) {
-	var channel = this.channelService.getChannel(JsUtil.dataChannel, false);
+	var channel = this.channelService.getChannel(JsUtil.dataChannel, true);
 	// leave channel
 	if( !! channel) {
 		channel.leave(uid, sid);

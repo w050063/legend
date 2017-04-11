@@ -1,5 +1,6 @@
 
 var JsUtil = require('../../../util/JsUtil').JsUtil;
+var BattleLogic = require("../../../game/BattleLogic");
 
 module.exports = function(app) {
 	return new Handler(app);
@@ -24,7 +25,7 @@ Handler.prototype.send = function(msg, session, next) {
 		from: session.get("uid"),
 		target: msg.target
 	};
-	channel = channelService.getChannel(JsUtil.dataChannel, false);
+	channel = channelService.getChannel(JsUtil.dataChannel, true);
 
 	//the target is all users
 	if(msg.target == '*') {

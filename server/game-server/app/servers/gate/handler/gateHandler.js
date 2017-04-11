@@ -28,7 +28,7 @@ Handler.prototype.queryEntry = function(msg, session, next) {
 	}
 	
 	// select connector
-	var res = JsUtil.dispatch(session.get("uid"), connectors);
+	var res = connectors[Math.floor(Math.random()*connectors.length)];
 	next(null, {
 		code: 200,
 		host: res.host,
