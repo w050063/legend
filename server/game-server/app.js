@@ -24,20 +24,29 @@ app.configure('production|development', 'gate', function(){
 		});
 });
 
-// app configure
-app.configure('production|development', function() {
-    // route configures
-    app.route('work', function(session, msg, app, cb) {
-        //根据玩家所在地图决定访问哪个服务器！
-        var chatServers = app.getServersByType('work');
-        var mapIndex = session.get("mapIndex");
-        var res = chatServers[(mapIndex || mapIndex==0)?mapIndex:0];
-        cb(null, res.id);
-    });
 
-    // filter configures
-    app.filter(pomelo.timeout());
+
+app.configure('production|development', 'work', function(){
+    app.set('connectorConfig',
+        {
+            connector : pomelo.connectors.hybridconnector,
+            useProtobuf : true
+        });
 });
+
+//// app configure
+//app.configure('production|development', function() {
+//    // route configures
+//    app.route('work', function(session, msg, app, cb) {
+//        //根据玩家所在地图决定访问哪个服务器！
+//        var chatServers = app.getServersByType('work');
+//        var res = chatServers[(mapIndex || mapIndex==0)?mapIndex:0];
+//        cb(null, res.id);
+//    });
+//
+//    // filter configures
+//    app.filter(pomelo.timeout());
+//});
 
 // start app
 app.start();

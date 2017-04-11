@@ -40,13 +40,6 @@ var Handler = cc.Class.extend({
             }
         });
 
-        session.set('mapIndex', Math.floor(Math.random()*3));
-        session.push('mapIndex', function(err) {
-            if(err) {
-                console.error('set mapIndex for session service failed! error is : %j', err.stack);
-            }
-        });
-
         session.on('closed', this.onUserLeave.bind(null, self.app));
 
         //put user into channel
