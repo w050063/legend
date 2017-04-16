@@ -29,6 +29,5 @@ module.exports = cc.Class.extend({
 
         this._data._type = 0;
         this._data._camp = 0;
-        console.log("玩家");
     },
 });

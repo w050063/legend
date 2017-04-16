@@ -43,7 +43,7 @@ module.exports = {
 			this.init();
 		}
 		
-		var player = this.getPlayer();
+		var player = this.getPlayer(uid);
 		if(!player){
 			player = new Player(uid);
 			this._playerMap[GameConst._bornMap].push(player);
@@ -51,12 +51,15 @@ module.exports = {
     },
 
 
-	//根据uid返回玩家数据
-	getPlayer:function(mapName,uid){
-        var array = this._playerMap[mapName];
-        for(var i=0;i<array.length;++i){
-            if(array[i]._data.uid==uid){
-                return array[i];
+	//根据uid返回玩家数据，mapName地图名字，可选，加速查找。
+	getPlayer:function(uid,mapName){
+        if(mapName){
+            var array = this._playerMap[mapName];
+            for(var i=0;i<array.length;++i)if(array[i]._data.uid==uid)return array[i];
+        }else{
+            for(var key in this._playerMap){
+                var array = this._playerMap[key];
+                for(var i=0;i<array.length;++i)if(array[i]._data.uid==uid)return array[i];
             }
         }
 		return null;
@@ -74,11 +77,18 @@ module.exports = {
                     var maxCount = array[i][4];
                     for(var j=count;j<maxCount;++j){
                         var player = new Player(array[i][0]);
-                        var x = array[i][1]+Math.floor(Math.random()*(GameConst._bornR*2+1)-GameConst._bornR);
-                        var y = array[i][2]+Math.floor(Math.random()*(GameConst._bornR*2+1)-GameConst._bornR);
+                        var x= 0,y=0;
+                        if(array[i][1]==-1 && array[i][2]==-1){
+                            x = Math.floor(Math.random()*map.mapX);
+                            y = Math.floor(Math.random()*map.mapY);
+                        }else{
+                            x = array[i][1]+Math.floor(Math.random()*(GameConst._bornR*2+1)-GameConst._bornR);
+                            y = array[i][2]+Math.floor(Math.random()*(GameConst._bornR*2+1)-GameConst._bornR);
+                        }
                         var position = this.getStandLocation(map.name,x,y);
                         player._data.x = position.x;
                         player._data.y = position.y;
+                        player._data._type = array[i][0];
                         this._playerMap[map.name].push(player);
                     }
                 }
