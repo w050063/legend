@@ -4,6 +4,7 @@ module.exports={
 
 
     //相关数据
+    _data:null,
     _sessionId:-1,
 	_id:100000,
 	_level:1,

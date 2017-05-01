@@ -46,6 +46,7 @@ cc.Class({
             UserInfo._name = msg.name;
             UserInfo._x = msg.x;
             UserInfo._y = msg.y;
+            UserInfo._data = msg;
             cc.director.loadScene("GameLayer");
         });
     },

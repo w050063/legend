@@ -1,5 +1,6 @@
 var UserInfo = require("UserInfo");
 var GameConst = require("GameConst");
+var Role = require("Role");
 cc.Class({
     extends: cc.Component,
 
@@ -16,8 +17,14 @@ cc.Class({
         var size = cc.director.getWinSize();
 
 
-        this._player = {_data:{}};
-        this._player._data = {x:UserInfo._x,y:UserInfo._y};
+
+        //创建主角
+        var node = new cc.Node();
+        this._player = node.addComponent(Role);
+        this._player.init(UserInfo._data);
+        this._player.setLocation(UserInfo._x,UserInfo._y);
+        this.node.addChild(node);
+        this._roleMap[this._player._data.id] = this._player;
     },
 
     // called every frame
