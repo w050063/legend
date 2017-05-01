@@ -31,7 +31,6 @@ WorkRemote.prototype.add = function(uid, sid, cb) {
 	if( !! channel) {
 		channel.add(uid, sid);
 	}
-    BattleLogic.addPlayer(uid);
 	cb(this.get());
 };
 

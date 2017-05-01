@@ -1,6 +1,11 @@
 module.exports={
+    //全局变量相关
+    //_gameLayer:null,
+
+
+    //相关数据
     _sessionId:-1,
-	_rid:100000,
+	_id:100000,
 	_level:1,
 	_name:"红军小战士",
 	_camp:"liuxing",
@@ -9,7 +14,7 @@ module.exports={
 	_exp:0,
 	_player:null,
 	_tileSize:cc.p(60,60),
-	_map:"maya",
+	_map:"mafa",
 	_skillLevel:[0,0,0,0],
 	_skillPointCount:1,
 	_bornLocation:cc.p(2,2),

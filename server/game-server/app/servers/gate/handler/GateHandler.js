@@ -5,7 +5,7 @@ module.exports = function(app) {
 };
 
 var Handler = cc.Class.extend({
-    _baseUid:1,
+    _baseUid:0,
     ctor:function (app) {
         this.app = app;
     },
@@ -35,8 +35,7 @@ var Handler = cc.Class.extend({
             code: 200,
             host: res.host,
             port: res.clientPort,
-            uid: 'u'+this._baseUid
+            uid: 'u'+(++this._baseUid)
         });
-        this._baseUid++;
     },
 });

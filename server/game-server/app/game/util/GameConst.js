@@ -1,5 +1,6 @@
 /**
  * Created by bot.su on 2017/4/11.
+ * 数据常量
  */
 module.exports = {
 
@@ -15,6 +16,18 @@ module.exports = {
             }
         }
     },
+
+
+    //网络相关编码
+    netOK: 200,
+    netFAIL: 500,
+
+
+    //出生相关,_bornR怪物和角色通用
+    _bornMap:"mafa",
+    _bornX:1,
+    _bornY:1,
+    _bornR:4,
 
 
     //地图详细信息,refresh怪物相关刷新，坐标-1表示全地图随机刷--hero type,x,y,aliquot time,max count.
@@ -49,13 +62,13 @@ module.exports = {
     },
 
 
-    //出生相关,_bornR怪物和角色通用
-    _bornMap:"mafa",
-    _bornX:1,
-    _bornY:1,
-    _bornR:4,
-
-
-    //怪物当前id
-    _baseMonsterId:0,
+    _roleMst: {
+        fighter:{id:"t0",name:"战士",type:"near2",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+        archmage:{id:"t1",name:"法师",type:"far9",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+        taoist:{id:"t2",name:"道士",type:"far1",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+        redEvilBoar:{id:"t3",name:"红野猪",type:"near1",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+        leftProtector:{id:"t4",name:"左护法",type:"near1",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+        rightProtector:{id:"t5",name:"右护法",type:"near1",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+        DarkLord:{id:"t6",name:"圣地魔王",type:"near1",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+    },
 };

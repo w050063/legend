@@ -10,15 +10,9 @@ var Handler = cc.Class.extend({
         this.app = app;
     },
 
-    /**
-     * New client entry work server.
-     *
-     * @param  {Object}   msg     request message
-     * @param  {Object}   session current session object
-     * @param  {Function} next    next stemp callback
-     * @return {Void}
-     */
-    enter : function(msg, session, next) {
+
+    //Á´½Ó½øÀ´
+    connect : function(msg, session, next) {
         var self = this;
         var uid = msg.uid
         var sessionService = self.app.get('sessionService');
@@ -43,10 +37,8 @@ var Handler = cc.Class.extend({
         session.on('closed', this.onUserLeave.bind(null, self.app));
 
         //put user into channel
-        self.app.rpc.work.WorkRemote.add(session, uid, self.app.get('serverId'), function(users){
-            next(null, {
-                users:users
-            });
+        self.app.rpc.work.WorkRemote.add(session, uid, self.app.get('serverId'), function(){
+            next(null, {});
         });
     },
 

@@ -3,6 +3,7 @@
  */
 var Player = require("./Player");
 var GameConst = require("./util/GameConst");
+var JsUtil = require("./util/JsUtil");
 
 
 //核心战斗逻辑
@@ -13,30 +14,43 @@ module.exports = {
 
 	//战斗场景初始化标志
 	_bInit:false,
+
+
+    _baseMonsterId:0,
 	
 	
 	//玩家的二维数组,每个元素是每个场景玩家数组
-    _playerMap:{},
+    _roleMap:{},
 	
 	
 	//初始化战斗数据
 	init:function(){
 		for(var key in GameConst._mapArray){
-			this._playerMap[key] = [];
+			this._roleMap[key] = [];
 		}
 
 
         //启动定时器,每秒执行一次
         setInterval(function(){
             ++this._gameTime;
-            console.log("定时器"+this._gameTime);
             this.refresh();
+
+
+            //测试主动发送
+            //var uids = [];
+            //for(var key in this._roleMap){
+            //    var array = this._roleMap[key];
+            //    for(var i=0;i<array.length;++i){
+            //        uids.push(array[i]._data.uid);
+            //    }
+            //}
+            //JsUtil.send("onChat","wwwww",uids);
         }.bind(this),1000);
 	},
 	
 	
 	//增加一个玩家
-    addPlayer:function(uid){
+    addPlayer:function(uid,name,type,sex){
 		if(!this._bInit){
 			this._bInit = true;
             GameConst.init();
@@ -45,21 +59,27 @@ module.exports = {
 		
 		var player = this.getPlayer(uid);
 		if(!player){
-			player = new Player(uid);
-			this._playerMap[GameConst._bornMap].push(player);
+			player = new Player(uid,type);
+            var pos = this.getStandLocation(GameConst._bornMap,GameConst._bornX,GameConst._bornY);
+            player._data.x = pos.x;
+            player._data.y = pos.y;
+            player._data.name = name;
+            player._data.sex = sex;
+			this._roleMap[GameConst._bornMap].push(player);
 		}
+        JsUtil.send("svEnter",JSON.stringify(player._data),[uid]);
     },
 
 
 	//根据uid返回玩家数据，mapName地图名字，可选，加速查找。
 	getPlayer:function(uid,mapName){
         if(mapName){
-            var array = this._playerMap[mapName];
-            for(var i=0;i<array.length;++i)if(array[i]._data.uid==uid)return array[i];
+            var array = this._roleMap[mapName];
+            for(var i=0;i<array.length;++i)if(array[i]._data.id==uid)return array[i];
         }else{
-            for(var key in this._playerMap){
-                var array = this._playerMap[key];
-                for(var i=0;i<array.length;++i)if(array[i]._data.uid==uid)return array[i];
+            for(var key in this._roleMap){
+                var array = this._roleMap[key];
+                for(var i=0;i<array.length;++i)if(array[i]._data.id==uid)return array[i];
             }
         }
 		return null;
@@ -76,7 +96,8 @@ module.exports = {
                     var count = this.getCountWithType(map.name,array[i][0]);
                     var maxCount = array[i][4];
                     for(var j=count;j<maxCount;++j){
-                        var player = new Player(array[i][0]);
+                        var player = new Player('m'+(++this._baseMonsterId),array[i][0]);
+                        player.mid = array[i][0];
                         var x= 0,y=0;
                         if(array[i][1]==-1 && array[i][2]==-1){
                             x = Math.floor(Math.random()*map.mapX);
@@ -88,8 +109,7 @@ module.exports = {
                         var position = this.getStandLocation(map.name,x,y);
                         player._data.x = position.x;
                         player._data.y = position.y;
-                        player._data._type = array[i][0];
-                        this._playerMap[map.name].push(player);
+                        this._roleMap[map.name].push(player);
                     }
                 }
             }
@@ -100,7 +120,7 @@ module.exports = {
     //获得某个地图上，某个怪物剩余多少
     getCountWithType:function(mapName,monsterName){
         var count =0;
-        var array = this._playerMap[mapName];
+        var array = this._roleMap[mapName];
         for(var i=0;i<array.length;++i){
             if(array[i]._data._type==monsterName)++count;
         }

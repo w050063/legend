@@ -20,6 +20,7 @@ cc.Class({
 
     // use this for initialization
     onLoad: function () {
+        if(!cc.vv)cc.vv = {};
 
         //初始化按钮对象
         this._buttonFighter = this.node.getChildByName("buttonFighter");
@@ -33,8 +34,19 @@ cc.Class({
 
 
 		this.m_labelSessionId.string=BSocket._sessionId;
-        BSocket.setRecv(function(data) {
+
+
+        pomelo.on('onChat',function(data) {
             cc.log(JSON.stringify(data));
+        });
+        pomelo.on('svEnter',function(data) {
+            var msg = JSON.parse(data.msg);
+            cc.log(JSON.stringify(msg));
+            UserInfo._id = msg.id;
+            UserInfo._name = msg.name;
+            UserInfo._x = msg.x;
+            UserInfo._y = msg.y;
+            cc.director.loadScene("GameLayer");
         });
     },
     
@@ -48,7 +60,7 @@ cc.Class({
         //必须超过4个字符判断
         if(this.m_editBoxName.string.length>=4){
             UserInfo._name = this.m_editBoxName.string;
-            cc.director.loadScene("GameLayer");
+            pomelo.request("work.WorkHandler.enter", {name:UserInfo._name,type:UserInfo._hero,sex:UserInfo._sex}, function(data) {});
         }else{
             //文字提示
             var node = new cc.Node();

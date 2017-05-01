@@ -1,6 +1,8 @@
 
 var JsUtil = require('../../../game/util/JsUtil');
-var cc = require("../../..//game/util/cc");
+var cc = require("../../../game/util/cc");
+var GameConst = require("../../../game/util/GameConst");
+var BattleLogic = require("../../../game/BattleLogic");
 
 module.exports = function(app) {
     return new Handler(app);
@@ -9,6 +11,9 @@ module.exports = function(app) {
 var Handler = cc.Class.extend({
     ctor:function (app) {
         this.app = app;
+        GameConst.workHandlerApp = app;
+        this.abc = Math.random();
+        console.log("wwwwwwwwww");
     },
 
 
@@ -21,13 +26,14 @@ var Handler = cc.Class.extend({
      *
      */
     send : function(msg, session, next) {
+        console.log("abbbbbbbvvv:"+this.abc);
         var channelService = this.app.get('channelService');
         var param = {
             msg: msg.content,
             from: session.get("uid"),
             target: msg.target
         };
-        channel = channelService.getChannel(JsUtil.dataChannel, true);
+        var channel = channelService.getChannel(JsUtil.dataChannel, true);
 
         //the target is all users
         if(msg.target == '*') {
@@ -42,6 +48,13 @@ var Handler = cc.Class.extend({
                 sid: tsid
             }]);
         }
+        next(null, {});
+    },
+
+
+    //Ω¯»Î”Œœ∑
+    enter:function(msg, session, next) {
+        BattleLogic.addPlayer(session.uid,msg.name,msg.type,msg.sex);
         next(null, {});
     },
 });
