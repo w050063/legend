@@ -4,6 +4,15 @@
  */
 module.exports = {
 
+
+    //阵营类型
+    campMonster:0,
+    campLiuxing:1,
+    campHudie:2,
+
+
+
+
     //显示的数据方便策划，init做转换。
     init:function(){
         for(var key in this._mapArray){
@@ -39,7 +48,7 @@ module.exports = {
             mapX: 50,
             mapY: 50,
             collision: "6,5;7,5;8,5;9,5",
-            refresh: [["redEvilBoar", -1, -1, 10, 10], ["DarkLord", 15, 12, 300, 10], ["leftProtector", 13, 12, 60, 10], ["rightProtector", 17, 12, 60, 10]]
+            refresh: [["redEvilBoar", -1, -1, 10, 1], ["DarkLord", 15, 12, 300, 1], ["leftProtector", 13, 12, 60, 1], ["rightProtector", 17, 12, 60, 1]]
         },
         zuma: {
             name: "zuma",

@@ -1,5 +1,7 @@
+/*
+ * ..
+ */
 var JsUtil = require('../../../game/util/JsUtil');
-var BattleLogic = require("../../../game/BattleLogic");
 
 
 module.exports = function(app) {

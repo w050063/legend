@@ -1,8 +1,10 @@
-
-var JsUtil = require('../../../game/util/JsUtil');
+/*
+ * ..
+ */
 var cc = require("../../../game/util/cc");
-var GameConst = require("../../../game/util/GameConst");
-var BattleLogic = require("../../../game/BattleLogic");
+var JsUtil = require('../../../game/util/JsUtil');
+var SVGameLayer = require("../../../game/SVGameLayer");
+
 
 module.exports = function(app) {
     return new Handler(app);
@@ -11,9 +13,6 @@ module.exports = function(app) {
 var Handler = cc.Class.extend({
     ctor:function (app) {
         this.app = app;
-        GameConst.workHandlerApp = app;
-        this.abc = Math.random();
-        console.log("wwwwwwwwww");
     },
 
 
@@ -26,7 +25,6 @@ var Handler = cc.Class.extend({
      *
      */
     send : function(msg, session, next) {
-        console.log("abbbbbbbvvv:"+this.abc);
         var channelService = this.app.get('channelService');
         var param = {
             msg: msg.content,
@@ -52,9 +50,17 @@ var Handler = cc.Class.extend({
     },
 
 
-    //进入游戏
+    //杩涘叆娓告垙
     enter:function(msg, session, next) {
-        BattleLogic.addPlayer(session.uid,msg.name,msg.type,msg.sex);
+        SVGameLayer.addPlayer(session.uid,msg.name,msg.type,msg.sex);
+        next(null, {});
+    },
+
+
+
+    //绉诲姩
+    walk:function(msg, session, next) {
+        SVGameLayer.getPlayer(session.uid).walk(msg.x,msg.y);
         next(null, {});
     },
 });
