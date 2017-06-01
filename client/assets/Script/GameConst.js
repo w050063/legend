@@ -6,8 +6,13 @@ module.exports= {
     stateDead : 4,
 
 
+    campMonster:0,
+    campLiuxing:1,
+    campHudie:2,
 
-    //µØÍ¼ÏêÏ¸ĞÅÏ¢,refresh¹ÖÎïÏà¹ØË¢ĞÂ£¬×ø±ê-1±íÊ¾È«µØÍ¼Ëæ»úË¢--hero type,x,y,aliquot time,max count.
+
+
+    //åœ°å›¾è¯¦ç»†ä¿¡æ¯,refreshæ€ªç‰©ç›¸å…³åˆ·æ–°ï¼Œåæ ‡-1è¡¨ç¤ºå…¨åœ°å›¾éšæœºåˆ·--hero type,x,y,aliquot time,max count.
     _mapArray: {
         mafa: {
             name: "mafa",

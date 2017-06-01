@@ -49,6 +49,8 @@ cc.Class({
             UserInfo._data = msg;
             cc.director.loadScene("GameLayer");
         });
+
+
     },
     
     buttonSend: function () {

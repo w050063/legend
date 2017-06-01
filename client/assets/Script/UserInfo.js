@@ -101,37 +101,5 @@ module.exports={
 		return location;
 	},
 	
-	
-	//get true vector for player.
-	getOffsetWithColloison:function(role,offset){
-		var points=[cc.p(1,0),cc.p(1,1),cc.p(0,1),cc.p(-1,1),cc.p(-1,0),cc.p(-1,-1),cc.p(0,-1),cc.p(1,-1)];
-		var index = 0;
-		for(var i=1;i<9;++i){
-			if(LuaUtils.pEqual(points[i],offset)){
-				index=i;
-				break;
-			}
-		}
-		var bCollision=true;
-		var randNum=math.random()>0.5 ? 1:-1;
 
-		for(var i=1;i<9;++i){
-			if(this.isCollision(cc.pAdd(role._location,points[index]))==false){
-				if(role._camp!=ECamp.monster){
-					bCollision=false;
-					break;
-				}
-				else if(LocalServer.roleInLocation(cc.pAdd(role._location,points[index]))==null){
-					bCollision=false;
-					break;
-				}
-			}
-			index+=i*randNum;
-			randNum=-randNum;
-			if(index>8)index = index-8;
-			else if(index<1)index = index+8;
-		}
-		if(bCollision)return null;
-		return points[index];
-	}
 };
