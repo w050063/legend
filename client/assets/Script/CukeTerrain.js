@@ -24,10 +24,11 @@ cc.Class({
 
     //加载完成
     loadOver:function(){
-        if(this._dataArray.length<5)return;
+        if(this._dataArray.length<6)return;
         this._dataArray.sort(function(a,b){return a[0]-b[0];});
         var tile = 32, reTile = 256/tile;
         var data = this._dataArray[4][1],w = this._dataArray[4][2],h = this._dataArray[4][3];
+        var deepData = this._dataArray[5][1];
         var newData = new Uint8ClampedArray(data.length*tile*tile);
 
 
@@ -42,6 +43,8 @@ cc.Class({
                 var tempUp = this._dataArray[this.getDataNum(cijIndex+cw4)][1];
                 var tempLeft = this._dataArray[this.getDataNum(cijIndex-4)][1];
                 var tempRight = this._dataArray[this.getDataNum(cijIndex+4)][1];
+                var deepRate = (this._dataArray[5][1][cijIndex]+0)/255+0.5;
+                deepRate = deepRate*deepRate*deepRate;
 
 
                 //处理每个小格子
@@ -66,6 +69,12 @@ cc.Class({
                             var rate1 = 1.5-cnDivTile, rate2 = cnDivTile-0.5;
                             this.setDataColor(newData,temp,tempRight,index,index2,rate1,rate2);
                         }
+                        newData[index] = newData[index]*deepRate;
+                        if(newData[index]>255)newData[index]=255;
+                        newData[index+1] = newData[index+1]*deepRate;
+                        if(newData[index+1]>255)newData[index+1]=255;
+                        newData[index+2] = newData[index+2]*deepRate;
+                        if(newData[index+2]>255)newData[index+2]=255;
                     }
                 }
             }

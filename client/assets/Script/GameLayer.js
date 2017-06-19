@@ -23,7 +23,7 @@ cc.Class({
         this._touchPoint = null;
         this._touchCenter = null;
         this.jockSprite.node.setLocalZOrder(1);
-        this.jockSprite.enabled = false;
+        this.jockSprite.node.active = false;
 
         //cc.audioEngine.playMusic(res.background_mp3, true);
 
@@ -34,8 +34,8 @@ cc.Class({
         this._map = node.addComponent(CukeTerrain);
         this.node.addChild(node);
         this._map.init(["resources/map/terrain0.png","resources/map/terrain1.png",
-            "resources/map/terrain2.png","resources/map/terrain3.png","resources/map/terrain4.png"]);
-
+            "resources/map/terrain2.png","resources/map/terrain3.png","resources/map/terrain4.png","resources/map/terrain5.png"]);
+        node.setScale(0.2);
 
 
 
@@ -47,6 +47,7 @@ cc.Class({
         this._roleMap[this._player._data.id] = this._player;
 
 
+
         //触摸事件
         cc.eventManager.addListener({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
@@ -54,20 +55,20 @@ cc.Class({
                 var size = cc.director.getWinSize();
                 this._touchCenter = null;
                 this._touchPoint = touch.getLocation();
-                this.jockSprite.enabled = false;
+                this.jockSprite.node.active = false;
                 return true;
             }.bind(this),
             onTouchMoved: function (touch, event) {
                 var size = cc.director.getWinSize();
                 this._touchCenter = touch.getStartLocation();
                 this._touchPoint = touch.getLocation();
-                this.jockSprite.enabled = true;
+                this.jockSprite.node.active = true;
                 this.jockSprite.node.setPosition(cc.pSub(this._touchCenter,cc.p(size.width/2,size.height/2)));
             }.bind(this),
             onTouchEnded: function (touch, event) {
                 this._touchCenter = null;
                 this._touchPoint = null;
-                this.jockSprite.enabled = false;
+                this.jockSprite.node.active = false;
             }.bind(this),
             swallowTouches: true
         }, this.node);
@@ -77,6 +78,7 @@ cc.Class({
         BSocket.doSVRole();
         BSocket.doSVWalk();
     },
+
 
     // called every frame
     update: function (dt) {

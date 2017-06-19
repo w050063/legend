@@ -3,7 +3,6 @@
  * 游戏角色类
  */
 var UserInfo = require("UserInfo");
-var CukeSpine = require("CukeSpine");
 var GameConst = require("GameConst");
 
 
@@ -18,10 +17,15 @@ cc.Class({
         this._state = GameConst.stateIdle;
 
         //创建模型
-        this._spine = this.addComponent(CukeSpine);
-        this._spine.init("spine/spineboy");
-        this._spine.setAnimation(0,"walk",true);
-        this._spine.setMixEx('walk','run',0.2);
+
+        var func = function(){
+            ww.cukeAniCache.getEffect(this.node,"ani/hum17/040116",6,1,0.1);
+            ww.cukeAniCache.getEffect(this.node,"ani/hum16/033116",6,3,0.1);
+            ww.cukeAniCache.getEffect(this.node,"ani/effect2/503048",8,4,0.1);
+        }.bind(this);
+        ww.cukeAniCache.getNode(this.node,"ani/hum3/010116",6,2,0.1,func);
+        func();
+
 
         this.setLocation(this._data.x,this._data.y);
     },
