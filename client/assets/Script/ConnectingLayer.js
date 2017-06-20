@@ -21,7 +21,7 @@ cc.Class({
         for(var i=1;i<=17;++i)array.push("ani/hum"+i);
         for(var i=1;i<=4;++i)array.push("ani/effect"+i);
         cc.loader.loadResArray(array, cc.SpriteAtlas, function (err, atlas) {
-            GameConst.change();
+            GameConst.init();
             BSocket.setup();
         }.bind(this));
     },

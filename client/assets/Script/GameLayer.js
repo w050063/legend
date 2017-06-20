@@ -35,7 +35,7 @@ cc.Class({
         this.node.addChild(node);
         this._map.init(["resources/map/terrain0.png","resources/map/terrain1.png",
             "resources/map/terrain2.png","resources/map/terrain3.png","resources/map/terrain4.png","resources/map/terrain5.png"]);
-        node.setScale(0.2);
+        //node.setScale(0.2);
 
 
 
@@ -115,10 +115,7 @@ cc.Class({
 
         //更新位置
         if(this._player){
-            var mapData = GameConst._mapArray[UserInfo._map];
-            var x = -this._player.node.x;
-            var y = -this._player.node.y;
-            this._map.node.setPosition(x,y);
+            this._map.node.setPosition(-this._player.node.x,-this._player.node.y);
         }
     },
 
@@ -137,10 +134,10 @@ cc.Class({
     },
 
 
+
     //碰撞检测
-    isCollision:function(x,y){
-        var mapName = UserInfo._map;
-        var obj = GameConst._mapArray[mapName];
+    isCollision:function(mapId,x,y){
+        var obj = GameConst._terrainMap[mapId];
         if(x<0 || x>obj.mapX || y<0 || y>obj.mapY)return true;
         for(var i=0;i<obj.collision.length;++i){
             if(obj.collision[i][0]==x && obj.collision[i][1]==y)return true;
@@ -149,41 +146,50 @@ cc.Class({
     },
 
 
-
-    //正确的方向是否可以走，不能走，其他方向用权重计算。
+    //根据碰撞检测得到正确的方向
     getOffsetWithColloison:function(role,offset){
         if(offset.x==0 && offset.y==0)return null;
-        if(cc.vv._gameLayer.isCollision(role._data.x+offset.x,role._data.y+offset.y)==false)return offset;
+        if(cc.vv._gameLayer.isCollision(role._data.mapId,role._data.x+offset.x,role._data.y+offset.y)==false)return offset;
+        var pointStringArray=['0,1','1,1','1,0','1,-1','0,-1','-1,-1','-1,0','-1,1'];//可走方向
+        var pointArray=[cc.p(0,1),cc.p(1,1),cc.p(1,0),cc.p(1,-1),cc.p(0,-1),cc.p(-1,-1),cc.p(-1,0),cc.p(-1,1)];//可走方向
+        var index = pointStringArray.indexOf(''+offset.x+','+offset.y);
 
 
-        //不能直接走，列出所有方向和权重比例，采用权重走路。
-        var points=[cc.p(1,0),cc.p(1,1),cc.p(0,1),cc.p(-1,1),cc.p(-1,0),cc.p(-1,-1),cc.p(0,-1),cc.p(1,-1)];//可走方向
-        var percent = (role._camp==GameConst.campMonster)?[16,4,1,1]:[100000000,10000,1,1];//权重比例
-        var index = 0;
-        for(var i=0;i<8;++i){
-            if(cc.pointEqualToPoint(points[i],offset)){index=i;break;}
-        }
-        var randNum=Math.random();
-        var weight=[];
-        var max = 0;
-        for(var i=0;i<8;++i){
-            if(cc.vv._gameLayer.isCollision(role._data.x+points[i].x,role._data.y+points[i].y)==false){
-                var dis = Math.abs(index-i);
-                if(dis>4)dis = 8-dis;
-                dis = percent[dis-1];
-                weight.push(dis);
-                max += dis;
-            }else{
-                weight.push(0);
+        if(role._camp==GameConst.campMonster){//怪物
+            var percent = (role._camp==GameConst.campMonster)?[16,4,1,1]:[100000000,10000,1,1];//权重比例
+            var weight=[];
+            var max = 0;
+            for(var i=0;i<8;++i){
+                if(this.isCollision(role._data.mapId,role._data.x+pointArray[i].x,role._data.y+pointArray[i].y) || this._roleXYMap[role.getMapXYString()]){
+                    weight.push(0);
+                }else{
+                    var dis = Math.abs(index-i);
+                    if(dis>4)dis = 8-dis;
+                    dis = percent[dis-1];
+                    weight.push(dis);
+                    max += dis;
+                }
             }
-        }
 
-
-        //遍历权重，计算返回哪一个方向
-        var curWeight = 0;
-        for(var i=0;i<8;++i){
-            curWeight += weight[i];
-            if(randNum<(curWeight/max))return points[i];
+            //遍历权重，计算返回哪一个方向
+            var curWeight = 0;
+            var randNum=Math.random()*max;
+            for(var i=0;i<8;++i){
+                curWeight += weight[i];
+                if(randNum<curWeight)return pointArray[i];
+            }
+        }else{//英雄
+            var randNum=Math.random()<0.5 ? -1:1;
+            for(var i=0;i<8;++i){
+                if(this.isCollision(role._data.mapId,role._data.x+pointArray[index].x,role._data.y+pointArray[index].y)){
+                    index+=(i+1)*randNum;
+                    randNum=-randNum;
+                    if(index>7)index -= 8;
+                    else if(index<0)index += 8;
+                }else{
+                    return pointArray[index];
+                }
+            }
         }
 
         return null;

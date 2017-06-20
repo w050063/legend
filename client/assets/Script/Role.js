@@ -21,7 +21,7 @@ cc.Class({
         var func = function(){
             ww.cukeAniCache.getEffect(this.node,"ani/hum17/040116",6,1,0.1);
             ww.cukeAniCache.getEffect(this.node,"ani/hum16/033116",6,3,0.1);
-            ww.cukeAniCache.getEffect(this.node,"ani/effect2/503048",8,4,0.1);
+            //ww.cukeAniCache.getEffect(this.node,"ani/effect2/503048",8,4,0.1);
         }.bind(this);
         ww.cukeAniCache.getNode(this.node,"ani/hum3/010116",6,2,0.1,func);
         func();
@@ -38,7 +38,7 @@ cc.Class({
             this._data.y = y;
         }
 
-        var mapData = GameConst._mapArray[UserInfo._map];
+        var mapData = GameConst._terrainMap[this._data.mapId];
         var x = this._data.x-mapData.mapX/2;
         var y = this._data.y-mapData.mapY/2;
         this.node.setPosition(x*mapData.tileX,y*mapData.tileY);
@@ -59,7 +59,7 @@ cc.Class({
         this._data.y += offset.y;
 
 
-        var mapData = GameConst._mapArray[UserInfo._map];
+        var mapData = GameConst._terrainMap[this._data.mapId];
         var x = this._data.x - mapData.mapX / 2;
         var y = this._data.y - mapData.mapY / 2;
         this.node.runAction(cc.sequence(cc.moveTo(0.6, cc.p(x * mapData.tileX, y * mapData.tileY)),cc.callFunc(function(){
@@ -71,5 +71,10 @@ cc.Class({
         if (this == cc.vv._gameLayer._player) {
             pomelo.request("work.WorkHandler.walk", {x: offset.x, y: offset.y}, function (data) {});
         }
-    }
+    },
+
+
+    getMapXYString:function(){
+        return ''+this._data.map+','+this._data.x+','+this._data.y;
+    },
 });

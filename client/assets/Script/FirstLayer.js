@@ -47,6 +47,8 @@ cc.Class({
             UserInfo._x = msg.x;
             UserInfo._y = msg.y;
             UserInfo._data = msg;
+            pomelo.on('onChat',null);
+            pomelo.on('svEnter',null);
             cc.director.loadScene("GameLayer");
         });
     },

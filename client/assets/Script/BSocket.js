@@ -47,7 +47,7 @@ module.exports={
             cc.log(obj);
 
             if(cc.vv._gameLayer){
-                cc.vv._gameLayer.getRole(obj.id,UserInfo._map).walk(cc.p(obj.x,obj.y));
+                cc.vv._gameLayer.getRole(obj.id).walk(cc.p(obj.x,obj.y));
             }else{
                 this._dataArray.push({key:"svWalk",value:obj});
             }
