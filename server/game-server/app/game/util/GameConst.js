@@ -15,8 +15,8 @@ module.exports = {
 
     //显示的数据方便策划，init做转换。
     init:function(){
-        for(var key in this._mapArray){
-            var map = this._mapArray[key];
+        for(var key in this._terrainMap){
+            var map = this._terrainMap[key];
             var array = map.collision.split(";");
             map.collision = [];
             for(var i=0;i<array.length;++i){
@@ -33,24 +33,33 @@ module.exports = {
 
 
     //出生相关,_bornR怪物和角色通用
-    _bornMap:"mafa",
+    _bornMap:"t0",
     _bornX:1,
     _bornY:1,
     _bornR:4,
 
 
+
     //地图详细信息,refresh怪物相关刷新，坐标-1表示全地图随机刷--hero type,x,y,aliquot time,max count.
-    _mapArray: {
-        mafa: {
+    _terrainMap: {
+        t0:{
+            id : "t0",
             name: "mafa",
-            tileX: 60,
+            tileX: 80,
             tileY: 60,
-            mapX: 50,
-            mapY: 50,
-            collision: "6,5;7,5;8,5;9,5",
-            refresh: [["redEvilBoar", -1, -1, 10, 1], ["DarkLord", 15, 12, 300, 1], ["leftProtector", 13, 12, 60, 1], ["rightProtector", 17, 12, 60, 1]]
+            mapX: 102,
+            mapY: 136,
+            collision: "9,12;9,13;9,14;9,15;9,16;9,17;9,18;9,19;9,20;" +
+            "10,12;10,13;10,14;10,15;10,16;10,17;10,18;10,19;10,20;" +
+            "11,12;11,13;11,14;11,15;11,16;11,17;11,18;11,19;11,20;" +
+            "12,12;12,13;12,14;12,15;12,16;12,17;12,18;12,19;12,20;" +
+            "13,12;13,13;13,14;13,15;13,16;13,17;13,18;13,19;13,20;" +
+            "14,12;14,13;14,14;14,15;14,16;14,17;14,18;14,19;14,20;" +
+            "15,12;15,13;15,14;15,15;15,16;15,17;15,18;15,19;15,20",
+            refresh: [["redEvilBoar", -1, -1, 10, 10], ["DarkLord", 15, 12, 300, 10], ["leftProtector", 13, 12, 60, 10], ["rightProtector", 17, 12, 60, 10]]
         },
-        zuma: {
+        t1:{
+            id : "t1",
             name: "zuma",
             tileX: 60,
             tileY: 60,
@@ -59,7 +68,8 @@ module.exports = {
             collision: "6,5;7,5;8,5;9,5",
             refresh: [["redEvilBoar", -1, -1, 60, 10], ["DarkLord", 15, 12, 300, 10], ["leftProtector", 13, 12, 60, 10], ["rightProtector", 17, 12, 60, 10]]
         },
-        tiankong: {
+        t2:{
+            id : "t2",
             name: "tiankong",
             tileX: 60,
             tileY: 60,
@@ -67,8 +77,8 @@ module.exports = {
             mapY: 50,
             collision: "6,5;7,5;8,5;9,5",
             refresh: [["redEvilBoar", -1, -1, 60, 10], ["DarkLord", 15, 12, 300, 10], ["leftProtector", 13, 12, 60, 10], ["rightProtector", 17, 12, 60, 10]]
-        }
-    },
+        }},
+
 
 
     _roleMst: {

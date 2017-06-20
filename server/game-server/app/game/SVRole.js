@@ -10,20 +10,8 @@ var JsUtil = require('./util/JsUtil');
 module.exports = cc.Class.extend({
     _data:null,
     _mst:null,
-    ctor:function (id,type) {
+    ctor:function () {
 
-        //为什么这么设计，因为这些数据要经常发送客户端
-        this._data = {};
-        this._data.id = id;
-        this._data.type = type;
-        this._data.camp = 0;
-        this._data.x = 0;
-        this._data.y = 0;
-
-
-        //if(id[0]=='u'){//玩家
-        //}else{//怪物
-        //}
     },
 
 
@@ -44,15 +32,30 @@ module.exports = cc.Class.extend({
 
 
     walk:function(x,y){
+        var oldStr = this.getMapXYString();
         this._data.x = x;
         this._data.y = y;
+        var newStr = this.getMapXYString();
 
-        //走路。
-        var array = cc.svGameLayer._roleMap[this.getMapName()];
-        for(var i=0;i<array.length;++i){
-            if(array[i]._data.camp!=GameConst.campMonster && array[i]._data.id!=this._data.id){
-                JsUtil.send("svWalk",JSON.stringify({id:this._data.id,x:this._data.x,y:this._data.y}),[array[i]._data.id]);
+
+        //更新xy数组信息
+        cc.svGameLayer._roleXYMap[oldStr].splice(cc.svGameLayer._roleXYMap[oldStr].indexOf(oldStr),1);
+        if(!cc.svGameLayer._roleXYMap[newStr])cc.svGameLayer._roleXYMap[newStr] = [];
+        cc.svGameLayer._roleXYMap[newStr].push(this);
+
+
+
+        //通知其他人
+        for(var key in cc.svGameLayer._roleMap){
+            var data = cc.svGameLayer._roleMap[key]._data;
+            if(data.mapId==this._data.mapId && data.camp!=GameConst.campMonster && data.id!=this._data.id){
+                JsUtil.send("svWalk",JSON.stringify({id:this._data.id,x:this._data.x,y:this._data.y}),[data.id]);
             }
         }
-    }
+    },
+
+
+    getMapXYString:function(){
+        return ''+this._data.mapId+','+this._data.x+','+this._data.y;
+    },
 });
