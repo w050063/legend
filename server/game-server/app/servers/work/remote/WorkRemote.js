@@ -1,7 +1,7 @@
-/*
- * ..
+/**
+ * Created by bot.su on 2017/6/21.
+ * 接收其他服务器的通知
  */
-var JsUtil = require('../../../game/util/JsUtil');
 
 
 module.exports = function(app) {
@@ -23,7 +23,16 @@ var WorkRemote = function(app) {
  *
  */
 WorkRemote.prototype.add = function(uid, sid, cb) {
-	var channel = this.channelService.getChannel(JsUtil.dataChannel, true);
+    if(!global.ag){
+        global.ag = {};
+        ag.class = require("../../../game/util/cc").Class;
+        ag.jsUtil = require('../../../game/util/JsUtil');
+        ag.gameConst = require('../../../game/util/GameConst');
+        ag.gameConst.init();
+        ag.gameLayer = require("../../../game/GameLayer");
+        ag.gameLayer.init();
+    }
+	var channel = this.channelService.getChannel(ag.jsUtil.dataChannel, true);
 	var param = {
 		route: 'onAdd',
 		user: uid
@@ -47,7 +56,7 @@ WorkRemote.prototype.add = function(uid, sid, cb) {
  */
 
 WorkRemote.prototype.get = function() {
-	return this.channelService.getChannel(JsUtil.dataChannel, true).getMembers();
+	return this.channelService.getChannel(ag.jsUtil.dataChannel, true).getMembers();
 };
 
 /**
@@ -59,7 +68,7 @@ WorkRemote.prototype.get = function() {
  *
  */
 WorkRemote.prototype.kick = function(uid, sid, cb) {
-	var channel = this.channelService.getChannel(JsUtil.dataChannel, true);
+	var channel = this.channelService.getChannel(ag.jsUtil.dataChannel, true);
 	// leave channel
 	if( !! channel) {
 		channel.leave(uid, sid);

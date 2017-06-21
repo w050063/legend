@@ -1,3 +1,9 @@
+/**
+ * Created by bot.su on 2017/6/21.
+ * å’Œå®¢æˆ·ç«¯é“¾æŽ¥ç±»
+ */
+
+
 var cc = require("../../..//game/util/cc");
 
 module.exports = function(app) {
@@ -11,7 +17,7 @@ var Handler = cc.Class.extend({
     },
 
 
-    //Á´½Ó½øÀ´
+    //ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½
     connect : function(msg, session, next) {
         var self = this;
         var uid = msg.uid

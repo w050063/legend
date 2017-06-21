@@ -1,3 +1,9 @@
+/**
+ * Created by bot.su on 2017/6/21.
+ * 网关
+ */
+
+
 var cc = require("../../..//game/util/cc");
 
 module.exports = function(app) {

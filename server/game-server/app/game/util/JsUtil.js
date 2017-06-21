@@ -1,13 +1,16 @@
-//¹¤¾ß·½·¨´ó¼¯ºÏ
+/**
+ * Created by bot.su on 2017/6/21.
+ * å¸¸ç”¨å·¥å…·
+ */
+
+
 var pomelo = require('pomelo');
-
-
 module.exports = {
     dataChannel:"dataChannel",
     send : function(route,msg,uids){
 
 
-        //·¢ËÍĞÅÏ¢
+        //å‘é€ä¿¡æ¯
         //var channelService = pomelo.app.get('channelService');
         //var channel = channelService.getChannel(JsUtil.dataChannel, true);
         //var param = {msg: "cvb",from: "",target: ""};
@@ -27,7 +30,7 @@ module.exports = {
         //channelService.pushMessageByUids('onChat', param, sendArray);
 
 
-        //·¢ËÍĞÅÏ¢
+        //å‘é€ä¿¡æ¯
         var channelService = pomelo.app.get('channelService');
         var channel = channelService.getChannel(this.dataChannel, true);
         var param = {msg: msg,from: "",target: ""};

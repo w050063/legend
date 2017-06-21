@@ -1,15 +1,12 @@
 /**
- * Created by bot.su on 2017/4/11.
+ * Created by bot.su on 2017/6/21.
+ * 核心战斗逻辑
  */
-var cc = require("./util/cc");
-var JsUtil = require('./util/JsUtil');
-var GameConst = require('./util/GameConst');
-var SVRole = require("./SVRole");
 
-//核心战斗逻辑
+
+var Role = require("./Role");
 module.exports = {
 	_gameTime:-1,//游戏时间
-	_bInit:false,//战斗场景初始化标志
     _baseMonsterId:0,//怪物id递增标志
     _roleMap:null,//根据角色id标识对象
     _roleXYMap:null,//根据地图xy标识对象
@@ -17,7 +14,7 @@ module.exports = {
 	
 	//初始化战斗数据
 	init:function(){
-        cc.svGameLayer = this;
+        ag.gameLayer = this;
         this._roleMap = {};
         this._roleXYMap = {};
 
@@ -36,7 +33,7 @@ module.exports = {
             //        uids.push(array[i]._data.uid);
             //    }
             //}
-            //JsUtil.send("onChat","wwwww",uids);
+            //ag.jsUtil.send("onChat","wwwww",uids);
         }.bind(this),1000);
 	},
 
@@ -49,25 +46,19 @@ module.exports = {
 	
 	//增加一个玩家
     addPlayer:function(uid,name,type,sex){
-		if(!this._bInit){
-			this._bInit = true;
-            GameConst.init();
-			this.init();
-		}
-		
 		var player = this._roleMap[uid];
 		if(!player){
-			player = new SVRole();
+			player = new Role();
             player._data = {};
             player._data.id = uid;
             player._data.type = type;
-            var pos = this.getStandLocation(GameConst._bornMap,GameConst._bornX,GameConst._bornY);
+            var pos = this.getStandLocation(ag.gameConst._bornMap,ag.gameConst._bornX,ag.gameConst._bornY);
             player._data.x = pos.x;
             player._data.y = pos.y;
             player._data.name = name;
             player._data.sex = sex;
-            player._data.camp = GameConst.campLiuxing;
-            player._data.mapId = GameConst._bornMap;
+            player._data.camp = ag.gameConst.campLiuxing;
+            player._data.mapId = ag.gameConst._bornMap;
 			this._roleMap[uid] = player;
             var xyStr = player.getMapXYString();
             if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
@@ -75,7 +66,7 @@ module.exports = {
 		}
 
         //确认进入游戏成功。
-        JsUtil.send("svEnter",JSON.stringify(player._data),[uid]);
+        ag.jsUtil.send("sEnter",JSON.stringify(player._data),[uid]);
 
 
         //返回当前地图非自己的角色。
@@ -86,13 +77,13 @@ module.exports = {
         }
 
         //发送当前场景的数据
-        JsUtil.send("svRole",JSON.stringify(array),[uid]);
+        ag.jsUtil.send("sRole",JSON.stringify(array),[uid]);
 
 
         //通知其他人。
         for(var i=0;i<array.length;++i){
-            if(array[i].camp!=GameConst.campMonster){
-                JsUtil.send("svRole",JSON.stringify([player._data]),[array[i].id]);
+            if(array[i].camp!=ag.gameConst.campMonster){
+                ag.jsUtil.send("sRole",JSON.stringify([player._data]),[array[i].id]);
             }
         }
     },
@@ -101,8 +92,8 @@ module.exports = {
     //怪物刷新函数
     refresh:function(){
         var reply = {};
-        for(var key in GameConst._terrainMap){
-            var map = GameConst._terrainMap[key];
+        for(var key in ag.gameConst._terrainMap){
+            var map = ag.gameConst._terrainMap[key];
             var array = map.refresh;
             reply[key]=[];
             for(var i=0;i<array.length;++i){
@@ -110,7 +101,7 @@ module.exports = {
                     var count = this.getCountWithType(key,array[i][0]);
                     var maxCount = array[i][4];
                     for(var j=count;j<maxCount;++j){
-                        var player = new SVRole();
+                        var player = new Role();
                         player._data = {};
                         player._data.id = 'm'+(++this._baseMonsterId);
                         player._data.type = array[i][0];
@@ -119,13 +110,13 @@ module.exports = {
                             x = Math.floor(Math.random()*map.mapX);
                             y = Math.floor(Math.random()*map.mapY);
                         }else{
-                            x = array[i][1]+Math.floor(Math.random()*(GameConst._bornR*2+1)-GameConst._bornR);
-                            y = array[i][2]+Math.floor(Math.random()*(GameConst._bornR*2+1)-GameConst._bornR);
+                            x = array[i][1]+Math.floor(Math.random()*(ag.gameConst._bornR*2+1)-ag.gameConst._bornR);
+                            y = array[i][2]+Math.floor(Math.random()*(ag.gameConst._bornR*2+1)-ag.gameConst._bornR);
                         }
                         var position = this.getStandLocation(key,x,y);
                         player._data.x = position.x;
                         player._data.y = position.y;
-                        player._data.camp = GameConst.campMonster;
+                        player._data.camp = ag.gameConst.campMonster;
                         player._data.mapId = key;
                         this._roleMap[player._data.id] = player;
                         var xyStr = player.getMapXYString();
@@ -139,8 +130,8 @@ module.exports = {
 
         for(var key in this._roleMap){
             var data = this._roleMap[key]._data;
-            if(reply[data.mapId].length>0 && data.camp!=GameConst.campMonster){
-                JsUtil.send("svRole",JSON.stringify(reply[data.mapId]),[data.id]);
+            if(reply[data.mapId].length>0 && data.camp!=ag.gameConst.campMonster){
+                ag.jsUtil.send("sRole",JSON.stringify(reply[data.mapId]),[data.id]);
             }
         }
     },
@@ -151,7 +142,7 @@ module.exports = {
         var count =0;
         for(var key in this._roleMap){
             var data = this._roleMap[key]._data;
-            if(data.mapId==mapId && data.camp==GameConst.campMonster && data.type==monsterName)++count;
+            if(data.mapId==mapId && data.camp==ag.gameConst.campMonster && data.type==monsterName)++count;
         }
         return count;
     },
@@ -177,7 +168,7 @@ module.exports = {
 
     //碰撞检测
     isCollision:function(mapId,x,y){
-        var obj = GameConst._terrainMap[mapId];
+        var obj = ag.gameConst._terrainMap[mapId];
         if(x<0 || x>obj.mapX || y<0 || y>obj.mapY)return true;
         for(var i=0;i<obj.collision.length;++i){
             if(obj.collision[i][0]==x && obj.collision[i][1]==y)return true;
@@ -189,14 +180,14 @@ module.exports = {
     //根据碰撞检测得到正确的方向
     getOffsetWithColloison:function(role,offset){
         if(offset.x==0 && offset.y==0)return null;
-        if(cc.vv._gameLayer.isCollision(role._data.mapId,role._data.x+offset.x,role._data.y+offset.y)==false)return offset;
+        if(this.isCollision(role._data.mapId,role._data.x+offset.x,role._data.y+offset.y)==false)return offset;
         var pointStringArray=['0,1','1,1','1,0','1,-1','0,-1','-1,-1','-1,0','-1,1'];//可走方向
         var pointArray=[cc.p(0,1),cc.p(1,1),cc.p(1,0),cc.p(1,-1),cc.p(0,-1),cc.p(-1,-1),cc.p(-1,0),cc.p(-1,1)];//可走方向
         var index = pointStringArray.indexOf(''+offset.x+','+offset.y);
 
 
-        if(role._camp==GameConst.campMonster){//怪物
-            var percent = (role._camp==GameConst.campMonster)?[16,4,1,1]:[100000000,10000,1,1];//权重比例
+        if(role._camp==ag.gameConst.campMonster){//怪物
+            var percent = (role._camp==ag.gameConst.campMonster)?[16,4,1,1]:[100000000,10000,1,1];//权重比例
             var weight=[];
             var max = 0;
             for(var i=0;i<8;++i){

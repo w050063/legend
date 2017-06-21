@@ -1,7 +1,9 @@
 /**
- * Created by bot.su on 2017/4/11.
- * 数据常量
+ * Created by bot.su on 2017/6/21.
+ * 游戏常量相关
  */
+
+
 module.exports = {
 
 
