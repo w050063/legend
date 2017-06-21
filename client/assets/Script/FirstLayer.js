@@ -1,5 +1,9 @@
-var UserInfo = require("UserInfo");
-var BSocket = require("BSocket");
+/**
+ * Created by bot.su on 2017/6/21.
+ * 选人界面
+ */
+
+
 cc.Class({
     extends: cc.Component,
 
@@ -30,31 +34,15 @@ cc.Class({
         this._buttonGirl = this.node.getChildByName("buttonGirl");
         this._buttonFighter.color = cc.color(0,0,255,255);
         this._buttonBoy.color = cc.color(0,0,255,255);
+		this.m_labelSessionId.string=ag.agSocket._sessionId;
 
 
-
-		this.m_labelSessionId.string=BSocket._sessionId;
-
-
-        pomelo.on('onChat',function(data) {
-            cc.log(JSON.stringify(data));
-        });
-        pomelo.on('svEnter',function(data) {
-            var msg = JSON.parse(data.msg);
-            cc.log(JSON.stringify(msg));
-            UserInfo._id = msg.id;
-            UserInfo._name = msg.name;
-            UserInfo._x = msg.x;
-            UserInfo._y = msg.y;
-            UserInfo._data = msg;
-            pomelo.on('onChat',null);
-            pomelo.on('svEnter',null);
-            cc.director.loadScene("GameLayer");
-        });
+        ag.agSocket.onSChat();
+        ag.agSocket.onSEnter();
     },
     
     buttonSend: function () {
-        BSocket.send("enterGame","www");
+        ag.agSocket.send("chat",{chat:"www"});
     },
 
 
@@ -62,8 +50,8 @@ cc.Class({
     buttonStart: function () {
         //必须超过4个字符判断
         if(this.m_editBoxName.string.length>=4){
-            UserInfo._name = this.m_editBoxName.string;
-            pomelo.request("work.WorkHandler.enter", {name:UserInfo._name,type:UserInfo._hero,sex:UserInfo._sex}, function(data) {});
+            ag.userInfo._name = this.m_editBoxName.string;
+            ag.agSocket.send("enter",{name:ag.userInfo._name,type:ag.userInfo._hero,sex:ag.userInfo._sex});
         }else{
             //文字提示
             var node = new cc.Node();
@@ -77,30 +65,30 @@ cc.Class({
         }
     },
     buttonFighter: function(){
-        UserInfo._hero = "fighter";
+        ag.userInfo._hero = "fighter";
         this._buttonFighter.color = cc.color(0,0,255,255);
         this._buttonArchmage.color = cc.color(255,255,255,255);
         this._buttonTaoist.color = cc.color(255,255,255,255);
     },
     buttonArchmage: function(){
-        UserInfo._hero = "archmage";
+        ag.userInfo._hero = "archmage";
         this._buttonFighter.color = cc.color(255,255,255,255);
         this._buttonArchmage.color = cc.color(0,0,255,255);
         this._buttonTaoist.color = cc.color(255,255,255,255);
     },
     buttonTaoist: function(){
-        UserInfo._hero = "taoist";
+        ag.userInfo._hero = "taoist";
         this._buttonFighter.color = cc.color(255,255,255,255);
         this._buttonArchmage.color = cc.color(255,255,255,255);
         this._buttonTaoist.color = cc.color(0,0,255,255);
     },
     buttonBoy: function(){
-        UserInfo._sex = "boy";
+        ag.userInfo._sex = "boy";
         this._buttonBoy.color = cc.color(0,0,255,255);
         this._buttonGirl.color = cc.color(255,255,255,255);
     },
     buttonGirl: function(){
-        UserInfo._sex = "girl";
+        ag.userInfo._sex = "girl";
         this._buttonBoy.color = cc.color(255,255,255,255);
         this._buttonGirl.color = cc.color(0,0,255,255);
     },

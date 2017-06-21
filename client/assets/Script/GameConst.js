@@ -1,6 +1,9 @@
 /**
- * 游戏常量
+ * Created by bot.su on 2017/6/21.
+ * 游戏常量相关
  */
+
+
 module.exports= {
     //显示的数据方便阅读，这里转换成数组。
     init:function(){
@@ -37,7 +40,7 @@ module.exports= {
     stateIdle : 0,
     stateStand : 1,
     stateAttack : 2,
-    stateWalk :3,
+    stateMove :3,
     stateDead : 4,
 
 

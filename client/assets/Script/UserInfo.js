@@ -1,3 +1,9 @@
+/**
+ * Created by bot.su on 2017/6/21.
+ * 当前用户信息实例
+ */
+
+
 module.exports={
     //全局变量相关
     //_gameLayer:null,
