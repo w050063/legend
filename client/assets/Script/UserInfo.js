@@ -17,7 +17,7 @@ module.exports={
 	_name:"红军小战士",
 	_camp:"liuxing",
 	_hero:"fighter",
-	_sex:"boy",
+	_sex:0,
 	_exp:0,
 	_player:null,
 	_tileSize:cc.p(60,60),
@@ -25,6 +25,7 @@ module.exports={
 	_skillLevel:[0,0,0,0],
 	_skillPointCount:1,
 	_bornLocation:cc.p(2,2),
+    _direction:4,
 	
 
 	//get a vector's direction(8,left,right,up,down....).
@@ -108,4 +109,10 @@ module.exports={
 	},
 	
 
+
+    //获得动画标号
+    getClothes:function(data,state,direction){
+        var name,count;
+        return
+    },
 };

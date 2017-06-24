@@ -24,7 +24,6 @@ cc.Class({
 
     // use this for initialization
     onLoad: function () {
-        if(!cc.vv)cc.vv = {};
 
         //初始化按钮对象
         this._buttonFighter = this.node.getChildByName("buttonFighter");
@@ -83,12 +82,12 @@ cc.Class({
         this._buttonTaoist.color = cc.color(0,0,255,255);
     },
     buttonBoy: function(){
-        ag.userInfo._sex = "boy";
+        ag.userInfo._sex = ag.gameConst.sexBoy;
         this._buttonBoy.color = cc.color(0,0,255,255);
         this._buttonGirl.color = cc.color(255,255,255,255);
     },
     buttonGirl: function(){
-        ag.userInfo._sex = "girl";
+        ag.userInfo._sex = ag.gameConst.sexGirl;
         this._buttonBoy.color = cc.color(255,255,255,255);
         this._buttonGirl.color = cc.color(0,0,255,255);
     },

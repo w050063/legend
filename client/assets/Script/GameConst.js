@@ -38,15 +38,25 @@ module.exports= {
         }
     },
     stateIdle : 0,
-    stateStand : 1,
+    stateMove :1,
     stateAttack : 2,
-    stateMove :3,
-    stateDead : 4,
+    stateDead : 3,
 
 
     campMonster:0,
     campLiuxing:1,
     campHudie:2,
+
+
+    //性别
+    sexBoy:0,
+    sexGirl:1,
+
+
+
+    //八个方向顺序
+    directionStringArray:['0,1','1,1','1,0','1,-1','0,-1','-1,-1','-1,0','-1,1'],
+    directionArray:[cc.p(0,1),cc.p(1,1),cc.p(1,0),cc.p(1,-1),cc.p(0,-1),cc.p(-1,-1),cc.p(-1,0),cc.p(-1,1)],
 
 
 
@@ -88,4 +98,24 @@ module.exports= {
             collision: "6,5;7,5;8,5;9,5",
             refresh: [["redEvilBoar", -1, -1, 60, 10], ["DarkLord", 15, 12, 300, 10], ["leftProtector", 13, 12, 60, 10], ["rightProtector", 17, 12, 60, 10]]
         }},
+
+
+
+    _roleMst: {
+        m0:{id:"m0",name:"战士",type:"near2",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds",
+            moveSpeed:0.6,attackSpeed:0.8},
+        m1:{id:"m1",name:"法师",type:"far9",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds",
+            moveSpeed:0.6,attackSpeed:1},
+        m2:{id:"m2",name:"道士",type:"far1",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds",
+            moveSpeed:0.6,attackSpeed:1},
+        m3:{id:"m3",name:"红野猪",type:"near1",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+        m4:{id:"m4",name:"左护法",type:"near1",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+        m5:{id:"m5",name:"右护法",type:"near1",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+        m6:{id:"m6",name:"圣地魔王",type:"near1",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,model:"qtds"},
+    },
+
+
+    _itemMst:{
+
+    },
 };

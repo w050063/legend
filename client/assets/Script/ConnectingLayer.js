@@ -22,12 +22,12 @@ cc.Class({
         ag.gameConst.init();
         ag.agSocket.init();
 
-
         //cuke add for test.
         //var array = [];
         //for(var i=1;i<=17;++i)array.push("ani/hum"+i);
         //for(var i=1;i<=4;++i)array.push("ani/effect"+i);
         //cc.loader.loadResArray(array, cc.SpriteAtlas, function (err, atlas) {
+        //    ag.agSocket.init();
         //}.bind(this));
     },
 

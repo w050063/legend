@@ -8,24 +8,14 @@ var Role = require("Role");
 var AGTerrain = require("AGTerrain");
 cc.Class({
     extends: cc.Component,
+    properties: {},
 
-    properties: {
-        jockSprite: {
-            default: null,
-            type: cc.Sprite
-        },
-    },
 
     // use this for initialization
     onLoad: function () {
         ag.gameLayer = this;
         this._roleMap = {};
         this._player = null;
-        this._map = this.node.getChildByName("map1");
-        this._touchPoint = null;
-        this._touchCenter = null;
-        this.jockSprite.node.setLocalZOrder(1);
-        this.jockSprite.node.active = false;
 
         //cc.audioEngine.playMusic(res.background_mp3, true);
 
@@ -40,7 +30,6 @@ cc.Class({
         //node.setScale(0.2);
 
 
-
         //创建主角
         var node = new cc.Node();
         this._player = node.addComponent(Role);
@@ -50,33 +39,7 @@ cc.Class({
 
 
 
-        //触摸事件
-        cc.eventManager.addListener({
-            event: cc.EventListener.TOUCH_ONE_BY_ONE,
-            onTouchBegan: function (touch, event) {
-                var size = cc.director.getWinSize();
-                this._touchCenter = null;
-                this._touchPoint = touch.getLocation();
-                this.jockSprite.node.active = false;
-                return true;
-            }.bind(this),
-            onTouchMoved: function (touch, event) {
-                var size = cc.director.getWinSize();
-                this._touchCenter = touch.getStartLocation();
-                this._touchPoint = touch.getLocation();
-                this.jockSprite.node.active = true;
-                this.jockSprite.node.setPosition(cc.pSub(this._touchCenter,cc.p(size.width/2,size.height/2)));
-            }.bind(this),
-            onTouchEnded: function (touch, event) {
-                this._touchCenter = null;
-                this._touchPoint = null;
-                this.jockSprite.node.active = false;
-            }.bind(this),
-            swallowTouches: true
-        }, this.node);
-
-
-
+        //设置网络
         ag.agSocket.doSRole();
         ag.agSocket.doSMove();
     },
@@ -84,37 +47,6 @@ cc.Class({
 
     // called every frame
     update: function (dt) {
-        //执行玩家操作
-        if(this._touchPoint){
-            if(this._touchCenter) {
-                var offset = null;
-                var radian = cc.pToAngle(cc.pSub(this._touchPoint, this._touchCenter));
-                if (Math.abs(radian) > Math.PI * 7 / 8)offset = cc.p(-1, 0);
-                else if (radian > Math.PI * 5 / 8)offset = cc.p(-1, 1);
-                else if (radian > Math.PI * 3 / 8)offset = cc.p(0, 1);
-                else if (radian > Math.PI * 1 / 8)offset = cc.p(1, 1);
-                else if (radian > -Math.PI * 1 / 8)offset = cc.p(1, 0);
-                else if (radian > -Math.PI * 3 / 8)offset = cc.p(1, -1);
-                else if (radian > -Math.PI * 5 / 8)offset = cc.p(0, -1);
-                else if (radian > -Math.PI * 7 / 8)offset = cc.p(-1, -1);
-                this._player.move(offset);
-            }else{
-                var size = cc.director.getWinSize();
-                var x = this._touchPoint.x;
-                var y = this._touchPoint.y;
-                var center = 50;
-                var offset = {};
-                if(x<size.width/2-center)offset.x=-1;
-                else if(x>size.width/2+center)offset.x=1;
-                else offset.x=0;
-                if(y<size.height/2-center)offset.y=-1;
-                else if(y>size.height/2+center)offset.y=1;
-                else offset.y=0;
-                this._player.move(offset);
-            }
-        }
-
-
         //更新位置
         if(this._player){
             this._map.node.setPosition(-this._player.node.x,-this._player.node.y);
@@ -122,6 +54,7 @@ cc.Class({
     },
 
 
+    //增加一个角色
     addRole:function(data){
         var node = new cc.Node();
         var role = node.addComponent(Role);

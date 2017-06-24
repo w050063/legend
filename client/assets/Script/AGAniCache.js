@@ -44,7 +44,12 @@ module.exports={
 
     //将一个用完的动画节点放回池中
     put : function(node){
-        if(node && node._cukeName && this._clipPoolArray.length<this._clipPoolMaxCount){
+        if(node && node._cukeName){
+            if(this._clipPoolArray.length>=this._clipPoolMaxCount){
+                //var delNode = this._clipPoolArray[i];
+                //delNode.release();
+                this._clipPoolArray.splice(0,1);
+            }
             //node.retain();
             var ani = node.getComponent(AGAni);
             ani.pause();
