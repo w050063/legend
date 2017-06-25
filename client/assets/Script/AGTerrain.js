@@ -13,7 +13,7 @@ cc.Class({
 
     //初始化地图信息,顺序为rgbap.红绿蓝,透明度,地图分布
     init: function (nameArray) {
-        return;
+        //return;
         this._dataArray = [];
         for(var i=0;i<nameArray.length;++i){
             this.loadImageData(nameArray[i],function(data,w,h){
