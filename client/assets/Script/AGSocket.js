@@ -13,7 +13,7 @@ module.exports={
     init: function() {
         var self = this;
         var tempId = null;
-        pomelo.init({host: "192.168.99.174",port: 3014,log: true}, function() {
+        pomelo.init({host: "127.0.0.1",port: 3014,log: true}, function() {
 			pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
 				pomelo.disconnect();
 				tempId=data.uid;
