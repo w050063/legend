@@ -64,10 +64,16 @@ var Handler = cc.Class.extend({
     },
 
 
-
     //移动
     move:function(msg, session, next) {
         ag.gameLayer.getPlayer(session.uid).move(msg.x,msg.y);
+        next();
+    },
+
+
+    //攻击
+    attack:function(msg, session, next) {
+        ag.gameLayer.getPlayer(session.uid).attack(msg.id);
         next();
     },
 });

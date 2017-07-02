@@ -42,4 +42,14 @@ module.exports = {
         }
         channelService.pushMessageByUids(route,param,infoArray);
     },
+
+
+    //发送给所有人
+    sendAll : function(route,msg){
+        //发送信息
+        var channelService = pomelo.app.get('channelService');
+        var channel = channelService.getChannel(this.dataChannel, true);
+        var param = {msg: msg,from: "",target: ""};
+        channel.pushMessage(route,param);
+    },
 };
