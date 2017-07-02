@@ -59,6 +59,9 @@ module.exports={
             ag.agSocket.offSEnter();
             ag.agSocket.onSRole();
             ag.agSocket.onSMove();
+            ag.agSocket.onSMyMove();
+            ag.agSocket.onSHP();
+            ag.agSocket.onSAttack();
             cc.director.loadScene("GameLayer");
         });
     },
@@ -90,7 +93,7 @@ module.exports={
         pomelo.on('sMove',function(data) {
             var obj = JSON.parse(data.msg);
             if(ag.gameLayer){
-                ag.gameLayer.getRole(obj.id).move(cc.p(obj.x,obj.y));
+                ag.gameLayer.getRole(obj.id).moveByServer(obj.x,obj.y);
             }else{
                 this._dataArray.push({key:"sMove",value:obj});
             }
@@ -98,6 +101,58 @@ module.exports={
     },
     offSMove:function(){
         pomelo.on('sMove',undefined);
+    },
+
+
+
+    //监听角色加载
+    onSMyMove:function(){
+        pomelo.on('sMyMove',function(data) {
+            var obj = JSON.parse(data.msg);
+            if(ag.gameLayer){
+                ag.gameLayer._player.myMoveByServer(obj.x,obj.y);
+            }else{
+                this._dataArray.push({key:"sMyMove",value:obj});
+            }
+        }.bind(this));
+    },
+    offSMyMove:function(){
+        pomelo.on('sMyMove',undefined);
+    },
+
+
+
+    //监听角色加载
+    onSAttack:function(){
+        pomelo.on('sAttack',function(data) {
+            var obj = JSON.parse(data.msg);
+            if(ag.gameLayer){
+                ag.gameLayer.getRole(obj.id).attack(ag.gameLayer.getRole(obj.lockedId),true);
+            }else{
+                this._dataArray.push({key:"sAttack",value:obj});
+            }
+        }.bind(this));
+    },
+    offSAttack:function(){
+        pomelo.on('sAttack',undefined);
+    },
+
+
+    //监听角色加载
+    onSHP:function(){
+        pomelo.on('sHP',function(data) {
+            var array = JSON.parse(data.msg);
+            if(ag.gameLayer){
+                for(var i=0;i<array.length;++i){
+                    ag.gameLayer.getRole(array[i].id).changeHP(array[i].hp);
+                }
+            }else{
+                this._dataArray.push({key:"sHP",value:array});
+            }
+        }.bind(this));
+    },
+    offSHP:function(){
+        pomelo.on('sHP',undefined);
     },
 
 

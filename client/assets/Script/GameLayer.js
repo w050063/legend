@@ -17,7 +17,8 @@ cc.Class({
         this._roleMap = {};
         this._player = null;
 
-        //cc.audioEngine.playMusic(res.background_mp3, true);
+
+        cc.audioEngine.play(cc.url.raw("resources/music/background.mp3"),true,0.1);
 
 
         //测试新地图
@@ -64,6 +65,7 @@ cc.Class({
     },
 
 
+    //根据id获得角色
     getRole:function(id){
         return this._roleMap[id];
     },

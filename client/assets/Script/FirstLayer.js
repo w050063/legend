@@ -64,19 +64,19 @@ cc.Class({
         }
     },
     buttonFighter: function(){
-        ag.userInfo._hero = "fighter";
+        ag.userInfo._hero = "m0";
         this._buttonFighter.color = cc.color(0,0,255,255);
         this._buttonArchmage.color = cc.color(255,255,255,255);
         this._buttonTaoist.color = cc.color(255,255,255,255);
     },
     buttonArchmage: function(){
-        ag.userInfo._hero = "archmage";
+        ag.userInfo._hero = "m1";
         this._buttonFighter.color = cc.color(255,255,255,255);
         this._buttonArchmage.color = cc.color(0,0,255,255);
         this._buttonTaoist.color = cc.color(255,255,255,255);
     },
     buttonTaoist: function(){
-        ag.userInfo._hero = "taoist";
+        ag.userInfo._hero = "m2";
         this._buttonFighter.color = cc.color(255,255,255,255);
         this._buttonArchmage.color = cc.color(255,255,255,255);
         this._buttonTaoist.color = cc.color(0,0,255,255);
