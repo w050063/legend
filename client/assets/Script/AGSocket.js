@@ -10,17 +10,18 @@ module.exports={
     _dataArray:[],
 
     //setup socket.
-    init: function() {
+    init: function(callback) {
         var self = this;
         var tempId = null;
-        pomelo.init({host: "127.0.0.1",port: 3014,log: true}, function() {
+        pomelo.init({host: "47.92.67.211",port: 3014,log: true}, function() {
 			pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
 				pomelo.disconnect();
 				tempId=data.uid;
 				pomelo.init({host: data.host,port: data.port,log: true}, function() {
 					pomelo.request("conn.ConnHandler.connect", {uid:tempId}, function(data) {
+                        cc.log("网关 successed!");
 				        self._sessionId=tempId;
-						cc.log("网关 successed!");
+                        if(callback)callback();
 					});
 				});
 			});
@@ -57,11 +58,7 @@ module.exports={
             ag.userInfo._data = msg;
             ag.agSocket.offSChat();
             ag.agSocket.offSEnter();
-            ag.agSocket.onSRole();
-            ag.agSocket.onSMove();
-            ag.agSocket.onSMyMove();
-            ag.agSocket.onSHP();
-            ag.agSocket.onSAttack();
+            ag.agSocket.onBattleEvent();
             cc.director.loadScene("GameLayer");
         });
     },
@@ -70,113 +67,82 @@ module.exports={
     },
 
 
-    //监听角色加载
-    onSRole:function(){
+    //启动战斗中网络
+    onBattleEvent:function(){
         pomelo.on('sRole',function(data) {
             var array = JSON.parse(data.msg);
-            if(ag.gameLayer){
-                for(var i=0;i<array.length;++i){
-                    ag.gameLayer.addRole(array[i]);
-                }
-            }else{
-                this._dataArray.push({key:"sRole",value:array});
-            }
+            this._dataArray.push({key:"sRole",value:array});
         }.bind(this));
-    },
-    offSRole:function(){
-        pomelo.on('sRole',undefined);
-    },
 
-
-    //监听角色加载
-    onSMove:function(){
         pomelo.on('sMove',function(data) {
             var obj = JSON.parse(data.msg);
-            if(ag.gameLayer){
-                ag.gameLayer.getRole(obj.id).moveByServer(obj.x,obj.y);
-            }else{
-                this._dataArray.push({key:"sMove",value:obj});
-            }
+            this._dataArray.push({key:"sMove",value:obj});
         }.bind(this));
-    },
-    offSMove:function(){
-        pomelo.on('sMove',undefined);
-    },
 
-
-
-    //监听角色加载
-    onSMyMove:function(){
         pomelo.on('sMyMove',function(data) {
             var obj = JSON.parse(data.msg);
-            if(ag.gameLayer){
-                ag.gameLayer._player.myMoveByServer(obj.x,obj.y);
-            }else{
-                this._dataArray.push({key:"sMyMove",value:obj});
-            }
+            this._dataArray.push({key:"sMyMove",value:obj});
         }.bind(this));
-    },
-    offSMyMove:function(){
-        pomelo.on('sMyMove',undefined);
-    },
 
-
-
-    //监听角色加载
-    onSAttack:function(){
         pomelo.on('sAttack',function(data) {
             var obj = JSON.parse(data.msg);
-            if(ag.gameLayer){
-                ag.gameLayer.getRole(obj.id).attack(ag.gameLayer.getRole(obj.lockedId),true);
-            }else{
-                this._dataArray.push({key:"sAttack",value:obj});
-            }
+            this._dataArray.push({key:"sAttack",value:obj});
         }.bind(this));
-    },
-    offSAttack:function(){
-        pomelo.on('sAttack',undefined);
-    },
 
-
-    //监听角色加载
-    onSHP:function(){
         pomelo.on('sHP',function(data) {
             var array = JSON.parse(data.msg);
-            if(ag.gameLayer){
-                for(var i=0;i<array.length;++i){
-                    ag.gameLayer.getRole(array[i].id).changeHP(array[i].hp);
-                }
-            }else{
-                this._dataArray.push({key:"sHP",value:array});
-            }
+            this._dataArray.push({key:"sHP",value:array});
         }.bind(this));
     },
-    offSHP:function(){
+
+
+
+    //停止战斗中网络
+    offBattleEvent:function(){
+        pomelo.on('sRole',undefined);
+        pomelo.on('sMove',undefined);
+        pomelo.on('sMyMove',undefined);
+        pomelo.on('sAttack',undefined);
         pomelo.on('sHP',undefined);
     },
 
 
     //缓存的数据，需要的时候调用。
-    doSRole:function(){
-        for(var i=this._dataArray.length-1;i>=0;--i){
-            var obj = this._dataArray[i];
+    doWork:function(){
+        if(this._dataArray.length==0)return;
+        while(this._dataArray.length>0){
+            var obj = this._dataArray[0];
             if(obj.key=="sRole"){
                 var array = obj.value;
                 for(var j=0;j<array.length;++j){
                     ag.gameLayer.addRole(array[j]);
                 }
-            }
-        }
-    },
-
-
-    doSMove:function(){
-        for(var i=this._dataArray.length-1;i>=0;--i){
-            var obj = this._dataArray[i];
-            if(obj.key=="sMove"){
+            }else if(obj.key=="sMove"){
                 var obj2 = obj.value;
-                ag.gameLayer.getPlayer(obj2.id,ag.userInfo._mapName).move(cc.p(obj2.x,obj2.y));
+                var player =  ag.gameLayer._roleMap[obj2.id];
+                if(player){
+                    player.move(cc.p(obj2.x,obj2.y),true);
+                }
+            }else if(obj.key=="sMyMove"){
+                var obj = obj.value;
+                ag.gameLayer._player.myMoveByServer(obj.x,obj.y);
+            }else if(obj.key=="sAttack"){
+                var obj = obj.value;
+                var player =  ag.gameLayer.getRole(obj.id);
+                var locked =  ag.gameLayer.getRole(obj.lockedId);
+                if(player && locked){
+                    player.attack(locked,true);
+                }
+            }else if(obj.key=="sHP"){
+                var array = obj.value;
+                for(var i=0;i<array.length;++i){
+                    var player =  ag.gameLayer.getRole(array[i].id);
+                    if(player){
+                        player.changeHP(array[i].hp);
+                    }
+                }
             }
+            this._dataArray.splice(0,1);
         }
     },
 };

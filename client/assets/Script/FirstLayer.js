@@ -60,7 +60,10 @@ cc.Class({
             tips.string = "最少4个字符";
             this.node.addChild(node);
             node.runAction(cc.sequence(cc.moveBy(0.5, cc.p(0, 200)), cc.delayTime(0.4),
-                cc.spawn(cc.moveBy(0.4, cc.p(0, 100)), cc.fadeOut(0.4)),cc.removeSelf()));
+                cc.spawn(cc.moveBy(0.4, cc.p(0, 100)), cc.fadeOut(0.4)),cc.callFunc(function () {
+                    node.removeFromParent();
+                    node.destroy();
+                })));
         }
     },
     buttonFighter: function(){

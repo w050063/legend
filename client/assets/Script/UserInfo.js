@@ -16,7 +16,7 @@ module.exports={
 	_level:1,
 	_name:"红军小战士",
 	_camp:"liuxing",
-	_hero:"fighter",
+	_hero:"m0",
 	_sex:0,
 	_exp:0,
 	_player:null,
@@ -94,21 +94,6 @@ module.exports={
 		}
 		return false;
 	},
-	
-	
-	
-	//get an moveable place.let monster born and relife.
-	getStandLocation:function(){
-		var w=MapData[this._map].size.width;
-		var h=MapData[this._map].size.height;
-		var location = cc.p(math.random(1,w),math.random(1,h));
-		while(this.isCollision(location)){
-			location = cc.p(math.random(1,w),math.random(1,h));
-		}
-		return location;
-	},
-	
-
 
     //获得动画标号
     getClothes:function(data,state,direction){

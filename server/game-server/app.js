@@ -12,7 +12,7 @@ app.configure('production|development', 'conn', function(){
 			connector : pomelo.connectors.hybridconnector,
 			heartbeat : 30,
 			useDict : true,
-			useProtobuf : true
+			useProtobuf : true,
 		});
 });
 
@@ -20,7 +20,7 @@ app.configure('production|development', 'gate', function(){
 	app.set('connectorConfig',
 		{
 			connector : pomelo.connectors.hybridconnector,
-			useProtobuf : true
+			useProtobuf : true,
 		});
 });
 
@@ -30,7 +30,7 @@ app.configure('production|development', 'work', function(){
     app.set('connectorConfig',
         {
             connector : pomelo.connectors.hybridconnector,
-            useProtobuf : true
+            useProtobuf : true,
         });
 });
 

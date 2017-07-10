@@ -14,6 +14,11 @@ cc.Class({
     //初始化地图信息,顺序为rgbap.红绿蓝,透明度,地图分布
     init: function (nameArray) {
         return;
+        this._nodeTips = new cc.Node();
+        var tips = this._nodeTips.addComponent(cc.Label);
+        tips.string = "等待10秒,加载地图中";
+        ag.gameLayer.node.addChild(this._nodeTips);
+
         this._dataArray = [];
         for(var i=0;i<nameArray.length;++i){
             this.loadImageData(nameArray[i],function(data,w,h){
@@ -28,6 +33,10 @@ cc.Class({
     //加载完成
     loadOver:function(){
         if(this._dataArray.length<6)return;
+        this._nodeTips.removeFromParent();
+        this._nodeTips.destroy();
+
+
         this._dataArray.sort(function(a,b){return a[0]-b[0];});
         var tile = 32, reTile = 256/tile;
         var data = this._dataArray[4][1],w = this._dataArray[4][2],h = this._dataArray[4][3];

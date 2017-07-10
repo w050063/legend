@@ -66,14 +66,21 @@ var Handler = cc.Class.extend({
 
     //移动
     move:function(msg, session, next) {
-        ag.gameLayer.getPlayer(session.uid).move(msg.x,msg.y);
+        var player =  ag.gameLayer.getPlayer(session.uid);
+        if(player){
+            player.move({x:msg.x,y:msg.y});
+        }
         next();
     },
 
 
     //攻击
     attack:function(msg, session, next) {
-        ag.gameLayer.getPlayer(session.uid).attack(msg.id);
+        var attacker =  ag.gameLayer.getPlayer(session.uid);
+        var locked =  ag.gameLayer._roleMap[msg.id];
+        if(attacker && locked){
+            attacker.attack(locked);
+        }
         next();
     },
 });

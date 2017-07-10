@@ -52,4 +52,19 @@ module.exports = {
         var param = {msg: msg,from: "",target: ""};
         channel.pushMessage(route,param);
     },
+
+
+    p:function(x,y){
+        return {x:x,y:y};
+    },
+
+    pDistance: function(v1,v2){
+        var vx = v1.x - v2.x,vy = v1.y - v2.y;
+        return Math.sqrt(vx*vx+vy*vy);
+    },
+
+
+    pAdd : function (v1, v2) {
+        return {x:v1.x + v2.x, y:v1.y + v2.y};
+    },
 };

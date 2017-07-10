@@ -6,10 +6,7 @@
 
 cc.Class({
     extends: cc.Component,
-
-    properties: {
-        _bGo: false,
-    },
+    properties: {},
 
     // use this for initialization
     onLoad: function () {
@@ -20,22 +17,36 @@ cc.Class({
         ag.gameConst = require("GameConst");
         ag.agSocket = require("AGSocket");
         ag.gameConst.init();
-        ag.agSocket.init();
 
-        //cuke add for test.
-        //var array = [];
-        //for(var i=1;i<=17;++i)array.push("ani/hum"+i);
-        //for(var i=1;i<=4;++i)array.push("ani/effect"+i);
-        //cc.loader.loadResArray(array, cc.SpriteAtlas, function (err, atlas) {
-        //    ag.agSocket.init();
-        //}.bind(this));
+
+
+        this._netState = cc.find("Canvas/label_netState");
+        this._loadRes = cc.find("Canvas/load_res");
+        this.labelPercent = cc.find("Canvas/load_res/label_percent").getComponent(cc.Label);
+        this._loadRes.active = false;
+        cc.loader.loadRes('prefab/nodeRoleProp',function(err,prefab){
+            ag.agSocket.init(this.loadRes.bind(this));
+        }.bind(this));
+    },
+
+
+    //加载资源
+    loadRes:function(){
+        this._loadRes.active = true;
+        this._netState.active = false;
+        var array = [];
+        for(var i=1;i<=17;++i)array.push("ani/hum"+i);
+        for(var i=1;i<=4;++i)array.push("ani/effect"+i);
+        cc.loader.loadResArray(array, cc.SpriteAtlas,function(num, totalNum, item){
+            this.labelPercent.string = "("+Math.floor(num/totalNum*100)+"%)";
+        }.bind(this),function (err, atlas) {
+            cc.director.loadScene('FirstLayer',null,function () {
+                cc.loader.onProgress = null;
+            });
+        }.bind(this));
     },
 
     // called every frame, uncomment this function to activate update callback
     update: function (dt) {
-        if(ag.agSocket._sessionId != null && this._bGo==false){
-            this._bGo = true;
-            cc.director.loadScene('FirstLayer');
-        }
     },
 });
