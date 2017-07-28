@@ -29,7 +29,7 @@ module.exports = {
 
 
     //获得某玩家
-    getPlayer:function(uid){
+    getRole:function(uid){
         return this._roleMap[uid];
     },
 	
@@ -50,7 +50,7 @@ module.exports = {
             player._data.camp = ag.gameConst.campLiuxing;
             player._data.mapId = ag.gameConst._bornMap;
             player._data.direction = 4;//默认朝下
-            player._data.moveSpeed = 1;
+            player._data.moveSpeed = 0.7;
             player._data.hp = 675;
             player._data.totalHP = 675;
             player._data.level = 5;
@@ -60,7 +60,7 @@ module.exports = {
                 player._data.attackSpeed = 0.8;
             }else if(player._data.type=="m1"){
                 player._data.clothes = player._data.sex==1?"magiciantwogirl":"magiciantwoboy";
-                player._data.attackSpeed = 2.5;
+                player._data.attackSpeed = 1.2;
             }else if(player._data.type=="m2"){
                 player._data.clothes = player._data.sex==1?"taoisttwogirl":"taoisttwoboy";
                 player._data.attackSpeed = 0.8;
@@ -92,6 +92,10 @@ module.exports = {
                 ag.jsUtil.send("sRole",JSON.stringify([player._data]),[array[i].id]);
             }
         }
+
+
+        //发送buff管理数据
+        ag.jsUtil.send("sBuffManager",JSON.stringify(ag.buffManager.getData()),[player._data.id]);
     },
 
 
@@ -113,8 +117,8 @@ module.exports = {
                         player._data.type = array[i][0];
                         var x= 0,y=0;
                         if(array[i][1]==-1 && array[i][2]==-1){
-                            x = Math.floor(Math.random()*map.mapX*0.2);
-                            y = Math.floor(Math.random()*map.mapY*0.2);
+                            x = Math.floor(Math.random()*(map.mapX+1));
+                            y = Math.floor(Math.random()*(map.mapY+1));
                         }else{
                             x = array[i][1]+Math.floor(Math.random()*(ag.gameConst._bornR*2+1)-ag.gameConst._bornR);
                             y = array[i][2]+Math.floor(Math.random()*(ag.gameConst._bornR*2+1)-ag.gameConst._bornR);
@@ -266,9 +270,13 @@ module.exports = {
             if (x<=2 && y<=2 && x+y!=3)return true;
         }
         else if(role1._data.type=="m1" || role1._data.type=="m2"){
-            if(cc.pDistance(myLocation,enemyLocation)<=4)return true;
+            if(ag.jsUtil.pDistance(myLocation,enemyLocation)<=4)return true;
+        }else if(role1._data.type=="m5" || role1._data.type=="m18"){
+            if(ag.jsUtil.pDistance(myLocation,enemyLocation)<=5)return true;
         }
-        else{
+        else if(role1._data.type=="m9"){
+            if(ag.jsUtil.pDistance(myLocation,enemyLocation)<=7)return true;
+        }else{
             if(x<=1 && y<=1)return true;
         }
         return false;
@@ -298,5 +306,33 @@ module.exports = {
                 temp._ai._locked = null;
             }
         }
-    }
+    },
+
+
+    //获得指定区域角色数组
+    getRoleFromCenterXY:function (mapId,center,x,y) {
+        x = x?x:0;
+        y = y?y:0;
+        var retArray = [];
+        for(var i=center.y-y;i<=center.y+y;++i){
+            for(var j=center.x-x;j<=center.x+x;++j){
+                var array = this._roleXYMap[''+mapId+','+j+','+i];
+                if(array){
+                    retArray = retArray.concat(array);
+                }
+            }
+        }
+        return retArray;
+    },
+
+
+
+    //是否攻击
+    isEnemyCamp:function(role1,role2){
+        if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
+            if(role1._data.camp!=role2._data.camp)return true;
+            if(role1._data.camp==ag.gameConst.campLiuxing && role2._data.camp==ag.gameConst.campLiuxing)return true;
+        }
+        return false;
+    },
 };

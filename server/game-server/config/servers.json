@@ -1,28 +1,28 @@
 {
   "development":{
     "conn":[
-      {"id":"conn-server-1", "host":"47.92.67.211", "port":4050, "clientPort": 3050, "frontend": true},
-      {"id":"conn-server-2", "host":"47.92.67.211", "port":4051, "clientPort": 3051, "frontend": true},
-      {"id":"conn-server-3", "host":"47.92.67.211", "port":4052, "clientPort": 3052, "frontend": true}
+      {"id":"conn-server-1", "host":"127.0.0.1", "port":4050, "clientPort": 3050, "frontend": true},
+      {"id":"conn-server-2", "host":"127.0.0.1", "port":4051, "clientPort": 3051, "frontend": true},
+      {"id":"conn-server-3", "host":"127.0.0.1", "port":4052, "clientPort": 3052, "frontend": true}
     ],
     "work":[
-      {"id":"work-server-1", "host":"47.92.67.211", "port":6055}
+      {"id":"work-server-1", "host":"127.0.0.1", "port":6055}
     ],
     "gate":[
-      {"id": "gate-server-1", "host": "47.92.67.211", "clientPort": 3014, "frontend": true}
+      {"id": "gate-server-1", "host": "127.0.0.1", "clientPort": 3014, "frontend": true}
     ]
   },
   "production":{
     "conn":[
-      {"id":"conn-server-1", "host":"47.92.67.211", "port":4050, "clientPort": 3050, "frontend": true},
-      {"id":"conn-server-2", "host":"47.92.67.211", "port":4051, "clientPort": 3051, "frontend": true},
-      {"id":"conn-server-3", "host":"47.92.67.211", "port":4052, "clientPort": 3052, "frontend": true}
+      {"id":"conn-server-1", "host":"127.0.0.1", "port":4050, "clientPort": 3050, "frontend": true},
+      {"id":"conn-server-2", "host":"127.0.0.1", "port":4051, "clientPort": 3051, "frontend": true},
+      {"id":"conn-server-3", "host":"127.0.0.1", "port":4052, "clientPort": 3052, "frontend": true}
     ],
     "work":[
-      {"id":"work-server-1", "host":"47.92.67.211", "port":6055}
+      {"id":"work-server-1", "host":"127.0.0.1", "port":6055}
     ],
     "gate":[
-      {"id": "gate-server-1", "host": "47.92.67.211", "clientPort": 3014, "frontend": true}
+      {"id": "gate-server-1", "host": "127.0.0.1", "clientPort": 3014, "frontend": true}
     ]
   }
 }

@@ -66,7 +66,7 @@ var Handler = cc.Class.extend({
 
     //移动
     move:function(msg, session, next) {
-        var player =  ag.gameLayer.getPlayer(session.uid);
+        var player =  ag.gameLayer.getRole(session.uid);
         if(player){
             player.move({x:msg.x,y:msg.y});
         }
@@ -76,7 +76,7 @@ var Handler = cc.Class.extend({
 
     //攻击
     attack:function(msg, session, next) {
-        var attacker =  ag.gameLayer.getPlayer(session.uid);
+        var attacker =  ag.gameLayer.getRole(session.uid);
         var locked =  ag.gameLayer._roleMap[msg.id];
         if(attacker && locked){
             attacker.attack(locked);

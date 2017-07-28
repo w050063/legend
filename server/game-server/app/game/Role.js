@@ -63,6 +63,7 @@ module.exports = ag.class.extend({
             return;
         }
 
+        this._data.direction = ag.gameLayer.getDirection(this.getLocation(),location);
         this.setLocation(location);
 
 
@@ -91,6 +92,9 @@ module.exports = ag.class.extend({
     attack:function(locked){
         var data = locked._data;
         var x = data.x, y = data.y;
+        this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
+
+
         var sendArray = [];
 
 
@@ -101,8 +105,12 @@ module.exports = ag.class.extend({
             if(array){
                 for(var k=0;k<array.length;++k){
                     var lockedData = array[k]._data;
-                    if(lockedData.camp!=this._data.camp){
-                        lockedData.hp -= 5;
+                    if(ag.gameLayer.isEnemyCamp(array[k],this)){
+                        if(ag.buffManager.getCDForFireCrit(this)==false){
+                            lockedData.hp -= 15;
+                        }else{
+                            lockedData.hp -= 5;
+                        }
                         sendArray.push({id:lockedData.id,hp:lockedData.hp});
                     }
                 }
@@ -112,21 +120,24 @@ module.exports = ag.class.extend({
             if(array){
                 for(var k=0;k<array.length;++k){
                     var lockedData = array[k]._data;
-                    if(lockedData.camp!=this._data.camp){
-                        lockedData.hp -= 8;
+                    if(ag.gameLayer.isEnemyCamp(array[k],this)){
+                        if(ag.buffManager.getCDForFireCrit(this)==false){
+                            lockedData.hp -= 15;
+                        }else{
+                            lockedData.hp -= 8;
+                        }
                         sendArray.push({id:lockedData.id,hp:lockedData.hp});
                     }
                 }
             }
-        }
-        if(this._data.type=='m1'){
+        }else if(this._data.type=='m1'){
             for(var i=y-1;i<=y+1;++i){
                 for(var j=x-1;j<=x+1;++j){
                     var array = ag.gameLayer._roleXYMap[''+data.mapId+','+j+','+i];
                     if(array){
                         for(var k=0;k<array.length;++k){
                             var lockedData = array[k]._data;
-                            if(lockedData.camp!=this._data.camp){
+                            if(ag.gameLayer.isEnemyCamp(array[k],this)){
                                 lockedData.hp -= 5;
                                 sendArray.push({id:lockedData.id,hp:lockedData.hp});
                             }
@@ -134,12 +145,40 @@ module.exports = ag.class.extend({
                     }
                 }
             }
+
+
+            //启动火墙
+            ag.buffManager.setFireWall(locked.getMapXYString(),this);
+        }else if(this._data.type=='m2'){
+            var array = ag.gameLayer._roleXYMap[''+data.mapId+','+x+','+y];
+            if(array){
+                for(var k=0;k<array.length;++k){
+                    var lockedData = array[k]._data;
+                    if(ag.gameLayer.isEnemyCamp(array[k],this)){
+                        lockedData.hp -= 5;
+                        sendArray.push({id:lockedData.id,hp:lockedData.hp});
+                    }
+                }
+            }
+
+
+            //启动毒
+            ag.buffManager.setPoison(locked,this);
+        }else if(this._data.type=='m9') {
+            var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(), 9, 9);
+            for (var i = 0; i < array.length; ++i) {
+                var lockedData = array[i]._data;
+                if (ag.gameLayer.isEnemyCamp(array[i],this)) {
+                    lockedData.hp -= 5;
+                    sendArray.push({id: lockedData.id, hp: lockedData.hp});
+                }
+            }
         }else{
             var array = ag.gameLayer._roleXYMap[''+data.mapId+','+x+','+y];
             if(array){
                 for(var k=0;k<array.length;++k){
                     var lockedData = array[k]._data;
-                    if(lockedData.camp!=this._data.camp){
+                    if(ag.gameLayer.isEnemyCamp(array[k],this)){
                         lockedData.hp -= 5;
                         sendArray.push({id:lockedData.id,hp:lockedData.hp});
                     }
@@ -166,6 +205,11 @@ module.exports = ag.class.extend({
 
         ag.jsUtil.sendAll("sHP",JSON.stringify(sendArray));
 
+        //战士没有进入烈火cd，则开始cd
+        if(this._data.type=='m0' && ag.buffManager.getCDForFireCrit(this)==false){
+            ag.buffManager.setCDForFireCrit(this);
+        }
+
 
         //删除本地怪物数据
         for(var i=0;i<sendArray.length;++i){
@@ -180,6 +224,10 @@ module.exports = ag.class.extend({
     dead:function () {
         this._state = ag.gameConst.stateDead;
 
+        ag.buffManager.delFireWallByDead(this);
+        ag.buffManager.delPoisonByDead(this);
+        ag.actionManager.delAll(this._ai);
+        ag.actionManager.delAll(this);
         //取消所有锁定自己的AI
         ag.gameLayer.delLockedRole(this);
         if(this._ai)this._ai._locked = null;
@@ -188,8 +236,6 @@ module.exports = ag.class.extend({
             ag.gameLayer._roleXYMap[str].splice(ag.gameLayer._roleXYMap[str].indexOf(this),1);
             if(ag.gameLayer._roleXYMap[str].length==0)delete ag.gameLayer._roleXYMap[str];
             delete ag.gameLayer._roleMap[this._data.id];
-            ag.actionManager.delAll(this._ai);
-            ag.actionManager.delAll(this);
         }else{//玩家5秒后重新复活
             ag.actionManager.runAction(this,5,function () {
                 this._state = ag.gameConst.stateIdle;

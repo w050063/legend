@@ -35,7 +35,7 @@ module.exports = ag.class.extend({
                 if(ag.jsUtil.pDistance(this._role.getLocation(),this._locked.getLocation())<this._role._data.visibleDistance){
                     if(ag.gameLayer.getAttackDistance(this._role,this._locked)){
                         this._role.attack(this._locked);
-                    }else{
+                    }else if(this._role._data._type!="m9"){
                         this.doMoveOperate(this._locked.getLocation());
                     }
                 }else{
@@ -60,7 +60,7 @@ module.exports = ag.class.extend({
                         var array = ag.gameLayer._roleXYMap[''+this._role._data.mapId+','+(this._role._data.x+j)+','+(this._role._data.y+i)];
                         if(array){
                             for(var k=0;k<array.length && !this._locked;++k){
-                                if(array[k]._data.camp!=this._role._data.camp && array[k]._state != ag.gameConst.stateDead){
+                                if(ag.gameLayer.isEnemyCamp(array[k],this._role)){
                                     this._locked = array[k];
                                 }
                             }

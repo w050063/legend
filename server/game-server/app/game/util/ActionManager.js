@@ -8,13 +8,24 @@ module.exports = {
     init: function () {
         this._actionArray = [];
         this._scheduleArray = [];
-        this._nowTime = 0;
+        this._nowTime = new Date().getTime()/1000;
         setInterval(function () {
             var curTime = new Date().getTime()/1000;
             var elapse = curTime-this._nowTime;
+
+
+            //防止错误，先遍历所有函数存起来，然后在统一执行，最后重新检索删除。
+            var callbacks = [];
+            for(var i=0;i<this._actionArray.length;++i){
+                if(this._actionArray[i].endTime<=this._nowTime){
+                    callbacks.push(this._actionArray[i].callback);
+                }
+            }
+
+            for(var i=0;i<callbacks.length;++i)callbacks[i](elapse);
+
             for(var i=this._actionArray.length-1;i>=0;--i){
                 if(this._actionArray[i].endTime<=this._nowTime){
-                    this._actionArray[i].callback(elapse);
                     this._actionArray.splice(i,1);
                 }
             }
@@ -23,6 +34,7 @@ module.exports = {
             for(var i=0;i<this._scheduleArray.length;++i){
                 this._scheduleArray[i].time += elapse;
                 if(this._scheduleArray[i].time>=this._scheduleArray[i].interval){
+                    this._scheduleArray[i].time-=this._scheduleArray[i].interval;
                     this._scheduleArray[i].callback(elapse);
                 }
             }
@@ -32,9 +44,10 @@ module.exports = {
     
 
     //第一个参数是对象,可以传入数字和函数
-    runAction: function (node,delay,callback) {
+    runAction: function (node,delay,callback,tag) {
         if(delay<0.016)delay = 0.016;
-        this._actionArray.push({node:node,endTime:this._nowTime+delay,callback:callback});
+        if(!tag)tag = 0;
+        this._actionArray.push({node:node,endTime:this._nowTime+delay,callback:callback,tag:tag});
     },
     
     
@@ -42,6 +55,16 @@ module.exports = {
     schedule:function (node,interval,callback) {
         if(interval<0.016)interval = 0.016;
         this._scheduleArray.push({node:node,interval:interval,time:0,callback:callback});
+    },
+
+
+    //根据tag删除
+    stopActionByTag:function(tag){
+        for(var i=this._actionArray.length-1;i>=0;--i){
+            if(this._actionArray[i].tag==tag) {
+                this._actionArray.splice(i, 1);
+            }
+        }
     },
 
 
