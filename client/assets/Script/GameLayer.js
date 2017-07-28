@@ -37,6 +37,12 @@ cc.Class({
         this._player.init(ag.userInfo._data);
         this._map.node.addChild(node);
         this._roleMap[this._player._data.id] = this._player;
+
+
+
+        //启动定时器,每秒执行一次
+        this.schedule(ag.buffManager.update1.bind(ag.buffManager),1);
+        this.schedule(ag.buffManager.update5.bind(ag.buffManager),5);
     },
 
 
@@ -116,7 +122,7 @@ cc.Class({
         var index = direction;
 
 
-        if(role._camp==ag.gameConst.campMonster){//怪物
+        if(role._data.camp==ag.gameConst.campMonster){//怪物
             var percent = [10000,1000,100,10,1];//权重比例
             var weight=[];
             var max = 0;
@@ -169,7 +175,12 @@ cc.Class({
         else if(role1._data.type=="m1" || role1._data.type=="m2"){
             if(cc.pDistance(myLocation,enemyLocation)<=9)return true;
         }
-        else{
+        else if(role1._data.type=="m5" || role1._data.type=="m18"){
+            if(cc.pDistance(myLocation,enemyLocation)<=5)return true;
+        }
+        else if(role1._data.type=="m9"){
+            if(cc.pDistance(myLocation,enemyLocation)<=7)return true;
+        }else{
             if(x<=1 && y<=1)return true;
         }
         return false;
@@ -184,5 +195,36 @@ cc.Class({
                 temp._ai._locked = null;
             }
         }
-    }
+    },
+
+
+    //获得指定区域角色数组
+    getRoleFromCenterXY:function (mapId,center,x,y) {
+        x = x?x:0;
+        y = y?y:0;
+        var retArray = [];
+        for(var key in this._roleMap){
+            var data = this._roleMap[key]._data;
+            if(mapId==data.mapId && data.x>=center.x-x && data.x<=center.x+x && data.y>=center.y-y && data.y<=center.y+y){
+                retArray.push(this._roleMap[key]);
+            }
+        }
+        return retArray;
+    },
+
+
+    tagAction:function(action,tag){
+        action.setTag(tag);
+        this.node.runAction(action);
+    },
+
+
+    //是否攻击
+    isEnemyCamp:function(role1,role2){
+        if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
+            if(role1._data.camp!=role2._data.camp)return true;
+            if(role1._data.camp==ag.gameConst.campLiuxing && role2._data.camp==ag.gameConst.campLiuxing)return true;
+        }
+        return false;
+    },
 });

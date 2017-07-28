@@ -18,7 +18,7 @@ cc.Class({
     onLoad: function () {
         this.labelShow = this.node.getChildByName("label_show").getComponent(cc.Label);
         this.labelPercent = this.node.getChildByName("label_percent").getComponent(cc.Label);
-        this.labelShow.node.runAction(cc.repeatForever(cc.sequence(
+        this.labelShow.node.runAction(cc.repeatForever(new cc.Sequence(
             cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = "资源加载中.";}.bind(this)),
             cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = "资源加载中..";}.bind(this)),
             cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = "资源加载中...";}.bind(this)),

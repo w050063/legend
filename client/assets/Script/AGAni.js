@@ -23,7 +23,7 @@ cc.Class({
         this._interval = 1;
         this._finishedCallback = null;
         this._totalCount = n;
-
+        this._aniPosition = cc.p(0,0);
 
         var urls = [];
         var before = str.substr(0,str.length-7);//6是图片后面数字的长度,下同
@@ -70,13 +70,18 @@ cc.Class({
     },
 
 
+    setAniPosition:function(position){
+        this._aniPosition = position;
+    },
+
+
     modifyFrame:function(){
         var sprite = this.node.getComponent(cc.Sprite);
         sprite.spriteFrame = this._spriteFrameArray[this._curIndex].value;
         var key = this._spriteFrameArray[this._curIndex].key;
         var after = key.substr(key.length-6);
         var array = AGAniOffset[after].split(",");
-        this.node.setPosition(parseInt(array[0]),parseInt(array[1]));
+        this.node.setPosition(cc.pAdd(this._aniPosition,cc.p(parseInt(array[0]),parseInt(array[1]))));
     },
 
 

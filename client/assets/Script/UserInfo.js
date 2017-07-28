@@ -15,7 +15,6 @@ module.exports={
 	_id:100000,
 	_level:1,
 	_name:"红军小战士",
-	_camp:"liuxing",
 	_hero:"m0",
 	_sex:0,
 	_exp:0,

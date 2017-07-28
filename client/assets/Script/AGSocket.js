@@ -4,7 +4,9 @@
  */
 
 
-require("boot");
+//require("boot");
+//require("pomelo_cocos2d_js");
+
 module.exports={
     _sessionId:null,
     _dataArray:[],
@@ -13,7 +15,7 @@ module.exports={
     init: function(callback) {
         var self = this;
         var tempId = null;
-        pomelo.init({host: "47.92.67.211",port: 3014,log: true}, function() {
+        pomelo.init({host: "127.0.0.1",port: 3014,log: true}, function() {
 			pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
 				pomelo.disconnect();
 				tempId=data.uid;
@@ -42,7 +44,8 @@ module.exports={
         });
     },
     offSChat:function(){
-        pomelo.on('sChat',undefined);
+        //pomelo.on('sChat',undefined);
+        pomelo.removeAllListeners('sChat');
     },
 
 
@@ -63,7 +66,8 @@ module.exports={
         });
     },
     offSEnter:function(){
-        pomelo.on('sEnter',undefined);
+        //pomelo.on('sEnter',undefined);
+        pomelo.removeAllListeners('sEnter');
     },
 
 
@@ -93,6 +97,21 @@ module.exports={
             var array = JSON.parse(data.msg);
             this._dataArray.push({key:"sHP",value:array});
         }.bind(this));
+
+        pomelo.on('sBuffManager',function(data) {
+            var array = JSON.parse(data.msg);
+            this._dataArray.push({key:"sBuffManager",value:array});
+        }.bind(this));
+
+        pomelo.on('sBFireCrit',function(data) {
+            var array = JSON.parse(data.msg);
+            this._dataArray.push({key:"sBFireCrit",value:array});
+        }.bind(this));
+
+        pomelo.on('sFireWall',function(data) {
+            var array = JSON.parse(data.msg);
+            this._dataArray.push({key:"sFireWall",value:array});
+        }.bind(this));
     },
 
 
@@ -104,6 +123,9 @@ module.exports={
         pomelo.on('sMyMove',undefined);
         pomelo.on('sAttack',undefined);
         pomelo.on('sHP',undefined);
+        pomelo.on('sBuffManager',undefined);
+        pomelo.on('sBFireCrit',undefined);
+        pomelo.on('sFireWall',undefined);
     },
 
 
@@ -112,6 +134,7 @@ module.exports={
         if(this._dataArray.length==0)return;
         while(this._dataArray.length>0){
             var obj = this._dataArray[0];
+            cc.log(JSON.stringify(obj));
             if(obj.key=="sRole"){
                 var array = obj.value;
                 for(var j=0;j<array.length;++j){
@@ -121,6 +144,7 @@ module.exports={
                 var obj2 = obj.value;
                 var player =  ag.gameLayer._roleMap[obj2.id];
                 if(player){
+                    cc.log(obj2.id,obj2.x,obj2.y);
                     player.move(cc.p(obj2.x,obj2.y),true);
                 }
             }else if(obj.key=="sMyMove"){
@@ -140,6 +164,18 @@ module.exports={
                     if(player){
                         player.changeHP(array[i].hp);
                     }
+                }
+            }else if(obj.key=="sBuffManager"){
+                var array = obj.value;
+                ag.buffManager.setData(array);
+            }else if(obj.key=="sBFireCrit"){
+                var obj = obj.value;
+                ag.buffManager.setCDForFireCritById(obj.id,false);
+            }else if(obj.key=="sFireWall"){
+                var obj = obj.value;
+                var player =  ag.gameLayer.getRole(obj.id);
+                if(player){
+                    ag.buffManager.setFireWall(obj.mapXYString,player);
                 }
             }
             this._dataArray.splice(0,1);

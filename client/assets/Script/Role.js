@@ -18,8 +18,9 @@ cc.Class({
         this._agAni = null;
         this._labelName = null;
         this.setLocation(this._data.x,this._data.y);
-        this.idle();
         this.node.setScale(2);
+        this._aniColor = cc.color(255,255,255,255);
+        this.idle();
 
         //血条
         //cc.loader.loadRes('prefab/nodeRoleProp',function(err,prefab){
@@ -55,6 +56,14 @@ cc.Class({
     },
 
 
+
+    //设置动画颜色
+    setAniColor:function(color){
+        this._aniColor = color;
+        if(this._agAni)this._agAni.setColor(this._aniColor);
+    },
+
+
     //设置逻辑位置
     setLocation:function(x,y){
         if(x!=undefined && y!=undefined){
@@ -75,6 +84,7 @@ cc.Class({
         var array = AGAniClothes[clothes+ag.gameConst.stateIdle+this._data.direction].split(',');
         if(this._agAni)ag.agAniCache.put(this._agAni);
         this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),2,0.3);
+        this._agAni.setColor(this._aniColor);
     },
 
 
@@ -82,9 +92,9 @@ cc.Class({
     idle:function(){
         if(this._state != ag.gameConst.stateIdle){
             this.node.stopAllActions();
-            if(this._data._camp!=ag.gameConst.campMonster && this._state == ag.gameConst.stateAttack){
+            if(this._data.camp!=ag.gameConst.campMonster && this._state == ag.gameConst.stateAttack){
                 this._agAni.getComponent(AGAni).pause();
-                this.node.runAction(cc.sequence(cc.delayTime(0.5),cc.callFunc(function(){
+                this.node.runAction(cc.sequenceEx(cc.delayTime(1),cc.callFunc(function(){
                     this.idleAnimation();
                 }.bind(this))));
             }else{
@@ -106,7 +116,8 @@ cc.Class({
         var mapData = ag.gameConst._terrainMap[this._data.mapId];
         var x = this._data.x - mapData.mapX / 2;
         var y = this._data.y - mapData.mapY / 2;
-        this.node.runAction(cc.sequence(cc.moveTo(this._data.moveSpeed, cc.p(x * mapData.tileX, y * mapData.tileY)),cc.callFunc(function(){
+        var moveSpeed = this._data.camp==ag.gameConst.campMonster ? 0.8:this._data.moveSpeed;
+        this.node.runAction(cc.sequenceEx(cc.moveTo(moveSpeed, cc.p(x * mapData.tileX, y * mapData.tileY)),cc.callFunc(function(){
             if(bServer){
                 this.idle();
             }else{
@@ -116,7 +127,9 @@ cc.Class({
         var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
         var array = AGAniClothes[clothes+ag.gameConst.stateMove+this._data.direction].split(',');
         if(this._agAni)ag.agAniCache.put(this._agAni);
-        this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),2,0.15);
+        var count = parseInt(array[1]);
+        this._agAni = ag.agAniCache.getNode(this.node,array[0],count,2,moveSpeed/count);
+        this._agAni.setColor(this._aniColor);
 
 
 
@@ -161,15 +174,20 @@ cc.Class({
         }
         var array = AGAniClothes[clothes+attackCode+this._data.direction].split(',');
         if(this._agAni)ag.agAniCache.put(this._agAni);
-        this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),2,0.15,function(){
-            if(bServer)this.idle();
-            else if(this._ai)this._ai.onAttackEnd();
+        this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),2,0.1,function(){
+            this.idle();
         }.bind(this));
+        ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(this._data.attackSpeed),cc.callFunc(function(){
+            if(this._ai)this._ai.onAttackEnd();
+        }.bind(this))));
+        this._agAni.setColor(this._aniColor);
 
         //攻击特效
         this.attackEffect(locked);
 
-        cc.audioEngine.play(cc.url.raw("resources/music/hit.mp3"),false,1);
+        if(this._data.camp!=ag.gameConst.campMonster){
+            cc.audioEngine.play(cc.url.raw("resources/music/hit.mp3"),false,1);
+        }
 
 
         //向服务器发送
@@ -185,13 +203,72 @@ cc.Class({
     //攻击特效
     attackEffect: function (locked) {
         if(this._data.type=="m0"){
-            ag.agAniCache.getEffect(this.node,"ani/effect1/"+(500000+this._data.direction*6),6,999,0.15);
+            if(ag.buffManager.getCDForFireCrit(this)==false){
+                ag.agAniCache.getEffect(this.node,"ani/effect2/"+(503000+this._data.direction*8),8,999,0.1);
+                ag.buffManager.setCDForFireCrit(this,true);
+            }else{
+                ag.agAniCache.getEffect(this.node,"ani/effect1/"+(500000+this._data.direction*6),6,999,0.1);
+            }
         }else if(this._data.type=="m1"){
+            var pos = locked.getTruePosition();
             ag.agAniCache.getNode(this.node,"ani/effect3/505000",10,0,0.05,function(sender){
                 ag.agAniCache.put(sender.node);
-                ag.agAniCache.getEffect(locked.node,"ani/effect3/505010",15,999,0.05);
+                var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/505010",15,999,0.05);
+                node.getComponent(AGAni).setAniPosition(pos);
             }.bind(this));
-        }else{
+        }else if(this._data.type=="m2"){
+            var lockedId = locked._data.id;
+            var pos1 = cc.pAdd(this.node.getPosition(),cc.p(0,70*this.node.scale));
+            var pos2 = cc.pAdd(locked.node.getPosition(),cc.p(0,70*this.node.scale));
+            var node = new cc.Node();
+            var sprite = node.addComponent(cc.Sprite);
+            node.setPosition(pos1);
+            var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(pos2,pos1))));
+            node.setRotation( 90-rotation);
+            ag.gameLayer._map.node.addChild(node,999999);
+            cc.loader.loadRes("ani/effect4", cc.SpriteAtlas, function (err, atlas) {
+                if(sprite)sprite.spriteFrame = atlas.getSpriteFrame("508000");
+            }.bind(this));
+
+
+            ag.agAniCache.getEffect(this.node,"ani/effect4/509000",6,999,0.15);
+            node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
+                sprite = undefined;
+                node.destroy();
+                if(ag.gameLayer.getRole(lockedId)){
+                    ag.agAniCache.getEffect(locked.node,"ani/effect4/509006",9,999,0.15);
+                }
+            })));
+
+
+            //道士启用毒
+            ag.buffManager.setPoison(locked,this);
+        }else if(this._data.type=="m5" || this._data.type=="m18"){
+            var pos1 = cc.pAdd(this.node.getPosition(),cc.p(0,60*this.node.scale));
+            var pos2 = cc.pAdd(locked.node.getPosition(),cc.p(0,35*this.node.scale));
+            var node = new cc.Node();
+            var sprite = node.addComponent(cc.Sprite);
+            node.setPosition(pos1);
+            var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(pos2,pos1))));
+            node.setRotation( 90-rotation);
+            ag.gameLayer._map.node.addChild(node,999999);
+            cc.loader.loadRes("ani/effect4", cc.SpriteAtlas, function (err, atlas) {
+                if(sprite)sprite.spriteFrame = atlas.getSpriteFrame("511000");
+            }.bind(this));
+
+            node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
+                sprite = undefined;
+                node.destroy();
+            })));
+        }else if(this._data.type=="m9") {
+            var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(), 9, 9);
+            for (var i = 0; i < array.length; ++i) {
+                if(ag.gameLayer.isEnemyCamp(this,array[i])){
+                    var pos = array[i].getTruePosition();
+                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect4/510000",6,999,0.15);
+                    node.getComponent(AGAni).setAniPosition(pos);
+                }
+            }
         }
     },
 
@@ -204,11 +281,16 @@ cc.Class({
         var tips = node.addComponent(cc.Label);
         node.x = 0;
         node.y = 71;
-        node.color = cc.color(255,0,0,255);
-        tips.string = str;
+        if(hp>this._data.hp){
+            node.color = cc.color(0,255,0,255);
+            tips.string = this._data.camp==ag.gameConst.campMonster?"":"+"+(hp-this._data.hp);
+        }else{
+            node.color = cc.color(255,0,0,255);
+            tips.string = ""+(hp-this._data.hp);
+        }
         this.node.addChild(node,30);
-        node.runAction(cc.sequence(cc.moveBy(0.4, cc.p(0,30)), cc.fadeOut(0.2),cc.callFunc(function(){
-            node.removeFromParent();
+        node.runAction(cc.sequenceEx(cc.moveBy(0.4, cc.p(0,30)), cc.fadeOut(0.2),cc.callFunc(function(){
+            //node.removeFromParent();
             node.destroy();
         })));
 
@@ -228,16 +310,19 @@ cc.Class({
     //死亡
     dead:function () {
         this._state = ag.gameConst.stateDead;
+        ag.buffManager.delFireWallByDead(this);
+        ag.buffManager.delPoisonByDead(this);
         //取消所有锁定自己的AI
         ag.gameLayer.delLockedRole(this);
         if(this._ai)this._ai._locked = null;
         if(this._data.camp==ag.gameConst.campMonster){
-            this.node.removeFromParent(true);
+            //this.node.removeFromParent(true);
+            this.node.destroy();
             delete ag.gameLayer._roleMap[this._data.id];
         }else{
             cc.log("ready");
             this.node.active = false;
-            ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(5),cc.callFunc(function () {
+            ag.gameLayer.node.runAction(cc.sequenceEx(cc.delayTime(5),cc.callFunc(function () {
                 this.node.active = true;
                 cc.log("relive");
                 this.changeHP(this._data.totalHP);
@@ -245,6 +330,20 @@ cc.Class({
                 this.idle();
                 this._state = ag.gameConst.stateIdle;
                 if(this._ai)this._ai._busy = false;
+
+
+                //复活飘字
+                var node = new cc.Node();
+                var tips = node.addComponent(cc.Label);
+                node.x = 0;
+                node.y = 87;
+                tips.fontSize = 12;
+                node.color = cc.color(0,255,0,255);
+                tips.string = "重新站起来还是一条好汉！！！";
+                this.node.addChild(node,30);
+                node.runAction(cc.sequence(cc.delayTime(3), cc.fadeOut(0.2),cc.callFunc(function(){
+                    node.destroy();
+                })));
             }.bind(this))));
         }
     },
@@ -260,6 +359,14 @@ cc.Class({
         return cc.p(this._data.x,this._data.y);
     },
 
+
+    //获得逻辑上的position
+    getTruePosition:function () {
+        var mapData = ag.gameConst._terrainMap[this._data.mapId];
+        var x = parseInt(this._data.x)-mapData.mapX/2;
+        var y = parseInt(this._data.y)-mapData.mapY/2;
+        return cc.p(x*mapData.tileX,y*mapData.tileY);
+    },
 
 
     //根据一个触摸点得到玩家方向向量
@@ -288,7 +395,7 @@ cc.Class({
         for(var key in map){
             var p = map[key].node.getPosition();
             if(!locked || p.y<locked.node.getPositionY()){
-                if(map[key]._data.camp!=this._data.camp && point.x>p.x-40 && point.x<p.x+40 && point.y>p.y && point.y< p.y+120){
+                if(ag.gameLayer.isEnemyCamp(map[key],this) && point.x>p.x-40 && point.x<p.x+40 && point.y>p.y && point.y< p.y+120){
                     locked = map[key];
                 }
             }

@@ -10,13 +10,25 @@ cc.Class({
 
     // use this for initialization
     onLoad: function () {
-        global.ag = {};
+        cc.sequenceEx = function(){
+            if(arguments.length==1)return new cc.Sequence(arguments[0]);
+            if(arguments.length==2)return new cc.Sequence(arguments[0],arguments[1]);
+            if(arguments.length==3)return new cc.Sequence(arguments[0],arguments[1],arguments[2]);
+            if(arguments.length==4)return new cc.Sequence(arguments[0],arguments[1],arguments[2],arguments[3]);
+            if(arguments.length==5)return new cc.Sequence(arguments[0],arguments[1],arguments[2],arguments[3],arguments[4]);
+            if(arguments.length==6)return new cc.Sequence(arguments[0],arguments[1],arguments[2],arguments[3],arguments[4],arguments[5]);
+            return cc.Sequence();
+        };
+        window.ag = {};
         ag.jsUtil = require("JsUtil");
         ag.agAniCache = require("AGAniCache");
         ag.userInfo = require("UserInfo");
         ag.gameConst = require("GameConst");
         ag.agSocket = require("AGSocket");
         ag.gameConst.init();
+        var BuffManager = require("BuffManager");
+        ag.buffManager = new BuffManager();
+        ag.buffManager.init();
 
 
 
@@ -34,16 +46,16 @@ cc.Class({
     loadRes:function(){
         this._loadRes.active = true;
         this._netState.active = false;
-        var array = [];
-        for(var i=1;i<=17;++i)array.push("ani/hum"+i);
-        for(var i=1;i<=4;++i)array.push("ani/effect"+i);
-        cc.loader.loadResArray(array, cc.SpriteAtlas,function(num, totalNum, item){
-            this.labelPercent.string = "("+Math.floor(num/totalNum*100)+"%)";
-        }.bind(this),function (err, atlas) {
+        //var array = [];
+        //for(var i=1;i<=17;++i)array.push("ani/hum"+i);
+        //for(var i=1;i<=4;++i)array.push("ani/effect"+i);
+        //cc.loader.loadResArray(array, cc.SpriteAtlas,function(num, totalNum, item){
+        //    this.labelPercent.string = "("+Math.floor(num/totalNum*100)+"%)";
+        //}.bind(this),function (err, atlas) {
             cc.director.loadScene('FirstLayer',null,function () {
                 cc.loader.onProgress = null;
             });
-        }.bind(this));
+//        }.bind(this));
     },
 
     // called every frame, uncomment this function to activate update callback

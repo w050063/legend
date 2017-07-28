@@ -13,6 +13,7 @@ cc.Class({
 
     //初始化地图信息,顺序为rgbap.红绿蓝,透明度,地图分布
     init: function (nameArray) {
+        this.test();
         return;
         this._nodeTips = new cc.Node();
         var tips = this._nodeTips.addComponent(cc.Label);
@@ -30,10 +31,26 @@ cc.Class({
     },
 
 
+    test:function(){
+        cc.loader.loadRes("map/terrainMap", cc.SpriteAtlas, function (err, atlas) {
+            var w = 170,h=170, x=Math.ceil(40*100/w),y=Math.ceil(40*60/h);
+            for(var i=0;i<y;++i){
+                for(var j=0;j<x;++j){
+                    var node = new cc.Node();
+                    var sprite = node.addComponent(cc.Sprite);
+                    node.setPosition(Math.round(w*(0.5+j-x/2)),Math.round(h*(0.5+i-y/2)));
+                    this.node.addChild(node);
+                    sprite.spriteFrame = atlas.getSpriteFrame(""+(i%2)+(j%2));
+                }
+            }
+        }.bind(this));
+    },
+
+
     //加载完成
     loadOver:function(){
         if(this._dataArray.length<6)return;
-        this._nodeTips.removeFromParent();
+        //this._nodeTips.removeFromParent();
         this._nodeTips.destroy();
 
 

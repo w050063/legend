@@ -5,6 +5,7 @@
 
 
 var AGAni = require("AGAni");
+
 module.exports={
     getEffect:function(father,name,count,zorder,interval){
         return this.getNode(father,name,count,zorder,interval,function(sender){this.put(sender.node);}.bind(this));
@@ -53,10 +54,11 @@ module.exports={
             //node.retain();
             var ani = node.getComponent(AGAni);
             ani.pause();
+            ani.setAniPosition(cc.p(0,0));
             ani.setFinishedCallback(null);
             node.setScale(1);
             node.setColor(cc.color(255,255,255));
-            node.removeFromParent(false);
+            node.removeFromParent();
             this._clipPoolArray.push(node);
         }
     }
