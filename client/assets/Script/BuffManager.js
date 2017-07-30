@@ -174,7 +174,7 @@ cc.Class({
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
             if(role._data.hp>0 && role._data.hp<role._data.totalHP){
-                var result = role._data.hp+1;
+                var result = role._data.hp+role._data.heal;
                 if(result>role._data.totalHP)result=role._data.totalHP;
                 role.changeHP(result);
             }

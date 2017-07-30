@@ -23,19 +23,6 @@ cc.Class({
         this.idle();
 
         //血条
-        //cc.loader.loadRes('prefab/nodeRoleProp',function(err,prefab){
-        //    var node = cc.instantiate(prefab);
-        //    node.parent = this.node;
-        //    node.setLocalZOrder(10);
-        //    this._progressBarHP = node.getChildByName("progressBarHP").getComponent(cc.ProgressBar);
-        //    this._labelHP = node.getChildByName("labelHP").getComponent(cc.Label);
-        //    this._labelName = node.getChildByName("labelName").getComponent(cc.Label);
-        //    this._progressBarHP.progress = this._data.hp/this._data.totalHP;
-        //    this._labelHP.string = ""+this._data.hp+"/"+this._data.totalHP+" Lv:"+this._data.level;
-        //    this._labelName.string = this._data.name?this._data.name:ag.gameConst._roleMst[this._data.type].name;
-        //}.bind(this));
-
-
         var prefab = cc.loader.getRes('prefab/nodeRoleProp');
         var node = cc.instantiate(prefab);
         node.parent = this.node;
@@ -43,9 +30,9 @@ cc.Class({
         this._progressBarHP = node.getChildByName("progressBarHP").getComponent(cc.ProgressBar);
         this._labelHP = node.getChildByName("labelHP").getComponent(cc.Label);
         this._labelName = node.getChildByName("labelName").getComponent(cc.Label);
-        this._progressBarHP.progress = this._data.hp/this._data.totalHP;
-        this._labelHP.string = ""+this._data.hp+"/"+this._data.totalHP+" Lv:"+this._data.level;
+        this.changeHP(this._data.hp);
         this._labelName.string = this._data.name?this._data.name:ag.gameConst._roleMst[this._data.type].name;
+        this._labelName.node.color = ag.gameLayer.isEnemyCamp(this,ag.gameLayer._player)?cc.color(255,122,0):cc.color(0,0,255);
 
 
         //增加AI
@@ -55,6 +42,38 @@ cc.Class({
         }
     },
 
+
+
+    //重置所有属性
+    resetAllProp:function(){
+        var mst = this.getMst();
+        var lv = this._data.level;
+        this._data.totalHP = mst.hp+mst.hpAdd*lv;
+        this._data.hp = this._data.totalHP;
+        this._data.defense = mst.defense+mst.defenseAdd*lv;
+        this._data.hurt = mst.hurt+mst.hurtAdd*lv;
+        this._data.totalExp = mst.exp+mst.expAdd*lv;
+        this._data.exp = 0;
+        this._data.heal = mst.heal+mst.healAdd*lv;
+        this._data.attackSpeed = mst.attackSpeed;
+        this._data.moveSpeed = mst.moveSpeed;
+    },
+
+
+    //增加经验
+    addExp:function(level,exp){
+        var last = this._data.level;
+        this._data.level = level;
+        if(last < this._data.level)this.resetAllProp();
+        this._data.exp =  exp;
+        if(last < this._data.level)this.changeHP(this._data.hp);
+    },
+
+
+    //获得策划数据
+    getMst : function(){
+        return ag.gameConst._roleMst[this._data.type];
+    },
 
 
     //设置动画颜色
@@ -157,6 +176,7 @@ cc.Class({
         var y = this._data.y - mapData.mapY / 2;
         this.node.setPosition(cc.p(x * mapData.tileX, y * mapData.tileY));
         this.idle();
+        if(this._ai)this._ai.onMoveEnd();
     },
 
 
@@ -231,12 +251,12 @@ cc.Class({
             }.bind(this));
 
 
-            ag.agAniCache.getEffect(this.node,"ani/effect4/509000",6,999,0.15);
+            ag.agAniCache.getEffect(this.node,"ani/effect4/509000",6,999,0.05);
             node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
                 sprite = undefined;
                 node.destroy();
                 if(ag.gameLayer.getRole(lockedId)){
-                    ag.agAniCache.getEffect(locked.node,"ani/effect4/509006",9,999,0.15);
+                    ag.agAniCache.getEffect(locked.node,"ani/effect4/509006",9,999,0.05);
                 }
             })));
 
@@ -277,27 +297,32 @@ cc.Class({
     changeHP:function(hp){
         var str = hp>this._data.hp ? "+"+(hp-this._data.hp) : ""+(hp-this._data.hp);
         //文字提示
-        var node = new cc.Node();
-        var tips = node.addComponent(cc.Label);
-        node.x = 0;
-        node.y = 71;
-        if(hp>this._data.hp){
-            node.color = cc.color(0,255,0,255);
-            tips.string = this._data.camp==ag.gameConst.campMonster?"":"+"+(hp-this._data.hp);
-        }else{
-            node.color = cc.color(255,0,0,255);
-            tips.string = ""+(hp-this._data.hp);
+        if(hp!=this._data.hp){
+            var node = new cc.Node();
+            var tips = node.addComponent(cc.Label);
+            node.x = 0;
+            node.y = 71;
+            if(hp>this._data.hp){
+                node.color = cc.color(0,255,0,255);
+                tips.string = "+"+(hp-this._data.hp);
+            }else{
+                node.color = cc.color(255,0,0,255);
+                tips.string = ""+(hp-this._data.hp);
+            }
+            this.node.addChild(node,30);
+            node.runAction(cc.sequence(cc.moveBy(0.4, cc.p(0,30)), cc.fadeOut(0.2),cc.callFunc(function(){
+                node.destroy();
+            })));
         }
-        this.node.addChild(node,30);
-        node.runAction(cc.sequenceEx(cc.moveBy(0.4, cc.p(0,30)), cc.fadeOut(0.2),cc.callFunc(function(){
-            //node.removeFromParent();
-            node.destroy();
-        })));
 
 
         this._data.hp = hp;
         this._progressBarHP.progress = this._data.hp/this._data.totalHP;
-        this._labelHP.string = ""+this._data.hp+"/"+this._data.totalHP+" Lv:"+this._data.level;
+        if(this._data.camp==ag.gameConst.campMonster){
+            this._labelHP.string = ""+this._data.hp+"/"+this._data.totalHP;
+        }else{
+            this._labelHP.string = ""+this._data.hp+"/"+this._data.totalHP+" Lv:"+this._data.level;
+        }
 
 
         //判断死亡
@@ -326,7 +351,8 @@ cc.Class({
                 this.node.active = true;
                 cc.log("relive");
                 this.changeHP(this._data.totalHP);
-                this.setLocation(1,1);
+                var pos = ag.gameLayer.getStandLocation(this._data.mapId,this._data.x%9-4,this._data.y%9-4,0);
+                this.setLocation(pos.x,pos.y);
                 this.idle();
                 this._state = ag.gameConst.stateIdle;
                 if(this._ai)this._ai._busy = false;
@@ -339,7 +365,7 @@ cc.Class({
                 node.y = 87;
                 tips.fontSize = 12;
                 node.color = cc.color(0,255,0,255);
-                tips.string = "重新站起来还是一条好汉！！！";
+                tips.string = "站起来还是一条好汉！！！";
                 this.node.addChild(node,30);
                 node.runAction(cc.sequence(cc.delayTime(3), cc.fadeOut(0.2),cc.callFunc(function(){
                     node.destroy();
@@ -407,6 +433,6 @@ cc.Class({
 
     // called every frame
     update: function (dt) {
-        this.node.setLocalZOrder(Math.floor(100000-this.node.y));
+        this.node.setLocalZOrder(Math.round(100000-this.node.y));
     },
 });

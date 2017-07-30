@@ -149,7 +149,7 @@ cc.Class({
         //执行玩家操作
         if(this._busy==false && this._state != ag.gameConst.stateDead){
             if(this._locked){
-                if(cc.pDistance(this._role.getLocation(),this._locked.getLocation())<=this._role._data.visibleDistance){
+                if(cc.pDistance(this._role.getLocation(),this._locked.getLocation())<=this._role.getMst().visibleDistance){
                     if(ag.gameLayer.getAttackDistance(this._role,this._locked)){
                         this._role.attack(this._locked);
                         this._busy = true;

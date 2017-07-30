@@ -32,14 +32,12 @@ cc.Class({
             urls.push(this.pad(after+i,6));
         }
 
-        cc.loader.loadRes(before, cc.SpriteAtlas, function (err, atlas) {
+        ag.altasTask.addTask(before,function (err, atlas) {
+            if(!this._spriteFrameArray)return;//防止内存已经释放
             for(var i=0;i<urls.length;++i){
                 this._spriteFrameArray.push({"key":urls[i],"value":atlas.getSpriteFrame(urls[i])});
             }
-
             this.modifyFrame();
-
-
             this.loadOver = true;
             for(var i=0;i<this._willDoArray.length;++i){
                 this._willDoArray[i]();

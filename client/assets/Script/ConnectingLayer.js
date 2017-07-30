@@ -29,16 +29,16 @@ cc.Class({
         var BuffManager = require("BuffManager");
         ag.buffManager = new BuffManager();
         ag.buffManager.init();
-
+        var AltasTask = require("AltasTask");
+        ag.altasTask = new AltasTask();
+        ag.altasTask.init();
 
 
         this._netState = cc.find("Canvas/label_netState");
         this._loadRes = cc.find("Canvas/load_res");
         this.labelPercent = cc.find("Canvas/load_res/label_percent").getComponent(cc.Label);
         this._loadRes.active = false;
-        cc.loader.loadRes('prefab/nodeRoleProp',function(err,prefab){
-            ag.agSocket.init(this.loadRes.bind(this));
-        }.bind(this));
+        ag.agSocket.init(this.loadRes.bind(this));
     },
 
 
@@ -46,16 +46,17 @@ cc.Class({
     loadRes:function(){
         this._loadRes.active = true;
         this._netState.active = false;
-        //var array = [];
-        //for(var i=1;i<=17;++i)array.push("ani/hum"+i);
-        //for(var i=1;i<=4;++i)array.push("ani/effect"+i);
-        //cc.loader.loadResArray(array, cc.SpriteAtlas,function(num, totalNum, item){
-        //    this.labelPercent.string = "("+Math.floor(num/totalNum*100)+"%)";
-        //}.bind(this),function (err, atlas) {
+
+
+        //公共资源在此添加,依次加载Prefab,SpriteAtlas,spriteFrame...
+        var array = ['prefab/nodeRoleProp'];
+        cc.loader.loadResArray(array, cc.Prefab,function(num, totalNum, item){
+            this.labelPercent.string = "("+Math.floor(num/totalNum*100)+"%)";
+        }.bind(this),function (err, atlas) {
             cc.director.loadScene('FirstLayer',null,function () {
                 cc.loader.onProgress = null;
             });
-//        }.bind(this));
+        }.bind(this));
     },
 
     // called every frame, uncomment this function to activate update callback

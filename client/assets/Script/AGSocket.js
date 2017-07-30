@@ -73,59 +73,15 @@ module.exports={
 
     //启动战斗中网络
     onBattleEvent:function(){
-        pomelo.on('sRole',function(data) {
-            var array = JSON.parse(data.msg);
-            this._dataArray.push({key:"sRole",value:array});
-        }.bind(this));
-
-        pomelo.on('sMove',function(data) {
-            var obj = JSON.parse(data.msg);
-            this._dataArray.push({key:"sMove",value:obj});
-        }.bind(this));
-
-        pomelo.on('sMyMove',function(data) {
-            var obj = JSON.parse(data.msg);
-            this._dataArray.push({key:"sMyMove",value:obj});
-        }.bind(this));
-
-        pomelo.on('sAttack',function(data) {
-            var obj = JSON.parse(data.msg);
-            this._dataArray.push({key:"sAttack",value:obj});
-        }.bind(this));
-
-        pomelo.on('sHP',function(data) {
-            var array = JSON.parse(data.msg);
-            this._dataArray.push({key:"sHP",value:array});
-        }.bind(this));
-
-        pomelo.on('sBuffManager',function(data) {
-            var array = JSON.parse(data.msg);
-            this._dataArray.push({key:"sBuffManager",value:array});
-        }.bind(this));
-
-        pomelo.on('sBFireCrit',function(data) {
-            var array = JSON.parse(data.msg);
-            this._dataArray.push({key:"sBFireCrit",value:array});
-        }.bind(this));
-
-        pomelo.on('sFireWall',function(data) {
-            var array = JSON.parse(data.msg);
-            this._dataArray.push({key:"sFireWall",value:array});
+        pomelo.on('onData',function(data) {
+            this._dataArray.push(data);
         }.bind(this));
     },
 
 
-
     //停止战斗中网络
     offBattleEvent:function(){
-        pomelo.on('sRole',undefined);
-        pomelo.on('sMove',undefined);
-        pomelo.on('sMyMove',undefined);
-        pomelo.on('sAttack',undefined);
-        pomelo.on('sHP',undefined);
-        pomelo.on('sBuffManager',undefined);
-        pomelo.on('sBFireCrit',undefined);
-        pomelo.on('sFireWall',undefined);
+        pomelo.on('onData',undefined);
     },
 
 
@@ -135,50 +91,65 @@ module.exports={
         while(this._dataArray.length>0){
             var obj = this._dataArray[0];
             cc.log(JSON.stringify(obj));
-            if(obj.key=="sRole"){
-                var array = obj.value;
-                for(var j=0;j<array.length;++j){
-                    ag.gameLayer.addRole(array[j]);
-                }
-            }else if(obj.key=="sMove"){
-                var obj2 = obj.value;
+            this.helpForDoWork(obj,'sMoveArray',function(obj2){
                 var player =  ag.gameLayer._roleMap[obj2.id];
                 if(player){
                     cc.log(obj2.id,obj2.x,obj2.y);
                     player.move(cc.p(obj2.x,obj2.y),true);
                 }
-            }else if(obj.key=="sMyMove"){
-                var obj = obj.value;
-                ag.gameLayer._player.myMoveByServer(obj.x,obj.y);
-            }else if(obj.key=="sAttack"){
-                var obj = obj.value;
+            }.bind(this));
+            this.helpForDoWork(obj,'sAttackArray',function(obj){
                 var player =  ag.gameLayer.getRole(obj.id);
                 var locked =  ag.gameLayer.getRole(obj.lockedId);
                 if(player && locked){
                     player.attack(locked,true);
                 }
-            }else if(obj.key=="sHP"){
-                var array = obj.value;
-                for(var i=0;i<array.length;++i){
-                    var player =  ag.gameLayer.getRole(array[i].id);
-                    if(player){
-                        player.changeHP(array[i].hp);
-                    }
+            }.bind(this));
+            this.helpForDoWork(obj,'sHPArray',function(obj){
+                var player =  ag.gameLayer.getRole(obj.id);
+                if(player){
+                    player.changeHP(obj.hp);
                 }
-            }else if(obj.key=="sBuffManager"){
-                var array = obj.value;
-                ag.buffManager.setData(array);
-            }else if(obj.key=="sBFireCrit"){
-                var obj = obj.value;
-                ag.buffManager.setCDForFireCritById(obj.id,false);
-            }else if(obj.key=="sFireWall"){
-                var obj = obj.value;
+            }.bind(this));
+            this.helpForDoWork(obj,'sRoleArray',function(obj){
+                ag.gameLayer.addRole(JSON.parse(obj));
+            }.bind(this));
+            this.helpForDoWork(obj,'sMyMoveArray',function(obj){
+                ag.gameLayer._player.myMoveByServer(obj.x,obj.y);
+            }.bind(this));
+            this.helpForDoWork(obj,'sBuffManagerArray',function(obj){
+                ag.buffManager.setData((JSON.parse(obj)));
+            }.bind(this));
+            this.helpForDoWork(obj,'sBFireCritArray',function(obj){
+                ag.buffManager.setCDForFireCritById(obj,false);
+            }.bind(this));
+            this.helpForDoWork(obj,'sFireWallArray',function(obj){
                 var player =  ag.gameLayer.getRole(obj.id);
                 if(player){
                     ag.buffManager.setFireWall(obj.mapXYString,player);
                 }
-            }
+            }.bind(this));
+            this.helpForDoWork(obj,'sAddExpArray',function(obj){
+                var player =  ag.gameLayer.getRole(obj.id);
+                if(player){
+                    player.addExp(obj.level,obj.exp);
+                }
+            }.bind(this));
             this._dataArray.splice(0,1);
+        }
+    },
+
+
+
+    //帮助上面的循环遍历
+    helpForDoWork:function(obj,name,callback){
+        for(var key in obj){
+            if(key==name){
+                var array = obj[name];
+                for(var i=0;i<array.length;++i){
+                    callback(array[i]);
+                }
+            }
         }
     },
 };

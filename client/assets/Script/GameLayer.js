@@ -31,6 +31,7 @@ cc.Class({
         //node.setScale(0.2);
 
 
+
         //创建主角
         var node = new cc.Node();
         this._player = node.addComponent(Role);
@@ -43,6 +44,7 @@ cc.Class({
         //启动定时器,每秒执行一次
         this.schedule(ag.buffManager.update1.bind(ag.buffManager),1);
         this.schedule(ag.buffManager.update5.bind(ag.buffManager),5);
+        this.schedule(ag.altasTask.update001.bind(ag.altasTask),0.01);
     },
 
 
@@ -171,17 +173,8 @@ cc.Class({
         var y=Math.abs(enemyLocation.y-myLocation.y);
         if(role1._data.type=="m0"){
             if (x<=2 && y<=2 && x+y!=3)return true;
-        }
-        else if(role1._data.type=="m1" || role1._data.type=="m2"){
-            if(cc.pDistance(myLocation,enemyLocation)<=9)return true;
-        }
-        else if(role1._data.type=="m5" || role1._data.type=="m18"){
-            if(cc.pDistance(myLocation,enemyLocation)<=5)return true;
-        }
-        else if(role1._data.type=="m9"){
-            if(cc.pDistance(myLocation,enemyLocation)<=7)return true;
         }else{
-            if(x<=1 && y<=1)return true;
+            if(cc.pDistance(myLocation,enemyLocation)<=role1.getMst().attackDistance)return true;
         }
         return false;
     },
@@ -226,5 +219,25 @@ cc.Class({
             if(role1._data.camp==ag.gameConst.campLiuxing && role2._data.camp==ag.gameConst.campLiuxing)return true;
         }
         return false;
+    },
+
+
+    //获得可以站立的位置
+    getStandLocation: function (mapId,x,y,r){
+        x = x-r+Math.floor(Math.random()*(2*r+1));
+        y = y-r+Math.floor(Math.random()*(2*r+1));
+        if(this.isCollision(mapId,x,y)==false)return {x:x,y:y};
+        for(var i=0;i<50;++i){
+            if(this.isCollision(mapId,x,y+i)==false)return {x:x,y:y+i};
+            if(this.isCollision(mapId,x,y-i)==false)return {x:x,y:y-i};
+            if(this.isCollision(mapId,x-i,y)==false)return {x:x-i,y:y};
+            if(this.isCollision(mapId,x+i,y)==false)return {x:x+i,y:y};
+            if(this.isCollision(mapId,x+i,y+i)==false)return {x:x+i,y:y+i};
+            if(this.isCollision(mapId,x-i,y-i)==false)return {x:x-i,y:y-i};
+            if(this.isCollision(mapId,x-i,y+i)==false)return {x:x-i,y:y+i};
+            if(this.isCollision(mapId,x+i,y-i)==false)return {x:x+i,y:y-i};
+        }
+        console.log("error position:"+mapId+",x:"+x+",y:"+y);
+        return {x:0,y:0};
     },
 });
