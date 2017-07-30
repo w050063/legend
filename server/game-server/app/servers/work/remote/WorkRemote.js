@@ -29,6 +29,7 @@ WorkRemote.prototype.add = function(uid, sid, cb) {
         ag.actionManager = require("../../../game/util/ActionManager");
         ag.actionManager.init();
         ag.jsUtil = require('../../../game/util/JsUtil');
+        ag.jsUtil.init();
         ag.gameConst = require('../../../game/util/GameConst');
         ag.gameConst.init();
         ag.gameLayer = require("../../../game/GameLayer");

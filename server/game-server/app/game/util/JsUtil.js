@@ -7,9 +7,9 @@
 var pomelo = require('pomelo');
 module.exports = {
     dataChannel:"dataChannel",
+
+
     send : function(route,msg,uids){
-
-
         //发送信息
         //var channelService = pomelo.app.get('channelService');
         //var channel = channelService.getChannel(JsUtil.dataChannel, true);
@@ -33,15 +33,16 @@ module.exports = {
         //发送信息
         var channelService = pomelo.app.get('channelService');
         var channel = channelService.getChannel(this.dataChannel, true);
-        var param = {msg: msg,from: "",target: ""};
         var infoArray = [];
         for(var i=0;i<uids.length;++i){
             var uid = uids[i];
             var userObj = channel.getMember(uid);
             if(userObj)infoArray.push({uid: uid,sid: userObj['sid']});
         }
+        var param = {msg: msg,from: "",target: ""};
         channelService.pushMessageByUids(route,param,infoArray);
     },
+
 
 
     //发送给所有人
@@ -51,6 +52,54 @@ module.exports = {
         var channel = channelService.getChannel(this.dataChannel, true);
         var param = {msg: msg,from: "",target: ""};
         channel.pushMessage(route,param);
+    },
+
+
+
+    init:function(){
+        this._sendObj = {};
+        setInterval(function () {
+            for(var id in this._sendObj){
+                var channelService = pomelo.app.get('channelService');
+                var channel = channelService.getChannel(this.dataChannel, true);
+                var userObj = channel.getMember(id);
+                if(userObj)channelService.pushMessageByUids('onData',this._sendObj[id],[{uid: id,sid: userObj['sid']}]);
+            }
+            this._sendObj = {};
+        }.bind(this),100);
+    },
+
+
+    //发送要合并的数据
+    sendData : function(route,msg,id){
+        if(!this._sendObj[id])this._sendObj[id] = {};
+        var idObj = this._sendObj[id];
+        var key = route+'Array';
+        if(!idObj[key])idObj[key] = [];
+        idObj[key].push(msg);
+    },
+
+
+    //发送要合并的数据
+    sendDataExcept : function(route,msg,role){
+        for(var key in ag.gameLayer._roleMap){
+            var data = ag.gameLayer._roleMap[key]._data;
+            if(data.camp!=ag.gameConst.campMonster && data.id!=role._data.id){
+                this.sendData(route,msg,data.id);
+            }
+        }
+    },
+
+
+
+    //发送要合并的数据
+    sendDataAll : function(route,msg){
+        for(var key in ag.gameLayer._roleMap){
+            var data = ag.gameLayer._roleMap[key]._data;
+            if(data.camp!=ag.gameConst.campMonster){
+                this.sendData(route,msg,data.id);
+            }
+        }
     },
 
 

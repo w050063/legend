@@ -3,5 +3,42 @@
   	"required string msg": 1,
   	"required string from": 2,
   	"required string target": 3
-   }
- }
+   },
+  "message sMove": {
+    "required string id": 1,
+    "required int32 x": 2,
+    "required int32 y": 3
+  },
+  "message sAttack": {
+    "required string id": 1,
+    "required string lockedId": 2
+  },
+  "message sHP": {
+    "required string id": 1,
+    "required int32 hp": 2
+  },
+  "message sMyMove": {
+    "required int32 x": 1,
+    "required int32 y": 2
+  },
+  "message sFireWall": {
+    "required string id": 1,
+    "required string mapXYString": 2
+  },
+  "message sAddExp": {
+    "required string id": 1,
+    "required int32 level": 2,
+    "required int32 exp": 3
+  },
+  "onData" : {
+    "repeated sMove sMoveArray": 1,
+    "repeated sAttack sAttackArray": 2,
+    "repeated sHP sHPArray": 3,
+    "repeated string sRoleArray": 4,
+    "repeated sMyMove sMyMoveArray": 5,
+    "repeated string sBuffManagerArray": 6,
+    "repeated string sBFireCritArray": 7,
+    "repeated sFireWall sFireWallArray": 8,
+    "repeated sAddExp sAddExpArray": 9
+  }
+}

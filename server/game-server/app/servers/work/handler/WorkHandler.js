@@ -77,7 +77,7 @@ var Handler = cc.Class.extend({
     //攻击
     attack:function(msg, session, next) {
         var attacker =  ag.gameLayer.getRole(session.uid);
-        var locked =  ag.gameLayer._roleMap[msg.id];
+        var locked =  ag.gameLayer.getRole(msg.id);
         if(attacker && locked){
             attacker.attack(locked);
         }

@@ -50,20 +50,14 @@ module.exports = {
             player._data.camp = ag.gameConst.campLiuxing;
             player._data.mapId = ag.gameConst._bornMap;
             player._data.direction = 4;//默认朝下
-            player._data.moveSpeed = 0.7;
-            player._data.hp = 675;
-            player._data.totalHP = 675;
-            player._data.level = 5;
-            player._data.visibleDistance = 9;
+            player._data.level = 0;
+            player.resetAllProp();
             if(player._data.type=="m0"){
                 player._data.clothes = player._data.sex==1?"fightertwogirl":"fightertwoboy";
-                player._data.attackSpeed = 0.8;
             }else if(player._data.type=="m1"){
                 player._data.clothes = player._data.sex==1?"magiciantwogirl":"magiciantwoboy";
-                player._data.attackSpeed = 1.2;
             }else if(player._data.type=="m2"){
                 player._data.clothes = player._data.sex==1?"taoisttwogirl":"taoisttwoboy";
-                player._data.attackSpeed = 0.8;
             }
 			this._roleMap[uid] = player;
             var xyStr = player.getMapXYString();
@@ -79,33 +73,26 @@ module.exports = {
         var array = [];
         for(var key in this._roleMap){
             var data = this._roleMap[key]._data;
-            if(data.mapId==player._data.mapId && data.id!=player._data.id)array.push(data);
-        }
-
-        //发送当前场景的数据
-        ag.jsUtil.send("sRole",JSON.stringify(array),[uid]);
-
-
-        //通知其他人。
-        for(var i=0;i<array.length;++i){
-            if(array[i].camp!=ag.gameConst.campMonster){
-                ag.jsUtil.send("sRole",JSON.stringify([player._data]),[array[i].id]);
+            if(data.mapId==player._data.mapId && data.id!=player._data.id){
+                array.push(data);
+                ag.jsUtil.sendData("sRole",JSON.stringify(data),uid);
             }
         }
 
+        //通知其他人。
+        ag.jsUtil.sendDataExcept("sRole",JSON.stringify(player._data),player);
+
 
         //发送buff管理数据
-        ag.jsUtil.send("sBuffManager",JSON.stringify(ag.buffManager.getData()),[player._data.id]);
+        ag.jsUtil.sendData("sBuffManager",JSON.stringify(ag.buffManager.getData()),player._data.id);
     },
 
 
     //怪物刷新函数
     refresh:function(){
-        var reply = {};
         for(var key in ag.gameConst._terrainMap){
             var map = ag.gameConst._terrainMap[key];
             var array = map.refresh;
-            reply[key]=[];
             for(var i=0;i<array.length;++i){
                 if(this._gameTime%array[i][3]==0){//时间正好是倍数，可以刷新了
                     var count = this.getCountWithType(key,array[i][0]);
@@ -129,28 +116,16 @@ module.exports = {
                         player._data.camp = ag.gameConst.campMonster;
                         player._data.mapId = key;
                         player._data.direction = Math.floor(Math.random()*8);
-                        player._data.moveSpeed = 2;
-                        player._data.attackSpeed = 2;
-                        player._data.hp = 500;
-                        player._data.totalHP = 675;
-                        player._data.level = 5;
-                        player._data.visibleDistance = 7;
-
+                        player._data.level = 0;
+                        player.resetAllProp();
                         this._roleMap[player._data.id] = player;
                         var xyStr = player.getMapXYString();
                         if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
                         this._roleXYMap[xyStr].push(player);
-                        reply[key].push(player._data);
                         player.setAIController(new AIController(player));
+                        ag.jsUtil.sendDataAll("sRole",JSON.stringify(player._data));
                     }
                 }
-            }
-        }
-
-        for(var key in this._roleMap){
-            var data = this._roleMap[key]._data;
-            if(reply[data.mapId].length>0 && data.camp!=ag.gameConst.campMonster){
-                ag.jsUtil.send("sRole",JSON.stringify(reply[data.mapId]),[data.id]);
             }
         }
     },
@@ -268,16 +243,8 @@ module.exports = {
         var y=Math.abs(enemyLocation.y-myLocation.y);
         if(role1._data.type=="m0"){
             if (x<=2 && y<=2 && x+y!=3)return true;
-        }
-        else if(role1._data.type=="m1" || role1._data.type=="m2"){
-            if(ag.jsUtil.pDistance(myLocation,enemyLocation)<=4)return true;
-        }else if(role1._data.type=="m5" || role1._data.type=="m18"){
-            if(ag.jsUtil.pDistance(myLocation,enemyLocation)<=5)return true;
-        }
-        else if(role1._data.type=="m9"){
-            if(ag.jsUtil.pDistance(myLocation,enemyLocation)<=7)return true;
         }else{
-            if(x<=1 && y<=1)return true;
+            if(ag.jsUtil.pDistance(myLocation,enemyLocation)<=role1.getMst().attackDistance)return true;
         }
         return false;
     },

@@ -17,9 +17,25 @@ module.exports = ag.class.extend({
     },
 
 
+    //重置所有属性
+    resetAllProp:function(){
+        var mst = this.getMst();
+        var lv = this._data.level;
+        this._data.totalHP = mst.hp+mst.hpAdd*lv;
+        this._data.hp = this._data.totalHP;
+        this._data.defense = mst.defense+mst.defenseAdd*lv;
+        this._data.hurt = mst.hurt+mst.hurtAdd*lv;
+        this._data.totalExp = mst.exp+mst.expAdd*lv;
+        this._data.exp = 0;
+        this._data.heal = mst.heal+mst.healAdd*lv;
+        this._data.attackSpeed = mst.attackSpeed;
+        this._data.moveSpeed = mst.moveSpeed;
+    },
+
+
     //获得策划数据
     getMst : function(){
-        return ag.gameConst._roleMst[type];
+        return ag.gameConst._roleMst[this._data.type];
     },
 
 
@@ -59,7 +75,7 @@ module.exports = ag.class.extend({
         var myData = this._data;
         if(Math.abs(this._data.x-location.x)>1 || Math.abs(this._data.y-location.y)>1){
             //位置异常，重新定位
-            ag.jsUtil.send("sMyMove",JSON.stringify({x:myData.x,y:myData.y}),[this._data.id]);
+            ag.jsUtil.sendData("sMyMove",{x:myData.x,y:myData.y},this._data.id);
             return;
         }
 
@@ -68,12 +84,7 @@ module.exports = ag.class.extend({
 
 
         //通知其他人
-        for(var key in ag.gameLayer._roleMap){
-            var data = ag.gameLayer._roleMap[key]._data;
-            if(data.mapId==this._data.mapId && data.camp!=ag.gameConst.campMonster && data.id!=this._data.id){
-                ag.jsUtil.send("sMove",JSON.stringify({id:myData.id, x:myData.x, y:myData.y}),[data.id]);
-            }
-        }
+        ag.jsUtil.sendDataExcept("sMove",{id:myData.id, x:myData.x, y:myData.y},this);
 
 
         //忙碌状态
@@ -106,10 +117,11 @@ module.exports = ag.class.extend({
                 for(var k=0;k<array.length;++k){
                     var lockedData = array[k]._data;
                     if(ag.gameLayer.isEnemyCamp(array[k],this)){
+                        var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            lockedData.hp -= 15;
+                            lockedData.hp -= Math.round(this._data.hurt/correct*3);
                         }else{
-                            lockedData.hp -= 5;
+                            lockedData.hp -=  Math.round(this._data.hurt/correct);
                         }
                         sendArray.push({id:lockedData.id,hp:lockedData.hp});
                     }
@@ -122,9 +134,10 @@ module.exports = ag.class.extend({
                     var lockedData = array[k]._data;
                     if(ag.gameLayer.isEnemyCamp(array[k],this)){
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            lockedData.hp -= 15;
+                            var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
+                            lockedData.hp -=  Math.round(this._data.hurt/correct*3);
                         }else{
-                            lockedData.hp -= 8;
+                            lockedData.hp -= this._data.hurt;
                         }
                         sendArray.push({id:lockedData.id,hp:lockedData.hp});
                     }
@@ -138,7 +151,8 @@ module.exports = ag.class.extend({
                         for(var k=0;k<array.length;++k){
                             var lockedData = array[k]._data;
                             if(ag.gameLayer.isEnemyCamp(array[k],this)){
-                                lockedData.hp -= 5;
+                                var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
+                                lockedData.hp -=  Math.round(this._data.hurt/correct);
                                 sendArray.push({id:lockedData.id,hp:lockedData.hp});
                             }
                         }
@@ -155,7 +169,8 @@ module.exports = ag.class.extend({
                 for(var k=0;k<array.length;++k){
                     var lockedData = array[k]._data;
                     if(ag.gameLayer.isEnemyCamp(array[k],this)){
-                        lockedData.hp -= 5;
+                        var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
+                        lockedData.hp -=  Math.round(this._data.hurt/correct);
                         sendArray.push({id:lockedData.id,hp:lockedData.hp});
                     }
                 }
@@ -169,7 +184,8 @@ module.exports = ag.class.extend({
             for (var i = 0; i < array.length; ++i) {
                 var lockedData = array[i]._data;
                 if (ag.gameLayer.isEnemyCamp(array[i],this)) {
-                    lockedData.hp -= 5;
+                    var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
+                    lockedData.hp -=  Math.round(this._data.hurt/correct);
                     sendArray.push({id: lockedData.id, hp: lockedData.hp});
                 }
             }
@@ -179,21 +195,13 @@ module.exports = ag.class.extend({
                 for(var k=0;k<array.length;++k){
                     var lockedData = array[k]._data;
                     if(ag.gameLayer.isEnemyCamp(array[k],this)){
-                        lockedData.hp -= 5;
+                        var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
+                        lockedData.hp -=  Math.round(this._data.hurt/correct);
                         sendArray.push({id:lockedData.id,hp:lockedData.hp});
                     }
                 }
             }
         }
-        //通知所有人
-        for(var key in ag.gameLayer._roleMap){
-            var data = ag.gameLayer._roleMap[key]._data;
-            if(data.camp!=ag.gameConst.campMonster && data.id!=this._data.id){
-                ag.jsUtil.send("sAttack",JSON.stringify({id:this._data.id,lockedId:locked._data.id}),[data.id]);
-            }
-        }
-
-
 
         //忙碌状态
         this._busy = true;
@@ -203,35 +211,54 @@ module.exports = ag.class.extend({
         }.bind(this));
 
 
-        ag.jsUtil.sendAll("sHP",JSON.stringify(sendArray));
-
         //战士没有进入烈火cd，则开始cd
         if(this._data.type=='m0' && ag.buffManager.getCDForFireCrit(this)==false){
             ag.buffManager.setCDForFireCrit(this);
         }
 
 
-        //删除本地怪物数据
+        //通知所有人
+        ag.jsUtil.sendDataExcept("sAttack",{id:this._data.id,lockedId:locked._data.id},this);
+
+
+        //删除本地死亡怪物数据,更新AI锁定
         for(var i=0;i<sendArray.length;++i){
+            ag.jsUtil.sendDataAll("sHP",sendArray[i]);
+            var beAttacker = ag.gameLayer._roleMap[sendArray[i].id];
             if(sendArray[i].hp<=0){
-                ag.gameLayer._roleMap[sendArray[i].id].dead();
+                beAttacker.dead(this);
+            }else{
+                if(beAttacker._ai)beAttacker._ai.setEnemy(this);
             }
         }
+
         this._state = ag.gameConst.stateAttack;
     },
 
 
-    dead:function () {
+    dead:function (attacker) {
         this._state = ag.gameConst.stateDead;
+        if(attacker._data.camp!=ag.gameConst.campMonster){
+            attacker._data.exp +=  this.getMst().expDead;
+            while(attacker._data.exp>=attacker._data.totalExp){
+                ++attacker._data.level;
+                var exp = attacker._data.exp-attacker._data.totalExp;
+                attacker.resetAllProp();
+                attacker._data.exp = exp;
+            }
+            ag.jsUtil.sendDataAll("sAddExp",{id:attacker._data.id,level:attacker._data.level,exp:attacker._data.exp});
+        }
+
 
         ag.buffManager.delFireWallByDead(this);
         ag.buffManager.delPoisonByDead(this);
-        ag.actionManager.delAll(this._ai);
-        ag.actionManager.delAll(this);
         //取消所有锁定自己的AI
         ag.gameLayer.delLockedRole(this);
         if(this._ai)this._ai._locked = null;
         if(this._data.camp==ag.gameConst.campMonster){
+            ag.actionManager.delAll(this._ai);
+            ag.actionManager.delAll(this);
+
             var str = this.getMapXYString();
             ag.gameLayer._roleXYMap[str].splice(ag.gameLayer._roleXYMap[str].indexOf(this),1);
             if(ag.gameLayer._roleXYMap[str].length==0)delete ag.gameLayer._roleXYMap[str];
@@ -240,7 +267,8 @@ module.exports = ag.class.extend({
             ag.actionManager.runAction(this,5,function () {
                 this._state = ag.gameConst.stateIdle;
                 this._data.hp = this._data.totalHP;
-                this.setLocation(ag.jsUtil.p(1,1));
+                var pos = ag.gameLayer.getStandLocation(this._data.mapId,this._data.x%9-4,this._data.y%9-4,0);
+                this.setLocation(pos.x,pos.y);
                 this._busy = false;
             }.bind(this));
         }

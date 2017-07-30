@@ -40,9 +40,10 @@ module.exports = ag.class.extend({
         ag.actionManager.runAction(role,5,function(){
             delete this._fireCritArray[role._data.id];
             //当玩家攻击后,服务器过10秒cd好了,会再次向客户端发送启用烈火,双方用完自动置为false
-            ag.jsUtil.sendAll("sBFireCrit",JSON.stringify({id:role._data.id}));
+            ag.jsUtil.sendDataAll("sBFireCrit",role._data.id);
         }.bind(this));
     },
+
 
 
     //设置某个位置出现火墙
@@ -53,7 +54,7 @@ module.exports = ag.class.extend({
             ag.actionManager.runAction(role,10,function(){
                 this.delFireWall(mapXYString);
             }.bind(this),tag);
-            ag.jsUtil.sendAll("sFireWall",JSON.stringify({mapXYString:mapXYString,id:role._data.id}));
+            ag.jsUtil.sendDataAll("sFireWall",{mapXYString:mapXYString,id:role._data.id});
         }
     },
 
@@ -144,10 +145,11 @@ module.exports = ag.class.extend({
 
     //更新数据
     update5: function (dt) {
+        //自动回血
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
             if(role._data.hp>0 && role._data.hp<role._data.totalHP){
-                role._data.hp+=1;
+                role._data.hp+=role._data.heal;
                 if(role._data.hp>role._data.totalHP)role._data.hp=role._data.totalHP;
             }
         }

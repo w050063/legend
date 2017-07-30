@@ -1,1 +1,17 @@
-{}
+{
+  "work.WorkHandler.chat" : {
+    "required string chat": 1
+  },
+  "work.WorkHandler.move" : {
+    "required int32 x": 1,
+    "required int32 y": 2
+  },
+  "work.WorkHandler.attack" : {
+    "required string id": 1
+  },
+  "work.WorkHandler.enter" : {
+    "required string name": 1,
+    "required string type": 2,
+    "required int32 sex": 3
+  }
+}
