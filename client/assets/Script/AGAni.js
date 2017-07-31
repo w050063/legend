@@ -13,7 +13,7 @@ cc.Class({
     //初始化角色
     init: function (str,n) {
         this._willDoArray = [];
-        this.loadOver = false;
+        this._loadOver = false;
         this.node._cukeName = str;
         this.node.addComponent(cc.Sprite);
         this._spriteFrameArray = [];
@@ -38,7 +38,7 @@ cc.Class({
                 this._spriteFrameArray.push({"key":urls[i],"value":atlas.getSpriteFrame(urls[i])});
             }
             this.modifyFrame();
-            this.loadOver = true;
+            this._loadOver = true;
             for(var i=0;i<this._willDoArray.length;++i){
                 this._willDoArray[i]();
             }

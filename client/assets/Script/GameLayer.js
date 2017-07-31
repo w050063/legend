@@ -47,7 +47,6 @@ cc.Class({
         this.schedule(ag.altasTask.update001.bind(ag.altasTask),0.01);
     },
 
-
     // called every frame
     update: function (dt) {
         //设置网络

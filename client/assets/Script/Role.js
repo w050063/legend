@@ -433,6 +433,9 @@ cc.Class({
 
     // called every frame
     update: function (dt) {
-        this.node.setLocalZOrder(Math.round(100000-this.node.y));
+        if(this._agAni && this._agAni.getComponent(AGAni)._loadOver){
+            var zorder = Math.round(10000-this.node.y);
+            if(this.node.getLocalZOrder()!=zorder)this.node.setLocalZOrder(zorder);
+        }
     },
 });
