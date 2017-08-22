@@ -13,5 +13,7 @@
     "required string name": 1,
     "required string type": 2,
     "required int32 sex": 3
+  },
+  "work.WorkHandler.relife" : {
   }
 }

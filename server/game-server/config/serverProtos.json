@@ -17,9 +17,10 @@
     "required string id": 1,
     "required int32 hp": 2
   },
-  "message sMyMove": {
-    "required int32 x": 1,
-    "required int32 y": 2
+  "message sMoveForce": {
+    "required string id": 1,
+    "required int32 x": 2,
+    "required int32 y": 3
   },
   "message sFireWall": {
     "required string id": 1,
@@ -35,7 +36,7 @@
     "repeated sAttack sAttackArray": 2,
     "repeated sHP sHPArray": 3,
     "repeated string sRoleArray": 4,
-    "repeated sMyMove sMyMoveArray": 5,
+    "repeated sMoveForce sMoveForceArray": 5,
     "repeated string sBuffManagerArray": 6,
     "repeated string sBFireCritArray": 7,
     "repeated sFireWall sFireWallArray": 8,
