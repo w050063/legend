@@ -66,7 +66,7 @@ module.exports = {
                 if(userObj)channelService.pushMessageByUids('onData',this._sendObj[id],[{uid: id,sid: userObj['sid']}]);
             }
             this._sendObj = {};
-        }.bind(this),100);
+        }.bind(this),50);
     },
 
 

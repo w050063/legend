@@ -75,7 +75,7 @@ module.exports = ag.class.extend({
         var myData = this._data;
         if(Math.abs(this._data.x-location.x)>1 || Math.abs(this._data.y-location.y)>1){
             //位置异常，重新定位
-            ag.jsUtil.sendData("sMyMove",{x:myData.x,y:myData.y},this._data.id);
+            ag.jsUtil.sendData("sMoveForce",{id:this._data.id,x:myData.x,y:myData.y},this._data.id);
             return;
         }
 
@@ -112,7 +112,11 @@ module.exports = ag.class.extend({
         //伤害计算
         if(this._data.type=='m0'){
             var dirPoint = ag.gameConst.directionArray[this._data.direction];
-            var array = ag.gameLayer._roleXYMap[''+data.mapId+','+(this._data.x+dirPoint.x)+','+(this._data.y+dirPoint.y)];
+            var array = [];
+            var array1 = ag.gameLayer._roleXYMap[''+data.mapId+','+(this._data.x+dirPoint.x)+','+(this._data.y+dirPoint.y)];
+            if(array1)array = array.concat(array1);
+            array1 = ag.gameLayer._roleXYMap[''+data.mapId+','+this._data.x+','+this._data.y];
+            if(array1)array = array.concat(array1);
             if(array){
                 for(var k=0;k<array.length;++k){
                     var lockedData = array[k]._data;
@@ -263,16 +267,22 @@ module.exports = ag.class.extend({
             ag.gameLayer._roleXYMap[str].splice(ag.gameLayer._roleXYMap[str].indexOf(this),1);
             if(ag.gameLayer._roleXYMap[str].length==0)delete ag.gameLayer._roleXYMap[str];
             delete ag.gameLayer._roleMap[this._data.id];
-        }else{//玩家5秒后重新复活
-            ag.actionManager.runAction(this,5,function () {
-                this._state = ag.gameConst.stateIdle;
-                this._data.hp = this._data.totalHP;
-                var pos = ag.gameLayer.getStandLocation(this._data.mapId,this._data.x%9-4,this._data.y%9-4,0);
-                this.setLocation(pos.x,pos.y);
-                this._busy = false;
-            }.bind(this));
         }
     },
+
+
+
+    relife: function () {
+        if(this._state == ag.gameConst.stateDead){
+            this._state = ag.gameConst.stateIdle;
+            this._data.hp = this._data.totalHP;
+            var pos = ag.gameLayer.getStandLocation(ag.gameConst._bornMap,ag.gameConst._bornX,ag.gameConst._bornY,ag.gameConst._bornR);
+            this.setLocation(pos);
+            ag.jsUtil.sendDataAll("sMoveForce",{id:this._data.id, x:this._data.x, y:this._data.y});
+            this._busy = false;
+        }
+    },
+
 
 
     getMapXYString:function(){

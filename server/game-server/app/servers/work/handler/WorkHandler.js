@@ -83,4 +83,15 @@ var Handler = cc.Class.extend({
         }
         next();
     },
+
+
+
+    //复活请求
+    relife:function(msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player){
+            player.relife();
+        }
+        next();
+    },
 });
