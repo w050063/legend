@@ -40,6 +40,31 @@ cc.Class({
             this._ai = this.node.addComponent(AIController);
             this._ai.init(this);
         }
+
+
+
+        //位置变化调用，第一次开始也调用一次
+        this.node.on('position-changed', function (event) {
+            this.setZorderAndMapPos.call(this);
+        }.bind(this));
+
+        if(this._agAni){
+            this._agAni.getComponent(AGAni).doCallback(this.setZorderAndMapPos.bind(this));
+        }
+    },
+
+
+    //刷新层级关系,设置地图位置
+    setZorderAndMapPos:function(){
+        if(this._agAni && this._agAni.getComponent(AGAni)._loadOver){
+            var zorder = Math.round(10000-this.node.y);
+            if(this.node.getLocalZOrder()!=zorder)this.node.setLocalZOrder(zorder);
+        }
+
+        //更新位置
+        if(ag.gameLayer._player == this){
+            ag.gameLayer._map.node.setPosition(-this.node.x,-this.node.y);
+        }
     },
 
 
@@ -109,7 +134,7 @@ cc.Class({
 
     //无事可以做状态，可以重复进入
     idle:function(){
-        if(this._state != ag.gameConst.stateIdle){
+        if(this._state != ag.gameConst.stateIdle && this._state != ag.gameConst.stateDead){
             this.node.stopAllActions();
             if(this._data.camp!=ag.gameConst.campMonster && this._state == ag.gameConst.stateAttack){
                 this._agAni.getComponent(AGAni).pause();
@@ -169,12 +194,13 @@ cc.Class({
     myMoveByServer:function(locationX,locationY) {
         cc.log("error!!!");
         this.node.stopAllActions();
-        this._data.x = location.x;
-        this._data.y = location.y;
-        var mapData = ag.gameConst._terrainMap[this._data.mapId];
-        var x = this._data.x - mapData.mapX / 2;
-        var y = this._data.y - mapData.mapY / 2;
-        this.node.setPosition(cc.p(x * mapData.tileX, y * mapData.tileY));
+        //this._data.x = location.x;
+        //this._data.y = location.y;
+        //var mapData = ag.gameConst._terrainMap[this._data.mapId];
+        //var x = this._data.x - mapData.mapX / 2;
+        //var y = this._data.y - mapData.mapY / 2;
+        //this.node.setPosition(cc.p(x * mapData.tileX, y * mapData.tileY));
+        this.setLocation(locationX,locationY);
         this.idle();
         if(this._ai)this._ai.onMoveEnd();
     },
@@ -341,36 +367,42 @@ cc.Class({
         ag.gameLayer.delLockedRole(this);
         if(this._ai)this._ai._locked = null;
         if(this._data.camp==ag.gameConst.campMonster){
-            //this.node.removeFromParent(true);
             this.node.destroy();
             delete ag.gameLayer._roleMap[this._data.id];
         }else{
             cc.log("ready");
             this.node.active = false;
-            ag.gameLayer.node.runAction(cc.sequenceEx(cc.delayTime(5),cc.callFunc(function () {
-                this.node.active = true;
-                cc.log("relive");
-                this.changeHP(this._data.totalHP);
-                var pos = ag.gameLayer.getStandLocation(this._data.mapId,this._data.x%9-4,this._data.y%9-4,0);
-                this.setLocation(pos.x,pos.y);
-                this.idle();
-                this._state = ag.gameConst.stateIdle;
-                if(this._ai)this._ai._busy = false;
+            if(this==ag.gameLayer._player){
+                ag.jsUtil.alert(ag.gameLayer.node,'重新复活!',function () {
+                    ag.agSocket.send("relife",{});
+                });
+            }
+        }
+    },
 
 
-                //复活飘字
-                var node = new cc.Node();
-                var tips = node.addComponent(cc.Label);
-                node.x = 0;
-                node.y = 87;
-                tips.fontSize = 12;
-                node.color = cc.color(0,255,0,255);
-                tips.string = "站起来还是一条好汉！！！";
-                this.node.addChild(node,30);
-                node.runAction(cc.sequence(cc.delayTime(3), cc.fadeOut(0.2),cc.callFunc(function(){
-                    node.destroy();
-                })));
-            }.bind(this))));
+    //复活
+    relife:function(){
+        if(this._state == ag.gameConst.stateDead){
+            this.node.active = true;
+            cc.log("relive");
+            this.changeHP(this._data.totalHP);
+            this.idle();
+            if(this._ai)this._ai._busy = false;
+
+
+            //复活飘字
+            var node = new cc.Node();
+            var tips = node.addComponent(cc.Label);
+            node.x = 0;
+            node.y = 87;
+            tips.fontSize = 12;
+            node.color = cc.color(0,255,0,255);
+            tips.string = "站起来还是一条好汉！！！";
+            this.node.addChild(node,30);
+            node.runAction(cc.sequence(cc.delayTime(3), cc.fadeOut(0.2),cc.callFunc(function(){
+                node.destroy();
+            })));
         }
     },
 
@@ -433,9 +465,5 @@ cc.Class({
 
     // called every frame
     update: function (dt) {
-        if(this._agAni && this._agAni.getComponent(AGAni)._loadOver){
-            var zorder = Math.round(10000-this.node.y);
-            if(this.node.getLocalZOrder()!=zorder)this.node.setLocalZOrder(zorder);
-        }
     },
 });

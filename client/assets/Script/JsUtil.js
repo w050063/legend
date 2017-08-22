@@ -5,6 +5,17 @@
 
 
 module.exports={
+    alert:function (father,content,callback) {
+        //加载
+        cc.loader.loadRes('prefab/nodeAlert',function(err,prefab){
+            var node = cc.instantiate(prefab);
+            node.parent = father;
+            node.setLocalZOrder(101);
+            var label = node.getChildByName("labelContent").getComponent(cc.Label);
+            label.string = content;
+            node._callback = callback;
+        }.bind(this));
+    },
 
 
     //获取图片的rgba数据，以左下角为起点

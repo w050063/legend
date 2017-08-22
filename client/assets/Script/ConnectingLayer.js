@@ -34,6 +34,19 @@ cc.Class({
         ag.altasTask.init();
 
 
+        //注册前后台切换事件
+        cc.game.on(cc.game.EVENT_HIDE, function () {
+            if(ag.gameLayer && ag.gameLayer._player && ag.gameLayer._player._ai){
+                ag.gameLayer._player._ai._touchPointArray = [];
+            }
+        });
+        cc.game.on(cc.game.EVENT_SHOW , function () {
+            if(ag.gameLayer && ag.gameLayer._player && ag.gameLayer._player._ai){
+                ag.gameLayer._player._ai._touchPointArray = [];
+            }
+        });
+
+
         this._netState = cc.find("Canvas/label_netState");
         this._loadRes = cc.find("Canvas/load_res");
         this.labelPercent = cc.find("Canvas/load_res/label_percent").getComponent(cc.Label);

@@ -16,6 +16,7 @@ cc.Class({
         ag.gameLayer = this;
         this._roleMap = {};
         this._player = null;
+        
 
 
         cc.audioEngine.play(cc.url.raw("resources/music/background.mp3"),true,1);
@@ -47,16 +48,20 @@ cc.Class({
         this.schedule(ag.altasTask.update001.bind(ag.altasTask),0.01);
     },
 
+    log:function(str){
+        //if(!this._log){
+        //    this._log = this.node.getChildByName('editBoxName').getComponent('cc.EditBox');
+        //    this._log.node.setLocalZOrder(99999);
+        //}
+        //var s = this._log.string + str;
+        //s = s.substr(s.length-400,400);
+        //this._log.string = s;
+    },
+
     // called every frame
     update: function (dt) {
         //设置网络
         ag.agSocket.doWork();
-
-
-        //更新位置
-        if(this._player){
-            this._map.node.setPosition(-this._player.node.x,-this._player.node.y);
-        }
     },
 
 

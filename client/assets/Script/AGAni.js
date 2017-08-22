@@ -46,6 +46,15 @@ cc.Class({
         }.bind(this));
     },
 
+    //加载完毕后指定参数任务
+    doCallback:function(callback){
+        if(this._loadOver){
+            callback(this);
+        }else{
+            this._willDoArray.push(callback);
+        }
+    },
+
 
     pause:function(){
         this._running = false;

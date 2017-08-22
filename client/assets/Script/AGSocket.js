@@ -53,7 +53,7 @@ module.exports={
     onSEnter:function(){
         pomelo.on('sEnter',function(data) {
             var msg = JSON.parse(data.msg);
-            cc.log(JSON.stringify(msg));
+            //cc.log(JSON.stringify(msg));
             ag.userInfo._id = msg.id;
             ag.userInfo._name = msg.name;
             ag.userInfo._x = msg.x;
@@ -90,11 +90,11 @@ module.exports={
         if(this._dataArray.length==0)return;
         while(this._dataArray.length>0){
             var obj = this._dataArray[0];
-            cc.log(JSON.stringify(obj));
+            //cc.log(JSON.stringify(obj));
             this.helpForDoWork(obj,'sMoveArray',function(obj2){
                 var player =  ag.gameLayer._roleMap[obj2.id];
                 if(player){
-                    cc.log(obj2.id,obj2.x,obj2.y);
+                    //cc.log(obj2.id,obj2.x,obj2.y);
                     player.move(cc.p(obj2.x,obj2.y),true);
                 }
             }.bind(this));
@@ -114,8 +114,12 @@ module.exports={
             this.helpForDoWork(obj,'sRoleArray',function(obj){
                 ag.gameLayer.addRole(JSON.parse(obj));
             }.bind(this));
-            this.helpForDoWork(obj,'sMyMoveArray',function(obj){
-                ag.gameLayer._player.myMoveByServer(obj.x,obj.y);
+            this.helpForDoWork(obj,'sMoveForceArray',function(obj){
+                var player =  ag.gameLayer.getRole(obj.id);
+                if(player) {
+                    player.myMoveByServer(obj.x, obj.y);
+                    player.relife();
+                }
             }.bind(this));
             this.helpForDoWork(obj,'sBuffManagerArray',function(obj){
                 ag.buffManager.setData((JSON.parse(obj)));
