@@ -66,7 +66,7 @@ cc.Class({
         cc.loader.loadResArray(array, cc.Prefab,function(num, totalNum, item){
             this.labelPercent.string = "("+Math.floor(num/totalNum*100)+"%)";
         }.bind(this),function (err, atlas) {
-            cc.director.loadScene('FirstLayer',null,function () {
+            cc.director.loadScene('LoginScene',null,function () {
                 cc.loader.onProgress = null;
             });
         }.bind(this));
