@@ -242,7 +242,7 @@ module.exports = ag.class.extend({
 
     dead:function (attacker) {
         this._state = ag.gameConst.stateDead;
-        if(attacker._data.camp!=ag.gameConst.campMonster){
+        if(attacker && attacker._data.camp!=ag.gameConst.campMonster){
             attacker._data.exp +=  this.getMst().expDead;
             while(attacker._data.exp>=attacker._data.totalExp){
                 ++attacker._data.level;

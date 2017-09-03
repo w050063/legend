@@ -17,6 +17,62 @@ var Handler = cc.Class.extend({
     },
 
 
+    //进入游戏,0正确,1Id为空,2ID已经存在
+    ykLogin:function(msg, session, next) {
+        var data = null;
+        if(session.uid){
+            data = ag.userManager.add(session.uid,session.uid,0,0);
+            var player =  ag.gameLayer.getRole(session.uid);
+            console.log("session.uid");
+            console.log(session.uid);
+            if(player){
+                data.type = player._data.type;
+                data.sex = player._data.sex;
+                console.log("enter");
+            }
+        }
+        next(null, {
+            code: data?0:1,
+            data: data?data:0
+        });
+    },
+
+
+    //0正常,1id不存在,2名字重复
+    changeName:function(msg, session, next) {
+        var code = ag.userManager.changeName(session.uid,msg);
+        next(null, {
+            code: code
+        });
+    },
+
+
+    //进入游戏,0正确,1Id为空
+    getGameList:function(msg, session, next) {
+        next(null, {
+            code: 0,
+            data: ag.gameListManager.get()
+        });
+    },
+
+
+    //删除角色,0正常，1不存在角色
+    deleteRole:function(msg, session, next) {
+        var code = 1;
+        var player =  ag.gameLayer.getRole(session.uid);
+        console.log("session.uid");
+        console.log(session.uid);
+        if(player){
+            player._data.camp=ag.gameConst.campMonster;
+            player.dead();
+            code = 0;
+            console.log("enter");
+        }
+        next(null, {
+            code: code
+        });
+    },
+
     /**
      * Send messages to users
      *
@@ -59,7 +115,9 @@ var Handler = cc.Class.extend({
 
     //进入游戏
     enter:function(msg, session, next) {
-        ag.gameLayer.addPlayer(session.uid,msg.name,msg.type,msg.sex);
+        console.log("session.uid:");
+        console.log(session.uid,ag.userManager.getName(session.uid),msg.type,msg.sex);
+        ag.gameLayer.addPlayer(session.uid,ag.userManager.getName(session.uid),msg.type,msg.sex);
         next();
     },
 
