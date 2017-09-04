@@ -16,28 +16,10 @@ cc.Class({
         this._scrollViewList.setSpace(2);
         this.update5();
         this.schedule(this.update5.bind(this),5);
-        //this._scrollViewList.setCount(50);
-        //this._scrollViewList.setCallback(function(item,index){
-        //    item.getChildByName('labelName').getComponent(cc.Label).string = '房间'+index;
-        //    item.getChildByName('labelCount').getComponent(cc.Label).string = '20/100';
-        //    item.getChildByName('labelTime').getComponent(cc.Label).string = '2分钟35秒';
-        //    item.off('touchend');
-        //    item.on('touchend', function () {
-        //        cc.log("Item " + index + ' clicked');
-        //        existThis = false;
-        //        cc.director.loadScene('CreateRoleScene');
-        //    }, this);
-        //});
-        //this._scrollViewList.reload();
 
-
-        var spriteHeadInfo = cc.find('Canvas/spriteHeadInfo');
         cc.find('Canvas/spriteIconButton').on('touchend', function () {
-            spriteHeadInfo.active = true;
+            cc.find('Canvas/spriteHeadInfo').active = true;
             this.nextUpdateInfo();
-        }, this);
-        spriteHeadInfo.on('touchend', function () {
-            spriteHeadInfo.active = false;
         }, this);
 
 
@@ -45,7 +27,7 @@ cc.Class({
         if(!cc.sys.localStorage.getItem('firstChangeName')){
             cc.sys.localStorage.setItem('firstChangeName','1');
         }else{
-            spriteHeadInfo.active = false;
+            cc.find('Canvas/spriteHeadInfo').active = false;
         }
         this.firstUpdateInfo();
     },
@@ -71,7 +53,7 @@ cc.Class({
                 });
                 self._scrollViewList.reload();
             }
-        });
+        },false);
     },
 
 
@@ -98,6 +80,9 @@ cc.Class({
         }
     },
 
+    buttonClose:function(){
+        cc.find('Canvas/spriteHeadInfo').active = false;
+    },
 
     back:function(){
         existThis = false;

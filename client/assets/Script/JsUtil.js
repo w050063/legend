@@ -18,23 +18,19 @@ module.exports={
     },
 
 
-    request:function (father,key,obj,callback) {
+    request:function (father,key,obj,callback,bShowLoading) {
+        if(bShowLoading==undefined)bShowLoading = true;
         //加载
         var node = null;
-        var action = cc.sequence(cc.delayTime(0.2),cc.callFunc(function(){
-            if(father){
-                cc.loader.loadRes('prefab/nodeRequest',function(err,prefab){
-                    node = cc.instantiate(prefab);
-                    node.parent = father;
-                    node.setLocalZOrder(101);
-                }.bind(this));
-            }
-        }));
-        action.setTag(10024);
+        if(bShowLoading){
+            var prefab = cc.loader.getRes('prefab/nodeRequest',cc.Prefab);
+            node = cc.instantiate(prefab);
+            node.parent = father;
+            node.setLocalZOrder(101);
+        }
         pomelo.request("work.WorkHandler."+key, obj, function(data) {
             cc.log(data);
             if(node)node.destroy();
-            if(father)father.stopActionByTag(10024);
             if(data.code==0){
                 if(callback)callback(data);
             }else{

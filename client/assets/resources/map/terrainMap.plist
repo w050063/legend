@@ -7,54 +7,54 @@
             <key>00.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{194,194},{190,190}}</string>
+                <string>{{176,176},{172,172}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{190,190}}</string>
+                <string>{{0,0},{172,172}}</string>
                 <key>sourceSize</key>
-                <string>{190,190}</string>
+                <string>{172,172}</string>
             </dict>
             <key>01.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{194,2},{190,190}}</string>
+                <string>{{176,2},{172,172}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{190,190}}</string>
+                <string>{{0,0},{172,172}}</string>
                 <key>sourceSize</key>
-                <string>{190,190}</string>
+                <string>{172,172}</string>
             </dict>
             <key>10.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,194},{190,190}}</string>
+                <string>{{2,176},{172,172}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{190,190}}</string>
+                <string>{{0,0},{172,172}}</string>
                 <key>sourceSize</key>
-                <string>{190,190}</string>
+                <string>{172,172}</string>
             </dict>
             <key>11.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,2},{190,190}}</string>
+                <string>{{2,2},{172,172}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{190,190}}</string>
+                <string>{{0,0},{172,172}}</string>
                 <key>sourceSize</key>
-                <string>{190,190}</string>
+                <string>{172,172}</string>
             </dict>
         </dict>
         <key>metadata</key>
@@ -66,7 +66,7 @@
             <key>size</key>
             <string>{512,512}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:6193792d0cea23cb3d8947b0820b499d:1/1$</string>
+            <string>$TexturePacker:SmartUpdate:3f96545f83b1a73fe03dd45092b1df18:1/1$</string>
             <key>textureFileName</key>
             <string>terrainMap.png</string>
         </dict>
