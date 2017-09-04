@@ -138,7 +138,7 @@ cc.Class({
             this.node.stopAllActions();
             if(this._data.camp!=ag.gameConst.campMonster && this._state == ag.gameConst.stateAttack){
                 this._agAni.getComponent(AGAni).pause();
-                this.node.runAction(cc.sequenceEx(cc.delayTime(1),cc.callFunc(function(){
+                this.node.runAction(cc.sequence(cc.delayTime(1),cc.callFunc(function(){
                     this.idleAnimation();
                 }.bind(this))));
             }else{
@@ -161,7 +161,7 @@ cc.Class({
         var x = this._data.x - mapData.mapX / 2;
         var y = this._data.y - mapData.mapY / 2;
         var moveSpeed = this._data.camp==ag.gameConst.campMonster ? 0.8:this._data.moveSpeed;
-        this.node.runAction(cc.sequenceEx(cc.moveTo(moveSpeed, cc.p(x * mapData.tileX, y * mapData.tileY)),cc.callFunc(function(){
+        this.node.runAction(cc.sequence(cc.moveTo(moveSpeed, cc.p(x * mapData.tileX, y * mapData.tileY)),cc.callFunc(function(){
             if(bServer){
                 this.idle();
             }else{

@@ -18,6 +18,50 @@ module.exports={
     },
 
 
+    request:function (father,key,obj,callback) {
+        //加载
+        var node = null;
+        var action = cc.sequence(cc.delayTime(0.2),cc.callFunc(function(){
+            if(father){
+                cc.loader.loadRes('prefab/nodeRequest',function(err,prefab){
+                    node = cc.instantiate(prefab);
+                    node.parent = father;
+                    node.setLocalZOrder(101);
+                }.bind(this));
+            }
+        }));
+        action.setTag(10024);
+        pomelo.request("work.WorkHandler."+key, obj, function(data) {
+            cc.log(data);
+            if(node)node.destroy();
+            if(father)father.stopActionByTag(10024);
+            if(data.code==0){
+                if(callback)callback(data);
+            }else{
+                ag.jsUtil.showText(father,'错误码:'+data.code);
+            }
+        });
+    },
+
+
+    showText:function (father,str) {
+        //文字提示
+        var node = new cc.Node();
+        var tips = node.addComponent(cc.Label);
+        node.x = 0;
+        node.y = 0;
+        node.color = cc.color(255,0,0,255);
+        tips.string = str;
+        father.addChild(node);
+        node.setLocalZOrder(109);
+        node.runAction(cc.sequence(cc.moveBy(0.5, cc.p(0, 200)), cc.delayTime(0.4),
+            cc.spawn(cc.moveBy(0.4, cc.p(0, 100)), cc.fadeOut(0.4)),
+            cc.callFunc(function () {
+                node.destroy();
+            })));
+    },
+
+
     //获取图片的rgba数据，以左下角为起点
     loadImageData:function(name,callback,aaa){
         var myImage = new Image();

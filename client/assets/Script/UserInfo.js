@@ -10,6 +10,7 @@ module.exports={
 
 
     //相关数据
+	_accountData:null,
     _data:null,
     _sessionId:-1,
 	_id:100000,

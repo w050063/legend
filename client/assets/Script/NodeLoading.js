@@ -1,30 +1,19 @@
 cc.Class({
     extends: cc.Component,
-
-    properties: {
-        // foo: {
-        //    default: null,      // The default value will be used only when the component attaching
-        //                           to a node for the first time
-        //    url: cc.Texture2D,  // optional, default is typeof default
-        //    serializable: true, // optional, default is true
-        //    visible: true,      // optional, default is true
-        //    displayName: 'Foo', // optional
-        //    readonly: false,    // optional, default is false
-        // },
-        // ...
-    },
+    properties: {},
 
     // use this for initialization
     onLoad: function () {
+        if(!this._sourceName)this._sourceName = '资源加载中';
         this.labelShow = this.node.getChildByName("label_show").getComponent(cc.Label);
         this.labelPercent = this.node.getChildByName("label_percent").getComponent(cc.Label);
-        this.labelShow.node.runAction(cc.repeatForever(new cc.Sequence(
-            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = "资源加载中.";}.bind(this)),
-            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = "资源加载中..";}.bind(this)),
-            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = "资源加载中...";}.bind(this)),
-            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = "资源加载中....";}.bind(this)),
-            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = "资源加载中.....";}.bind(this)),
-            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = "资源加载中......";}.bind(this))
+        this.labelShow.node.runAction(cc.repeatForever(cc.sequence(
+            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = this._sourceName+".";}.bind(this)),
+            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = this._sourceName+"..";}.bind(this)),
+            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = this._sourceName+"...";}.bind(this)),
+            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = this._sourceName+"....";}.bind(this)),
+            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = this._sourceName+".....";}.bind(this)),
+            cc.delayTime(0.2),cc.callFunc(function(){this.labelShow.string = this._sourceName+"......";}.bind(this))
         )));
 
         //cc.loader.onProgress = function(num, totalNum, item) {
@@ -34,8 +23,11 @@ cc.Class({
         //}.bind(this);
     },
 
-    // called every frame, uncomment this function to activate update callback
-    // update: function (dt) {
 
-    // },
+    setShow:function (str) {
+        this._sourceName = str;
+    },
+    setPercent:function (str) {
+        if(this.labelPercent)this.labelPercent.string = str;
+    },
 });

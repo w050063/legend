@@ -41,7 +41,7 @@ cc.Class({
     reload:function(){
         this.init();
         for(var i=0;i<this.items.length;++i){
-            this.items.destroy();
+            this.items[i].destroy();
         }
         this.items = [];
         this.content.height = this.totalCount==0?0:(this.totalCount * (this.itemTemplate.height + this.spacing) - this.spacing);

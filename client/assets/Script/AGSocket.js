@@ -14,21 +14,37 @@ module.exports={
     //setup socket.
     init: function(callback) {
         var self = this;
-        var tempId = null;
-        pomelo.init({host: "127.0.0.1",port: 3014,log: true}, function() {
+        var id = cc.sys.localStorage.getItem('id');
+        if(!id){
+            id = 'r'+(new Date().getTime());
+            cc.sys.localStorage.setItem('id',id);
+        }
+        self._sessionId=id;
+        //var tempId = null;
+        pomelo.disconnect();
+        pomelo.init({host: "47.92.67.211",port: 3014,log: true}, function() {
 			pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
 				pomelo.disconnect();
-				tempId=data.uid;
-				pomelo.init({host: data.host,port: data.port,log: true}, function() {
-					pomelo.request("conn.ConnHandler.connect", {uid:tempId}, function(data) {
+				//tempId=data.uid;
+                pomelo.init({host: data.host,port: data.port,log: true}, function() {
+                    pomelo.request("conn.ConnHandler.connect", {uid:self._sessionId}, function(data) {
                         cc.log("网关 successed!");
-				        self._sessionId=tempId;
-                        if(callback)callback();
-					});
-				});
+                        //self._sessionId=tempId;
+                        if(callback)callback(data);
+                    });
+                });
 			});
 		});
 	},
+
+
+    //设置断开逻辑
+    setDisconnect:function (callback) {
+        pomelo.on('disconnect',function () {
+            pomelo.removeAllListeners('disconnect');
+            callback();
+        });
+    },
 
 
     //发送数据封装
@@ -59,7 +75,7 @@ module.exports={
             ag.userInfo._x = msg.x;
             ag.userInfo._y = msg.y;
             ag.userInfo._data = msg;
-            ag.agSocket.offSChat();
+            //ag.agSocket.offSChat();
             ag.agSocket.offSEnter();
             ag.agSocket.onBattleEvent();
             cc.director.loadScene("GameLayer");
@@ -81,7 +97,8 @@ module.exports={
 
     //停止战斗中网络
     offBattleEvent:function(){
-        pomelo.on('onData',undefined);
+        //pomelo.on('onData',undefined);
+        pomelo.removeAllListeners('onData');
     },
 
 

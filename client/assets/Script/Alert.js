@@ -9,6 +9,10 @@ cc.Class({
     properties: {},
 
 
+    onLoad: function () {
+
+    },
+
     buttonOK: function() {
         if (this.node._callback)this.node._callback();
         this.node.destroy();

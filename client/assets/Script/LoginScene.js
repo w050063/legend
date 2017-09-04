@@ -3,13 +3,16 @@
  * 网络链接场景
  */
 
-
+var UserInfo = require('UserInfo');
 cc.Class({
     extends: cc.Component,
     properties: {},
 
 
     buttonTourist: function() {
-        cc.director.loadScene('HallScene',null,function () {});
+        ag.jsUtil.request(this.node,'ykLogin',ag.agSocket._sessionId,function (data) {
+            UserInfo._accountData = data.data;
+            cc.director.loadScene('HallScene');
+        });
     },
 });
