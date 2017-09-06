@@ -90,7 +90,16 @@ module.exports={
     //启动战斗中网络
     onBattleEvent:function(){
         pomelo.on('onData',function(data) {
-            this._dataArray.push(data);
+            for(var key in data){
+                var array = data[key];
+                for(var i=0;i<array.length;++i){
+                    var value = array[i];
+                    if(this.getExistAttackOrMove(value.id,key)==false){
+                        var obj = {key:key,value:value};
+                        this._dataArray.push(obj);
+                    }
+                }
+            }
         }.bind(this));
     },
 
@@ -102,75 +111,134 @@ module.exports={
     },
 
 
+    //获得有没有某id攻击移动数据
+    getExistAttackOrMove:function (id,key) {
+        if(key=='sMoveArray' || key=='sAttackArray'){
+            for(var i=0;i<this._dataArray.length;++i){
+                var obj = this._dataArray[i];
+                if(obj.value.id==id && (obj.key=='sMoveArray' || obj.key=='sAttackArray')){
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
+
     //缓存的数据，需要的时候调用。
     doWork:function(){
-        if(this._dataArray.length==0)return;
-        while(this._dataArray.length>0){
-            var obj = this._dataArray[0];
-            //cc.log(JSON.stringify(obj));
-            this.helpForDoWork(obj,'sMoveArray',function(obj2){
-                var player =  ag.gameLayer._roleMap[obj2.id];
+        for(var i=0;i<this._dataArray.length;++i){
+            var obj = this._dataArray[i];
+            if(obj.key=='sMoveArray'){
+                var player =  ag.gameLayer._roleMap[obj.value.id];
                 if(player){
-                    //cc.log(obj2.id,obj2.x,obj2.y);
-                    player.move(cc.p(obj2.x,obj2.y),true);
+                    player.move(cc.p(obj.value.x,obj.value.y),true);
                 }
-            }.bind(this));
-            this.helpForDoWork(obj,'sAttackArray',function(obj){
-                var player =  ag.gameLayer.getRole(obj.id);
-                var locked =  ag.gameLayer.getRole(obj.lockedId);
+            }else if(obj.key=='sAttackArray'){
+                var player =  ag.gameLayer.getRole(obj.value.id);
+                var locked =  ag.gameLayer.getRole(obj.value.lockedId);
                 if(player && locked){
                     player.attack(locked,true);
                 }
-            }.bind(this));
-            this.helpForDoWork(obj,'sHPArray',function(obj){
-                var player =  ag.gameLayer.getRole(obj.id);
+            }else if(obj.key=='sHPArray'){
+                var player =  ag.gameLayer.getRole(obj.value.id);
                 if(player){
-                    player.changeHP(obj.hp);
+                    player.changeHP(obj.value.hp);
                 }
-            }.bind(this));
-            this.helpForDoWork(obj,'sRoleArray',function(obj){
-                ag.gameLayer.addRole(JSON.parse(obj));
-            }.bind(this));
-            this.helpForDoWork(obj,'sMoveForceArray',function(obj){
-                var player =  ag.gameLayer.getRole(obj.id);
+            }else if(obj.key=='sRoleArray'){
+                ag.gameLayer.addRole(JSON.parse(obj.value));
+            }else if(obj.key=='sMoveForceArray'){
+                var player =  ag.gameLayer.getRole(obj.value.id);
                 if(player) {
-                    player.myMoveByServer(obj.x, obj.y);
+                    player.myMoveByServer(obj.value.x, obj.value.y);
                     player.relife();
                 }
-            }.bind(this));
-            this.helpForDoWork(obj,'sBuffManagerArray',function(obj){
-                ag.buffManager.setData((JSON.parse(obj)));
-            }.bind(this));
-            this.helpForDoWork(obj,'sBFireCritArray',function(obj){
-                ag.buffManager.setCDForFireCritById(obj,false);
-            }.bind(this));
-            this.helpForDoWork(obj,'sFireWallArray',function(obj){
-                var player =  ag.gameLayer.getRole(obj.id);
+            }else if(obj.key=='sBuffManagerArray'){
+                ag.buffManager.setData((JSON.parse(obj.value)));
+            }else if(obj.key=='sBFireCritArray'){
+                ag.buffManager.setCDForFireCritById(obj.value,false);
+            }else if(obj.key=='sFireWallArray'){
+                var player =  ag.gameLayer.getRole(obj.value.id);
                 if(player){
-                    ag.buffManager.setFireWall(obj.mapXYString,player);
+                    ag.buffManager.setFireWall(obj.value.mapXYString,player);
                 }
-            }.bind(this));
-            this.helpForDoWork(obj,'sAddExpArray',function(obj){
-                var player =  ag.gameLayer.getRole(obj.id);
+            }else if(obj.key=='sAddExpArray'){
+                var player =  ag.gameLayer.getRole(obj.value.id);
                 if(player){
-                    player.addExp(obj.level,obj.exp);
+                    player.addExp(obj.value.level,obj.value.exp);
                 }
-            }.bind(this));
-            this._dataArray.splice(0,1);
+            }
         }
+        this._dataArray = [];
+
+
+        // if(this._dataArray.length==0)return;
+        // while(this._dataArray.length>0){
+        //     var obj = this._dataArray[0];
+        //     //cc.log(JSON.stringify(obj));
+        //     this.helpForDoWork(obj,'sMoveArray',function(obj2){
+        //         var player =  ag.gameLayer._roleMap[obj2.id];
+        //         if(player){
+        //             //cc.log(obj2.id,obj2.x,obj2.y);
+        //             player.move(cc.p(obj2.x,obj2.y),true);
+        //         }
+        //     }.bind(this));
+        //     this.helpForDoWork(obj,'sAttackArray',function(obj){
+        //         var player =  ag.gameLayer.getRole(obj.id);
+        //         var locked =  ag.gameLayer.getRole(obj.lockedId);
+        //         if(player && locked){
+        //             player.attack(locked,true);
+        //         }
+        //     }.bind(this));
+        //     this.helpForDoWork(obj,'sHPArray',function(obj){
+        //         var player =  ag.gameLayer.getRole(obj.id);
+        //         if(player){
+        //             player.changeHP(obj.hp);
+        //         }
+        //     }.bind(this));
+        //     this.helpForDoWork(obj,'sRoleArray',function(obj){
+        //         ag.gameLayer.addRole(JSON.parse(obj));
+        //     }.bind(this));
+        //     this.helpForDoWork(obj,'sMoveForceArray',function(obj){
+        //         var player =  ag.gameLayer.getRole(obj.id);
+        //         if(player) {
+        //             player.myMoveByServer(obj.x, obj.y);
+        //             player.relife();
+        //         }
+        //     }.bind(this));
+        //     this.helpForDoWork(obj,'sBuffManagerArray',function(obj){
+        //         ag.buffManager.setData((JSON.parse(obj)));
+        //     }.bind(this));
+        //     this.helpForDoWork(obj,'sBFireCritArray',function(obj){
+        //         ag.buffManager.setCDForFireCritById(obj,false);
+        //     }.bind(this));
+        //     this.helpForDoWork(obj,'sFireWallArray',function(obj){
+        //         var player =  ag.gameLayer.getRole(obj.id);
+        //         if(player){
+        //             ag.buffManager.setFireWall(obj.mapXYString,player);
+        //         }
+        //     }.bind(this));
+        //     this.helpForDoWork(obj,'sAddExpArray',function(obj){
+        //         var player =  ag.gameLayer.getRole(obj.id);
+        //         if(player){
+        //             player.addExp(obj.level,obj.exp);
+        //         }
+        //     }.bind(this));
+        //     this._dataArray.splice(0,1);
+        // }
     },
 
 
 
     //帮助上面的循环遍历
-    helpForDoWork:function(obj,name,callback){
-        for(var key in obj){
-            if(key==name){
-                var array = obj[name];
-                for(var i=0;i<array.length;++i){
-                    callback(array[i]);
-                }
-            }
-        }
-    },
+    // helpForDoWork:function(obj,name,callback){
+    //     for(var key in obj){
+    //         if(key==name){
+    //             var array = obj[name];
+    //             for(var i=0;i<array.length;++i){
+    //                 callback(array[i]);
+    //             }
+    //         }
+    //     }
+    // },
 };

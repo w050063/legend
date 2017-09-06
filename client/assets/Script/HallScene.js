@@ -26,6 +26,7 @@ cc.Class({
         //是否第一次改名字
         if(!cc.sys.localStorage.getItem('firstChangeName')){
             cc.sys.localStorage.setItem('firstChangeName','1');
+            ag.jsUtil.showText(this.node,'欢迎大侠，给您起个霸气的名字吧！');
         }else{
             cc.find('Canvas/spriteHeadInfo').active = false;
         }

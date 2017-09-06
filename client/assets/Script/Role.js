@@ -20,7 +20,8 @@ cc.Class({
         this.setLocation(this._data.x,this._data.y);
         this.node.setScale(2);
         this._aniColor = cc.color(255,255,255,255);
-        this.idle();
+
+
 
         //血条
         var prefab = cc.loader.getRes('prefab/nodeRoleProp');
@@ -42,29 +43,61 @@ cc.Class({
         }
 
 
-
         //位置变化调用，第一次开始也调用一次
         this.node.on('position-changed', function (event) {
-            this.setZorderAndMapPos.call(this);
+            this.setZorderAndMapPos();
         }.bind(this));
 
-        if(this._agAni){
-            this._agAni.getComponent(AGAni).doCallback(this.setZorderAndMapPos.bind(this));
-        }
+        this.setZorderAndMapPos();
+        this.idle();
+
+        //this.node.runAction(cc.sequence(cc.delayTime(0.1),cc.callFunc(function(){
+        //    this.setZorderAndMapPos();
+        //}.bind(this))));
+
+
+        //if(this._agAni){
+        //    this._agAni.getComponent(AGAni).doCallback(this.setZorderAndMapPos.bind(this));
+        //}
     },
 
 
     //刷新层级关系,设置地图位置
     setZorderAndMapPos:function(){
-        if(this._agAni && this._agAni.getComponent(AGAni)._loadOver){
-            var zorder = Math.round(10000-this.node.y);
-            if(this.node.getLocalZOrder()!=zorder)this.node.setLocalZOrder(zorder);
-        }
-
         //更新位置
         if(ag.gameLayer._player == this){
             ag.gameLayer._map.node.setPosition(-this.node.x,-this.node.y);
         }
+
+
+        //优化显示和隐藏,上下左右各多两个地块,超过1.9就认为要更新了
+        var mapData = ag.gameConst._terrainMap[this._data.mapId];
+        var x = ag.gameLayer._player.node.x,y = ag.gameLayer._player.node.y,xHalf = 568+mapData.mapX,yHalf = 320+mapData.mapY;
+        //xHalf = 200,yHalf = 200;
+        if(ag.gameLayer._player == this){
+            for(var key in  ag.gameLayer._roleMap){
+                var role = ag.gameLayer._roleMap[key];
+                role._farAway = !!(Math.abs(role.node.x-x)<xHalf && Math.abs(role.node.y-y)<yHalf);
+                if(role._farAway && role._agAni==null){
+                    role.idleAnimation();
+                }else if(role._farAway==false && role._agAni){
+                    ag.agAniCache.put(role._agAni);
+                    role._agAni = null;
+                }
+            }
+        }else{
+            this._farAway = !!(Math.abs(this.node.x-x)<xHalf && Math.abs(this.node.y-y)<yHalf);
+            if(this._farAway && this._agAni==null){
+                this.idleAnimation();
+            }else if(this._farAway==false && this._agAni){
+                ag.agAniCache.put(this._agAni);
+                this._agAni = null;
+            }
+        }
+
+
+        var zorder = Math.round(10000-this.node.y);
+        if(this.node.getLocalZOrder()!=zorder)this.node.setLocalZOrder(zorder);
     },
 
 
@@ -124,11 +157,13 @@ cc.Class({
 
     //无事可做动画
     idleAnimation:function(){
-        var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
-        var array = AGAniClothes[clothes+ag.gameConst.stateIdle+this._data.direction].split(',');
-        if(this._agAni)ag.agAniCache.put(this._agAni);
-        this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),2,0.3);
-        this._agAni.setColor(this._aniColor);
+        if(this._farAway){
+            var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
+            var array = AGAniClothes[clothes+ag.gameConst.stateIdle+this._data.direction].split(',');
+            if(this._agAni)ag.agAniCache.put(this._agAni);
+            this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),2,0.3);
+            this._agAni.setColor(this._aniColor);
+        }
     },
 
 
@@ -152,6 +187,11 @@ cc.Class({
     //按方向移动
     move:function(location,bServer) {
         this.node.stopAllActions();
+        if(Math.abs(this._data.x-location.x)>1 || Math.abs(this._data.y-location.y)>1){
+            this.setLocation(location.x,location.y);
+            return true;
+        }
+
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),location);
         this._data.x = location.x;
         this._data.y = location.y;
@@ -168,12 +208,14 @@ cc.Class({
                 if(this._ai)this._ai.onMoveEnd();
             }
         }.bind(this))));
-        var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
-        var array = AGAniClothes[clothes+ag.gameConst.stateMove+this._data.direction].split(',');
-        if(this._agAni)ag.agAniCache.put(this._agAni);
-        var count = parseInt(array[1]);
-        this._agAni = ag.agAniCache.getNode(this.node,array[0],count,2,moveSpeed/count);
-        this._agAni.setColor(this._aniColor);
+        if(this._farAway){
+            var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
+            var array = AGAniClothes[clothes+ag.gameConst.stateMove+this._data.direction].split(',');
+            if(this._agAni)ag.agAniCache.put(this._agAni);
+            var count = parseInt(array[1]);
+            this._agAni = ag.agAniCache.getNode(this.node,array[0],count,2,moveSpeed/count);
+            this._agAni.setColor(this._aniColor);
+        }
 
 
 
@@ -210,30 +252,28 @@ cc.Class({
         this.node.stopAllActions();
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
         //攻击动画
-        var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
-        var attackCode = ag.gameConst.stateAttack;
-        //判断是攻击动作,还是施法动作
-        if(this._data.type=="m1" || this._data.type=="m2"){
-            if (clothes == 'nudeboy0' || clothes == 'nudegirl0' || clothes == 'clothboy0' || clothes == 'clothgirl0') {
-                ++attackCode;
+        if(this._farAway){
+            var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
+            var attackCode = ag.gameConst.stateAttack;
+            //判断是攻击动作,还是施法动作
+            if(this._data.type=="m1" || this._data.type=="m2"){
+                if (clothes == 'nudeboy0' || clothes == 'nudegirl0' || clothes == 'clothboy0' || clothes == 'clothgirl0') {
+                    ++attackCode;
+                }
             }
+            var array = AGAniClothes[clothes+attackCode+this._data.direction].split(',');
+            if(this._agAni)ag.agAniCache.put(this._agAni);
+            this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),2,0.1,function(){
+                this.idle();
+            }.bind(this));
+            this._agAni.setColor(this._aniColor);
         }
-        var array = AGAniClothes[clothes+attackCode+this._data.direction].split(',');
-        if(this._agAni)ag.agAniCache.put(this._agAni);
-        this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),2,0.1,function(){
-            this.idle();
-        }.bind(this));
         ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(this._data.attackSpeed),cc.callFunc(function(){
             if(this._ai)this._ai.onAttackEnd();
         }.bind(this))));
-        this._agAni.setColor(this._aniColor);
 
         //攻击特效
         this.attackEffect(locked);
-
-        if(this._data.camp!=ag.gameConst.campMonster){
-            cc.audioEngine.play(cc.url.raw("resources/music/hit.mp3"),false,1);
-        }
 
 
         //向服务器发送
@@ -245,13 +285,13 @@ cc.Class({
         this._state = ag.gameConst.stateAttack;
     },
 
-
     //攻击特效
     attackEffect: function (locked) {
         if(this._data.type=="m0"){
             if(ag.buffManager.getCDForFireCrit(this)==false){
                 ag.agAniCache.getEffect(this.node,"ani/effect2/"+(503000+this._data.direction*8),8,999,0.1);
                 ag.buffManager.setCDForFireCrit(this,true);
+                cc.audioEngine.play(cc.url.raw("resources/music/hit.mp3"),false,1);
             }else{
                 ag.agAniCache.getEffect(this.node,"ani/effect1/"+(500000+this._data.direction*6),6,999,0.1);
             }

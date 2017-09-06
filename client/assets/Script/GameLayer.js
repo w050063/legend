@@ -16,6 +16,7 @@ cc.Class({
         ag.gameLayer = this;
         this._roleMap = {};
         this._player = null;
+        this._lastMapPosition = cc.p(0,0);
         
 
 
@@ -36,9 +37,9 @@ cc.Class({
         //创建主角
         var node = new cc.Node();
         this._player = node.addComponent(Role);
-        this._player.init(ag.userInfo._data);
         this._map.node.addChild(node);
-        this._roleMap[this._player._data.id] = this._player;
+        this._roleMap[ag.userInfo._data.id] = this._player;
+        this._player.init(ag.userInfo._data);
 
 
 
@@ -69,9 +70,9 @@ cc.Class({
     addRole:function(data){
         var node = new cc.Node();
         var role = node.addComponent(Role);
-        role.init(data);
         this._map.node.addChild(node);
-        this._roleMap[role._data.id] = role;
+        this._roleMap[data.id] = role;
+        role.init(data);
     },
 
 
