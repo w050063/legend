@@ -84,6 +84,15 @@ cc.Class({
     //开始游戏按钮
     buttonStart: function () {
         cc.log('buttonStart');
+
+        var prefab = cc.loader.getRes('prefab/nodeRequest',cc.Prefab);
+        var node = cc.instantiate(prefab);
+        node.parent = this.node;
+        node.setLocalZOrder(101);
+        node.runAction(cc.sequence(cc.delayTime(5),cc.callFunc(function(){
+            node.destroy();
+        })));
+
         var type,sex;
         if(this._selectIndex==0){type='m0';sex=ag.gameConst.sexBoy}
         else if(this._selectIndex==1){type='m0';sex=ag.gameConst.sexGirl}
