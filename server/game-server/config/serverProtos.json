@@ -31,6 +31,12 @@
     "required int32 level": 2,
     "required int32 exp": 3
   },
+  "message sDrop": {
+    "required string id": 1,
+    "required string mid": 2,
+    "required int32 x": 3,
+    "required int32 y": 4
+  },
   "onData" : {
     "repeated sMove sMoveArray": 1,
     "repeated sAttack sAttackArray": 2,
@@ -39,7 +45,10 @@
     "repeated sMoveForce sMoveForceArray": 5,
     "repeated string sBuffManagerArray": 6,
     "repeated string sBFireCritArray": 7,
-    "repeated sFireWall sFireWallArray": 8,
-    "repeated sAddExp sAddExpArray": 9
+    "repeated sDrop sDropArray": 8,
+    "repeated sAddExp sAddExpArray": 9,
+    "repeated sFireWall sFireWallArray": 10,
+    "repeated string sItemGroundDeleteArray": 11,
+    "repeated string sItemBagAddArray": 12
   }
 }
