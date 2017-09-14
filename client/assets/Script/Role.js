@@ -20,6 +20,7 @@ cc.Class({
         this.setLocation(this._data.x,this._data.y);
         this.node.setScale(2);
         this._aniColor = cc.color(255,255,255,255);
+        this._state = ag.gameConst.stateIdle;
 
 
 
@@ -412,8 +413,10 @@ cc.Class({
         }else{
             cc.log("ready");
             this.node.active = false;
-            if(this==ag.gameLayer._player){
+            if(this==ag.gameLayer._player && !ag.gameLayer.bShowRelife){
+                ag.gameLayer.bShowRelife = true;
                 ag.jsUtil.alert(ag.gameLayer.node,'重新复活!',function () {
+                    ag.gameLayer.bShowRelife = undefined;
                     ag.agSocket.send("relife",{});
                 });
             }

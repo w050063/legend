@@ -4,6 +4,7 @@
  */
 
 
+var AgXYMap = require("./AgXYMap");
 module.exports={
     //全局变量相关
     //_gameLayer:null,
@@ -26,7 +27,15 @@ module.exports={
 	_skillPointCount:1,
 	_bornLocation:cc.p(2,2),
     _direction:4,
-	
+	_groundMap:{},
+	_bagMap:[],
+	_equipMap:[],
+	_itemInstanceMap:{},
+
+	init:function () {
+
+	},
+
 
 	//get a vector's direction(8,left,right,up,down....).
 	getV:function(pos){

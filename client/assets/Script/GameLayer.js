@@ -5,7 +5,9 @@
 
 
 var Role = require("Role");
+var Item = require("Item");
 var AGTerrain = require("AGTerrain");
+var UserInfo = require("UserInfo");
 cc.Class({
     extends: cc.Component,
     properties: {},
@@ -81,6 +83,29 @@ cc.Class({
         return this._roleMap[id];
     },
 
+
+    //地上增加一个道具,并且存到本地实例中
+    dropItem:function (data) {
+        UserInfo._itemInstanceMap[data.id] = data;
+        var node = new cc.Node();
+        var item = node.addComponent(Item);
+        this._map.node.addChild(node);
+        item.init(data);
+        UserInfo._groundMap[data.id]={id:data.id,comp:item};
+    },
+
+
+    itemGroundDelete:function (id) {
+        var data = UserInfo._groundMap[id];
+        if(data)data.comp.node.destroy();
+        delete UserInfo._groundMap[id];
+    },
+
+
+
+    itemBagAdd:function (id) {
+        UserInfo._bagMap.push(id);
+    },
 
 
     //根据原点和锁定点获得方向

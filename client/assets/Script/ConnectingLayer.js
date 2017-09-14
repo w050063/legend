@@ -15,6 +15,7 @@ cc.Class({
             ag.jsUtil = require("JsUtil");
             ag.agAniCache = require("AGAniCache");
             ag.userInfo = require("UserInfo");
+            ag.userInfo.init();
             ag.gameConst = require("GameConst");
             ag.agSocket = require("AGSocket");
             ag.gameConst.init();
@@ -92,6 +93,7 @@ cc.Class({
         var array = [];
         for(var i=1;i<=17;++i)array.push("ani/hum"+i);
         for(var i=1;i<=4;++i)array.push("ani/effect"+i);
+        array.push("ani/icon");
         cc.loader.loadResArray(array, cc.SpriteAtlas,function(num, totalNum, item){
             this._nodeLoading.setPercent("("+Math.floor(num/totalNum*100)+"%)");
         }.bind(this),function (err, atlas) {

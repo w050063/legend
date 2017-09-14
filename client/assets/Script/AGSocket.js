@@ -21,7 +21,7 @@ module.exports={
         }
         self._sessionId=id;
         //var tempId = null;
-        pomelo.init({host: "127.0.0.1",port: 3014,log: true}, function() {
+        pomelo.init({host: "47.92.67.211",port: 3014,log: true}, function() {
             pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
                 //tempId=data.uid;
                 pomelo.disconnect(function () {
@@ -167,78 +167,17 @@ module.exports={
                 if(player){
                     player.addExp(obj.value.level,obj.value.exp);
                 }
+            }else if(obj.key=='sDropArray'){
+                ag.gameLayer.dropItem(obj.value);
+            }else if(obj.key=='sItemGroundDeleteArray'){
+                cc.log('sItemGroundDeleteArray');
+                cc.log(obj.value);
+                ag.gameLayer.itemGroundDelete(obj.value);
+            }else if(obj.key=='sItemBagAddArray'){
+                cc.log(obj.value);
+                ag.gameLayer.itemBagAdd(obj.value);
             }
         }
         this._dataArray = [];
-
-
-        // if(this._dataArray.length==0)return;
-        // while(this._dataArray.length>0){
-        //     var obj = this._dataArray[0];
-        //     //cc.log(JSON.stringify(obj));
-        //     this.helpForDoWork(obj,'sMoveArray',function(obj2){
-        //         var player =  ag.gameLayer._roleMap[obj2.id];
-        //         if(player){
-        //             //cc.log(obj2.id,obj2.x,obj2.y);
-        //             player.move(cc.p(obj2.x,obj2.y),true);
-        //         }
-        //     }.bind(this));
-        //     this.helpForDoWork(obj,'sAttackArray',function(obj){
-        //         var player =  ag.gameLayer.getRole(obj.id);
-        //         var locked =  ag.gameLayer.getRole(obj.lockedId);
-        //         if(player && locked){
-        //             player.attack(locked,true);
-        //         }
-        //     }.bind(this));
-        //     this.helpForDoWork(obj,'sHPArray',function(obj){
-        //         var player =  ag.gameLayer.getRole(obj.id);
-        //         if(player){
-        //             player.changeHP(obj.hp);
-        //         }
-        //     }.bind(this));
-        //     this.helpForDoWork(obj,'sRoleArray',function(obj){
-        //         ag.gameLayer.addRole(JSON.parse(obj));
-        //     }.bind(this));
-        //     this.helpForDoWork(obj,'sMoveForceArray',function(obj){
-        //         var player =  ag.gameLayer.getRole(obj.id);
-        //         if(player) {
-        //             player.myMoveByServer(obj.x, obj.y);
-        //             player.relife();
-        //         }
-        //     }.bind(this));
-        //     this.helpForDoWork(obj,'sBuffManagerArray',function(obj){
-        //         ag.buffManager.setData((JSON.parse(obj)));
-        //     }.bind(this));
-        //     this.helpForDoWork(obj,'sBFireCritArray',function(obj){
-        //         ag.buffManager.setCDForFireCritById(obj,false);
-        //     }.bind(this));
-        //     this.helpForDoWork(obj,'sFireWallArray',function(obj){
-        //         var player =  ag.gameLayer.getRole(obj.id);
-        //         if(player){
-        //             ag.buffManager.setFireWall(obj.mapXYString,player);
-        //         }
-        //     }.bind(this));
-        //     this.helpForDoWork(obj,'sAddExpArray',function(obj){
-        //         var player =  ag.gameLayer.getRole(obj.id);
-        //         if(player){
-        //             player.addExp(obj.level,obj.exp);
-        //         }
-        //     }.bind(this));
-        //     this._dataArray.splice(0,1);
-        // }
     },
-
-
-
-    //帮助上面的循环遍历
-    // helpForDoWork:function(obj,name,callback){
-    //     for(var key in obj){
-    //         if(key==name){
-    //             var array = obj[name];
-    //             for(var i=0;i<array.length;++i){
-    //                 callback(array[i]);
-    //             }
-    //         }
-    //     }
-    // },
 };
