@@ -95,6 +95,18 @@ module.exports = ag.class.extend({
         }.bind(this));
 
 
+        //捡装备,是玩家,地上有东西,背包没满
+        var array = ag.itemManager.getDropByLocation(this.getLocation());
+        var left = ag.gameConst.bagLength-ag.itemManager.getBagLength(this._data.id);
+        if(this._data.camp!=ag.gameConst.campMonster && array.length>0 && left>0){
+            for(var i=0;i<array.length && i<left;++i){
+                var id = array[i]._data.id;
+                ag.jsUtil.sendDataAll("sItemGroundDelete",id);
+                ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
+                ag.itemManager.addBagItem(this._data.id,ag.itemManager._dropMap.get(id));
+                ag.itemManager._dropMap.del(id);
+            }
+        }
         this._state = ag.gameConst.stateMove;
     },
 
@@ -242,6 +254,15 @@ module.exports = ag.class.extend({
 
     dead:function (attacker) {
         this._state = ag.gameConst.stateDead;
+        
+        //掉落装备
+        var str = ag.gameConst._roleMst[this._data.type].drop;
+
+        if(str){
+            ag.itemManager.drop(str,this.getLocation());
+        }
+        
+        
         if(attacker && attacker._data.camp!=ag.gameConst.campMonster){
             attacker._data.exp +=  this.getMst().expDead;
             while(attacker._data.exp>=attacker._data.totalExp){

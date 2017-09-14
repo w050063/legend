@@ -131,7 +131,6 @@ module.exports = {
         }
     },
 
-
     //获得某个地图上，某个怪物剩余多少
     getCountWithType:function(mapId,monsterName){
         var count =0;

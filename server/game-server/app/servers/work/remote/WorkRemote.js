@@ -38,8 +38,10 @@ WorkRemote.prototype.add = function(uid, sid, cb) {
         ag.buffManager = new BuffManager();
 		var UserManager = require("../../../game/UserManager");
 		ag.userManager = new UserManager();
-        var GameListManager = require("../../../game/GameListManager");
-        ag.gameListManager = new GameListManager();
+		var GameListManager = require("../../../game/GameListManager");
+		ag.gameListManager = new GameListManager();
+		var ItemManager = require("../../../game/ItemManager");
+		ag.itemManager = new ItemManager();
     }
 	var channel = this.channelService.getChannel(ag.jsUtil.dataChannel, true);
 	var param = {
