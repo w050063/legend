@@ -61,8 +61,8 @@ module.exports = {
             name: "mafa",
             tileX: 100,
             tileY: 60,
-            mapX: 40,
-            mapY: 40,
+            mapX: 30,
+            mapY: 30,
             collision:"",
             //collision: "9,12;9,13;9,14;9,15;9,16;9,17;9,18;9,19;9,20;" +
             //"10,12;10,13;10,14;10,15;10,16;10,17;10,18;10,19;10,20;" +
@@ -71,8 +71,8 @@ module.exports = {
             //"13,12;13,13;13,14;13,15;13,16;13,17;13,18;13,19;13,20;" +
             //"14,12;14,13;14,14;14,15;14,16;14,17;14,18;14,19;14,20;" +
             //"15,12;15,13;15,14;15,15;15,16;15,17;15,18;15,19;15,20",
-            refresh: [["m3", -1, -1, 30, 50],["m4", -1, -1, 30, 50],["m5", -1, -1, 30, 20],["m6", -1, -1, 30, 1],
-                ["m7", -1, -1, 30, 1],["m9", -1, -1, 30, 1],["m10", -1, -1, 30, 1],
+            refresh: [["m3", -1, -1, 30, 50],["m4", -1, -1, 30, 50],["m5", -1, -1, 30, 20],["m6", -1, -1, 30, 10],
+                ["m7", -1, -1, 30, 10],["m9", -1, -1, 30, 1],["m10", -1, -1, 30, 1],
                 ["m11", -1, -1, 30, 1],["m12", -1, -1, 30, 1],["m13", -1, -1, 30, 1],["m14", -1, -1, 30, 1],
                 ["m15", -1, -1, 30, 1],["m16", -1, -1, 30, 1],["m17", -1, -1, 30, 1],["m18", -1, -1, 30, 1]]
         },
@@ -102,11 +102,11 @@ module.exports = {
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"redboar",drop:'i014,30,i026,30'},
         m5:{id:"m5",name:"祖玛羊",hp:220,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:1,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:4,model:"zumasheep",drop:'i020,5,i021,5,i022,5'},
-        m6:{id:"m6",name:"祖玛卫士",hp:500,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:10,healAdd:0,
+        m6:{id:"m6",name:"祖玛卫士",hp:1000,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:10,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"zumabodyguard",drop:'i027,5,i028,5,i029,5'},
-        m7:{id:"m7",name:"白野猪",hp:500,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:10,healAdd:0,
+        m7:{id:"m7",name:"白野猪",hp:1000,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:10,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"whiteboar",drop:'i002,5,i003,5,i004,5,i005,5,i006,5,i007,5'},
-        m9:{id:"m9",name:"千年树妖",hp:1000,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:200,heal:20,healAdd:0,
+        m9:{id:"m9",name:"千年树妖",hp:2000,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:200,heal:20,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:6,visibleDistance:6,attackDistance:6,model:"treedemon",drop:'i015,10,i016,10,i017,10'},
         m10:{id:"m10",name:"双头血魔",hp:2000,hpAdd:0,defense:50,defenseAdd:0,hurt:100,hurtAdd:0,exp:0,expAdd:0,expDead:200,heal:50,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"clothesbossone",drop:'i008,50'},
