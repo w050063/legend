@@ -57,7 +57,13 @@ cc.Class({
                 ++times;
                 ag.agSocket.init(function(){
                     self.unschedule(scheduleFunc);
-                    ag.agSocket.setDisconnect(function () {cc.director.loadScene('ConnectingLayer');});
+                    ag.agSocket.setDisconnect(function () {
+                        ag.gameLayer = null;
+                        pomelo.removeAllListeners('onData');
+                        ag.agSocket._dataArray = [];
+                        cc.audioEngine.stopAll();
+                        cc.director.loadScene('ConnectingLayer');
+                    });
                     self.loadPrefab();
                 });
             }
