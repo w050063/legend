@@ -18,7 +18,7 @@ cc.Class({
         this._agAni = null;
         this._labelName = null;
         this.setLocation(this._data.x,this._data.y);
-        this.node.setScale(2);
+        this.node.setScale(1.5);
         this._aniColor = cc.color(255,255,255,255);
         this._state = ag.gameConst.stateIdle;
 
@@ -290,19 +290,35 @@ cc.Class({
     attackEffect: function (locked) {
         if(this._data.type=="m0"){
             if(ag.buffManager.getCDForFireCrit(this)==false){
-                ag.agAniCache.getEffect(this.node,"ani/effect2/"+(503000+this._data.direction*8),8,999,0.1);
+                if(Math.random()>0.5){
+                    ag.agAniCache.getEffect(this.node,"ani/effect2/"+(502000+this._data.direction*5),5,999,0.1);
+                }else{
+                    ag.agAniCache.getEffect(this.node,"ani/effect2/"+(503000+this._data.direction*8),8,999,0.1);
+                }
                 ag.buffManager.setCDForFireCrit(this,true);
                 cc.audioEngine.play(cc.url.raw("resources/music/hit.mp3"),false,1);
             }else{
-                ag.agAniCache.getEffect(this.node,"ani/effect1/"+(500000+this._data.direction*6),6,999,0.1);
+                if(Math.random()>0.5){
+                    ag.agAniCache.getEffect(this.node,"ani/effect1/"+(500000+this._data.direction*6),6,999,0.1);
+                }else{
+                    ag.agAniCache.getEffect(this.node,"ani/effect1/"+(501000+this._data.direction*6),6,999,0.1);
+                }
             }
         }else if(this._data.type=="m1"){
             var pos = locked.getTruePosition();
-            ag.agAniCache.getNode(this.node,"ani/effect3/505000",10,0,0.05,function(sender){
-                ag.agAniCache.put(sender.node);
-                var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/505010",15,999,0.05);
-                node.getComponent(AGAni).setAniPosition(pos);
-            }.bind(this));
+            if(Math.random()>0.5){
+                ag.agAniCache.getNode(this.node,"ani/effect3/504000",6,0,0.05,function(sender){
+                    ag.agAniCache.put(sender.node);
+                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/504006",13,999,0.05);
+                    node.getComponent(AGAni).setAniPosition(pos);
+                }.bind(this));
+            }else{
+                ag.agAniCache.getNode(this.node,"ani/effect3/505000",10,0,0.05,function(sender){
+                    ag.agAniCache.put(sender.node);
+                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/505010",13,999,0.05);
+                    node.getComponent(AGAni).setAniPosition(pos);
+                }.bind(this));
+            }
         }else if(this._data.type=="m2"){
             var lockedId = locked._data.id;
             var pos1 = cc.pAdd(this.node.getPosition(),cc.p(0,70*this.node.scale));
@@ -313,17 +329,18 @@ cc.Class({
             var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(pos2,pos1))));
             node.setRotation( 90-rotation);
             ag.gameLayer._map.node.addChild(node,999999);
-            cc.loader.loadRes("ani/effect4", cc.SpriteAtlas, function (err, atlas) {
-                if(sprite)sprite.spriteFrame = atlas.getSpriteFrame("508000");
-            }.bind(this));
 
 
-            ag.agAniCache.getEffect(this.node,"ani/effect4/509000",6,999,0.05);
+            if(Math.random()>0.5){
+                sprite.spriteFrame = cc.loader.getRes("ani/effect3",cc.SpriteAtlas).getSpriteFrame('508000');
+            }else{
+                sprite.spriteFrame = cc.loader.getRes("ani/effect3",cc.SpriteAtlas).getSpriteFrame('509015');
+            }
+            ag.agAniCache.getEffect(this.node,"ani/effect3/509000",6,999,0.05);
             node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
-                sprite = undefined;
                 node.destroy();
                 if(ag.gameLayer.getRole(lockedId)){
-                    ag.agAniCache.getEffect(locked.node,"ani/effect4/509006",9,999,0.05);
+                    ag.agAniCache.getEffect(locked.node,"ani/effect3/509006",9,999,0.05);
                 }
             })));
 
@@ -339,12 +356,8 @@ cc.Class({
             var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(pos2,pos1))));
             node.setRotation( 90-rotation);
             ag.gameLayer._map.node.addChild(node,999999);
-            cc.loader.loadRes("ani/effect4", cc.SpriteAtlas, function (err, atlas) {
-                if(sprite)sprite.spriteFrame = atlas.getSpriteFrame("511000");
-            }.bind(this));
-
+            sprite.spriteFrame = cc.loader.getRes("ani/effect3",cc.SpriteAtlas).getSpriteFrame('511000');
             node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
-                sprite = undefined;
                 node.destroy();
             })));
         }else if(this._data.type=="m9") {
@@ -352,7 +365,8 @@ cc.Class({
             for (var i = 0; i < array.length; ++i) {
                 if(ag.gameLayer.isEnemyCamp(this,array[i])){
                     var pos = array[i].getTruePosition();
-                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect4/510000",6,999,0.15);
+                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/510000",6,999,0.15);
+                    node.setScale(2);
                     node.getComponent(AGAni).setAniPosition(pos);
                 }
             }

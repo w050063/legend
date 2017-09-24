@@ -125,10 +125,10 @@ cc.Class({
                 var text = this._spriteTouchArray[i].node.getChildByName("labelText");
                 if(text)text.opacity = (i==this._touchMoveDirection?255:0);
                 if(bAction){
-                    this._spriteTouchArray[i].node.opacity = 255*0.2;
+                    this._spriteTouchArray[i].node.opacity = 255*0.1;
                     if(i!=this._touchMoveDirection)this._spriteTouchArray[i].node.runAction(cc.fadeOut(1));
                 }else{
-                    this._spriteTouchArray[i].node.opacity = (i==this._touchMoveDirection?255*0.2:0);
+                    this._spriteTouchArray[i].node.opacity = (i==this._touchMoveDirection?255*0.1:0);
                 }
             }
         }else{

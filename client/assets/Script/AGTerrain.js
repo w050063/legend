@@ -33,7 +33,7 @@ cc.Class({
 
     test:function(){
         ag.altasTask.addTask("map/terrainMap",function (err, atlas) {
-            var w = 170,h=170, x=Math.ceil(40*100/w),y=Math.ceil(40*60/h);
+            var w = 170,h=170, x=Math.ceil(ag.gameConst._terrainMap['t0'].mapX*100/w),y=Math.ceil(ag.gameConst._terrainMap['t0'].mapY*60/h);
             for(var i=0;i<y;++i){
                 for(var j=0;j<x;++j){
                     var node = new cc.Node();

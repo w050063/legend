@@ -8,9 +8,11 @@ var Role = require("Role");
 var Item = require("Item");
 var AGTerrain = require("AGTerrain");
 var UserInfo = require("UserInfo");
+var AGListView = require("AgListView");
 cc.Class({
     extends: cc.Component,
     properties: {},
+
 
 
     // use this for initialization
@@ -19,17 +21,20 @@ cc.Class({
         this._roleMap = {};
         this._player = null;
         this._lastMapPosition = cc.p(0,0);
-        
+
+
+        this._nodeBag = cc.find("Canvas/nodeBag");
+        this._nodeBag.active = false;
+        this._scrollViewList = cc.find("Canvas/nodeBag/scrollViewList").getComponent(AGListView);
+        this._scrollViewList.setSpace(2);
+        this.refreshBag();
 
 
         cc.audioEngine.play(cc.url.raw("resources/music/background.mp3"),true,1);
 
 
         //测试新地图
-        var node = new cc.Node();
-        node.x = 0,node.y = 0;
-        this._map = node.addComponent(AGTerrain);
-        this.node.addChild(node);
+        this._map = cc.find("Canvas/nodeMap").addComponent(AGTerrain);
         this._map.init(["resources/map/terrain0.png","resources/map/terrain1.png",
             "resources/map/terrain2.png","resources/map/terrain3.png","resources/map/terrain4.png","resources/map/terrain5.png"]);
         //node.setScale(0.2);
@@ -105,6 +110,7 @@ cc.Class({
 
     itemBagAdd:function (id) {
         UserInfo._bagMap.push(id);
+        this.refreshBag();
     },
 
 
@@ -270,4 +276,40 @@ cc.Class({
         console.log("error position:"+mapId+",x:"+x+",y:"+y);
         return {x:0,y:0};
     },
+
+
+    buttonBagEvent:function (sender) {
+        this._nodeBag.active = !this._nodeBag.active;
+    },
+
+
+    refreshBag:function () {
+        var array = UserInfo._bagMap;
+        this._scrollViewList.setCount(array.length);
+        this._scrollViewList.setCallback(function(item,index){
+            var data = ag.gameConst._itemMst[UserInfo._itemInstanceMap[array[index]].mid];
+            item.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+data.id.substr(1));
+            item.getChildByName('labelName').getComponent(cc.Label).string = this.getItemBagShow(data);
+            item.off('touchstart');
+            item.on('touchstart', function (event) {
+                cc.log("Item " + index + ' clicked');
+            }.bind(this));
+
+            item.off(cc.Node.EventType.TOUCH_END);
+            item.getChildByName('buttonEquip').on(cc.Node.EventType.TOUCH_END, function (event) {
+                cc.log('equip clicked');
+            }.bind(this));
+            item.off(cc.Node.EventType.TOUCH_END);
+            item.getChildByName('buttonDrop').on(cc.Node.EventType.TOUCH_END, function (event) {
+                cc.log('drop clicked');
+            }.bind(this));
+        }.bind(this));
+        this._scrollViewList.reload();
+    },
+
+
+    //获得属性显示
+    getItemBagShow:function (data) {
+        return data.name+(data.hurt?' 攻击力:'+data.hurt:' ')+(data.defense?' 防御:'+data.defense:' ');
+    }
 });

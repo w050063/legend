@@ -91,8 +91,8 @@ cc.Class({
         this._nodeLoading.setShow("图集资源加载中");
         this._nodeLoading.setPercent("(0%)");
         var array = [];
-        for(var i=1;i<=17;++i)array.push("ani/hum"+i);
-        for(var i=1;i<=4;++i)array.push("ani/effect"+i);
+        for(var i=1;i<=17;++i)if(i!=7 && i!=8)array.push("ani/hum"+i);
+        for(var i=1;i<=3;++i)array.push("ani/effect"+i);
         array.push("ani/icon");
         cc.loader.loadResArray(array, cc.SpriteAtlas,function(num, totalNum, item){
             this._nodeLoading.setPercent("("+Math.floor(num/totalNum*100)+"%)");
