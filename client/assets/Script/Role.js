@@ -158,7 +158,7 @@ cc.Class({
 
     //无事可做动画
     idleAnimation:function(){
-        if(this._farAway){
+        if(this._farAway || this==ag.gameLayer._player){
             var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
             var array = AGAniClothes[clothes+ag.gameConst.stateIdle+this._data.direction].split(',');
             if(this._agAni)ag.agAniCache.put(this._agAni);
@@ -187,6 +187,7 @@ cc.Class({
 
     //按方向移动
     move:function(location,bServer) {
+        if(this._state==ag.gameConst.stateDead)return;
         this.node.stopAllActions();
         if(Math.abs(this._data.x-location.x)>1 || Math.abs(this._data.y-location.y)>1){
             this.setLocation(location.x,location.y);
@@ -235,7 +236,6 @@ cc.Class({
 
     //按方向移动,强制玩家位置
     myMoveByServer:function(locationX,locationY) {
-        cc.log("error!!!");
         this.node.stopAllActions();
         //this._data.x = location.x;
         //this._data.y = location.y;
@@ -250,6 +250,7 @@ cc.Class({
 
 
     attack:function(locked,bServer){
+        if(this._state==ag.gameConst.stateDead)return;
         this.node.stopAllActions();
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
         //攻击动画
@@ -415,6 +416,7 @@ cc.Class({
 
     //死亡
     dead:function () {
+        if(this._state==ag.gameConst.stateDead)return;
         this._state = ag.gameConst.stateDead;
         ag.buffManager.delFireWallByDead(this);
         ag.buffManager.delPoisonByDead(this);
@@ -425,7 +427,6 @@ cc.Class({
             this.node.destroy();
             delete ag.gameLayer._roleMap[this._data.id];
         }else{
-            cc.log("ready");
             this.node.active = false;
             if(this==ag.gameLayer._player && !ag.gameLayer.bShowRelife){
                 ag.gameLayer.bShowRelife = true;
@@ -442,9 +443,9 @@ cc.Class({
     relife:function(){
         if(this._state == ag.gameConst.stateDead){
             this.node.active = true;
-            cc.log("relive");
             this.changeHP(this._data.totalHP);
-            this.idle();
+            this.idleAnimation();
+            this._state = ag.gameConst.stateIdle;
             if(this._ai)this._ai._busy = false;
 
 

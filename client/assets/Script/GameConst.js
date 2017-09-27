@@ -107,11 +107,11 @@ module.exports= {
 
     _roleMst: {
         m0:{id:"m0",name:"战士",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,
-            moveSpeed:0.7,attackSpeed:0.8,checkDistance:0,visibleDistance:9,attackDistance:0},
+            moveSpeed:0.7,attackSpeed:0.8,checkDistance:4,visibleDistance:9,attackDistance:0},
         m1:{id:"m1",name:"法师",hp:220,hpAdd:20,defense:50,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:3,
-            moveSpeed:0.7,attackSpeed:1.2,checkDistance:0,visibleDistance:9,attackDistance:6},
+            moveSpeed:0.7,attackSpeed:1.2,checkDistance:4,visibleDistance:9,attackDistance:6},
         m2:{id:"m2",name:"道士",hp:400,hpAdd:20,defense:5,defenseAdd:1,hurt:100,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:5,
-            moveSpeed:0.7,attackSpeed:1.2,checkDistance:0,visibleDistance:9,attackDistance:6},
+            moveSpeed:0.7,attackSpeed:1.2,checkDistance:4,visibleDistance:9,attackDistance:6},
         m3:{id:"m3",name:"甲壳虫",hp:220,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:1,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"beetle",drop:'i000,30,i001,30,i019,30'},
         m4:{id:"m4",name:"红野猪",hp:220,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:1,healAdd:0,

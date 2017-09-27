@@ -69,7 +69,6 @@ cc.Class({
 
     //开始游戏按钮
     buttonDelete: function () {
-        cc.log('buttonDelete');
         if(UserInfo._accountData.type!=undefined && UserInfo._accountData.sex!=undefined){
             ag.jsUtil.request(this.node,'deleteRole',ag.agSocket._sessionId,function (data) {
                 UserInfo._accountData.type=undefined;
@@ -83,8 +82,6 @@ cc.Class({
 
     //开始游戏按钮
     buttonStart: function () {
-        cc.log('buttonStart');
-
         var prefab = cc.loader.getRes('prefab/nodeRequest',cc.Prefab);
         var node = cc.instantiate(prefab);
         node.parent = this.node;

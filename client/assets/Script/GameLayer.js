@@ -89,28 +89,41 @@ cc.Class({
     },
 
 
+    //初始化道具
+    initItem:function(data){
+        if(!data.owner){
+            this.dropItem(data);
+        }else if(!data.puton){
+            UserInfo._itemMap[data.id]={_data:data};
+            this.refreshBag();
+        }
+    },
+
+
     //地上增加一个道具,并且存到本地实例中
     dropItem:function (data) {
-        UserInfo._itemInstanceMap[data.id] = data;
         var node = new cc.Node();
         var item = node.addComponent(Item);
-        this._map.node.addChild(node);
+        this._map.node.addChild(node,1);
         item.init(data);
-        UserInfo._groundMap[data.id]={id:data.id,comp:item};
+        UserInfo._itemMap[data.id]={_data:data,comp:item};
     },
 
 
     itemGroundDelete:function (id) {
-        var data = UserInfo._groundMap[id];
-        if(data)data.comp.node.destroy();
-        delete UserInfo._groundMap[id];
+
     },
 
 
 
     itemBagAdd:function (id) {
-        UserInfo._bagMap.push(id);
-        this.refreshBag();
+        var obj = UserInfo._itemMap[id];
+        if(obj && obj.comp){
+            obj._data.owner = this._player._data.id;
+            obj.comp.node.destroy();
+            obj.comp = undefined;
+            this.refreshBag();
+        }
     },
 
 
@@ -284,24 +297,31 @@ cc.Class({
 
 
     refreshBag:function () {
-        var array = UserInfo._bagMap;
+        var array = [];
+        for(var key in UserInfo._itemMap){
+            var obj = UserInfo._itemMap[key];
+            if(obj._data.owner==this._player._data.id && !obj._data.puton){
+                array.push(obj);
+            }
+        }
         this._scrollViewList.setCount(array.length);
         this._scrollViewList.setCallback(function(item,index){
-            var data = ag.gameConst._itemMst[UserInfo._itemInstanceMap[array[index]].mid];
+            var data = ag.gameConst._itemMst[array[index]._data.mid];
             item.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+data.id.substr(1));
             item.getChildByName('labelName').getComponent(cc.Label).string = this.getItemBagShow(data);
             item.off('touchstart');
             item.on('touchstart', function (event) {
-                cc.log("Item " + index + ' clicked');
             }.bind(this));
 
             item.off(cc.Node.EventType.TOUCH_END);
             item.getChildByName('buttonEquip').on(cc.Node.EventType.TOUCH_END, function (event) {
-                cc.log('equip clicked');
             }.bind(this));
             item.off(cc.Node.EventType.TOUCH_END);
             item.getChildByName('buttonDrop').on(cc.Node.EventType.TOUCH_END, function (event) {
-                cc.log('drop clicked');
+                var id = array[index]._data.id;
+                ag.agSocket.send("bagItemToGround",id);
+                UserInfo._itemMap[id]._data.owner = undefined;
+                this.refreshBag();
             }.bind(this));
         }.bind(this));
         this._scrollViewList.reload();

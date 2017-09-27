@@ -27,10 +27,7 @@ module.exports={
 	_skillPointCount:1,
 	_bornLocation:cc.p(2,2),
     _direction:4,
-	_groundMap:{},
-	_bagMap:[],
-	_equipMap:[],
-	_itemInstanceMap:{},
+	_itemMap : {},
 
 	init:function () {
 

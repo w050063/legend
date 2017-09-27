@@ -15,7 +15,7 @@ cc.Class({
 
 
     add:function (obj) {
-        this._roleMap[obj.id] = obj;
+        this._roleMap[obj._data.id] = obj;
         var xyStr = this.getMapXYString(obj);
         if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
         this._roleXYMap[xyStr].push(obj);
@@ -37,10 +37,11 @@ cc.Class({
     },
 
     getByXY:function (location) {
-        return this._roleXYMap[''+location.x+','+location.y];
+        var array = this._roleXYMap[''+location.x+','+location.y];
+        return array?array:[];
     },
 
     getMapXYString:function(obj){
-        return ''+obj.x+','+obj.y;
+        return ''+obj._data.x+','+obj._data.y;
     },
 });

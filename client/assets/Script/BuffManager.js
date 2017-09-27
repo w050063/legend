@@ -90,7 +90,6 @@ cc.Class({
 
     delFireWall:function (key) {
         if(this._fireWallMap[key]){
-            cc.log("del111");
             ag.agAniCache.put(this._fireWallMap[key].node._agani);
             this._fireWallMap[key].node.destroy();
             ag.gameLayer.node.stopActionByTag(this._fireWallMap[key].tag);

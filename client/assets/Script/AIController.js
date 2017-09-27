@@ -145,14 +145,14 @@ cc.Class({
     //一次移动完成
     onMoveEnd:function(){
         this._busy = false;
-        this.update(0);
+        //this.update(0);
     },
 
 
     //一次移动完成
     onAttackEnd:function(){
         this._busy = false;
-        this.update(0);
+        //this.update(0);
     },
 
 
@@ -172,7 +172,7 @@ cc.Class({
     // called every frame
     update: function (dt) {
         //执行玩家操作
-        if(this._busy==false && this._state != ag.gameConst.stateDead){
+        if(ag.gameLayer && this._busy==false && this._state != ag.gameConst.stateDead){
             if(this._locked){
                 if(cc.pDistance(this._role.getLocation(),this._locked.getLocation())<=this._role.getMst().visibleDistance){
                     if(ag.gameLayer.getAttackDistance(this._role,this._locked)){
@@ -188,8 +188,27 @@ cc.Class({
             }else if(this._touchMoveDirection!=-1){
                 this.doMoveOperate(cc.pAdd(this._role.getLocation(),ag.gameConst.directionArray[this._touchMoveDirection]));
             }else{
+                //this._locked = this.findLocked();
                 this._role.idle();
             }
         }
+    },
+
+
+    //查找目标,怪物
+    findLocked:function(){
+        var locked = null;
+        var lockedDis = 9999;
+        var checkDistance = this._role.getMst().checkDistance;
+        var myLocation=this._role.getLocation();
+        for(var key in ag.gameLayer._roleMap){
+            var role = ag.gameLayer._roleMap[key];
+            var dis = cc.pDistance(myLocation,role.getLocation());
+            if(role._state != ag.gameConst.stateDead && role._data.camp==ag.gameConst.campMonster && dis<lockedDis && dis<=checkDistance){
+                locked = role;
+                lockedDis = dis;
+            }
+        }
+        return locked;
     },
 });

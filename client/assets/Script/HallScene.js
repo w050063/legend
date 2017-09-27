@@ -47,7 +47,6 @@ cc.Class({
                     item.getChildByName('labelTime').getComponent(cc.Label).string = ''+Math.floor(array[index].time/60)+'分钟'+(array[index].time%60)+'秒';
                     item.off('touchend');
                     item.on('touchend', function () {
-                        cc.log("Item " + index + ' clicked');
                         existThis = false;
                         cc.director.loadScene('CreateRoleScene');
                     });

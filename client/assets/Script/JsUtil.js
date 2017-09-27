@@ -29,7 +29,6 @@ module.exports={
             node.setLocalZOrder(101);
         }
         pomelo.request("work.WorkHandler."+key, obj, function(data) {
-            cc.log(data);
             if(node)node.destroy();
             if(data.code==0){
                 if(callback)callback(data);

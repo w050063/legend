@@ -69,7 +69,6 @@ module.exports={
     onSEnter:function(){
         pomelo.on('sEnter',function(data) {
             var msg = JSON.parse(data.msg);
-            //cc.log(JSON.stringify(msg));
             ag.userInfo._id = msg.id;
             ag.userInfo._name = msg.name;
             ag.userInfo._x = msg.x;
@@ -90,6 +89,7 @@ module.exports={
     //启动战斗中网络
     onBattleEvent:function(){
         pomelo.on('onData',function(data) {
+            cc.log(data);
             for(var key in data){
                 var array = data[key];
                 for(var i=0;i<array.length;++i){
@@ -170,12 +170,11 @@ module.exports={
             }else if(obj.key=='sDropArray'){
                 ag.gameLayer.dropItem(obj.value);
             }else if(obj.key=='sItemGroundDeleteArray'){
-                cc.log('sItemGroundDeleteArray');
-                cc.log(obj.value);
                 ag.gameLayer.itemGroundDelete(obj.value);
             }else if(obj.key=='sItemBagAddArray'){
-                cc.log(obj.value);
                 ag.gameLayer.itemBagAdd(obj.value);
+            }else if(obj.key=='sItemArray'){
+                ag.gameLayer.initItem(obj.value);
             }
         }
         this._dataArray = [];
