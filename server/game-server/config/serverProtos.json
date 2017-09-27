@@ -37,6 +37,14 @@
     "required int32 x": 3,
     "required int32 y": 4
   },
+  "message sItem": {
+    "required string id": 1,
+    "required string mid": 2,
+    "optional int32 x": 3,
+    "optional int32 y": 4,
+    "optional string owner": 5,
+    "optional bool puton": 6
+  },
   "onData" : {
     "repeated sMove sMoveArray": 1,
     "repeated sAttack sAttackArray": 2,
@@ -49,6 +57,7 @@
     "repeated sAddExp sAddExpArray": 9,
     "repeated sFireWall sFireWallArray": 10,
     "repeated string sItemGroundDeleteArray": 11,
-    "repeated string sItemBagAddArray": 12
+    "repeated string sItemBagAddArray": 12,
+    "repeated sItem sItemArray": 13
   }
 }
