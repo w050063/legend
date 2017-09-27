@@ -34,6 +34,10 @@ module.exports = ag.class.extend({
         return this._roleMap[id];
     },
 
+    getMap:function(){
+        return this._roleMap;
+    },
+
     getByXY:function (location) {
         var array = this._roleXYMap[''+location.x+','+location.y];
         return array?array:[];

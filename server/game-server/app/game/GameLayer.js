@@ -86,6 +86,12 @@ module.exports = {
 
         //发送buff管理数据
         ag.jsUtil.sendData("sBuffManager",JSON.stringify(ag.buffManager.getData()),player._data.id);
+
+        //发送装备情况
+        var map = ag.itemManager._itemMap.getMap();
+        for(var key in map){
+            ag.jsUtil.sendData("sItem",map[key]._data,player._data.id);
+        }
     },
 
 

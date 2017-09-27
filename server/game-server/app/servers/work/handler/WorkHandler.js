@@ -23,12 +23,9 @@ var Handler = cc.Class.extend({
         if(session.uid){
             data = ag.userManager.add(session.uid,session.uid,0,0);
             var player =  ag.gameLayer.getRole(session.uid);
-            console.log("session.uid");
-            console.log(session.uid);
             if(player){
                 data.type = player._data.type;
                 data.sex = player._data.sex;
-                console.log("enter");
             }
         }
         next(null, {
@@ -60,13 +57,10 @@ var Handler = cc.Class.extend({
     deleteRole:function(msg, session, next) {
         var code = 1;
         var player =  ag.gameLayer.getRole(session.uid);
-        console.log("session.uid");
-        console.log(session.uid);
         if(player){
             player._data.camp=ag.gameConst.campMonster;
             player.dead();
             code = 0;
-            console.log("enter");
         }
         next(null, {
             code: code
@@ -115,8 +109,6 @@ var Handler = cc.Class.extend({
 
     //进入游戏
     enter:function(msg, session, next) {
-        console.log("session.uid:");
-        console.log(session.uid,ag.userManager.getName(session.uid),msg.type,msg.sex);
         ag.gameLayer.addPlayer(session.uid,ag.userManager.getName(session.uid),msg.type,msg.sex);
         next();
     },
@@ -152,4 +144,10 @@ var Handler = cc.Class.extend({
         }
         next();
     },
+
+
+    bagItemToGround:function (msg, session, next) {
+        ag.itemManager.bagItemToGround(msg,session.uid);
+        next();
+    }
 });

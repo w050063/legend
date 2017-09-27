@@ -67,11 +67,13 @@ module.exports = ag.class.extend({
 
     //无事可以做状态，可以重复进入
     idle:function(){
+        if(this._state==ag.gameConst.stateDead)return;
         this._state = ag.gameConst.stateIdle;
     },
 
 
     move:function(location){
+        if(this._state==ag.gameConst.stateDead)return;
         var myData = this._data;
         if(Math.abs(this._data.x-location.x)>1 || Math.abs(this._data.y-location.y)>1){
             //位置异常，重新定位
@@ -101,10 +103,8 @@ module.exports = ag.class.extend({
         if(this._data.camp!=ag.gameConst.campMonster && array.length>0 && left>0){
             for(var i=0;i<array.length && i<left;++i){
                 var id = array[i]._data.id;
-                ag.jsUtil.sendDataAll("sItemGroundDelete",id);
                 ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
-                ag.itemManager.addBagItem(this._data.id,ag.itemManager._dropMap.get(id));
-                ag.itemManager._dropMap.del(id);
+                ag.itemManager.addBagItem(id,this._data.id);
             }
         }
         this._state = ag.gameConst.stateMove;
@@ -113,6 +113,7 @@ module.exports = ag.class.extend({
 
     //攻击
     attack:function(locked){
+        if(this._state==ag.gameConst.stateDead)return;
         var data = locked._data;
         var x = data.x, y = data.y;
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
@@ -253,6 +254,7 @@ module.exports = ag.class.extend({
 
 
     dead:function (attacker) {
+        if(this._state==ag.gameConst.stateDead)return;
         this._state = ag.gameConst.stateDead;
         
         //掉落装备
