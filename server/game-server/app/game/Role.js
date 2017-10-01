@@ -23,13 +23,39 @@ module.exports = ag.class.extend({
         var lv = this._data.level;
         this._data.totalHP = mst.hp+mst.hpAdd*lv;
         this._data.hp = this._data.totalHP;
-        this._data.defense = mst.defense+mst.defenseAdd*lv;
-        this._data.hurt = mst.hurt+mst.hurtAdd*lv;
         this._data.totalExp = mst.exp+mst.expAdd*lv;
         this._data.exp = 0;
         this._data.heal = mst.heal+mst.healAdd*lv;
         this._data.attackSpeed = mst.attackSpeed;
         this._data.moveSpeed = mst.moveSpeed;
+        this.refreshItemProp();
+    },
+
+
+    refreshItemProp:function(){
+        var mst = this.getMst();
+        var lv = this._data.level;
+        var hurt = mst.hurt+mst.hurtAdd*lv;
+        var defense = mst.defense+mst.defenseAdd*lv;
+        var map = ag.itemManager._itemMap.getMap();
+        for (var key in map) {
+            var obj = map[key]._data;
+            if (obj.owner == this._data.id && obj.puton) {
+                var itemMst = ag.gameConst._itemMst[obj.mid];
+                if(itemMst.hurt)hurt+=itemMst.hurt;
+                if(itemMst.defense)defense+=itemMst.defense;
+            }
+        }
+        this._data.hurt = hurt;
+        this._data.defense = defense;
+    },
+
+
+    getTypeNum:function(){
+        if(this._data.type=='m0')return this._data.sex==ag.gameConst.sexBoy?0:1;
+        if(this._data.type=='m1')return this._data.sex==ag.gameConst.sexBoy?2:3;
+        if(this._data.type=='m2')return this._data.sex==ag.gameConst.sexBoy?4:5;
+        return 0;
     },
 
 
@@ -86,7 +112,7 @@ module.exports = ag.class.extend({
 
 
         //通知其他人
-        ag.jsUtil.sendDataExcept("sMove",{id:myData.id, x:myData.x, y:myData.y},this);
+        ag.jsUtil.sendDataExcept("sMove",{id:myData.id, x:myData.x, y:myData.y},this._data.id);
 
 
         //忙碌状态
@@ -104,6 +130,7 @@ module.exports = ag.class.extend({
             for(var i=0;i<array.length && i<left;++i){
                 var id = array[i]._data.id;
                 ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
+                ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
                 ag.itemManager.addBagItem(id,this._data.id);
             }
         }
@@ -235,7 +262,7 @@ module.exports = ag.class.extend({
 
 
         //通知所有人
-        ag.jsUtil.sendDataExcept("sAttack",{id:this._data.id,lockedId:locked._data.id},this);
+        ag.jsUtil.sendDataExcept("sAttack",{id:this._data.id,lockedId:locked._data.id},this._data.id);
 
 
         //删除本地死亡怪物数据,更新AI锁定

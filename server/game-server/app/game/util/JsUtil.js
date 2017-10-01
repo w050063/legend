@@ -81,10 +81,10 @@ module.exports = {
 
 
     //发送要合并的数据
-    sendDataExcept : function(route,msg,role){
+    sendDataExcept : function(route,msg,id){
         for(var key in ag.gameLayer._roleMap){
             var data = ag.gameLayer._roleMap[key]._data;
-            if(data.camp!=ag.gameConst.campMonster && data.id!=role._data.id){
+            if(data.camp!=ag.gameConst.campMonster && data.id!==id){
                 this.sendData(route,msg,data.id);
             }
         }

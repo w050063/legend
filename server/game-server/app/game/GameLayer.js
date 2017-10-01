@@ -81,7 +81,7 @@ module.exports = {
         }
 
         //通知其他人。
-        ag.jsUtil.sendDataExcept("sRole",JSON.stringify(player._data),player);
+        ag.jsUtil.sendDataExcept("sRole",JSON.stringify(player._data),player._data.id);
 
 
         //发送buff管理数据

@@ -58,9 +58,11 @@ var Handler = cc.Class.extend({
         var code = 1;
         var player =  ag.gameLayer.getRole(session.uid);
         if(player){
+            ag.itemManager.delItemByRoleId(session.uid);
             player._data.camp=ag.gameConst.campMonster;
             player.dead();
             code = 0;
+            ag.jsUtil.sendDataExcept("sDeleteRole",player._data.id,player._data.id);
         }
         next(null, {
             code: code
@@ -149,5 +151,18 @@ var Handler = cc.Class.extend({
     bagItemToGround:function (msg, session, next) {
         ag.itemManager.bagItemToGround(msg,session.uid);
         next();
-    }
+    },
+
+
+
+    bagItemToEquip:function (msg, session, next) {
+        ag.itemManager.bagItemToEquip(msg,session.uid);
+        next();
+    },
+
+
+    equipItemToBag:function (msg, session, next) {
+        ag.itemManager.equipItemToBag(msg,session.uid);
+        next();
+    },
 });

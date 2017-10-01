@@ -10,8 +10,24 @@ module.exports = ag.class.extend({
     ctor:function () {
         this._itemMap = new AgXYMap();
         this._bagLengthMap = {};
+        ag.actionManager.schedule(this,1,this.update1.bind(this));
     },
 
+
+    //更新数据
+    update1: function (dt) {
+        var map = this._itemMap.getMap();
+        for (var key in map) {
+            var obj = map[key];
+            if(!obj._data.owner){
+                --obj._duration;
+                if(obj._duration<=0){
+                    ag.jsUtil.sendDataAll("sItemDisappear",obj._data.id);
+                    this._itemMap.del(key);
+                }
+            }
+        }
+    },
 
     drop:function (str,location) {
         var array = str.split(',');
@@ -22,6 +38,7 @@ module.exports = ag.class.extend({
                     var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
                     pos = ag.gameLayer.getStandLocation('t0',pos.x,pos.y,0);
                     var item = new Item(array[i],pos);
+                    item._duration = ag.gameConst.itemDuration;
                     this._itemMap.add(item);
                     ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)));
                 }
@@ -55,11 +72,61 @@ module.exports = ag.class.extend({
             pos = ag.gameLayer.getStandLocation('t0',pos.x,pos.y,0);
             obj._data.x = pos.x;
             obj._data.y = pos.y;
+            obj._duration = ag.gameConst.itemDuration;
             this._itemMap.add(obj);
             if(!this._bagLengthMap[rid])this._bagLengthMap[rid] = 1;
             --this._bagLengthMap[rid];
             ag.jsUtil.sendDataAll("sDrop",obj._data);
         }
+    },
+
+
+    bagItemToEquip:function (id,rid) {
+        var item = this._itemMap.get(id);
+        var role = ag.gameLayer.getRole(rid);
+        if(item && role){
+            var mst = ag.gameConst._itemMst[item._data.mid];
+            if(mst.exclusive.indexOf(role.getTypeNum())!=-1) {
+                var map = this._itemMap.getMap();
+                for (var key in map) {
+                    var obj = map[key]._data;
+                    if (obj.owner == rid && obj.puton && mst.type == ag.gameConst._itemMst[obj.mid].type) {
+                        delete obj.puton;
+                        ++this._bagLengthMap[rid];
+                        break;
+                    }
+                }
+                item._data.puton = 1;
+                --this._bagLengthMap[rid];
+                ag.jsUtil.sendDataExcept("sBagItemToEquip",{id:id,rid:rid},rid);
+                role.refreshItemProp();
+            }
+        }
+    },
+
+
+    equipItemToBag:function (id,rid) {
+        var item = this._itemMap.get(id);
+        var role = ag.gameLayer.getRole(rid);
+        if(item && role){
+            delete item.puton;
+            ++this._bagLengthMap[rid];
+            role.refreshItemProp();
+            ag.jsUtil.sendDataExcept("sEquipItemToBag",{id:id,rid:rid},rid);
+        }
+    },
+
+
+    //删除指定角色的道具
+    delItemByRoleId:function(rid){
+        var map = this._itemMap.getMap();
+        for (var key in map) {
+            var obj = map[key]._data;
+            if (obj.owner == rid) {
+                this._itemMap.del(key);
+            }
+        }
+        this._bagLengthMap[rid]=0;
     },
 
 
