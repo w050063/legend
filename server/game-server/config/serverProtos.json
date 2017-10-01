@@ -43,7 +43,15 @@
     "optional int32 x": 3,
     "optional int32 y": 4,
     "optional string owner": 5,
-    "optional bool puton": 6
+    "optional int32 puton": 6
+  },
+  "message sBagItemToEquip": {
+    "required string id": 1,
+    "required string rid": 2
+  },
+  "message sEquipItemToBag": {
+    "required string id": 1,
+    "required string rid": 2
   },
   "onData" : {
     "repeated sMove sMoveArray": 1,
@@ -58,6 +66,10 @@
     "repeated sFireWall sFireWallArray": 10,
     "repeated string sItemGroundDeleteArray": 11,
     "repeated string sItemBagAddArray": 12,
-    "repeated sItem sItemArray": 13
+    "repeated sItem sItemArray": 13,
+    "repeated string sItemDisappearArray": 14,
+    "repeated string sDeleteRoleArray": 15,
+    "repeated sBagItemToEquip sBagItemToEquipArray": 16,
+    "repeated sEquipItemToBag sEquipItemToBagArray": 17
   }
 }
