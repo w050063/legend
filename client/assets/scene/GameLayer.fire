@@ -5022,7 +5022,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1080,
+      "width": 400,
       "height": 40
     },
     "_rotationX": 0,
@@ -5066,8 +5066,8 @@
     "_N$returnType": 2,
     "_N$inputFlag": 5,
     "_N$inputMode": 6,
-    "_N$fontSize": 20,
-    "_N$lineHeight": 20,
+    "_N$fontSize": 40,
+    "_N$lineHeight": 40,
     "_N$fontColor": {
       "__type__": "cc.Color",
       "r": 0,
@@ -5076,7 +5076,7 @@
       "a": 255
     },
     "_N$placeholder": "聊天内容......",
-    "_N$placeholderFontSize": 20,
+    "_N$placeholderFontSize": 40,
     "_N$placeholderFontColor": {
       "__type__": "cc.Color",
       "r": 127,
@@ -5084,7 +5084,7 @@
       "b": 127,
       "a": 255
     },
-    "_N$maxLength": 20,
+    "_N$maxLength": 40,
     "_N$stayOnTop": false
   },
   {
