@@ -64,7 +64,6 @@ module.exports = {
             if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
             this._roleXYMap[xyStr].push(player);
 		}
-        player._data.name = name;//如果玩家改了名字，再次进来要更改
 
         //确认进入游戏成功。
         ag.jsUtil.send("sEnter",JSON.stringify(player._data),[uid]);

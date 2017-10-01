@@ -301,7 +301,12 @@ module.exports = ag.class.extend({
                 attacker._data.exp = exp;
             }
             ag.jsUtil.sendDataAll("sAddExp",{id:attacker._data.id,level:attacker._data.level,exp:attacker._data.exp});
+
+            if(this._data.camp!=ag.gameConst.campMonster){
+                ag.jsUtil.sendDataAll("sSystemNotify",attacker._data.name+' 击杀 '+this._data.name);
+            }
         }
+
 
 
         ag.buffManager.delFireWallByDead(this);

@@ -60,6 +60,7 @@ var Handler = cc.Class.extend({
         if(player){
             ag.itemManager.delItemByRoleId(session.uid);
             player._data.camp=ag.gameConst.campMonster;
+            player._state = ag.gameConst.stateIdle;
             player.dead();
             code = 0;
             ag.jsUtil.sendDataExcept("sDeleteRole",player._data.id,player._data.id);
@@ -69,43 +70,10 @@ var Handler = cc.Class.extend({
         });
     },
 
-    /**
-     * Send messages to users
-     *
-     * @param {Object} msg message from client
-     * @param {Object} session
-     * @param  {Function} next next stemp callback
-     *
-     */
-    chat : function(msg, session, next) {
-        var channelService = this.app.get('channelService');
-        var channel = channelService.getChannel(ag.jsUtil.dataChannel, true);
-        channel.pushMessage('sChat', msg);
+
+    chatYou : function(msg, session, next) {
+        ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,content:msg});
         next();
-
-
-        //var channelService = this.app.get('channelService');
-        //var param = {
-        //    msg: msg.content,
-        //    from: session.get("uid"),
-        //    target: msg.target
-        //};
-        //var channel = channelService.getChannel(JsUtil.dataChannel, true);
-        //
-        ////the target is all users
-        //if(msg.target == '*') {
-        //    channel.pushMessage('onChat', param);
-        //}
-        ////the target is specific user
-        //else {
-        //    var tuid = msg.target;
-        //    var tsid = channel.getMember(tuid)['sid'];
-        //    channelService.pushMessageByUids('onChat', param, [{
-        //        uid: tuid,
-        //        sid: tsid
-        //    }]);
-        //}
-        //next(null, {});
     },
 
 
