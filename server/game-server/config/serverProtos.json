@@ -53,6 +53,10 @@
     "required string id": 1,
     "required string rid": 2
   },
+  "message sChatYou": {
+    "required string id": 1,
+    "required string content": 2
+  },
   "onData" : {
     "repeated sMove sMoveArray": 1,
     "repeated sAttack sAttackArray": 2,
@@ -70,6 +74,8 @@
     "repeated string sItemDisappearArray": 14,
     "repeated string sDeleteRoleArray": 15,
     "repeated sBagItemToEquip sBagItemToEquipArray": 16,
-    "repeated sEquipItemToBag sEquipItemToBagArray": 17
+    "repeated sEquipItemToBag sEquipItemToBagArray": 17,
+    "repeated sChatYou sChatYouArray": 18,
+    "repeated string sSystemNotifyArray": 19
   }
 }
