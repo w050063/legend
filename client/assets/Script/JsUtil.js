@@ -5,6 +5,16 @@
 
 
 module.exports={
+    //获取当前时间,begin
+    _timeCounter: 0,
+    startTime: function () {
+        this._timeCounter = new Date().getTime();
+    },
+    printTime: function (tag) {
+        cc.log(tag + " time:" + (new Date().getTime() - this._timeCounter));
+    },
+
+
     alert:function (father,content,callback) {
         //加载
         cc.loader.loadRes('prefab/nodeAlert',function(err,prefab){

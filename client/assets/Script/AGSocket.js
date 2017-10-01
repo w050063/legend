@@ -21,7 +21,7 @@ module.exports={
         }
         self._sessionId=id;
         //var tempId = null;
-        pomelo.init({host: "127.0.0.1",port: 3014,log: true}, function() {
+        pomelo.init({host: "192.168.99.174",port: 3014,log: true}, function() {
             pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
                 //tempId=data.uid;
                 pomelo.disconnect(function () {
@@ -74,6 +74,8 @@ module.exports={
             ag.userInfo._x = msg.x;
             ag.userInfo._y = msg.y;
             ag.userInfo._data = msg;
+            ag.userInfo._accountData.sex = msg.sex;
+            ag.userInfo._accountData.type = msg.type;
             //ag.agSocket.offSChat();
             ag.agSocket.offSEnter();
             ag.agSocket.onBattleEvent();
@@ -175,6 +177,14 @@ module.exports={
                 ag.gameLayer.itemBagAdd(obj.value);
             }else if(obj.key=='sItemArray'){
                 ag.gameLayer.initItem(obj.value);
+            }else if(obj.key=='sItemDisappearArray'){
+                ag.gameLayer.sItemDisappear(obj.value);
+            }else if(obj.key=='sDeleteRoleArray'){
+                ag.gameLayer.deleteRoleByServer(obj.value);
+            }else if(obj.key=='sBagItemToEquipArray'){
+                ag.gameLayer.bagItemToEquip(obj.value.id,obj.value.rid);
+            }else if(obj.key=='sEquipItemToBagArray'){
+                ag.gameLayer.equipItemToBag(obj.value.id,obj.value.rid);
             }
         }
         this._dataArray = [];

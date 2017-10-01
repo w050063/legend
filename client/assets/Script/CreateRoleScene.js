@@ -5,7 +5,6 @@
 
 var AGAniClothes = require("AGAniClothes");
 var AGAni = require("AGAni");
-var UserInfo = require("UserInfo");
 cc.Class({
     extends: cc.Component,
     properties: {},
@@ -28,7 +27,7 @@ cc.Class({
             }.call(this,i));
         }
 
-        this.setSelected(this.getRoleIndex(UserInfo._accountData.type,UserInfo._accountData.sex));
+        this.setSelected(this.getRoleIndex(ag.userInfo._accountData.type,ag.userInfo._accountData.sex));
         this._buttonDelete = cc.find('Canvas/buttonDelete').getComponent(cc.Button);
         this._buttonStart = cc.find('Canvas/buttonStart').getComponent(cc.Button);
         //this._buttonDelete.enableAutoGrayEffect = true;
@@ -44,8 +43,8 @@ cc.Class({
     //选中哪一个
     setSelected:function (index) {
         //如果存在角色，不能选，必须先删除
-        if(UserInfo._accountData.type!=undefined && UserInfo._accountData.sex!=undefined
-            && this.getRoleIndex(UserInfo._accountData.type,UserInfo._accountData.sex)!=index){
+        if(ag.userInfo._accountData.type!=undefined && ag.userInfo._accountData.sex!=undefined
+            && this.getRoleIndex(ag.userInfo._accountData.type,ag.userInfo._accountData.sex)!=index){
             ag.jsUtil.showText(this.node,'已存在角色');
             return;
         }
@@ -69,10 +68,10 @@ cc.Class({
 
     //开始游戏按钮
     buttonDelete: function () {
-        if(UserInfo._accountData.type!=undefined && UserInfo._accountData.sex!=undefined){
+        if(ag.userInfo._accountData.type!=undefined && ag.userInfo._accountData.sex!=undefined){
             ag.jsUtil.request(this.node,'deleteRole',ag.agSocket._sessionId,function (data) {
-                UserInfo._accountData.type=undefined;
-                UserInfo._accountData.sex=undefined;
+                ag.userInfo._accountData.type=undefined;
+                ag.userInfo._accountData.sex=undefined;
                 ag.jsUtil.showText(this.node,'删除成功！');
             }.bind(this));
         }else{

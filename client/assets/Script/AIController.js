@@ -188,7 +188,7 @@ cc.Class({
             }else if(this._touchMoveDirection!=-1){
                 this.doMoveOperate(cc.pAdd(this._role.getLocation(),ag.gameConst.directionArray[this._touchMoveDirection]));
             }else{
-                //this._locked = this.findLocked();
+                this._locked = this.findLocked();
                 this._role.idle();
             }
         }

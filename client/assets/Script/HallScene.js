@@ -4,7 +4,6 @@
  */
 
 var AGListView = require("AgListView");
-var UserInfo = require("UserInfo");
 var existThis = false;
 cc.Class({
     extends: cc.Component,
@@ -59,12 +58,12 @@ cc.Class({
 
     //更新个人资料数据
     firstUpdateInfo:function(){
-        cc.find('Canvas/spriteHeadInfo/labelId').getComponent(cc.Label).string = 'ID：'+UserInfo._accountData.id;
-        cc.find('Canvas/spriteHeadInfo/labelSessions').getComponent(cc.Label).string = '场次：'+UserInfo._accountData.sessions;
+        cc.find('Canvas/spriteHeadInfo/labelId').getComponent(cc.Label).string = 'ID：'+ag.userInfo._accountData.id;
+        cc.find('Canvas/spriteHeadInfo/labelSessions').getComponent(cc.Label).string = '场次：'+ag.userInfo._accountData.sessions;
         this.nextUpdateInfo();
     },
     nextUpdateInfo:function(){
-        cc.find('Canvas/spriteHeadInfo/editBoxName').getComponent(cc.EditBox).string = UserInfo._accountData.name;
+        cc.find('Canvas/spriteHeadInfo/editBoxName').getComponent(cc.EditBox).string = ag.userInfo._accountData.name;
     },
 
 
@@ -72,7 +71,7 @@ cc.Class({
     editBoxConfirm: function (sender) {
         if(sender.string.length>=2){
             ag.jsUtil.request(this.node,'changeName',sender.string,function (data) {
-                UserInfo._accountData.name = sender.string;
+                ag.userInfo._accountData.name = sender.string;
                 ag.jsUtil.showText(this.node,'名字更新成功');
             }.bind(this));
         }else{

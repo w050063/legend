@@ -15,6 +15,16 @@ cc.Class({
     //初始化角色
     init: function (data) {
         this._data=data;
+        this._equipArray = [null,null,null,null,null];//装备序列
+        for(var key in ag.userInfo._itemMap){
+            var obj = ag.userInfo._itemMap[key];
+            if(obj._data.owner==this._data.id && obj._data.puton){
+                this.addEquip(obj._data.mid);
+            }
+        }
+
+        this._weaponAni = null;
+        this._wingAni = null;
         this._agAni = null;
         this._labelName = null;
         this.setLocation(this._data.x,this._data.y);
@@ -23,12 +33,11 @@ cc.Class({
         this._state = ag.gameConst.stateIdle;
 
 
-
         //血条
         var prefab = cc.loader.getRes('prefab/nodeRoleProp');
         var node = cc.instantiate(prefab);
         node.parent = this.node;
-        node.setLocalZOrder(10);
+        node.setLocalZOrder(ag.gameConst.roleNameZorder);
         this._progressBarHP = node.getChildByName("progressBarHP").getComponent(cc.ProgressBar);
         this._labelHP = node.getChildByName("labelHP").getComponent(cc.Label);
         this._labelName = node.getChildByName("labelName").getComponent(cc.Label);
@@ -60,6 +69,34 @@ cc.Class({
         //if(this._agAni){
         //    this._agAni.getComponent(AGAni).doCallback(this.setZorderAndMapPos.bind(this));
         //}
+    },
+
+
+    addEquip:function(id){
+        var mst = ag.gameConst._itemMst[id];
+        if(mst.exclusive.indexOf(this.getTypeNum())!=-1){
+            this._equipArray[mst.type] = id;
+            if(this._state==ag.gameConst.stateIdle){
+                this.idleAnimation();
+            }
+        }
+    },
+
+
+
+    delEquip:function(index){
+        this._equipArray[index] = null;
+        if(this._state==ag.gameConst.stateIdle){
+            this.idleAnimation();
+        }
+    },
+
+
+    getTypeNum:function(){
+        if(this._data.type=='m0')return this._data.sex==ag.gameConst.sexBoy?0:1;
+        if(this._data.type=='m1')return this._data.sex==ag.gameConst.sexBoy?2:3;
+        if(this._data.type=='m2')return this._data.sex==ag.gameConst.sexBoy?4:5;
+        return 0;
     },
 
 
@@ -116,6 +153,7 @@ cc.Class({
         this._data.heal = mst.heal+mst.healAdd*lv;
         this._data.attackSpeed = mst.attackSpeed;
         this._data.moveSpeed = mst.moveSpeed;
+        if(this==ag.gameLayer._player)ag.gameLayer.refreshEquip();
     },
 
 
@@ -159,11 +197,41 @@ cc.Class({
     //无事可做动画
     idleAnimation:function(){
         if(this._farAway || this==ag.gameLayer._player){
-            var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
-            var array = AGAniClothes[clothes+ag.gameConst.stateIdle+this._data.direction].split(',');
-            if(this._agAni)ag.agAniCache.put(this._agAni);
-            this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),2,0.3);
-            this._agAni.setColor(this._aniColor);
+            if(this._data.camp==ag.gameConst.campMonster){
+                var model = ag.gameConst._roleMst[this._data.type].model;
+                if(!model){
+                    this.dead();
+                    return;
+                }
+                var clothes = model+'0';
+                var array = AGAniClothes[clothes+ag.gameConst.stateIdle+this._data.direction].split(',');
+                if(this._agAni)ag.agAniCache.put(this._agAni);
+                this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,0.3);
+                this._agAni.setColor(this._aniColor);
+            }else{
+                //衣服
+                var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+this._data.direction].split(',');
+                var endName = array[0].substr(array[0].length-3);
+                var name = (this._data.sex==0?'ani/hum1/000':'ani/hum1/001');
+                if(this._equipArray[1])name = ag.gameConst._itemMst[this._equipArray[1]].model;
+                if(this._agAni)ag.agAniCache.put(this._agAni);
+                this._agAni = ag.agAniCache.getNode(this.node,name+endName,parseInt(array[1]),ag.gameConst.roleAniZorder,0.3);
+                this._agAni.setColor(this._aniColor);
+                //武器
+                if(this._weaponAni){ag.agAniCache.put(this._weaponAni);this._weaponAni = undefined;}
+                if(this._equipArray[0]){
+                    var mst = ag.gameConst._itemMst[this._equipArray[0]];
+                    this._weaponAni = ag.agAniCache.getNode(this.node,mst.model+endName,parseInt(array[1]),ag.gameConst.roleWeaponZorder[this._data.direction],0.3);
+                    this._weaponAni.setColor(this._aniColor);
+                }
+                //翅膀
+                if(this._wingAni){ag.agAniCache.put(this._wingAni);this._wingAni = undefined;}
+                if(this._equipArray[2]){
+                    var mst = ag.gameConst._itemMst[this._equipArray[2]];
+                    this._wingAni = ag.agAniCache.getNode(this.node,mst.model+endName,parseInt(array[1]),ag.gameConst.roleWingZorder,0.3);
+                    this._wingAni.setColor(this._aniColor);
+                }
+            }
         }
     },
 
@@ -173,7 +241,9 @@ cc.Class({
         if(this._state != ag.gameConst.stateIdle && this._state != ag.gameConst.stateDead){
             this.node.stopAllActions();
             if(this._data.camp!=ag.gameConst.campMonster && this._state == ag.gameConst.stateAttack){
-                this._agAni.getComponent(AGAni).pause();
+                if(this._agAni)this._agAni.getComponent(AGAni).pause();
+                if(this._weaponAni)this._weaponAni.getComponent(AGAni).pause();
+                if(this._wingAni)this._wingAni.getComponent(AGAni).pause();
                 this.node.runAction(cc.sequence(cc.delayTime(1),cc.callFunc(function(){
                     this.idleAnimation();
                 }.bind(this))));
@@ -211,12 +281,38 @@ cc.Class({
             }
         }.bind(this))));
         if(this._farAway){
-            var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
-            var array = AGAniClothes[clothes+ag.gameConst.stateMove+this._data.direction].split(',');
-            if(this._agAni)ag.agAniCache.put(this._agAni);
-            var count = parseInt(array[1]);
-            this._agAni = ag.agAniCache.getNode(this.node,array[0],count,2,moveSpeed/count);
-            this._agAni.setColor(this._aniColor);
+            if(this._data.camp==ag.gameConst.campMonster){
+                var clothes = ag.gameConst._roleMst[this._data.type].model+'0';
+                var array = AGAniClothes[clothes+ag.gameConst.stateMove+this._data.direction].split(',');
+                if(this._agAni)ag.agAniCache.put(this._agAni);
+                var count = parseInt(array[1]);
+                this._agAni = ag.agAniCache.getNode(this.node,array[0],count,ag.gameConst.roleAniZorder,moveSpeed/count);
+                this._agAni.setColor(this._aniColor);
+            }else{
+                //衣服
+                var array = AGAniClothes['nudeboy0'+ag.gameConst.stateMove+this._data.direction].split(',');
+                var count = parseInt(array[1]);
+                var endName = array[0].substr(array[0].length-3);
+                var name = (this._data.sex==0?'ani/hum1/000':'ani/hum1/001');
+                if(this._equipArray[1])name = ag.gameConst._itemMst[this._equipArray[1]].model;
+                if(this._agAni)ag.agAniCache.put(this._agAni);
+                this._agAni = ag.agAniCache.getNode(this.node,name+endName,parseInt(array[1]),ag.gameConst.roleAniZorder,moveSpeed/count);
+                this._agAni.setColor(this._aniColor);
+                //武器
+                if(this._weaponAni){ag.agAniCache.put(this._weaponAni);this._weaponAni = undefined;}
+                if(this._equipArray[0]){
+                    var mst = ag.gameConst._itemMst[this._equipArray[0]];
+                    this._weaponAni = ag.agAniCache.getNode(this.node,mst.model+endName,count,ag.gameConst.roleWeaponZorder[this._data.direction],moveSpeed/count);
+                    this._weaponAni.setColor(this._aniColor);
+                }
+                //翅膀
+                if(this._wingAni){ag.agAniCache.put(this._wingAni);this._wingAni = undefined;}
+                if(this._equipArray[2]){
+                    var mst = ag.gameConst._itemMst[this._equipArray[2]];
+                    this._wingAni = ag.agAniCache.getNode(this.node,mst.model+endName,count,ag.gameConst.roleWingZorder,moveSpeed/count);
+                    this._wingAni.setColor(this._aniColor);
+                }
+            }
         }
 
 
@@ -255,20 +351,42 @@ cc.Class({
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
         //攻击动画
         if(this._farAway){
-            var clothes = (this._data.clothes?this._data.clothes:ag.gameConst._roleMst[this._data.type].model)+'0';
-            var attackCode = ag.gameConst.stateAttack;
-            //判断是攻击动作,还是施法动作
-            if(this._data.type=="m1" || this._data.type=="m2"){
-                if (clothes == 'nudeboy0' || clothes == 'nudegirl0' || clothes == 'clothboy0' || clothes == 'clothgirl0') {
-                    ++attackCode;
+            if(this._data.camp==ag.gameConst.campMonster){
+                var clothes = ag.gameConst._roleMst[this._data.type].model+'0';
+                var array = AGAniClothes[clothes+ag.gameConst.stateAttack+this._data.direction].split(',');
+                if(this._agAni)ag.agAniCache.put(this._agAni);
+                this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,0.1,function(){
+                    this.idle();
+                }.bind(this));
+                this._agAni.setColor(this._aniColor);
+            }else{
+                //衣服
+                var name = (this._data.sex==0?'ani/hum1/000':'ani/hum1/001');
+                if(this._equipArray[1])name = ag.gameConst._itemMst[this._equipArray[1]].model;
+                var attackCode = ag.gameConst.stateAttack;//判断是攻击动作,还是施法动作
+                if(this._data.type=="m1" || this._data.type=="m2")++attackCode;
+                var array = AGAniClothes['nudeboy0'+attackCode+this._data.direction].split(',');
+                var endName = array[0].substr(array[0].length-3);
+                if(this._agAni)ag.agAniCache.put(this._agAni);
+                this._agAni = ag.agAniCache.getNode(this.node,name+endName,parseInt(array[1]),ag.gameConst.roleAniZorder,0.1,function(){
+                    this.idle();
+                }.bind(this));
+                this._agAni.setColor(this._aniColor);
+                //武器
+                if(this._weaponAni){ag.agAniCache.put(this._weaponAni);this._weaponAni = undefined;}
+                if(this._equipArray[0]){
+                    var mst = ag.gameConst._itemMst[this._equipArray[0]];
+                    this._weaponAni = ag.agAniCache.getNode(this.node,mst.model+endName,parseInt(array[1]),ag.gameConst.roleWeaponZorder[this._data.direction],0.1);
+                    this._weaponAni.setColor(this._aniColor);
+                }
+                //翅膀
+                if(this._wingAni){ag.agAniCache.put(this._wingAni);this._wingAni = undefined;}
+                if(this._equipArray[2]){
+                    var mst = ag.gameConst._itemMst[this._equipArray[2]];
+                    this._wingAni = ag.agAniCache.getNode(this.node,mst.model+endName,parseInt(array[1]),ag.gameConst.roleWingZorder,0.1);
+                    this._wingAni.setColor(this._aniColor);
                 }
             }
-            var array = AGAniClothes[clothes+attackCode+this._data.direction].split(',');
-            if(this._agAni)ag.agAniCache.put(this._agAni);
-            this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),2,0.1,function(){
-                this.idle();
-            }.bind(this));
-            this._agAni.setColor(this._aniColor);
         }
         ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(this._data.attackSpeed),cc.callFunc(function(){
             if(this._ai)this._ai.onAttackEnd();
@@ -292,31 +410,31 @@ cc.Class({
         if(this._data.type=="m0"){
             if(ag.buffManager.getCDForFireCrit(this)==false){
                 if(Math.random()>0.5){
-                    ag.agAniCache.getEffect(this.node,"ani/effect2/"+(502000+this._data.direction*5),5,999,0.1);
+                    ag.agAniCache.getEffect(this.node,"ani/effect2/"+(502000+this._data.direction*5),5,ag.gameConst.roleEffectZorder,0.1);
                 }else{
-                    ag.agAniCache.getEffect(this.node,"ani/effect2/"+(503000+this._data.direction*8),8,999,0.1);
+                    ag.agAniCache.getEffect(this.node,"ani/effect2/"+(503000+this._data.direction*8),8,ag.gameConst.roleEffectZorder,0.1);
                 }
                 ag.buffManager.setCDForFireCrit(this,true);
                 cc.audioEngine.play(cc.url.raw("resources/music/hit.mp3"),false,1);
             }else{
                 if(Math.random()>0.5){
-                    ag.agAniCache.getEffect(this.node,"ani/effect1/"+(500000+this._data.direction*6),6,999,0.1);
+                    ag.agAniCache.getEffect(this.node,"ani/effect1/"+(500000+this._data.direction*6),6,ag.gameConst.roleEffectZorder,0.1);
                 }else{
-                    ag.agAniCache.getEffect(this.node,"ani/effect1/"+(501000+this._data.direction*6),6,999,0.1);
+                    ag.agAniCache.getEffect(this.node,"ani/effect1/"+(501000+this._data.direction*6),6,ag.gameConst.roleEffectZorder,0.1);
                 }
             }
         }else if(this._data.type=="m1"){
             var pos = locked.getTruePosition();
             if(Math.random()>0.5){
-                ag.agAniCache.getNode(this.node,"ani/effect3/504000",6,0,0.05,function(sender){
+                ag.agAniCache.getNode(this.node,"ani/effect3/504000",6,ag.gameConst.roleEffectUnderZorder,0.05,function(sender){
                     ag.agAniCache.put(sender.node);
-                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/504006",13,999,0.05);
+                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/504006",13,ag.gameConst.roleEffectZorder,0.05);
                     node.getComponent(AGAni).setAniPosition(pos);
                 }.bind(this));
             }else{
-                ag.agAniCache.getNode(this.node,"ani/effect3/505000",10,0,0.05,function(sender){
+                ag.agAniCache.getNode(this.node,"ani/effect3/505000",10,ag.gameConst.roleEffectUnderZorder,0.05,function(sender){
                     ag.agAniCache.put(sender.node);
-                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/505010",13,999,0.05);
+                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/505010",13,ag.gameConst.roleEffectZorder,0.05);
                     node.getComponent(AGAni).setAniPosition(pos);
                 }.bind(this));
             }
@@ -337,11 +455,11 @@ cc.Class({
             }else{
                 sprite.spriteFrame = cc.loader.getRes("ani/effect3",cc.SpriteAtlas).getSpriteFrame('509015');
             }
-            ag.agAniCache.getEffect(this.node,"ani/effect3/509000",6,999,0.05);
+            ag.agAniCache.getEffect(this.node,"ani/effect3/509000",6,ag.gameConst.roleEffectZorder,0.05);
             node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
                 node.destroy();
                 if(ag.gameLayer.getRole(lockedId)){
-                    ag.agAniCache.getEffect(locked.node,"ani/effect3/509006",9,999,0.05);
+                    ag.agAniCache.getEffect(locked.node,"ani/effect3/509006",9,ag.gameConst.roleEffectZorder,0.05);
                 }
             })));
 
@@ -356,7 +474,7 @@ cc.Class({
             node.setPosition(pos1);
             var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(pos2,pos1))));
             node.setRotation( 90-rotation);
-            ag.gameLayer._map.node.addChild(node,999999);
+            ag.gameLayer._map.node.addChild(node,ag.gameConst.roleEffectZorder);
             sprite.spriteFrame = cc.loader.getRes("ani/effect3",cc.SpriteAtlas).getSpriteFrame('511000');
             node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
                 node.destroy();
@@ -366,7 +484,7 @@ cc.Class({
             for (var i = 0; i < array.length; ++i) {
                 if(ag.gameLayer.isEnemyCamp(this,array[i])){
                     var pos = array[i].getTruePosition();
-                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/510000",6,999,0.15);
+                    var node = ag.agAniCache.getEffect(ag.gameLayer._map.node,"ani/effect3/510000",6,ag.gameConst.roleEffectZorder,0.15);
                     node.setScale(2);
                     node.getComponent(AGAni).setAniPosition(pos);
                 }

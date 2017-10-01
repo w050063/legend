@@ -32,15 +32,15 @@ cc.Class({
 
 
     test:function(){
-        ag.altasTask.addTask("map/terrainMap",function (err, atlas) {
-            var w = 170,h=170, x=Math.ceil(ag.gameConst._terrainMap['t0'].mapX*100/w),y=Math.ceil(ag.gameConst._terrainMap['t0'].mapY*60/h);
+        cc.loader.loadRes('map/mapgrass',cc.SpriteFrame,function(err,spriteFrame){
+            var w = 340,h=340, x=Math.ceil(ag.gameConst._terrainMap['t0'].mapX*100/w),y=Math.ceil(ag.gameConst._terrainMap['t0'].mapY*60/h);
             for(var i=0;i<y;++i){
                 for(var j=0;j<x;++j){
                     var node = new cc.Node();
                     var sprite = node.addComponent(cc.Sprite);
                     node.setPosition(Math.round(w*(0.5+j-x/2)),Math.round(h*(0.5+i-y/2)));
                     this.node.addChild(node,0);
-                    sprite.spriteFrame = atlas.getSpriteFrame(""+(i%2)+(j%2));
+                    sprite.spriteFrame = spriteFrame;
                     sprite.spriteFrame.getTexture().setAliasTexParameters();
                 }
             }

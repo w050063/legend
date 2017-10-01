@@ -7,7 +7,6 @@
 var Role = require("Role");
 var Item = require("Item");
 var AGTerrain = require("AGTerrain");
-var UserInfo = require("UserInfo");
 var AGListView = require("AgListView");
 cc.Class({
     extends: cc.Component,
@@ -21,6 +20,31 @@ cc.Class({
         this._roleMap = {};
         this._player = null;
         this._lastMapPosition = cc.p(0,0);
+
+        this._equipArray = [];
+        var self = this;
+        for(var i=0;i<5;++i){
+            (function(i){
+                self._equipArray.push(cc.find('Canvas/nodeBag/sprite'+i+'/sprite').getComponent(cc.Sprite));
+                cc.find('Canvas/nodeBag/sprite'+i).on(cc.Node.EventType.TOUCH_END, function (event) {
+                    for(var key in ag.userInfo._itemMap){
+                        var obj = ag.userInfo._itemMap[key];
+                        var mst = ag.gameConst._itemMst[obj._data.mid];
+                        if(obj._data.owner==self._player._data.id && obj._data.puton && mst.type==i){
+                            delete obj._data.puton;
+                            self._player.delEquip(i);
+                            self.refreshBag();
+                            self.refreshEquip();
+                            ag.agSocket.send("equipItemToBag",obj._data.id);
+                        }
+                    }
+                });
+            })(i);
+        }
+        this._equipArray.push(cc.find('Canvas/nodeBag/labelAttack').getComponent(cc.Label));
+        this._equipArray.push(cc.find('Canvas/nodeBag/labelDefense').getComponent(cc.Label));
+
+
 
 
         this._nodeBag = cc.find("Canvas/nodeBag");
@@ -56,6 +80,16 @@ cc.Class({
         this.schedule(ag.altasTask.update001.bind(ag.altasTask),0.01);
     },
 
+
+    gotoHall:function(sender){
+        pomelo.removeAllListeners('onData');
+        ag.agSocket._dataArray = [];
+        ag.userInfo._itemMap = {};
+        cc.audioEngine.stopAll();
+        cc.director.loadScene('HallScene');
+        ag.gameLayer = null;
+    },
+
     log:function(str){
         //if(!this._log){
         //    this._log = this.node.getChildByName('editBoxName').getComponent('cc.EditBox');
@@ -75,11 +109,13 @@ cc.Class({
 
     //增加一个角色
     addRole:function(data){
-        var node = new cc.Node();
-        var role = node.addComponent(Role);
-        this._map.node.addChild(node);
-        this._roleMap[data.id] = role;
-        role.init(data);
+        if(!this.getRole(data.id)){
+            var node = new cc.Node();
+            var role = node.addComponent(Role);
+            this._map.node.addChild(node);
+            this._roleMap[data.id] = role;
+            role.init(data);
+        }
     },
 
 
@@ -94,8 +130,13 @@ cc.Class({
         if(!data.owner){
             this.dropItem(data);
         }else if(!data.puton){
-            UserInfo._itemMap[data.id]={_data:data};
+            ag.userInfo._itemMap[data.id]={_data:data};
             this.refreshBag();
+        }else{
+            ag.userInfo._itemMap[data.id]={_data:data};
+            var role = this.getRole(data.owner);
+            role.addEquip(data.mid);
+            if(role == this._player)this.refreshEquip();
         }
     },
 
@@ -106,23 +147,64 @@ cc.Class({
         var item = node.addComponent(Item);
         this._map.node.addChild(node,1);
         item.init(data);
-        UserInfo._itemMap[data.id]={_data:data,comp:item};
+        ag.userInfo._itemMap[data.id]={_data:data,comp:item};
     },
 
 
-    itemGroundDelete:function (id) {
-
+    sItemDisappear:function (id) {
+        var obj = ag.userInfo._itemMap[id];
+        if(obj && obj.comp){
+            obj._data.owner = undefined;
+            obj.comp.node.destroy();
+            obj.comp = undefined;
+        }
     },
 
+
+    deleteRoleByServer:function (id) {
+        var player =  ag.gameLayer.getRole(id);
+        if(player){
+            for(var key in ag.userInfo._itemMap){
+                var obj = ag.userInfo._itemMap[key];
+                if(obj._data.owner==id){
+                    delete ag.userInfo._itemMap[key];
+                }
+            }
+            player._data.camp=ag.gameConst.campMonster;
+            player._state = ag.gameConst.stateIdle;
+            player.dead();
+        }
+    },
 
 
     itemBagAdd:function (id) {
-        var obj = UserInfo._itemMap[id];
+        var obj = ag.userInfo._itemMap[id];
         if(obj && obj.comp){
             obj._data.owner = this._player._data.id;
             obj.comp.node.destroy();
             obj.comp = undefined;
             this.refreshBag();
+        }
+    },
+
+
+    bagItemToEquip:function(id,rid){
+        var obj = ag.userInfo._itemMap[id];
+        var role = ag.gameLayer.getRole(rid);
+        if(obj && role){
+            obj._data.owner = rid;
+            obj._data.puton = 1;
+            role.addEquip(obj._data.mid);
+        }
+    },
+
+
+    equipItemToBag:function(id,rid){
+        var obj = ag.userInfo._itemMap[id];
+        var role = ag.gameLayer.getRole(rid);
+        if(obj && role){
+            delete obj._data.puton;
+            role.delEquip(ag.gameConst._itemMst[obj._data.mid].type);
         }
     },
 
@@ -292,14 +374,19 @@ cc.Class({
 
 
     buttonBagEvent:function (sender) {
-        this._nodeBag.active = !this._nodeBag.active;
+        this._nodeBag.active = true;
+    },
+
+
+    buttonClose:function (sender) {
+        this._nodeBag.active = false;
     },
 
 
     refreshBag:function () {
         var array = [];
-        for(var key in UserInfo._itemMap){
-            var obj = UserInfo._itemMap[key];
+        for(var key in ag.userInfo._itemMap){
+            var obj = ag.userInfo._itemMap[key];
             if(obj._data.owner==this._player._data.id && !obj._data.puton){
                 array.push(obj);
             }
@@ -308,6 +395,7 @@ cc.Class({
         this._scrollViewList.setCallback(function(item,index){
             var data = ag.gameConst._itemMst[array[index]._data.mid];
             item.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+data.id.substr(1));
+            item.getChildByName('spriteIcon').setScale(2);
             item.getChildByName('labelName').getComponent(cc.Label).string = this.getItemBagShow(data);
             item.off('touchstart');
             item.on('touchstart', function (event) {
@@ -315,16 +403,72 @@ cc.Class({
 
             item.off(cc.Node.EventType.TOUCH_END);
             item.getChildByName('buttonEquip').on(cc.Node.EventType.TOUCH_END, function (event) {
+                var id = array[index]._data.id;
+                var mst = ag.gameConst._itemMst[array[index]._data.mid];
+                if(mst.exclusive.indexOf(this._player.getTypeNum())!=-1){
+                    ag.agSocket.send("bagItemToEquip",id);
+                    for(var key in ag.userInfo._itemMap){
+                        var obj = ag.userInfo._itemMap[key]._data;
+                        if(obj.owner==this._player._data.id && obj.puton && mst.type==ag.gameConst._itemMst[obj.mid].type){
+                            delete obj.puton;
+                            break;
+                        }
+                    }
+                    ag.userInfo._itemMap[id]._data.puton = 1;
+                    this._player.addEquip(mst.id);
+                    this.refreshBag();
+                    this.refreshEquip();
+                }else{
+                    ag.jsUtil.showText(this.node,'不能穿戴');
+                }
             }.bind(this));
             item.off(cc.Node.EventType.TOUCH_END);
             item.getChildByName('buttonDrop').on(cc.Node.EventType.TOUCH_END, function (event) {
                 var id = array[index]._data.id;
                 ag.agSocket.send("bagItemToGround",id);
-                UserInfo._itemMap[id]._data.owner = undefined;
+                ag.userInfo._itemMap[id]._data.owner = undefined;
                 this.refreshBag();
             }.bind(this));
         }.bind(this));
         this._scrollViewList.reload();
+    },
+
+
+    refreshEquip:function () {
+        var array = [];
+        for(var key in ag.userInfo._itemMap){
+            var obj = ag.userInfo._itemMap[key];
+            if(obj._data.owner==this._player._data.id && obj._data.puton){
+                array.push(obj);
+            }
+        }
+
+
+        for(var i=0;i<5;++i){
+            this._equipArray[i].spriteFrame = undefined;
+        }
+
+        for(var i=0;i<array.length;++i){
+            var mst = ag.gameConst._itemMst[array[i]._data.mid];
+            this._equipArray[mst.type].spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+mst.id.substr(1));
+            this._equipArray[mst.type].node.setScale(2);
+        }
+
+
+        //属性显示
+        var mst = this._player.getMst();
+        var lv = this._player._data.level;
+        var hurt = mst.hurt+mst.hurtAdd*lv;
+        var defense = mst.defense+mst.defenseAdd*lv;
+        for(var i=0;i<5;++i){
+            if(this._player._equipArray[i]){
+                var itemMst = ag.gameConst._itemMst[this._player._equipArray[i]];
+                if(itemMst.hurt)hurt+=itemMst.hurt;
+                if(itemMst.defense)defense+=itemMst.defense;
+            }
+        }
+        this._equipArray[5].string = '攻击:'+hurt;
+        this._equipArray[6].string = '防御:'+defense;
     },
 
 
