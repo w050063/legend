@@ -380,8 +380,8 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
+      "r": 255,
+      "g": 255,
       "b": 255,
       "a": 255
     },
@@ -393,7 +393,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 26,
+      "width": 35,
       "height": 14
     },
     "_rotationX": 0,
@@ -421,8 +421,8 @@
     },
     "_enabled": true,
     "_useOriginalSize": false,
-    "_actualFontSize": 10,
-    "_fontSize": 10,
+    "_actualFontSize": 14,
+    "_fontSize": 14,
     "_lineHeight": 14,
     "_enableWrapText": true,
     "_N$file": null,

@@ -32,18 +32,25 @@ cc.Class({
             urls.push(this.pad(after+i,6));
         }
 
-        ag.altasTask.addTask(before,function (err, atlas) {
-            if(!this._spriteFrameArray)return;//防止内存已经释放
-            for(var i=0;i<urls.length;++i){
-                this._spriteFrameArray.push({"key":urls[i],"value":atlas.getSpriteFrame(urls[i])});
-            }
-            this.modifyFrame();
-            this._loadOver = true;
-            for(var i=0;i<this._willDoArray.length;++i){
-                this._willDoArray[i]();
-            }
-            this._willDoArray = [];
-        }.bind(this));
+
+        var atlas = cc.loader.getRes(before,cc.SpriteAtlas);
+        for(var i=0;i<urls.length;++i){
+            this._spriteFrameArray.push({"key":urls[i],"value":atlas.getSpriteFrame(urls[i])});
+        }
+        this.modifyFrame();
+
+        //ag.altasTask.addTask(before,function (err, atlas) {
+        //    if(!this._spriteFrameArray)return;//防止内存已经释放
+        //    for(var i=0;i<urls.length;++i){
+        //        this._spriteFrameArray.push({"key":urls[i],"value":atlas.getSpriteFrame(urls[i])});
+        //    }
+        //    this.modifyFrame();
+        //    this._loadOver = true;
+        //    for(var i=0;i<this._willDoArray.length;++i){
+        //        this._willDoArray[i]();
+        //    }
+        //    this._willDoArray = [];
+        //}.bind(this));
     },
 
     //加载完毕后指定参数任务
@@ -89,11 +96,18 @@ cc.Class({
         var after = key.substr(key.length-6);
         var array = AGAniOffset[after].split(",");
         this.node.setPosition(cc.pAdd(this._aniPosition,cc.p(parseInt(array[0]),parseInt(array[1]))));
+        if(this._controllArray){
+            for(var i=0;i<this._controllArray.length;++i){
+                this._controllArray[i]._curIndex = this._curIndex;
+                this._controllArray[i].modifyFrame();
+            }
+        }
     },
 
 
     // called every frame
     update: function (dt) {
+        if(this._bBeControll)return;
         if(this._running && this._spriteFrameArray.length>0){
             this._passTime += dt;
             if(this._passTime>=this._interval){
@@ -107,6 +121,26 @@ cc.Class({
                 }
                 this.modifyFrame();
             }
+        }
+    },
+
+
+    addControl:function(comp){
+        if(!this._controllArray)this._controllArray = [];
+        this._controllArray.push(comp);
+        comp.beControll();
+    },
+
+    beControll:function(){
+        this._bBeControll=true;
+    },
+
+    delControll:function(){
+        if(this._controllArray){
+            for(var i=0;i<this._controllArray.length;++i){
+                delete this._controllArray[i]._bBeControll;
+            }
+            delete this._controllArray;
         }
     },
 

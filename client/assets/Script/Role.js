@@ -43,7 +43,7 @@ cc.Class({
         this._labelName = node.getChildByName("labelName").getComponent(cc.Label);
         this.changeHP(this._data.hp);
         this._labelName.string = this._data.name?this._data.name:ag.gameConst._roleMst[this._data.type].name;
-        this._labelName.node.color = ag.gameLayer.isEnemyCamp(this,ag.gameLayer._player)?cc.color(255,122,0):cc.color(0,0,255);
+        this._labelName.node.color = ag.gameLayer.isEnemyCamp(this,ag.gameLayer._player)?cc.color(255,0,0):cc.color(255,255,255);
 
 
         //增加AI
@@ -223,6 +223,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[this._equipArray[0]];
                     this._weaponAni = ag.agAniCache.getNode(this.node,mst.model+endName,parseInt(array[1]),ag.gameConst.roleWeaponZorder[this._data.direction],0.3);
                     this._weaponAni.setColor(this._aniColor);
+                    this._agAni.getComponent(AGAni).addControl(this._weaponAni.getComponent(AGAni));
                 }
                 //翅膀
                 if(this._wingAni){ag.agAniCache.put(this._wingAni);this._wingAni = undefined;}
@@ -230,6 +231,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[this._equipArray[2]];
                     this._wingAni = ag.agAniCache.getNode(this.node,mst.model+endName,parseInt(array[1]),ag.gameConst.roleWingZorder,0.3);
                     this._wingAni.setColor(this._aniColor);
+                    this._agAni.getComponent(AGAni).addControl(this._wingAni.getComponent(AGAni));
                 }
             }
         }
@@ -304,6 +306,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[this._equipArray[0]];
                     this._weaponAni = ag.agAniCache.getNode(this.node,mst.model+endName,count,ag.gameConst.roleWeaponZorder[this._data.direction],moveSpeed/count);
                     this._weaponAni.setColor(this._aniColor);
+                    this._agAni.getComponent(AGAni).addControl(this._weaponAni.getComponent(AGAni));
                 }
                 //翅膀
                 if(this._wingAni){ag.agAniCache.put(this._wingAni);this._wingAni = undefined;}
@@ -311,6 +314,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[this._equipArray[2]];
                     this._wingAni = ag.agAniCache.getNode(this.node,mst.model+endName,count,ag.gameConst.roleWingZorder,moveSpeed/count);
                     this._wingAni.setColor(this._aniColor);
+                    this._agAni.getComponent(AGAni).addControl(this._wingAni.getComponent(AGAni));
                 }
             }
         }
@@ -378,6 +382,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[this._equipArray[0]];
                     this._weaponAni = ag.agAniCache.getNode(this.node,mst.model+endName,parseInt(array[1]),ag.gameConst.roleWeaponZorder[this._data.direction],0.1);
                     this._weaponAni.setColor(this._aniColor);
+                    this._agAni.getComponent(AGAni).addControl(this._weaponAni.getComponent(AGAni));
                 }
                 //翅膀
                 if(this._wingAni){ag.agAniCache.put(this._wingAni);this._wingAni = undefined;}
@@ -385,6 +390,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[this._equipArray[2]];
                     this._wingAni = ag.agAniCache.getNode(this.node,mst.model+endName,parseInt(array[1]),ag.gameConst.roleWingZorder,0.1);
                     this._wingAni.setColor(this._aniColor);
+                    this._agAni.getComponent(AGAni).addControl(this._wingAni.getComponent(AGAni));
                 }
             }
         }
@@ -442,26 +448,21 @@ cc.Class({
             var lockedId = locked._data.id;
             var pos1 = cc.pAdd(this.node.getPosition(),cc.p(0,70*this.node.scale));
             var pos2 = cc.pAdd(locked.node.getPosition(),cc.p(0,70*this.node.scale));
-            var node = new cc.Node();
-            var sprite = node.addComponent(cc.Sprite);
-            node.setPosition(pos1);
-            var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(pos2,pos1))));
-            node.setRotation( 90-rotation);
-            ag.gameLayer._map.node.addChild(node,999999);
-
-
-            if(Math.random()>0.5){
-                sprite.spriteFrame = cc.loader.getRes("ani/effect3",cc.SpriteAtlas).getSpriteFrame('508000');
-            }else{
-                sprite.spriteFrame = cc.loader.getRes("ani/effect3",cc.SpriteAtlas).getSpriteFrame('509015');
-            }
-            ag.agAniCache.getEffect(this.node,"ani/effect3/509000",6,ag.gameConst.roleEffectZorder,0.05);
-            node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
-                node.destroy();
-                if(ag.gameLayer.getRole(lockedId)){
-                    ag.agAniCache.getEffect(locked.node,"ani/effect3/509006",9,ag.gameConst.roleEffectZorder,0.05);
-                }
-            })));
+            ag.agAniCache.getNode(this.node,"ani/effect3/509000",6,ag.gameConst.roleEffectZorder,0.05,function(sender){
+                ag.agAniCache.put(sender.node);
+                var node = new cc.Node();
+                node.setPosition(pos1);
+                var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(pos2,pos1))));
+                node.setRotation( 90-rotation);
+                ag.gameLayer._map.node.addChild(node,999999);
+                node.addComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/effect3",cc.SpriteAtlas).getSpriteFrame(Math.random()>0.5?'508000':'509015');
+                node.runAction(cc.sequence(cc.moveTo(cc.pDistance(pos1,pos2)/2000,pos2),cc.callFunc(function () {
+                    node.destroy();
+                    if(ag.gameLayer.getRole(lockedId)){
+                        ag.agAniCache.getEffect(locked.node,"ani/effect3/509006",9,ag.gameConst.roleEffectZorder,0.05);
+                    }
+                })));
+            }.bind(this));
 
 
             //道士启用毒
@@ -518,11 +519,8 @@ cc.Class({
 
         this._data.hp = hp;
         this._progressBarHP.progress = this._data.hp/this._data.totalHP;
-        if(this._data.camp==ag.gameConst.campMonster){
-            this._labelHP.string = ""+this._data.hp+"/"+this._data.totalHP;
-        }else{
-            this._labelHP.string = ""+this._data.hp+"/"+this._data.totalHP+" Lv:"+this._data.level;
-        }
+        var lv = this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level;
+        this._labelHP.string = ""+this._data.hp+"/"+this._data.totalHP+" Lv:"+lv;
 
 
         //判断死亡

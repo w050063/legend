@@ -17,6 +17,7 @@ cc.Class({
         this._busy = false;
         this._spriteTouchArray = [];
         this._touchMoveDirection = -1;
+        this._setupAutoAttack = true;
 
         //加载
         cc.loader.loadRes('prefab/nodeTouchSprite',function(err,prefab){
@@ -35,7 +36,6 @@ cc.Class({
 
         var node = ag.gameLayer.node;
         node.on(cc.Node.EventType.TOUCH_START, function (event) {
-            ag.gameLayer.log('b');
             this._touchPointArray = this._touchPointArray.concat(event.getTouches());
             if(this._touchPointArray.length==3)this._touchPointArray.splice(0,1);//防止出现没有end的事件的情况
             this._locked = this._role.getPlayerForTouch(this._touchPointArray[0]);
@@ -50,11 +50,8 @@ cc.Class({
             }
         }.bind(this));
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
-            ag.gameLayer.log('e');
             var touches = event.getTouches();
             for(var i=this._touchPointArray.length-1;i>=0;--i)if(touches.indexOf(this._touchPointArray[i])!=-1){
-                ag.gameLayer.log('m');
-
                 this._touchPointArray.splice(i,1);
             }
             this.resetTouchDirection();
@@ -62,11 +59,9 @@ cc.Class({
         }.bind(this));
 
         node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
-            ag.gameLayer.log('c');
             var touches = event.getTouches();
             for(var i=this._touchPointArray.length-1;i>=0;--i)if(touches.indexOf(this._touchPointArray[i])!=-1){
                 this._touchPointArray.splice(i,1);
-                ag.gameLayer.log('n');
             }
             this.resetTouchDirection();
             this.changeTouchSprite();
@@ -78,41 +73,30 @@ cc.Class({
     //获得当前移动方向
     resetTouchDirection:function () {
         if(!this._locked){
-            ag.gameLayer.log("1");
             if(this._touchPointArray.length==2){
-                //ag.gameLayer.log("("+this._touchPointArray[0].getLocationX()+','+this._touchPointArray[0].getLocationY()+','+this._touchPointArray[1].getLocationX()+','+this._touchPointArray[1].getLocationY()+")");
                 var offset1 = this._role.getTouchOffsetScreen(this._touchPointArray[0]);
                 var offset2 = this._role.getTouchOffsetScreen(this._touchPointArray[1]);
                 //if(cc.pointEqualToPoint(offset1,cc.p(-1,1)) && cc.pointEqualToPoint(offset2,cc.p(1,1))){
                 if((offset1.x==-1 && offset1.y==1 && offset2.x==1 && offset2.y==1) || (offset1.x==1 && offset1.y==1 && offset2.x==-1 && offset2.y==1)){
                     this._touchMoveDirection = 0;
-                    ag.gameLayer.log("2");
                 //}else if(cc.pointEqualToPoint(offset1,cc.p(-1,-1)) && cc.pointEqualToPoint(offset2,cc.p(1,-1))){
                 }else if((offset1.x==-1 && offset1.y==-1 && offset2.x==1 && offset2.y==-1) || (offset1.x==1 && offset1.y==-1 && offset2.x==-1 && offset2.y==-1)){
                     this._touchMoveDirection = 4;
-                    ag.gameLayer.log("3");
                 }else{
                     this._touchMoveDirection = -1;
-                    ag.gameLayer.log("4");
                 }
             }else if(this._touchPointArray.length==1){
                 var offset1 = this._role.getTouchOffsetScreen(this._touchPointArray[0]);
-                //ag.gameLayer.log("("+this._touchPointArray[0].getLocationX()+','+this._touchPointArray[0].getLocationY()+','+offset1.x+','+offset1.y+")");
-                //if(cc.pointEqualToPoint(offset1,cc.p(0,0))==false){
                 if(offset1.x==0 && offset1.y==0){
                     this._touchMoveDirection = -1;
-                    ag.gameLayer.log("7");
                 }else{
                     this._touchMoveDirection = ag.gameConst.directionStringArray.indexOf(""+offset1.x+","+offset1.y);
-                    ag.gameLayer.log("6");
                 }
             }else{
                 this._touchMoveDirection = -1;
-                ag.gameLayer.log("8");
             }
         }else{
             this._touchMoveDirection = -1;
-            ag.gameLayer.log("9");
         }
     },
 
@@ -188,7 +172,7 @@ cc.Class({
             }else if(this._touchMoveDirection!=-1){
                 this.doMoveOperate(cc.pAdd(this._role.getLocation(),ag.gameConst.directionArray[this._touchMoveDirection]));
             }else{
-                this._locked = this.findLocked();
+                if(this._setupAutoAttack)this._locked = this.findLocked();
                 this._role.idle();
             }
         }

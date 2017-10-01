@@ -21,7 +21,7 @@ module.exports={
         }
         self._sessionId=id;
         //var tempId = null;
-        pomelo.init({host: "192.168.99.174",port: 3014,log: true}, function() {
+        pomelo.init({host: "127.0.0.1",port: 3014,log: true}, function() {
             pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
                 //tempId=data.uid;
                 pomelo.disconnect(function () {
@@ -50,18 +50,6 @@ module.exports={
     //发送数据封装
     send: function(key,obj) {
         pomelo.notify("work.WorkHandler."+key, obj);
-    },
-
-
-    //监听聊天
-    onSChat:function(){
-        pomelo.on('sChat',function(data) {
-            cc.log(JSON.stringify(data));
-        });
-    },
-    offSChat:function(){
-        //pomelo.on('sChat',undefined);
-        pomelo.removeAllListeners('sChat');
     },
 
 
@@ -185,6 +173,10 @@ module.exports={
                 ag.gameLayer.bagItemToEquip(obj.value.id,obj.value.rid);
             }else if(obj.key=='sEquipItemToBagArray'){
                 ag.gameLayer.equipItemToBag(obj.value.id,obj.value.rid);
+            }else if(obj.key=='sChatYouArray'){
+                ag.gameLayer.chat(obj.value.id,obj.value.content);
+            }else if(obj.key=='sSystemNotifyArray'){
+                ag.gameLayer.systemNotify(obj.value);
             }
         }
         this._dataArray = [];

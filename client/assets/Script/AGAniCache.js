@@ -56,6 +56,7 @@ module.exports={
             ani.pause();
             ani.setAniPosition(cc.p(0,0));
             ani.setFinishedCallback(null);
+            ani.delControll();
             node.setScale(1);
             node.setColor(cc.color(255,255,255));
             node.removeFromParent();

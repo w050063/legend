@@ -44,8 +44,27 @@ cc.Class({
         this._equipArray.push(cc.find('Canvas/nodeBag/labelAttack').getComponent(cc.Label));
         this._equipArray.push(cc.find('Canvas/nodeBag/labelDefense').getComponent(cc.Label));
 
+        //聊天相关
+        var nodeChat = cc.find('Canvas/nodeChat');
+        nodeChat.active = false;
+        nodeChat.on(cc.Node.EventType.TOUCH_END, function (event) {
+            nodeChat.active = false;
+        }.bind(this));
+        this._chatContentArray = [];
+        this._chatLabelArray = [];
+        for(var i=0;i<5;++i){
+            this._chatLabelArray.push(cc.find('Canvas/nodeChatContent/label'+i));
+            this._chatLabelArray[i].opacity = 0;
+        }
 
+        var nodeHelp = cc.find('Canvas/nodeHelp');
+        nodeHelp.active = false;
+        nodeHelp.on(cc.Node.EventType.TOUCH_END, function (event) {
+            nodeHelp.active = false;
+        }.bind(this));
 
+        //系统公告
+        cc.find('Canvas/nodeChatContent/labelSystemNotify').opacity = 0;
 
         this._nodeBag = cc.find("Canvas/nodeBag");
         this._nodeBag.active = false;
@@ -71,6 +90,7 @@ cc.Class({
         this._map.node.addChild(node);
         this._roleMap[ag.userInfo._data.id] = this._player;
         this._player.init(ag.userInfo._data);
+        this.refreshEquip();
 
 
 
@@ -90,15 +110,6 @@ cc.Class({
         ag.gameLayer = null;
     },
 
-    log:function(str){
-        //if(!this._log){
-        //    this._log = this.node.getChildByName('editBoxName').getComponent('cc.EditBox');
-        //    this._log.node.setLocalZOrder(99999);
-        //}
-        //var s = this._log.string + str;
-        //s = s.substr(s.length-400,400);
-        //this._log.string = s;
-    },
 
     // called every frame
     update: function (dt) {
@@ -475,5 +486,75 @@ cc.Class({
     //获得属性显示
     getItemBagShow:function (data) {
         return data.name+(data.hurt?' 攻击力:'+data.hurt:' ')+(data.defense?' 防御:'+data.defense:' ');
+    },
+
+
+    //聊天按钮
+    buttonShowChatNode:function(){
+        cc.find('Canvas/nodeChat').active = true;
+    },
+
+    //聊天按钮
+    buttonShowHelp:function(){
+        cc.find('Canvas/nodeHelp').active = true;
+    },
+
+
+    //回车发送信息
+    editBoxConfirm: function (sender) {
+        cc.find('Canvas/nodeChat').active = false;
+        if(sender.string.length>0){
+            ag.agSocket.send("chatYou",sender.string);
+            sender.string = '';
+        }
+    },
+
+    chat:function(id,content){
+        var role = this.getRole(id);
+        if(role){
+            var node = new cc.Node();
+            var tips = node.addComponent(cc.Label);
+            node.x = 0;
+            node.y = 87;
+            tips.fontSize = 12;
+            node.color = cc.color(255,255,255);
+            tips.string = content;
+            role.node.addChild(node,30);
+            node.runAction(cc.sequence(cc.delayTime(3), cc.fadeOut(0.2),cc.callFunc(function(){
+                node.destroy();
+            })));
+
+
+            //this._chatContentArray.push(id+':'+content);
+            var lb = this._chatLabelArray[0];
+            var y = this._chatLabelArray[0].y;
+            for(var i=0;i<4;++i){
+                this._chatLabelArray[i] = this._chatLabelArray[i+1];
+                var tempY = this._chatLabelArray[i].y;
+                this._chatLabelArray[i].y = y;
+                y = tempY;
+            }
+            this._chatLabelArray[4] = lb;
+            lb.y = y;
+
+            lb.opacity = 255;
+            lb.getComponent(cc.Label).string = role._data.name+' : '+content;
+            lb.stopAllActions();
+            lb.runAction(cc.sequence(cc.delayTime(10),cc.fadeOut(2)));
+        }
+    },
+
+
+    systemNotify:function(content){
+        var node = cc.find('Canvas/nodeChatContent/labelSystemNotify');
+        node.opacity = 255;
+        node.getComponent(cc.Label).string = content;
+        node.stopAllActions();
+        node.runAction(cc.sequence(cc.delayTime(3),cc.fadeOut(2)));
+    },
+
+
+    toggleAutoAttack: function (event) {
+        this._player._ai._setupAutoAttack = event.isChecked;
     }
 });
