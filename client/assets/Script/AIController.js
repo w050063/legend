@@ -66,6 +66,8 @@ cc.Class({
             this.resetTouchDirection();
             this.changeTouchSprite();
         }.bind(this));
+
+        this._role.schedule(this.update05.bind(this),0.5);
     },
 
 
@@ -126,20 +128,6 @@ cc.Class({
     },
 
 
-    //一次移动完成
-    onMoveEnd:function(){
-        this._busy = false;
-        //this.update(0);
-    },
-
-
-    //一次移动完成
-    onAttackEnd:function(){
-        this._busy = false;
-        //this.update(0);
-    },
-
-
     //返回移动到锁定角色的的方向
     doMoveOperate:function (location) {
         var direction = ag.gameLayer.getDirection(this._role.getLocation(),location);
@@ -157,9 +145,13 @@ cc.Class({
     update: function (dt) {
         //执行玩家操作
         if(ag.gameLayer && this._busy==false && this._state != ag.gameConst.stateDead){
-            if(this._locked){
-                if(cc.pDistance(this._role.getLocation(),this._locked.getLocation())<=this._role.getMst().visibleDistance){
-                    if(ag.gameLayer.getAttackDistance(this._role,this._locked)){
+            if(this._touchMoveDirection!=-1){
+                this.doMoveOperate(cc.pAdd(this._role.getLocation(),ag.gameConst.directionArray[this._touchMoveDirection]));
+            }else if(this._locked){
+                var l1 = this._role.getLocation(), l2 = this._locked.getLocation(),vd = this._role.getMst().visibleDistance,ad = this._role.getMst().attackDistance;
+                var lx = Math.abs(l1.x-l2.x), ly = Math.abs(l1.y-l2.y);
+                if(lx<=vd && ly<=vd){
+                    if((lx<=ad && ly<=ad) || (this._role._data.type=='m0' && lx<=2 && ly<=2 && lx+ly!=3)){
                         this._role.attack(this._locked);
                         this._busy = true;
                     }else{
@@ -169,12 +161,17 @@ cc.Class({
                     this._role.idle();
                     this._locked = null;
                 }
-            }else if(this._touchMoveDirection!=-1){
-                this.doMoveOperate(cc.pAdd(this._role.getLocation(),ag.gameConst.directionArray[this._touchMoveDirection]));
             }else{
-                if(this._setupAutoAttack)this._locked = this.findLocked();
                 this._role.idle();
             }
+        }
+    },
+
+
+    update05: function (dt) {
+        //执行玩家操作
+        if(ag.gameLayer && this._busy==false && this._state != ag.gameConst.stateDead && !this._locked && this._touchMoveDirection==-1){
+            if(this._setupAutoAttack)this._locked = this.findLocked();
         }
     },
 
@@ -184,11 +181,12 @@ cc.Class({
         var locked = null;
         var lockedDis = 9999;
         var checkDistance = this._role.getMst().checkDistance;
-        var myLocation=this._role.getLocation();
+        var l1=this._role.getLocation();
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
-            var dis = cc.pDistance(myLocation,role.getLocation());
-            if(role._state != ag.gameConst.stateDead && role._data.camp==ag.gameConst.campMonster && dis<lockedDis && dis<=checkDistance){
+            var l2=role.getLocation();
+            var dis = Math.max(Math.abs(l1.x-l2.x),Math.abs(l1.y-l2.y));
+            if(dis<=checkDistance && dis<lockedDis && ag.gameLayer.isEnemyCamp(this._role,role)){
                 locked = role;
                 lockedDis = dis;
             }

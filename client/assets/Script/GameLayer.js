@@ -12,7 +12,11 @@ cc.Class({
     extends: cc.Component,
     properties: {},
 
-
+    onDestroy:function(){
+        if(cc.sys.isBrowser){
+            cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+        }
+    },
 
     // use this for initialization
     onLoad: function () {
@@ -20,6 +24,18 @@ cc.Class({
         this._roleMap = {};
         this._player = null;
         this._lastMapPosition = cc.p(0,0);
+
+
+        this._flyBloodArray = [];//飘血数组
+
+
+        //键盘事件注入
+        if(cc.sys.isBrowser){
+            cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+        }
+
+        //地图坐标
+        this._labelLocation = cc.find('Canvas/labelLocation').getComponent(cc.Label);
 
         this._equipArray = [];
         var self = this;
@@ -49,6 +65,7 @@ cc.Class({
         nodeChat.active = false;
         nodeChat.on(cc.Node.EventType.TOUCH_END, function (event) {
             nodeChat.active = false;
+            cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
         }.bind(this));
         this._chatContentArray = [];
         this._chatLabelArray = [];
@@ -71,9 +88,6 @@ cc.Class({
         this._scrollViewList = cc.find("Canvas/nodeBag/scrollViewList").getComponent(AGListView);
         this._scrollViewList.setSpace(2);
         this.refreshBag();
-
-
-        cc.audioEngine.play(cc.url.raw("resources/music/background.mp3"),true,1);
 
 
         //测试新地图
@@ -105,7 +119,6 @@ cc.Class({
         pomelo.removeAllListeners('onData');
         ag.agSocket._dataArray = [];
         ag.userInfo._itemMap = {};
-        cc.audioEngine.stopAll();
         cc.director.loadScene('HallScene');
         ag.gameLayer = null;
     },
@@ -307,21 +320,6 @@ cc.Class({
     },
 
 
-    //get every one attack rangle..
-    getAttackDistance:function(role1,role2){
-        var myLocation=role1.getLocation();
-        var enemyLocation=role2.getLocation();
-        var x=Math.abs(enemyLocation.x-myLocation.x);
-        var y=Math.abs(enemyLocation.y-myLocation.y);
-        if(role1._data.type=="m0"){
-            if (x<=2 && y<=2 && x+y!=3)return true;
-        }else{
-            if(cc.pDistance(myLocation,enemyLocation)<=role1.getMst().attackDistance)return true;
-        }
-        return false;
-    },
-
-
     //解除此角色的所有锁定
     delLockedRole:function (role) {
         for(var key in this._roleMap){
@@ -334,13 +332,11 @@ cc.Class({
 
 
     //获得指定区域角色数组
-    getRoleFromCenterXY:function (mapId,center,x,y) {
-        x = x?x:0;
-        y = y?y:0;
+    getRoleFromCenterXY:function (mapId,center,offset) {
         var retArray = [];
         for(var key in this._roleMap){
             var data = this._roleMap[key]._data;
-            if(mapId==data.mapId && data.x>=center.x-x && data.x<=center.x+x && data.y>=center.y-y && data.y<=center.y+y){
+            if(mapId==data.mapId && data.x>=center.x-offset && data.x<=center.x+offset && data.y>=center.y-offset && data.y<=center.y+offset){
                 retArray.push(this._roleMap[key]);
             }
         }
@@ -480,6 +476,8 @@ cc.Class({
         }
         this._equipArray[5].string = '攻击:'+hurt;
         this._equipArray[6].string = '防御:'+defense;
+        this._player._hurt = hurt;
+        this._player._defense = defense;
     },
 
 
@@ -492,6 +490,9 @@ cc.Class({
     //聊天按钮
     buttonShowChatNode:function(){
         cc.find('Canvas/nodeChat').active = true;
+        var editbox = cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox);
+        editbox.stayOnTop = true;
+        editbox.setFocus();
     },
 
     //聊天按钮
@@ -503,10 +504,12 @@ cc.Class({
     //回车发送信息
     editBoxConfirm: function (sender) {
         cc.find('Canvas/nodeChat').active = false;
+        cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
         if(sender.string.length>0){
             ag.agSocket.send("chatYou",sender.string);
             sender.string = '';
         }
+        this._bEditBoxKey = true;
     },
 
     chat:function(id,content){
@@ -540,7 +543,7 @@ cc.Class({
             lb.opacity = 255;
             lb.getComponent(cc.Label).string = role._data.name+' : '+content;
             lb.stopAllActions();
-            lb.runAction(cc.sequence(cc.delayTime(10),cc.fadeOut(2)));
+            lb.runAction(cc.sequence(cc.delayTime(15),cc.fadeOut(2)));
         }
     },
 
@@ -556,5 +559,17 @@ cc.Class({
 
     toggleAutoAttack: function (event) {
         this._player._ai._setupAutoAttack = event.isChecked;
+    },
+
+    onKeyUp: function (event) {
+        switch(event.keyCode) {
+            case cc.KEY.enter:
+                if(this._bEditBoxKey==true){
+                    this._bEditBoxKey=false;
+                }else{
+                    this.buttonShowChatNode();
+                }
+                break;
+        }
     }
 });

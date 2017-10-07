@@ -86,6 +86,7 @@ cc.Class({
 
     setAniPosition:function(position){
         this._aniPosition = position;
+        this.modifyFrame();
     },
 
 

@@ -140,7 +140,7 @@ cc.Class({
             var attacker = ag.gameLayer.getRole(this._fireWallMap[key].id);
             if(attacker){
                 var array = key.split(',');
-                array = ag.gameLayer.getRoleFromCenterXY(array[0],cc.p(parseInt(array[1]),parseInt(array[2])));
+                array = ag.gameLayer.getRoleFromCenterXY(array[0],cc.p(parseInt(array[1]),parseInt(array[2])),0);
                 if(array){
                     for(var i=0;i<array.length;++i){
                         if(ag.gameLayer.isEnemyCamp(attacker,array[i])){
@@ -172,10 +172,8 @@ cc.Class({
     update5: function (dt) {
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
-            if(role._data.hp>0 && role._data.hp<role._data.totalHP){
-                var result = role._data.hp+role._data.heal;
-                if(result>role._data.totalHP)result=role._data.totalHP;
-                role.changeHP(result);
+            if(role._data.hp>0 && role._data.hp<role._totalHP){
+                role.changeHP(Math.min(role._data.hp+role._heal,role._totalHP));
             }
         }
     }

@@ -67,6 +67,41 @@ module.exports={
     },
 
 
+    getCacheNode:function(str,father){
+        if(!this._cacheNodeArray)this._cacheNodeArray = [];
+        for(var i=0;i<this._cacheNodeArray.length;++i){
+            var node = this._cacheNodeArray[i];
+            if(node._agName==str){
+                this._cacheNodeArray.splice(i,1);
+                node.parent = father;
+                return node;
+            }
+        }
+
+
+        var node = null;
+        if(str=='prefab/nodeRoleProp'){
+            var prefab = cc.loader.getRes('prefab/nodeRoleProp');
+            var node = cc.instantiate(prefab);
+            node.setLocalZOrder(ag.gameConst.roleNameZorder);
+            node._progressBarHP = node.getChildByName("progressBarHP").getComponent(cc.ProgressBar);
+            node._labelHP = node.getChildByName("labelHP").getComponent(cc.Label);
+            node._labelName = node.getChildByName("labelName").getComponent(cc.Label);
+        }
+        node.parent = father;
+        node._agName = str;
+        return node;
+    },
+
+    //将一个用完的动画节点放回池中
+    putCacheNode : function(node){
+        if(node && node._agName){
+            node.removeFromParent();
+            this._cacheNodeArray.push(node);
+        }
+    },
+
+
     //获取图片的rgba数据，以左下角为起点
     loadImageData:function(name,callback,aaa){
         var myImage = new Image();

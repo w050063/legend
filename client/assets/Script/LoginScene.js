@@ -7,7 +7,10 @@ var UserInfo = require('UserInfo');
 cc.Class({
     extends: cc.Component,
     properties: {},
-
+    onLoad: function () {
+        cc.audioEngine.stopAll();
+        cc.audioEngine.play(cc.url.raw("resources/music/background.mp3"),true,1);
+    },
 
     buttonTourist: function() {
         ag.jsUtil.request(this.node,'ykLogin',ag.agSocket._sessionId,function (data) {

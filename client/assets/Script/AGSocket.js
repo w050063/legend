@@ -21,7 +21,7 @@ module.exports={
         }
         self._sessionId=id;
         //var tempId = null;
-        pomelo.init({host: "127.0.0.1",port: 3014,log: true}, function() {
+        pomelo.init({host: "192.168.99.174",port: 3014,log: true}, function() {
             pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
                 //tempId=data.uid;
                 pomelo.disconnect(function () {
@@ -136,21 +136,19 @@ module.exports={
                     player.changeHP(obj.value.hp);
                 }
             }else if(obj.key=='sRoleArray'){
-                ag.gameLayer.addRole(JSON.parse(obj.value));
+                ag.gameLayer.addRole(obj.value);
             }else if(obj.key=='sMoveForceArray'){
                 var player =  ag.gameLayer.getRole(obj.value.id);
                 if(player) {
-                    player.myMoveByServer(obj.value.x, obj.value.y);
+                    player.myMoveByServer(cc.p(obj.value.x, obj.value.y));
                     player.relife();
                 }
-            }else if(obj.key=='sBuffManagerArray'){
-                ag.buffManager.setData((JSON.parse(obj.value)));
             }else if(obj.key=='sBFireCritArray'){
                 ag.buffManager.setCDForFireCritById(obj.value,false);
             }else if(obj.key=='sFireWallArray'){
-                var player =  ag.gameLayer.getRole(obj.value.id);
+                var player =  ag.gameLayer.getRole(obj.value.rid);
                 if(player){
-                    ag.buffManager.setFireWall(obj.value.mapXYString,player);
+                    ag.buffManager.setFireWall(obj.value.id,player);
                 }
             }else if(obj.key=='sAddExpArray'){
                 var player =  ag.gameLayer.getRole(obj.value.id);

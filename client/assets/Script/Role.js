@@ -15,6 +15,7 @@ cc.Class({
     //初始化角色
     init: function (data) {
         this._data=data;
+        this.resetAllProp();
         this._equipArray = [null,null,null,null,null];//装备序列
         for(var key in ag.userInfo._itemMap){
             var obj = ag.userInfo._itemMap[key];
@@ -23,27 +24,17 @@ cc.Class({
             }
         }
 
+
         this._weaponAni = null;
         this._wingAni = null;
         this._agAni = null;
         this._labelName = null;
-        this.setLocation(this._data.x,this._data.y);
         this.node.setScale(1.5);
         this._aniColor = cc.color(255,255,255,255);
-        this._state = ag.gameConst.stateIdle;
-
-
-        //血条
-        var prefab = cc.loader.getRes('prefab/nodeRoleProp');
-        var node = cc.instantiate(prefab);
-        node.parent = this.node;
-        node.setLocalZOrder(ag.gameConst.roleNameZorder);
-        this._progressBarHP = node.getChildByName("progressBarHP").getComponent(cc.ProgressBar);
-        this._labelHP = node.getChildByName("labelHP").getComponent(cc.Label);
-        this._labelName = node.getChildByName("labelName").getComponent(cc.Label);
+        this.setLocation(cc.p(this._data.x,this._data.y));
+        this.idle();
         this.changeHP(this._data.hp);
-        this._labelName.string = this._data.name?this._data.name:ag.gameConst._roleMst[this._data.type].name;
-        this._labelName.node.color = ag.gameLayer.isEnemyCamp(this,ag.gameLayer._player)?cc.color(255,0,0):cc.color(255,255,255);
+
 
 
         //增加AI
@@ -57,18 +48,7 @@ cc.Class({
         this.node.on('position-changed', function (event) {
             this.setZorderAndMapPos();
         }.bind(this));
-
         this.setZorderAndMapPos();
-        this.idle();
-
-        //this.node.runAction(cc.sequence(cc.delayTime(0.1),cc.callFunc(function(){
-        //    this.setZorderAndMapPos();
-        //}.bind(this))));
-
-
-        //if(this._agAni){
-        //    this._agAni.getComponent(AGAni).doCallback(this.setZorderAndMapPos.bind(this));
-        //}
     },
 
 
@@ -104,38 +84,11 @@ cc.Class({
     setZorderAndMapPos:function(){
         //更新位置
         if(ag.gameLayer._player == this){
-            ag.gameLayer._map.node.setPosition(-this.node.x,-this.node.y);
+            ag.gameLayer._map.node.setPosition(-this.node.x,-this.node.y-40);
         }
-
-
-        //优化显示和隐藏,上下左右各多两个地块,超过1.9就认为要更新了
-        var mapData = ag.gameConst._terrainMap[this._data.mapId];
-        var x = ag.gameLayer._player.node.x,y = ag.gameLayer._player.node.y,xHalf = 568+mapData.mapX,yHalf = 320+mapData.mapY;
-        //xHalf = 200,yHalf = 200;
-        if(ag.gameLayer._player == this){
-            for(var key in  ag.gameLayer._roleMap){
-                var role = ag.gameLayer._roleMap[key];
-                role._farAway = !!(Math.abs(role.node.x-x)<xHalf && Math.abs(role.node.y-y)<yHalf);
-                if(role._farAway && role._agAni==null){
-                    role.idleAnimation();
-                }else if(role._farAway==false && role._agAni){
-                    ag.agAniCache.put(role._agAni);
-                    role._agAni = null;
-                }
-            }
-        }else{
-            this._farAway = !!(Math.abs(this.node.x-x)<xHalf && Math.abs(this.node.y-y)<yHalf);
-            if(this._farAway && this._agAni==null){
-                this.idleAnimation();
-            }else if(this._farAway==false && this._agAni){
-                ag.agAniCache.put(this._agAni);
-                this._agAni = null;
-            }
-        }
-
 
         var zorder = Math.round(10000-this.node.y);
-        if(this.node.getLocalZOrder()!=zorder)this.node.setLocalZOrder(zorder);
+        this.node.setLocalZOrder(zorder);
     },
 
 
@@ -144,16 +97,11 @@ cc.Class({
     resetAllProp:function(){
         var mst = this.getMst();
         var lv = this._data.level;
-        this._data.totalHP = mst.hp+mst.hpAdd*lv;
-        this._data.hp = this._data.totalHP;
-        this._data.defense = mst.defense+mst.defenseAdd*lv;
-        this._data.hurt = mst.hurt+mst.hurtAdd*lv;
-        this._data.totalExp = mst.exp+mst.expAdd*lv;
-        this._data.exp = 0;
-        this._data.heal = mst.heal+mst.healAdd*lv;
-        this._data.attackSpeed = mst.attackSpeed;
-        this._data.moveSpeed = mst.moveSpeed;
-        if(this==ag.gameLayer._player)ag.gameLayer.refreshEquip();
+        this._totalHP = mst.hp+mst.hpAdd*lv;
+        this._data.hp = this._totalHP;
+        this._heal = mst.heal+mst.healAdd*lv;
+        this._attackSpeed = mst.attackSpeed;
+        this._moveSpeed = mst.moveSpeed;
     },
 
 
@@ -161,9 +109,11 @@ cc.Class({
     addExp:function(level,exp){
         var last = this._data.level;
         this._data.level = level;
-        if(last < this._data.level)this.resetAllProp();
-        this._data.exp =  exp;
-        if(last < this._data.level)this.changeHP(this._data.hp);
+        if(last < this._data.level){
+            this.resetAllProp();
+            if(this==ag.gameLayer._player)ag.gameLayer.refreshEquip();
+            this.changeHP(this._data.hp);
+        }
     },
 
 
@@ -181,22 +131,57 @@ cc.Class({
 
 
     //设置逻辑位置
-    setLocation:function(x,y){
-        if(x!=undefined && y!=undefined){
-            this._data.x = x;
-            this._data.y = y;
-        }
-
+    setLocation:function(location){
+        this._data.x = location.x;
+        this._data.y = location.y;
         var mapData = ag.gameConst._terrainMap[this._data.mapId];
-        var x = this._data.x-mapData.mapX/2;
-        var y = this._data.y-mapData.mapY/2;
-        this.node.setPosition(x*mapData.tileX,y*mapData.tileY);
+        this.node.setPosition((this._data.x-mapData.mapX/2)*mapData.tileX,(this._data.y-mapData.mapY/2)*mapData.tileY);
+
+
+        //优化显示和隐藏,上下左右各多两个地块,超过1.9就认为要更新了
+        if(this._state!=ag.gameConst.stateDead){
+            var x = ag.gameLayer._player._data.x,y = ag.gameLayer._player._data.y;
+            if(ag.gameLayer._player == this){
+                ag.gameLayer._labelLocation.string = '新手村 '+this._data.x+','+this._data.y;
+                for(var key in  ag.gameLayer._roleMap){
+                    ag.gameLayer._roleMap[key].resetNearFlag(x,y);
+                }
+            }else{
+                this.resetNearFlag(x,y);
+            }
+        }
+    },
+
+
+    resetNearFlag:function(x,y){
+        this._nearFlag = !!(Math.abs(this._data.x-x)<7 && Math.abs(this._data.y-y)<7);
+        if(this._nearFlag){
+            if(!this._agAni){
+                this.idleAnimation();
+            }
+            if(!this._propNode){
+                this._propNode = ag.jsUtil.getCacheNode('prefab/nodeRoleProp',this.node);
+                this._propNode._labelName.string = this._data.name?this._data.name:ag.gameConst._roleMst[this._data.type].name;
+                this._propNode._labelName.node.color = ag.gameLayer.isEnemyCamp(this,ag.gameLayer._player)?cc.color(255,0,0):cc.color(255,255,255);
+                this._propNode._progressBarHP.progress = this._data.hp/this._totalHP;
+                this._propNode._labelHP.string = ""+this._data.hp+"/"+this._totalHP+" Lv:"+(this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level);
+            }
+        }else{
+            if(this._agAni){
+                ag.agAniCache.put(this._agAni);
+                this._agAni = null;
+            }
+            if(this._propNode){
+                ag.jsUtil.putCacheNode(this._propNode);
+                this._propNode = null;
+            }
+        }
     },
 
 
     //无事可做动画
     idleAnimation:function(){
-        if(this._farAway || this==ag.gameLayer._player){
+        if(this._nearFlag){
             if(this._data.camp==ag.gameConst.campMonster){
                 var model = ag.gameConst._roleMst[this._data.type].model;
                 if(!model){
@@ -260,29 +245,32 @@ cc.Class({
     //按方向移动
     move:function(location,bServer) {
         if(this._state==ag.gameConst.stateDead)return;
-        this.node.stopAllActions();
         if(Math.abs(this._data.x-location.x)>1 || Math.abs(this._data.y-location.y)>1){
-            this.setLocation(location.x,location.y);
+            this.node.stopAllActions();
+            this.setLocation(location);
             return true;
         }
 
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),location);
-        this._data.x = location.x;
-        this._data.y = location.y;
-
-
         var mapData = ag.gameConst._terrainMap[this._data.mapId];
-        var x = this._data.x - mapData.mapX / 2;
-        var y = this._data.y - mapData.mapY / 2;
-        var moveSpeed = this._data.camp==ag.gameConst.campMonster ? 0.8:this._data.moveSpeed;
-        this.node.runAction(cc.sequence(cc.moveTo(moveSpeed, cc.p(x * mapData.tileX, y * mapData.tileY)),cc.callFunc(function(){
-            if(bServer){
-                this.idle();
-            }else{
-                if(this._ai)this._ai.onMoveEnd();
-            }
-        }.bind(this))));
-        if(this._farAway){
+        var temp = cc.p((this._data.x-mapData.mapX/2)*mapData.tileX,(this._data.y-mapData.mapY/2)*mapData.tileY);
+        this.setLocation(location);
+        this.node.setPosition(temp);
+
+
+        if(this._nearFlag){
+            var mapData = ag.gameConst._terrainMap[this._data.mapId];
+            var x = this._data.x - mapData.mapX / 2;
+            var y = this._data.y - mapData.mapY / 2;
+            var moveSpeed = this._data.camp==ag.gameConst.campMonster ? 0.8:this._moveSpeed;//怪物始终是一个播放速度，走完后等待
+            this.node.stopAllActions();
+            this.node.runAction(cc.sequence(cc.moveTo(moveSpeed, cc.p(x * mapData.tileX, y * mapData.tileY)),cc.callFunc(function(){
+                if(bServer){
+                    this.idle();
+                }else{
+                    if(this._ai)this._ai._busy = false;
+                }
+            }.bind(this))));
             if(this._data.camp==ag.gameConst.campMonster){
                 var clothes = ag.gameConst._roleMst[this._data.type].model+'0';
                 var array = AGAniClothes[clothes+ag.gameConst.stateMove+this._data.direction].split(',');
@@ -317,8 +305,10 @@ cc.Class({
                     this._agAni.getComponent(AGAni).addControl(this._wingAni.getComponent(AGAni));
                 }
             }
-        }
 
+            //最后变更状态
+            this._state = ag.gameConst.stateMove;
+        }
 
 
         //向服务器发送
@@ -326,16 +316,12 @@ cc.Class({
             var myData = this._data;
             ag.agSocket.send("move",{x: myData.x, y: myData.y});
         }
-
-
-        //最后变更状态
-        this._state = ag.gameConst.stateMove;
         return true;
     },
 
 
     //按方向移动,强制玩家位置
-    myMoveByServer:function(locationX,locationY) {
+    myMoveByServer:function(location) {
         this.node.stopAllActions();
         //this._data.x = location.x;
         //this._data.y = location.y;
@@ -343,18 +329,18 @@ cc.Class({
         //var x = this._data.x - mapData.mapX / 2;
         //var y = this._data.y - mapData.mapY / 2;
         //this.node.setPosition(cc.p(x * mapData.tileX, y * mapData.tileY));
-        this.setLocation(locationX,locationY);
+        this.setLocation(location);
         this.idle();
-        if(this._ai)this._ai.onMoveEnd();
+        if(this._ai)this._ai._busy = false;
     },
 
 
     attack:function(locked,bServer){
         if(this._state==ag.gameConst.stateDead)return;
-        this.node.stopAllActions();
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
         //攻击动画
-        if(this._farAway){
+        if(this._nearFlag){
+            this.node.stopAllActions();
             if(this._data.camp==ag.gameConst.campMonster){
                 var clothes = ag.gameConst._roleMst[this._data.type].model+'0';
                 var array = AGAniClothes[clothes+ag.gameConst.stateAttack+this._data.direction].split(',');
@@ -393,22 +379,23 @@ cc.Class({
                     this._agAni.getComponent(AGAni).addControl(this._wingAni.getComponent(AGAni));
                 }
             }
-        }
-        ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(this._data.attackSpeed),cc.callFunc(function(){
-            if(this._ai)this._ai.onAttackEnd();
-        }.bind(this))));
 
-        //攻击特效
-        this.attackEffect(locked);
+            ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(this._attackSpeed),cc.callFunc(function(){
+                if(this._ai)this._ai._busy = false;
+            }.bind(this))));
+
+            //攻击特效
+            this.attackEffect(locked);
+
+            //最后变更状态
+            this._state = ag.gameConst.stateAttack;
+        }
 
 
         //向服务器发送
         if (!bServer && this == ag.gameLayer._player) {
             ag.agSocket.send("attack",{id:locked._data.id});
         }
-
-        //最后变更状态
-        this._state = ag.gameConst.stateAttack;
     },
 
     //攻击特效
@@ -481,7 +468,7 @@ cc.Class({
                 node.destroy();
             })));
         }else if(this._data.type=="m9") {
-            var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(), 9, 9);
+            var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(), this.getMst().attackDistance);
             for (var i = 0; i < array.length; ++i) {
                 if(ag.gameLayer.isEnemyCamp(this,array[i])){
                     var pos = array[i].getTruePosition();
@@ -494,37 +481,66 @@ cc.Class({
     },
 
 
+    //飘雪动画
+    flyAnimation:function(){
+        if(!this._flyBloodFlag){
+            var hpStr = null;
+            for(var i=0;i<ag.gameLayer._flyBloodArray.length;++i){
+                if(this._data.id==ag.gameLayer._flyBloodArray[i].id){
+                    hpStr = ag.gameLayer._flyBloodArray[i].hp;
+                    ag.gameLayer._flyBloodArray.splice(i,1);
+                    break;
+                }
+            }
+
+            if(hpStr){
+                this._flyBloodFlag = true;
+                var node = new cc.Node();
+                var tips = node.addComponent(cc.Label);
+                node.x = 0;
+                node.y = 71;
+                tips.string = hpStr;
+                node.color = (hpStr[0]=='+')?cc.color(0,255,0,255):cc.color(255,0,0,255);
+                this.node.addChild(node,30);
+                node.runAction(cc.sequence(cc.moveBy(0.4, cc.p(0,30)), cc.fadeOut(0.2),cc.callFunc(function(){
+                    node.destroy();
+                })));
+
+                var id = this._data.id;
+                ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(0.2),cc.callFunc(function(){
+                    var role = ag.gameLayer.getRole(id);
+                    if(role){
+                        role._flyBloodFlag = false;
+                        role.flyAnimation();
+                    }else{
+                        for(var i=ag.gameLayer._flyBloodArray.length-1;i>=0;--i){
+                            if(id==ag.gameLayer._flyBloodArray[i].id){
+                                ag.gameLayer._flyBloodArray.splice(i,1);
+                            }
+                        }
+                    }
+                })));
+            }else{
+                this._flyBloodFlag = false;
+            }
+        }
+    },
+
+
     //血量变化
     changeHP:function(hp){
-        var str = hp>this._data.hp ? "+"+(hp-this._data.hp) : ""+(hp-this._data.hp);
-        //文字提示
-        if(hp!=this._data.hp){
-            var node = new cc.Node();
-            var tips = node.addComponent(cc.Label);
-            node.x = 0;
-            node.y = 71;
-            if(hp>this._data.hp){
-                node.color = cc.color(0,255,0,255);
-                tips.string = "+"+(hp-this._data.hp);
-            }else{
-                node.color = cc.color(255,0,0,255);
-                tips.string = ""+(hp-this._data.hp);
+        if(hp==this._data.hp)return;
+        if(this._nearFlag){
+            ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp)))});
+            this.flyAnimation();
+            if(this._propNode){
+                this._propNode._progressBarHP.progress = hp/this._totalHP;
+                this._propNode._labelHP.string = ""+hp+"/"+this._totalHP+" Lv:"+(this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level);
             }
-            this.node.addChild(node,30);
-            node.runAction(cc.sequence(cc.moveBy(0.4, cc.p(0,30)), cc.fadeOut(0.2),cc.callFunc(function(){
-                node.destroy();
-            })));
         }
 
-
         this._data.hp = hp;
-        this._progressBarHP.progress = this._data.hp/this._data.totalHP;
-        var lv = this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level;
-        this._labelHP.string = ""+this._data.hp+"/"+this._data.totalHP+" Lv:"+lv;
-
-
-        //判断死亡
-        if(this._data.hp<=0){
+        if(this._data.hp<=0){//判断死亡
             this.dead();
         }
     },
@@ -559,24 +575,27 @@ cc.Class({
     relife:function(){
         if(this._state == ag.gameConst.stateDead){
             this.node.active = true;
-            this.changeHP(this._data.totalHP);
+            this.changeHP(this._totalHP);
             this.idleAnimation();
             this._state = ag.gameConst.stateIdle;
             if(this._ai)this._ai._busy = false;
+            this.setLocation(this.getLocation());
 
 
-            //复活飘字
-            var node = new cc.Node();
-            var tips = node.addComponent(cc.Label);
-            node.x = 0;
-            node.y = 87;
-            tips.fontSize = 12;
-            node.color = cc.color(0,255,0,255);
-            tips.string = "站起来还是一条好汉！！！";
-            this.node.addChild(node,30);
-            node.runAction(cc.sequence(cc.delayTime(3), cc.fadeOut(0.2),cc.callFunc(function(){
-                node.destroy();
-            })));
+            if(this._nearFlag){
+                //复活飘字
+                var node = new cc.Node();
+                var tips = node.addComponent(cc.Label);
+                node.x = 0;
+                node.y = 87;
+                tips.fontSize = 12;
+                node.color = cc.color(0,255,0,255);
+                tips.string = "站起来还是一条好汉！！！";
+                this.node.addChild(node,30);
+                node.runAction(cc.sequence(cc.delayTime(3), cc.fadeOut(0.2),cc.callFunc(function(){
+                    node.destroy();
+                })));
+            }
         }
     },
 

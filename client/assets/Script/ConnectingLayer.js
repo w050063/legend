@@ -39,7 +39,7 @@ cc.Class({
                 }
             });
 
-            cc.director.setDisplayStats(false);
+            //cc.director.setDisplayStats(false);
         }
 
 
