@@ -59,6 +59,7 @@ module.exports = {
 		}
 
         //确认进入游戏成功。
+        player.relife();
         ag.jsUtil.send("sEnter",JSON.stringify(player._data),[uid]);
 
 
