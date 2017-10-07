@@ -21,13 +21,13 @@ module.exports = ag.class.extend({
     resetAllProp:function(){
         var mst = this.getMst();
         var lv = this._data.level;
-        this._data.totalHP = mst.hp+mst.hpAdd*lv;
-        this._data.hp = this._data.totalHP;
-        this._data.totalExp = mst.exp+mst.expAdd*lv;
-        this._data.exp = 0;
-        this._data.heal = mst.heal+mst.healAdd*lv;
-        this._data.attackSpeed = mst.attackSpeed;
-        this._data.moveSpeed = mst.moveSpeed;
+        this._totalHP = mst.hp+mst.hpAdd*lv;
+        this._data.hp = this._totalHP;
+        this._totalExp = mst.exp+mst.expAdd*lv;
+        this._exp = 0;
+        this._heal = mst.heal+mst.healAdd*lv;
+        this._attackSpeed = mst.attackSpeed;
+        this._moveSpeed = mst.moveSpeed;
         this.refreshItemProp();
     },
 
@@ -46,8 +46,8 @@ module.exports = ag.class.extend({
                 if(itemMst.defense)defense+=itemMst.defense;
             }
         }
-        this._data.hurt = hurt;
-        this._data.defense = defense;
+        this._hurt = hurt;
+        this._defense = defense;
     },
 
 
@@ -117,7 +117,7 @@ module.exports = ag.class.extend({
 
         //忙碌状态
         this._busy = true;
-        ag.actionManager.runAction(this,this._data.moveSpeed,function(){
+        ag.actionManager.runAction(this,this._moveSpeed,function(){
             this._busy = false;
             this.idle();
         }.bind(this));
@@ -159,15 +159,15 @@ module.exports = ag.class.extend({
             if(array1)array = array.concat(array1);
             if(array){
                 for(var k=0;k<array.length;++k){
-                    var lockedData = array[k]._data;
-                    if(ag.gameLayer.isEnemyCamp(array[k],this)){
-                        var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
+                    var tempRole = array[k];
+                    if(ag.gameLayer.isEnemyCamp(tempRole,this)){
+                        var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            lockedData.hp -= Math.round(this._data.hurt/correct*3);
+                            tempRole._data.hp -= Math.round(this._hurt/correct*3);
                         }else{
-                            lockedData.hp -=  Math.round(this._data.hurt/correct);
+                            tempRole._data.hp -=  Math.round(this._hurt/correct);
                         }
-                        sendArray.push({id:lockedData.id,hp:lockedData.hp});
+                        sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }
             }
@@ -175,15 +175,15 @@ module.exports = ag.class.extend({
             array = ag.gameLayer._roleXYMap[''+data.mapId+','+(this._data.x+dirPoint.x*2)+','+(this._data.y+dirPoint.y*2)];
             if(array){
                 for(var k=0;k<array.length;++k){
-                    var lockedData = array[k]._data;
-                    if(ag.gameLayer.isEnemyCamp(array[k],this)){
+                    var tempRole = array[k];
+                    if(ag.gameLayer.isEnemyCamp(tempRole,this)){
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
-                            lockedData.hp -=  Math.round(this._data.hurt/correct*3);
+                            var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
+                            tempRole._data.hp -=  Math.round(this._hurt/correct*3);
                         }else{
-                            lockedData.hp -= this._data.hurt;
+                            tempRole._data.hp -= this._hurt;
                         }
-                        sendArray.push({id:lockedData.id,hp:lockedData.hp});
+                        sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }
             }
@@ -193,11 +193,11 @@ module.exports = ag.class.extend({
                     var array = ag.gameLayer._roleXYMap[''+data.mapId+','+j+','+i];
                     if(array){
                         for(var k=0;k<array.length;++k){
-                            var lockedData = array[k]._data;
-                            if(ag.gameLayer.isEnemyCamp(array[k],this)){
-                                var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
-                                lockedData.hp -=  Math.round(this._data.hurt/correct);
-                                sendArray.push({id:lockedData.id,hp:lockedData.hp});
+                            var tempRole = array[k];
+                            if(ag.gameLayer.isEnemyCamp(tempRole,this)){
+                                var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
+                                tempRole._data.hp -=  Math.round(this._hurt/correct);
+                                sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                             }
                         }
                     }
@@ -211,11 +211,11 @@ module.exports = ag.class.extend({
             var array = ag.gameLayer._roleXYMap[''+data.mapId+','+x+','+y];
             if(array){
                 for(var k=0;k<array.length;++k){
-                    var lockedData = array[k]._data;
-                    if(ag.gameLayer.isEnemyCamp(array[k],this)){
-                        var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
-                        lockedData.hp -=  Math.round(this._data.hurt/correct);
-                        sendArray.push({id:lockedData.id,hp:lockedData.hp});
+                    var tempRole = array[k];
+                    if(ag.gameLayer.isEnemyCamp(tempRole,this)){
+                        var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
+                        tempRole._data.hp -=  Math.round(this._hurt/correct);
+                        sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }
             }
@@ -224,24 +224,24 @@ module.exports = ag.class.extend({
             //启动毒
             ag.buffManager.setPoison(locked,this);
         }else if(this._data.type=='m9') {
-            var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(), 9, 9);
+            var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(),this.getMst().attackDistance);
             for (var i = 0; i < array.length; ++i) {
-                var lockedData = array[i]._data;
-                if (ag.gameLayer.isEnemyCamp(array[i],this)) {
-                    var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
-                    lockedData.hp -=  Math.round(this._data.hurt/correct);
-                    sendArray.push({id: lockedData.id, hp: lockedData.hp});
+                var tempRole = array[i];
+                if (ag.gameLayer.isEnemyCamp(tempRole,this)) {
+                    var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
+                    tempRole._data.hp -= Math.round(this._hurt/correct);
+                    sendArray.push({id: tempRole._data.id, hp: tempRole._data.hp});
                 }
             }
         }else{
             var array = ag.gameLayer._roleXYMap[''+data.mapId+','+x+','+y];
             if(array){
                 for(var k=0;k<array.length;++k){
-                    var lockedData = array[k]._data;
-                    if(ag.gameLayer.isEnemyCamp(array[k],this)){
-                        var correct = lockedData.defense>=0 ? lockedData.defense/10+1 : -1/(lockedData.defense/10-1);
-                        lockedData.hp -=  Math.round(this._data.hurt/correct);
-                        sendArray.push({id:lockedData.id,hp:lockedData.hp});
+                    var tempRole = array[k];
+                    if(ag.gameLayer.isEnemyCamp(tempRole,this)){
+                        var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
+                        tempRole._data.hp -=  Math.round(this._hurt/correct);
+                        sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }
             }
@@ -249,7 +249,7 @@ module.exports = ag.class.extend({
 
         //忙碌状态
         this._busy = true;
-        ag.actionManager.runAction(this,this._data.attackSpeed,function(){
+        ag.actionManager.runAction(this,this._attackSpeed,function(){
             this._busy = false;
             this.idle();
         }.bind(this));
@@ -293,14 +293,14 @@ module.exports = ag.class.extend({
         
         
         if(attacker && attacker._data.camp!=ag.gameConst.campMonster){
-            attacker._data.exp +=  this.getMst().expDead;
-            while(attacker._data.exp>=attacker._data.totalExp){
+            attacker._exp +=  this.getMst().expDead;
+            while(attacker._exp>=attacker._totalExp){
                 ++attacker._data.level;
-                var exp = attacker._data.exp-attacker._data.totalExp;
+                var exp = attacker._exp-attacker._totalExp;
                 attacker.resetAllProp();
-                attacker._data.exp = exp;
+                attacker._exp = exp;
             }
-            ag.jsUtil.sendDataAll("sAddExp",{id:attacker._data.id,level:attacker._data.level,exp:attacker._data.exp});
+            ag.jsUtil.sendDataAll("sAddExp",{id:attacker._data.id,level:attacker._data.level,exp:attacker._exp});
 
             if(this._data.camp!=ag.gameConst.campMonster){
                 ag.jsUtil.sendDataAll("sSystemNotify",attacker._data.name+' 击杀 '+this._data.name);
@@ -330,7 +330,7 @@ module.exports = ag.class.extend({
     relife: function () {
         if(this._state == ag.gameConst.stateDead){
             this._state = ag.gameConst.stateIdle;
-            this._data.hp = this._data.totalHP;
+            this._data.hp = this._totalHP;
             var pos = ag.gameLayer.getStandLocation(ag.gameConst._bornMap,ag.gameConst._bornX,ag.gameConst._bornY,ag.gameConst._bornR);
             this.setLocation(pos);
             ag.jsUtil.sendDataAll("sMoveForce",{id:this._data.id, x:this._data.x, y:this._data.y});

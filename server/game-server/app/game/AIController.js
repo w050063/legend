@@ -32,7 +32,7 @@ module.exports = ag.class.extend({
     //返回移动到锁定角色的的方向,每次移动操作，怪物有一定1/4几率重新锁定目标
     doMoveOperate:function (location) {
         var locked = this.findLocked();
-        if(locked && Math.random()<0.25){
+        if(locked && Math.random()<0.5){
             this._role.idle();
             this._locked = locked;
         }else{
@@ -53,8 +53,10 @@ module.exports = ag.class.extend({
         if(this._role._busy==false && this._role._state != ag.gameConst.stateDead){
             //有锁定目标
             if(this._locked){
-                if(ag.jsUtil.pDistance(this._role.getLocation(),this._locked.getLocation())<=this._role.getMst().visibleDistance){
-                    if(ag.gameLayer.getAttackDistance(this._role,this._locked)){
+                var l1 = this._role.getLocation(), l2 = this._locked.getLocation(),vd = this._role.getMst().visibleDistance,ad = this._role.getMst().attackDistance;
+                var lx = Math.abs(l1.x-l2.x), ly = Math.abs(l1.y-l2.y);
+                if(lx<=vd && ly<=vd){
+                    if(lx<=ad && ly<=ad){
                         this._role.attack(this._locked);
                     }else if(this._role._data._type!="m9"){
                         this.doMoveOperate(this._locked.getLocation());
@@ -82,23 +84,19 @@ module.exports = ag.class.extend({
 
     //查找目标
     findLocked:function(){
-        var locked = null;
         var checkDistance = this._role.getMst().checkDistance;
-        var myLocation=this._role.getLocation();
-        for(var i= 0,iAdd=1;Math.abs(i)<=checkDistance && !locked;i+=iAdd,iAdd=-iAdd+(iAdd>0?-1:1)){
-            for(var j= 0,jAdd=1;Math.abs(j)<=checkDistance && !locked;j+=jAdd,jAdd=-jAdd+(jAdd>0?-1:1)){
-                if(ag.jsUtil.pDistance(myLocation,ag.jsUtil.p(this._role._data.x+j,this._role._data.y+i))<=checkDistance){
-                    var array = ag.gameLayer._roleXYMap[''+this._role._data.mapId+','+(this._role._data.x+j)+','+(this._role._data.y+i)];
-                    if(array){
-                        for(var k=0;k<array.length && !locked;++k){
-                            if(ag.gameLayer.isEnemyCamp(array[k],this._role)){
-                                locked = array[k];
-                            }
-                        }
+        var searchEnemypath = ag.gameConst.searchEnemypath;
+        var count = Math.min(Math.pow(checkDistance*2+1,2),searchEnemypath.length);
+        for(var i=0;i<count;++i){
+            var array = ag.gameLayer._roleXYMap[''+this._role._data.mapId+','+(this._role._data.x+searchEnemypath[i][0])+','+(this._role._data.y+searchEnemypath[i][1])];
+            if(array){
+                for(var k=0;k<array.length;++k){
+                    if(ag.gameLayer.isEnemyCamp(array[k],this._role)){
+                        return array[k];
                     }
                 }
             }
         }
-        return locked;
+        return null;
     },
 });

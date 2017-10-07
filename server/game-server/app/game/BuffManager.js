@@ -21,10 +21,10 @@ module.exports = ag.class.extend({
 
 
     //获得当前的buff数据,不包括函数
-    getData:function () {
-        return {_fireCritArray:this._fireCritArray,
-            _fireWallMap:this._fireWallMap,
-            _poisonMap:this._poisonMap};
+    dataToClient:function (id) {
+        for(var key in this._fireWallMap){
+            ag.jsUtil.sendData("sFireWall",{id:key,rid:this._fireWallMap[key].id},id);
+        }
     },
 
 
@@ -54,7 +54,7 @@ module.exports = ag.class.extend({
             ag.actionManager.runAction(role,10,function(){
                 this.delFireWall(mapXYString);
             }.bind(this),tag);
-            ag.jsUtil.sendDataAll("sFireWall",{mapXYString:mapXYString,id:role._data.id});
+            ag.jsUtil.sendDataAll("sFireWall",{id:mapXYString,rid:role._data.id});
         }
     },
 
@@ -117,7 +117,7 @@ module.exports = ag.class.extend({
             var attacker = ag.gameLayer.getRole(this._fireWallMap[key].id);
             if(attacker){
                 var array = key.split(',');
-                array = ag.gameLayer.getRoleFromCenterXY(array[0],ag.jsUtil.p(parseInt(array[1]),parseInt(array[2])));
+                array = ag.gameLayer.getRoleFromCenterXY(array[0],ag.jsUtil.p(parseInt(array[1]),parseInt(array[2])),0);
                 if(array){
                     for(var i=0;i<array.length;++i){
                         if(ag.gameLayer.isEnemyCamp(attacker,array[i])){
@@ -148,9 +148,8 @@ module.exports = ag.class.extend({
         //自动回血
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
-            if(role._data.hp>0 && role._data.hp<role._data.totalHP){
-                role._data.hp+=role._data.heal;
-                if(role._data.hp>role._data.totalHP)role._data.hp=role._data.totalHP;
+            if(role._data.hp>0 && role._data.hp<role._totalHP){
+                role._data.hp = Math.min(role._data.hp+role._heal,role._totalHP);
             }
         }
     }

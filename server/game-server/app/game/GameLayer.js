@@ -52,13 +52,6 @@ module.exports = {
             player._data.direction = 4;//默认朝下
             player._data.level = 0;
             player.resetAllProp();
-            if(player._data.type=="m0"){
-                player._data.clothes = player._data.sex==1?"fightertwogirl":"fightertwoboy";
-            }else if(player._data.type=="m1"){
-                player._data.clothes = player._data.sex==1?"magiciantwogirl":"magiciantwoboy";
-            }else if(player._data.type=="m2"){
-                player._data.clothes = player._data.sex==1?"taoisttwogirl":"taoisttwoboy";
-            }
 			this._roleMap[uid] = player;
             var xyStr = player.getMapXYString();
             if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
@@ -75,16 +68,16 @@ module.exports = {
             var data = this._roleMap[key]._data;
             if(data.mapId==player._data.mapId && data.id!=player._data.id){
                 array.push(data);
-                ag.jsUtil.sendData("sRole",JSON.stringify(data),uid);
+                ag.jsUtil.sendData("sRole",data,uid);
             }
         }
 
         //通知其他人。
-        ag.jsUtil.sendDataExcept("sRole",JSON.stringify(player._data),player._data.id);
+        ag.jsUtil.sendDataExcept("sRole",player._data,player._data.id);
 
 
         //发送buff管理数据
-        ag.jsUtil.sendData("sBuffManager",JSON.stringify(ag.buffManager.getData()),player._data.id);
+        ag.buffManager.dataToClient(player._data.id);
 
         //发送装备情况
         var map = ag.itemManager._itemMap.getMap();
@@ -129,7 +122,7 @@ module.exports = {
                         if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
                         this._roleXYMap[xyStr].push(player);
                         player.setAIController(new AIController(player));
-                        ag.jsUtil.sendDataAll("sRole",JSON.stringify(player._data));
+                        ag.jsUtil.sendDataAll("sRole",player._data);
                     }
                 }
             }
@@ -203,8 +196,8 @@ module.exports = {
             var weight=[];
             var max = 0;
             for(var i=0;i<8;++i){
-                if(this.isCollision(role._data.mapId,role._data.x+pointArray[i].x,role._data.y+pointArray[i].y) ||
-                    this._roleXYMap[this.getMapXYRole(role._data.mapId,role._data.x+pointArray[i].x,role._data.y+pointArray[i].y)]){
+                if(this.isCollision(role._data.mapId,role._data.x+pointArray[i].x,role._data.y+pointArray[i].y)
+                    || this.getHavelivedRole(this.getMapXYRole(role._data.mapId,role._data.x+pointArray[i].x,role._data.y+pointArray[i].y))){
                     weight.push(0);
                 }else{
                     var dis = Math.abs(index-i);
@@ -240,20 +233,11 @@ module.exports = {
     },
 
 
-    //get every one attack rangle..
-    getAttackDistance:function(role1,role2){
-        var myLocation=role1.getLocation();
-        var enemyLocation=role2.getLocation();
-        var x=Math.abs(enemyLocation.x-myLocation.x);
-        var y=Math.abs(enemyLocation.y-myLocation.y);
-        if(role1._data.type=="m0"){
-            if (x<=2 && y<=2 && x+y!=3)return true;
-        }else{
-            if(ag.jsUtil.pDistance(myLocation,enemyLocation)<=role1.getMst().attackDistance)return true;
-        }
+    getHavelivedRole:function(mapStr){
+        var array = this._roleXYMap[mapStr];
+        if(array)for(var i=0;i<array.length;++i)if(array[i]._state!=ag.gameConst.stateDead)return true;
         return false;
     },
-
 
 
     //根据原点和锁定点获得方向
@@ -282,16 +266,13 @@ module.exports = {
 
 
     //获得指定区域角色数组
-    getRoleFromCenterXY:function (mapId,center,x,y) {
-        x = x?x:0;
-        y = y?y:0;
+    getRoleFromCenterXY:function (mapId,center,offset) {
         var retArray = [];
-        for(var i=center.y-y;i<=center.y+y;++i){
-            for(var j=center.x-x;j<=center.x+x;++j){
+        var posX = center.x+offset,posY = center.y+offset;
+        for(var i=center.y-offset;i<=posY;++i){
+            for(var j=center.x-offset;j<=posX;++j){
                 var array = this._roleXYMap[''+mapId+','+j+','+i];
-                if(array){
-                    retArray = retArray.concat(array);
-                }
+                if(array)retArray = retArray.concat(array);
             }
         }
         return retArray;

@@ -57,6 +57,12 @@ module.exports = {
     directionStringArray:['0,1','1,1','1,0','1,-1','0,-1','-1,-1','-1,0','-1,1'],
     directionArray:[{x:0,y:1},{x:1,y:1},{x:1,y:0},{x:1,y:-1},{x:0,y:-1},{x:-1,y:-1},{x:-1,y:0},{x:-1,y:1}],
 
+    searchEnemypath:[[0,0],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1],
+        [0,2],[1,2],[2,2],[2,1],[2,0],[2,-1],[2,-2],[1,-2],[0,-2],[-1,-2],[-2,-2],[-2,-1],[-2,0],[-2,1],[-2,2],[-1,2],
+        [0,3],[1,3],[2,3],[3,3],[3,2],[3,1],[3,0],[3,-1],[3,-2],[3,-3],[2,-3],[1,-3],[0,-3],[-1,-3],[-2,-3],[-3,-3],[-3,-2],[-3,-1],[-3,0],[-3,1],[-3,2],[-3,3],[-2,3],[-1,3],
+        [0,4],[1,4],[2,4],[3,4],[4,4],[4,3],[4,2],[4,1],[4,0],[4,-1],[4,-2],[4,-3],[4,-4],[3,-4],[2,-4],[1,-4],[0,-4],[-1,-4],[-2,-4],[-3,-4],[-4,-4],[-4,-3],[-4,-2],[-4,-1],[-4,0],[-4,1],[-4,2],[-4,3],[-4,4],[-3,4],[-2,4],[-1,4],
+        [0,5],[1,5],[2,5],[3,5],[4,5],[5,5],[5,4],[5,3],[5,2],[5,1],[5,0],[5,-1],[5,-2],[5,-3],[5,-4],[5,-5],[4,-5],[3,-5],[2,-5],[1,-5],[0,-5],[-1,-5],[-2,-5],[-3,-5],[-4,-5],[-4,-5],[-5,-5],[-5,-4],[-5,-3],[-5,-2],[-5,-1],[-5,0],[-5,1],[-5,2],[-5,3],[-5,4],[-5,5],[-4,5],[-3,5],[-2,5],[-1,5]],
+
 
     //地图详细信息,refresh怪物相关刷新，坐标-1表示全地图随机刷--hero type,x,y,aliquot time,max count.
     _terrainMap: {
@@ -65,8 +71,8 @@ module.exports = {
             name: "mafa",
             tileX: 100,
             tileY: 60,
-            mapX: 23,
-            mapY: 22,
+            mapX: 30,
+            mapY: 28,
             collision:"",
             //collision: "9,12;9,13;9,14;9,15;9,16;9,17;9,18;9,19;9,20;" +
             //"10,12;10,13;10,14;10,15;10,16;10,17;10,18;10,19;10,20;" +
@@ -75,10 +81,10 @@ module.exports = {
             //"13,12;13,13;13,14;13,15;13,16;13,17;13,18;13,19;13,20;" +
             //"14,12;14,13;14,14;14,15;14,16;14,17;14,18;14,19;14,20;" +
             //"15,12;15,13;15,14;15,15;15,16;15,17;15,18;15,19;15,20",
-            refresh: [["m3", -1, -1, 60, 15],["m4", -1, -1, 60, 15],["m5", -1, -1, 60, 15],["m6", -1, -1, 60, 5],
-                ["m7", -1, -1, 60, 5],["m9", -1, -1, 60, 3],["m10", -1, -1, 60, 1],
-                ["m11", -1, -1, 60, 1],["m12", -1, -1, 60, 1],["m13", -1, -1, 60, 1],["m14", -1, -1, 60, 1],
-                ["m15", -1, -1, 60, 1],["m16", -1, -1, 90, 1],["m17", -1, -1, 90, 1],["m18", -1, -1, 90, 1]]
+            refresh: [["m3", -1, -1, 60, 1],["m4", -1, -1, 60, 1],["m5", -1, -1, 60, 1],["m6", -1, -1, 60, 1],
+                ["m7", -1, -1, 60, 1],["m9", -1, -1, 60, 3],["m10", -1, -1, 60, 1],]
+                //["m11", -1, -1, 60, 1],["m12", -1, -1, 60, 1],["m13", -1, -1, 60, 1],["m14", -1, -1, 60, 1],
+                //["m15", -1, -1, 60, 1],["m16", -1, -1, 90, 1],["m17", -1, -1, 90, 1],["m18", -1, -1, 90, 1]]
         },
         t1:{
             id : "t1",
@@ -97,9 +103,9 @@ module.exports = {
         m0:{id:"m0",name:"战士",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,
             moveSpeed:0.7,attackSpeed:0.8,checkDistance:4,visibleDistance:9,attackDistance:0},
         m1:{id:"m1",name:"法师",hp:220,hpAdd:20,defense:50,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:3,
-            moveSpeed:0.7,attackSpeed:1.2,checkDistance:4,visibleDistance:9,attackDistance:6},
+            moveSpeed:0.7,attackSpeed:1.2,checkDistance:5,visibleDistance:9,attackDistance:5},
         m2:{id:"m2",name:"道士",hp:400,hpAdd:20,defense:5,defenseAdd:1,hurt:100,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:5,
-            moveSpeed:0.7,attackSpeed:1.2,checkDistance:4,visibleDistance:9,attackDistance:6},
+            moveSpeed:0.7,attackSpeed:1.2,checkDistance:5,visibleDistance:9,attackDistance:5},
         m3:{id:"m3",name:"甲壳虫",hp:220,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:1,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"beetle",drop:'i000,30,i001,30,i019,30',lv:1},
         m4:{id:"m4",name:"红野猪",hp:220,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:1,healAdd:0,
@@ -111,7 +117,7 @@ module.exports = {
         m7:{id:"m7",name:"白野猪",hp:1000,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:10,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"whiteboar",drop:'i002,20,i003,20,i004,20,i005,20,i006,20,i007,20',lv:2},
         m9:{id:"m9",name:"千年树妖",hp:2000,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:200,heal:20,healAdd:0,
-            moveSpeed:2,attackSpeed:2,checkDistance:6,visibleDistance:6,attackDistance:6,model:"treedemon",drop:'i015,50,i016,50,i017,50',lv:2},
+            moveSpeed:2,attackSpeed:2,checkDistance:5,visibleDistance:5,attackDistance:5,model:"treedemon",drop:'i015,50,i016,50,i017,50',lv:2},
         m10:{id:"m10",name:"双头血魔",hp:2000,hpAdd:0,defense:50,defenseAdd:0,hurt:100,hurtAdd:0,exp:0,expAdd:0,expDead:200,heal:50,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"clothesbossone",drop:'i008,50',lv:3},
         m11:{id:"m11",name:"骷髅精灵",hp:2000,hpAdd:0,defense:50,defenseAdd:0,hurt:100,hurtAdd:0,exp:0,expAdd:0,expDead:200,heal:50,healAdd:0,
