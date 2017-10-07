@@ -184,11 +184,13 @@ cc.Class({
         var l1=this._role.getLocation();
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
-            var l2=role.getLocation();
-            var dis = Math.max(Math.abs(l1.x-l2.x),Math.abs(l1.y-l2.y));
-            if(dis<=checkDistance && dis<lockedDis && ag.gameLayer.isEnemyCamp(this._role,role)){
-                locked = role;
-                lockedDis = dis;
+            if(role._data.camp==ag.gameConst.campMonster){
+                var l2=role.getLocation();
+                var dis = Math.max(Math.abs(l1.x-l2.x),Math.abs(l1.y-l2.y));
+                if(dis<=checkDistance && dis<lockedDis && ag.gameLayer.isEnemyCamp(this._role,role)){
+                    locked = role;
+                    lockedDis = dis;
+                }
             }
         }
         return locked;

@@ -490,9 +490,11 @@ cc.Class({
     //聊天按钮
     buttonShowChatNode:function(){
         cc.find('Canvas/nodeChat').active = true;
-        var editbox = cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox);
-        editbox.stayOnTop = true;
-        editbox.setFocus();
+        if(!cc.sys.isMobile && cc.sys.isBrowser){
+            var editbox = cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox);
+            editbox.stayOnTop = true;
+            editbox.setFocus();
+        }
     },
 
     //聊天按钮

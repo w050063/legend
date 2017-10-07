@@ -89,13 +89,12 @@ cc.Class({
             node.destroy();
         })));
 
-        var type,sex;
-        if(this._selectIndex==0){type='m0';sex=ag.gameConst.sexBoy}
-        else if(this._selectIndex==1){type='m0';sex=ag.gameConst.sexGirl}
-        else if(this._selectIndex==2){type='m1';sex=ag.gameConst.sexBoy}
-        else if(this._selectIndex==3){type='m1';sex=ag.gameConst.sexGirl}
-        else if(this._selectIndex==4){type='m2';sex=ag.gameConst.sexBoy}
-        else if(this._selectIndex==5){type='m2';sex=ag.gameConst.sexGirl}
+        var type='m0',sex=ag.gameConst.sexBoy;
+        if(this._selectIndex==1){type='m0';sex=ag.gameConst.sexGirl;}
+        else if(this._selectIndex==2){type='m1';sex=ag.gameConst.sexBoy;}
+        else if(this._selectIndex==3){type='m1';sex=ag.gameConst.sexGirl;}
+        else if(this._selectIndex==4){type='m2';sex=ag.gameConst.sexBoy;}
+        else if(this._selectIndex==5){type='m2';sex=ag.gameConst.sexGirl;}
         ag.agSocket.send("enter",{type:type,sex:sex});
     },
 
