@@ -24,7 +24,7 @@
   },
   "message sFireWall": {
     "required string id": 1,
-    "required string mapXYString": 2
+    "required string rid": 2
   },
   "message sAddExp": {
     "required string id": 1,
@@ -57,11 +57,22 @@
     "required string id": 1,
     "required string content": 2
   },
+  "message sRole": {
+    "required string id": 1,
+    "required string type": 2,
+    "required int32 x": 3,
+    "required int32 y": 4,
+    "required int32 camp": 5,
+    "required string mapId": 6,
+    "required int32 direction": 7,
+    "required int32 level": 8,
+    "required int32 hp": 9
+  },
   "onData" : {
     "repeated sMove sMoveArray": 1,
     "repeated sAttack sAttackArray": 2,
     "repeated sHP sHPArray": 3,
-    "repeated string sRoleArray": 4,
+    "repeated sRole sRoleArray": 4,
     "repeated sMoveForce sMoveForceArray": 5,
     "repeated string sBuffManagerArray": 6,
     "repeated string sBFireCritArray": 7,
