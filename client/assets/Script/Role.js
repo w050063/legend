@@ -98,7 +98,6 @@ cc.Class({
         var mst = this.getMst();
         var lv = this._data.level;
         this._totalHP = mst.hp+mst.hpAdd*lv;
-        this._data.hp = this._totalHP;
         this._heal = mst.heal+mst.healAdd*lv;
         this._attackSpeed = mst.attackSpeed;
         this._moveSpeed = mst.moveSpeed;
@@ -111,6 +110,7 @@ cc.Class({
         this._data.level = level;
         if(last < this._data.level){
             this.resetAllProp();
+            this._data.hp = this._totalHP;
             if(this==ag.gameLayer._player)ag.gameLayer.refreshEquip();
             this.changeHP(this._data.hp);
         }
@@ -529,17 +529,18 @@ cc.Class({
 
     //血量变化
     changeHP:function(hp){
-        if(hp==this._data.hp)return;
-        if(this._nearFlag){
-            ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp)))});
-            this.flyAnimation();
-            if(this._propNode){
-                this._propNode._progressBarHP.progress = hp/this._totalHP;
-                this._propNode._labelHP.string = ""+hp+"/"+this._totalHP+" Lv:"+(this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level);
+        if(hp!=this._data.hp){
+            if(this._nearFlag){
+                ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp)))});
+                this.flyAnimation();
+                if(this._propNode){
+                    this._propNode._progressBarHP.progress = hp/this._totalHP;
+                    this._propNode._labelHP.string = ""+hp+"/"+this._totalHP+" Lv:"+(this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level);
+                }
             }
-        }
 
-        this._data.hp = hp;
+            this._data.hp = hp;
+        }
         if(this._data.hp<=0){//判断死亡
             this.dead();
         }
