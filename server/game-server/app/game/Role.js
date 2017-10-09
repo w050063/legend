@@ -330,7 +330,7 @@ module.exports = ag.class.extend({
     relife: function () {
         if(this._state == ag.gameConst.stateDead){
             this._state = ag.gameConst.stateIdle;
-            this._data.hp = this._totalHP;
+            this._data.hp = Math.floor(this._totalHP/2);
             var pos = ag.gameLayer.getStandLocation(ag.gameConst._bornMap,ag.gameConst._bornX,ag.gameConst._bornY,ag.gameConst._bornR);
             this.setLocation(pos);
             ag.jsUtil.sendDataAll("sMoveForce",{id:this._data.id, x:this._data.x, y:this._data.y});
