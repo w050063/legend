@@ -308,8 +308,11 @@ cc.Class({
 
             //最后变更状态
             this._state = ag.gameConst.stateMove;
+        }else{
+            var mapData = ag.gameConst._terrainMap[this._data.mapId];
+            this.node.stopAllActions();
+            this.node.setPosition(cc.p((this._data.x-mapData.mapX/2)*mapData.tileX,(this._data.y-mapData.mapY/2)*mapData.tileY));
         }
-
 
         //向服务器发送
         if (this == ag.gameLayer._player) {

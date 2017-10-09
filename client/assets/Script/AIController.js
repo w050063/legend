@@ -17,7 +17,7 @@ cc.Class({
         this._busy = false;
         this._spriteTouchArray = [];
         this._touchMoveDirection = -1;
-        this._setupAutoAttack = true;
+        this._setupAutoAttack = false;
 
         //加载
         cc.loader.loadRes('prefab/nodeTouchSprite',function(err,prefab){
