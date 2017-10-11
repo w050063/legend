@@ -7,7 +7,7 @@
 module.exports = ag.class.extend({
     ctor:function () {
         this._infoMap = {};
-        for(var i=0;i<10;++i){
+        for(var i=0;i<1;++i){
             var id = ''+i;
             this._infoMap[id] = {id:id,name:'乱世枭雄',count:0,maxCount:100,time:Math.floor(Math.random()*1200)};
         }

@@ -6,10 +6,11 @@
 
 var baseItemId = 0;
 module.exports = ag.class.extend({
-    ctor:function (mid,location) {
+    ctor:function (mid,mapId,location) {
         this._data = {};
         this._data.id = 'i'+(++baseItemId);
         this._data.mid = mid;
+        this._data.mapId = mapId;
         this._data.x = location.x;
         this._data.y = location.y;
     },

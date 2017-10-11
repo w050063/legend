@@ -19,15 +19,6 @@ module.exports = ag.class.extend({
         ag.actionManager.schedule(this,5,this.update5.bind(this));
     },
 
-
-    //获得当前的buff数据,不包括函数
-    dataToClient:function (id) {
-        for(var key in this._fireWallMap){
-            ag.jsUtil.sendData("sFireWall",{id:key,rid:this._fireWallMap[key].id},id);
-        }
-    },
-
-
     //烈火技能相关
     getCDForFireCrit:function (role) {
         return this._fireCritArray[role._data.id]==true;
@@ -40,7 +31,7 @@ module.exports = ag.class.extend({
         ag.actionManager.runAction(role,5,function(){
             delete this._fireCritArray[role._data.id];
             //当玩家攻击后,服务器过10秒cd好了,会再次向客户端发送启用烈火,双方用完自动置为false
-            ag.jsUtil.sendDataAll("sBFireCrit",role._data.id);
+            ag.jsUtil.sendDataAll("sBFireCrit",role._data.id,role._data.mapId);
         }.bind(this));
     },
 
@@ -54,7 +45,7 @@ module.exports = ag.class.extend({
             ag.actionManager.runAction(role,10,function(){
                 this.delFireWall(mapXYString);
             }.bind(this),tag);
-            ag.jsUtil.sendDataAll("sFireWall",{id:mapXYString,rid:role._data.id});
+            ag.jsUtil.sendDataAll("sFireWall",{id:mapXYString,rid:role._data.id},role._data.mapId);
         }
     },
 

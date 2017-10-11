@@ -55,7 +55,7 @@ module.exports = ag.class.extend({
             if(this._locked){
                 var l1 = this._role.getLocation(), l2 = this._locked.getLocation(),vd = this._role.getMst().visibleDistance,ad = this._role.getMst().attackDistance;
                 var lx = Math.abs(l1.x-l2.x), ly = Math.abs(l1.y-l2.y);
-                if(lx<=vd && ly<=vd){
+                if(this._role._data.mapId==this._locked._data.mapId && lx<=vd && ly<=vd){
                     if(lx<=ad && ly<=ad){
                         this._role.attack(this._locked);
                     }else if(this._role._data._type!="m9"){

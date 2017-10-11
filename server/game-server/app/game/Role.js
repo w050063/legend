@@ -90,6 +90,56 @@ module.exports = ag.class.extend({
     },
 
 
+    //更换地图
+    changeMap:function(mapId){
+        if(this._data.mapId != mapId){
+            ag.jsUtil.sendDataExcept("sDeleteRole",this._data.id,this._data.id);
+            var oldStr = this.getMapXYString();
+            var map = ag.gameConst._terrainMap[mapId];
+            var pos = ag.gameLayer.getStandLocation(mapId,map.born.x,map.born.y);
+            this._data.mapId = mapId;
+            this._data.x = pos.x;
+            this._data.y = pos.y;
+            var newStr = this.getMapXYString();
+
+            //更新xy数组信息
+            ag.gameLayer._roleXYMap[oldStr].splice(ag.gameLayer._roleXYMap[oldStr].indexOf(this),1);
+            if(ag.gameLayer._roleXYMap[oldStr].length==0)delete ag.gameLayer._roleXYMap[oldStr];
+            if(!ag.gameLayer._roleXYMap[newStr])ag.gameLayer._roleXYMap[newStr] = [];
+            ag.gameLayer._roleXYMap[newStr].push(this);
+        }
+
+
+        //返回当前地图非自己的角色。
+        for(var key in ag.gameLayer._roleMap){
+            var data = ag.gameLayer._roleMap[key]._data;
+            if(data.mapId==this._data.mapId && data.id!=this._data.id){
+                ag.jsUtil.sendData("sRole",data,this._data.id);
+            }
+        }
+
+        //通知其他人。
+        ag.jsUtil.sendDataExcept("sRole",this._data,this._data.id);
+
+        //发送装备情况
+        var map = ag.itemManager._itemMap.getMap();
+        for(var key in map){
+            var itemData = map[key]._data;
+            if(itemData.mapId==this._data.mapId){
+                ag.jsUtil.sendData("sItem",itemData,this._data.id);
+            }else{
+                var role = ag.gameLayer.getRole(itemData.owner);
+                if(role && role._data.mapId==this._data.mapId){
+                    ag.jsUtil.sendData("sItem",itemData,this._data.id);
+                }
+            }
+            if(itemData.owner==this._data.id){
+                ag.jsUtil.sendDataExcept("sItem",itemData,this._data.id);
+            }
+        }
+    },
+
+
 
     //无事可以做状态，可以重复进入
     idle:function(){
@@ -267,7 +317,7 @@ module.exports = ag.class.extend({
 
         //删除本地死亡怪物数据,更新AI锁定
         for(var i=0;i<sendArray.length;++i){
-            ag.jsUtil.sendDataAll("sHP",sendArray[i]);
+            ag.jsUtil.sendDataAll("sHP",sendArray[i],this._data.mapId);
             var beAttacker = ag.gameLayer._roleMap[sendArray[i].id];
             if(sendArray[i].hp<=0){
                 beAttacker.dead(this);
@@ -288,7 +338,7 @@ module.exports = ag.class.extend({
         var str = ag.gameConst._roleMst[this._data.type].drop;
 
         if(str){
-            ag.itemManager.drop(str,this.getLocation());
+            ag.itemManager.drop(str,this._data.mapId,this.getLocation());
         }
         
         
@@ -300,10 +350,10 @@ module.exports = ag.class.extend({
                 attacker.resetAllProp();
                 attacker._exp = exp;
             }
-            ag.jsUtil.sendDataAll("sAddExp",{id:attacker._data.id,level:attacker._data.level,exp:attacker._exp});
+            ag.jsUtil.sendDataAll("sAddExp",{id:attacker._data.id,level:attacker._data.level,exp:attacker._exp},this._data.mapId);
 
             if(this._data.camp!=ag.gameConst.campMonster){
-                ag.jsUtil.sendDataAll("sSystemNotify",attacker._data.name+' 击杀 '+this._data.name);
+                ag.jsUtil.sendDataAll("sSystemNotify",attacker._data.name+' 击杀 '+this._data.name,this._data.mapId);
             }
         }
 
@@ -330,10 +380,11 @@ module.exports = ag.class.extend({
     relife: function () {
         if(this._state == ag.gameConst.stateDead){
             this._state = ag.gameConst.stateIdle;
-            this._data.hp = Math.floor(this._totalHP/2);
-            var pos = ag.gameLayer.getStandLocation(ag.gameConst._bornMap,ag.gameConst._bornX,ag.gameConst._bornY,ag.gameConst._bornR);
+            this._data.hp = this._totalHP;
+            var map = ag.gameConst._terrainMap[ag.gameConst._bornMap];
+            var pos = ag.gameLayer.getStandLocation(ag.gameConst._bornMap,map.born.x,map.born.y);
             this.setLocation(pos);
-            ag.jsUtil.sendDataAll("sMoveForce",{id:this._data.id, x:this._data.x, y:this._data.y});
+            ag.jsUtil.sendDataAll("sMoveForce",{id:this._data.id, x:this._data.x, y:this._data.y},this._data.mapId);
             this._busy = false;
         }
     },

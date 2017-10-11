@@ -82,9 +82,11 @@ module.exports = {
 
     //发送要合并的数据
     sendDataExcept : function(route,msg,id){
+        var role = ag.gameLayer._roleMap[id];
+        var mapId = role?role._data.mapId:'t0';
         for(var key in ag.gameLayer._roleMap){
             var data = ag.gameLayer._roleMap[key]._data;
-            if(data.camp!=ag.gameConst.campMonster && data.id!==id){
+            if(data.camp!=ag.gameConst.campMonster && data.id!==id && data.mapId==mapId){
                 this.sendData(route,msg,data.id);
             }
         }
@@ -93,10 +95,10 @@ module.exports = {
 
 
     //发送要合并的数据
-    sendDataAll : function(route,msg){
+    sendDataAll : function(route,msg,mapId){
         for(var key in ag.gameLayer._roleMap){
             var data = ag.gameLayer._roleMap[key]._data;
-            if(data.camp!=ag.gameConst.campMonster){
+            if(data.camp!=ag.gameConst.campMonster && data.mapId==mapId){
                 this.sendData(route,msg,data.id);
             }
         }

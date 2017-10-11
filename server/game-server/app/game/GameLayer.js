@@ -42,7 +42,8 @@ module.exports = {
             player._data = {};
             player._data.id = uid;
             player._data.type = type;
-            var pos = this.getStandLocation(ag.gameConst._bornMap,ag.gameConst._bornX,ag.gameConst._bornY,ag.gameConst._bornR);
+            var map = ag.gameConst._terrainMap[ag.gameConst._bornMap];
+            var pos = this.getStandLocation(ag.gameConst._bornMap,map.born.x,map.born.y);
             player._data.x = pos.x;
             player._data.y = pos.y;
             player._data.name = name;
@@ -61,30 +62,7 @@ module.exports = {
         //确认进入游戏成功。
         player.relife();
         ag.jsUtil.send("sEnter",JSON.stringify(player._data),[uid]);
-
-
-        //返回当前地图非自己的角色。
-        var array = [];
-        for(var key in this._roleMap){
-            var data = this._roleMap[key]._data;
-            if(data.mapId==player._data.mapId && data.id!=player._data.id){
-                array.push(data);
-                ag.jsUtil.sendData("sRole",data,uid);
-            }
-        }
-
-        //通知其他人。
-        ag.jsUtil.sendDataExcept("sRole",player._data,player._data.id);
-
-
-        //发送buff管理数据
-        ag.buffManager.dataToClient(player._data.id);
-
-        //发送装备情况
-        var map = ag.itemManager._itemMap.getMap();
-        for(var key in map){
-            ag.jsUtil.sendData("sItem",map[key]._data,player._data.id);
-        }
+        player.changeMap(player._data.mapId);
     },
 
 
@@ -107,10 +85,10 @@ module.exports = {
                             x = Math.floor(Math.random()*(map.mapX+1));
                             y = Math.floor(Math.random()*(map.mapY+1));
                         }else{
-                            x = array[i][1]+Math.floor(Math.random()*(ag.gameConst._bornR*2+1)-ag.gameConst._bornR);
-                            y = array[i][2]+Math.floor(Math.random()*(ag.gameConst._bornR*2+1)-ag.gameConst._bornR);
+                            x = array[i][1];
+                            y = array[i][2];
                         }
-                        var position = this.getStandLocation(key,x,y,0);
+                        var position = this.getStandLocation(key,x,y);
                         player._data.x = position.x;
                         player._data.y = position.y;
                         player._data.camp = ag.gameConst.campMonster;
@@ -123,7 +101,7 @@ module.exports = {
                         if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
                         this._roleXYMap[xyStr].push(player);
                         player.setAIController(new AIController(player));
-                        ag.jsUtil.sendDataAll("sRole",player._data);
+                        ag.jsUtil.sendDataAll("sRole",player._data,player._data.mapId);
                     }
                 }
             }
@@ -142,9 +120,7 @@ module.exports = {
 
 
     //获得可以站立的位置
-    getStandLocation: function (mapId,x,y,r){
-        x = x-r+Math.floor(Math.random()*(2*r+1));
-        y = y-r+Math.floor(Math.random()*(2*r+1));
+    getStandLocation: function (mapId,x,y){
         if(this.isCollision(mapId,x,y)==false)return {x:x,y:y};
         for(var i=0;i<50;++i){
             if(this.isCollision(mapId,x,y+i)==false)return {x:x,y:y+i};

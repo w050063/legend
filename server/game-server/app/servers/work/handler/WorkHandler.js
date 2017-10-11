@@ -77,6 +77,16 @@ var Handler = cc.Class.extend({
     },
 
 
+    //更换新地图
+    changeMap:function(msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player){
+            player.changeMap(msg);
+        }
+        next();
+    },
+
+
     //进入游戏
     enter:function(msg, session, next) {
         ag.gameLayer.addPlayer(session.uid,ag.userManager.getName(session.uid),msg.type,msg.sex);
