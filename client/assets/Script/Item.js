@@ -12,7 +12,7 @@ cc.Class({
     init:function (data) {
         this._data = data;
 
-        var mapData = ag.gameConst._terrainMap['t0'];
+        var mapData = ag.gameConst._terrainMap[data.mapId];
         var x = data.x-mapData.mapX/2;
         var y = data.y-mapData.mapY/2;
         this.node.setPosition(x*mapData.tileX,y*mapData.tileY);

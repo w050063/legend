@@ -14,7 +14,6 @@ cc.Class({
         this._scrollViewList = cc.find("Canvas/scrollViewList").getComponent(AGListView);
         this._scrollViewList.setSpace(2);
         this.update5();
-        this.schedule(this.update5.bind(this),5);
 
         cc.find('Canvas/spriteIconButton').on('touchend', function () {
             cc.find('Canvas/spriteHeadInfo').active = true;

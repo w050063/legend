@@ -31,9 +31,10 @@ cc.Class({
     },
 
 
-    test:function(){
-        cc.loader.loadRes('map/mapgrass',cc.SpriteFrame,function(err,spriteFrame){
-            var w = 340,h=340, x=Math.ceil(ag.gameConst._terrainMap['t0'].mapX*100/w),y=Math.ceil(ag.gameConst._terrainMap['t0'].mapY*60/h);
+    test:function(mapId){
+        var map = ag.gameConst._terrainMap[mapId];
+        cc.loader.loadRes(map.res,cc.SpriteFrame,function(err,spriteFrame){
+            var w = 340,h=340, x=Math.ceil(map.mapX*100/w),y=Math.ceil(map.mapY*60/h);
             for(var i=0;i<y;++i){
                 for(var j=0;j<x;++j){
                     var node = new cc.Node();

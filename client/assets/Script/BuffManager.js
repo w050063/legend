@@ -2,8 +2,6 @@
  * Created by bot.su on 2017/6/21.
  * 游戏角色状态管理类
  */
-
-
 cc.Class({
     extends: cc.Component,
     properties: {},
@@ -19,15 +17,13 @@ cc.Class({
     },
 
 
-    setData:function (data) {
-        for(var key in data){
-            this[key] = data[key];
-        }
+    changeMap:function(){
+        this._fireCritArray = {};
         for(var key in this._fireWallMap){
-            this.setFireWall(key,ag.gameLayer.getRole(this._fireWallMap[key].id));
+            this.delFireWall(key);
         }
         for(var key in this._poisonMap){
-            this.setPoison(ag.gameLayer.getRole(key),ag.gameLayer.getRole(this._poisonMap[key].id));
+            this.delPoison(key);
         }
     },
 
@@ -101,14 +97,16 @@ cc.Class({
 
     //设置毒
     setPoison:function (role,attacker) {
-        if(this._poisonMap[role._data.id]){
-            this.delPoison(role._data.id);
+        var id = role._data.id;
+        if(this._poisonMap[id]){
+            this.delPoison(id);
         }
         var tag = ++this._baseTag;
-        this._poisonMap[role._data.id] = {id:attacker._data.id,tag:tag};
+        this._poisonMap[id] = {id:attacker._data.id,tag:tag};
         role.setAniColor(cc.color(0,255,0,255));
         ag.gameLayer.tagAction(cc.sequence(cc.delayTime(10),cc.callFunc(function(){
-            this.delPoison(role._data.id);
+            var tempRole = ag.gameLayer.getRole(id);
+            if(tempRole)this.delPoison(id);
         }.bind(this))),tag);
     },
 
@@ -125,7 +123,7 @@ cc.Class({
     delPoison:function (key) {
         if(this._poisonMap[key]){
             var role = ag.gameLayer.getRole(key);
-            role.setAniColor(cc.color(255,255,255,255));
+            if(role)role.setAniColor(cc.color(255,255,255,255));
             ag.gameLayer.node.stopActionByTag(this._poisonMap[key].tag);
             delete this._poisonMap[key];
         }
@@ -164,8 +162,6 @@ cc.Class({
             }
         }
     },
-
-
 
 
     //更新数据

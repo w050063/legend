@@ -8,6 +8,7 @@ var Role = require("Role");
 var Item = require("Item");
 var AGTerrain = require("AGTerrain");
 var AGListView = require("AgListView");
+var baseNpcId = 5000;
 cc.Class({
     extends: cc.Component,
     properties: {},
@@ -24,6 +25,7 @@ cc.Class({
         this._roleMap = {};
         this._player = null;
         this._lastMapPosition = cc.p(0,0);
+        this._setupAutoAttack = false;
 
 
         this._flyBloodArray = [];//飘血数组
@@ -36,6 +38,7 @@ cc.Class({
 
         //地图坐标
         this._labelLocation = cc.find('Canvas/labelLocation').getComponent(cc.Label);
+        this._nodeNpcContent = cc.find('Canvas/nodeNpcContent');
 
         this._equipArray = [];
         var self = this;
@@ -92,10 +95,32 @@ cc.Class({
 
         //测试新地图
         this._map = cc.find("Canvas/nodeMap").addComponent(AGTerrain);
-        this._map.init(["resources/map/terrain0.png","resources/map/terrain1.png",
-            "resources/map/terrain2.png","resources/map/terrain3.png","resources/map/terrain4.png","resources/map/terrain5.png"]);
+        //this._map.init(["resources/map/terrain0.png","resources/map/terrain1.png","resources/map/terrain2.png","resources/map/terrain3.png","resources/map/terrain4.png","resources/map/terrain5.png"]);
         //node.setScale(0.2);
 
+
+        this.changeMap();
+
+
+
+        //启动定时器,每秒执行一次
+        this.schedule(ag.buffManager.update1.bind(ag.buffManager),1);
+        this.schedule(ag.buffManager.update5.bind(ag.buffManager),5);
+        this.schedule(ag.altasTask.update001.bind(ag.altasTask),0.01);
+    },
+
+
+    //换地图
+    changeMap:function(){
+        var mapId = ag.userInfo._data.mapId;
+        //清空所有内容
+        ag.buffManager.changeMap();
+        this.buttonEventNpcClose();
+        this._map.node.destroyAllChildren();
+        this._roleMap = {};
+
+        //地图更新
+        this._map.test(mapId);
 
 
         //创建主角
@@ -106,12 +131,26 @@ cc.Class({
         this._player.init(ag.userInfo._data);
         this.refreshEquip();
 
+        //增加npc
+        var map = ag.gameConst._terrainMap[mapId];
+        for(var i=0;i<map.npc.length;++i){
+            var npc = new cc.Node().addComponent(Role);
+            this._map.node.addChild(npc.node);
+            var data = JSON.parse(JSON.stringify(map.npc[i]));
+            data.id = 'r'+baseNpcId;
+            data.mapId = mapId;
+            data.camp = ag.gameConst.campNpc;
+            this._roleMap[data.id] = npc;
+            npc.init(data);
+            ++baseNpcId;
+        }
+
+        //清空地上的道具，并更新
+        ag.userInfo._itemMap = {};
 
 
-        //启动定时器,每秒执行一次
-        this.schedule(ag.buffManager.update1.bind(ag.buffManager),1);
-        this.schedule(ag.buffManager.update5.bind(ag.buffManager),5);
-        this.schedule(ag.altasTask.update001.bind(ag.altasTask),0.01);
+        //请求本地图所有角色
+        ag.agSocket.send("changeMap",mapId);
     },
 
 
@@ -155,23 +194,29 @@ cc.Class({
             this.dropItem(data);
         }else if(!data.puton){
             ag.userInfo._itemMap[data.id]={_data:data};
-            this.refreshBag();
+            if(data.owner==this._player._data.id)this.refreshBag();
         }else{
             ag.userInfo._itemMap[data.id]={_data:data};
             var role = this.getRole(data.owner);
-            role.addEquip(data.mid);
-            if(role == this._player)this.refreshEquip();
+            if(role){
+                role.addEquip(data.mid);
+                if(role == this._player)this.refreshEquip();
+            }
         }
     },
 
 
     //地上增加一个道具,并且存到本地实例中
     dropItem:function (data) {
-        var node = new cc.Node();
-        var item = node.addComponent(Item);
-        this._map.node.addChild(node,1);
-        item.init(data);
-        ag.userInfo._itemMap[data.id]={_data:data,comp:item};
+        if(data.mapId==this._player._data.mapId){
+            var node = new cc.Node();
+            var item = node.addComponent(Item);
+            this._map.node.addChild(node,1);
+            item.init(data);
+            ag.userInfo._itemMap[data.id]={_data:data,comp:item};
+        }else{
+            ag.userInfo._itemMap[data.id]={_data:data};
+        }
     },
 
 
@@ -361,9 +406,7 @@ cc.Class({
 
 
     //获得可以站立的位置
-    getStandLocation: function (mapId,x,y,r){
-        x = x-r+Math.floor(Math.random()*(2*r+1));
-        y = y-r+Math.floor(Math.random()*(2*r+1));
+    getStandLocation: function (mapId,x,y){
         if(this.isCollision(mapId,x,y)==false)return {x:x,y:y};
         for(var i=0;i<50;++i){
             if(this.isCollision(mapId,x,y+i)==false)return {x:x,y:y+i};
@@ -408,8 +451,9 @@ cc.Class({
             item.on('touchstart', function (event) {
             }.bind(this));
 
-            item.off(cc.Node.EventType.TOUCH_END);
-            item.getChildByName('buttonEquip').on(cc.Node.EventType.TOUCH_END, function (event) {
+            var button = item.getChildByName('buttonEquip');
+            button.off(cc.Node.EventType.TOUCH_END);
+            button.on(cc.Node.EventType.TOUCH_END, function (event) {
                 var id = array[index]._data.id;
                 var mst = ag.gameConst._itemMst[array[index]._data.mid];
                 if(mst.exclusive.indexOf(this._player.getTypeNum())!=-1){
@@ -429,8 +473,10 @@ cc.Class({
                     ag.jsUtil.showText(this.node,'不能穿戴');
                 }
             }.bind(this));
-            item.off(cc.Node.EventType.TOUCH_END);
-            item.getChildByName('buttonDrop').on(cc.Node.EventType.TOUCH_END, function (event) {
+
+            var button = item.getChildByName('buttonDrop');
+            button.off(cc.Node.EventType.TOUCH_END);
+            button.on(cc.Node.EventType.TOUCH_END, function (event) {
                 var id = array[index]._data.id;
                 ag.agSocket.send("bagItemToGround",id);
                 ag.userInfo._itemMap[id]._data.owner = undefined;
@@ -560,7 +606,7 @@ cc.Class({
 
 
     toggleAutoAttack: function (event) {
-        this._player._ai._setupAutoAttack = event.isChecked;
+        this._setupAutoAttack = event.isChecked;
     },
 
     onKeyUp: function (event) {
@@ -573,5 +619,47 @@ cc.Class({
                 }
                 break;
         }
-    }
+    },
+
+
+    buttonEventNpcClose:function(){
+        this._nodeNpcContent.active = false;
+    },
+
+    showNodeNpcContent:function(data){
+        this._nodeNpcContent.active = true;
+        this._nodeNpcContent.getChildByName('labelTitle').getComponent(cc.Label).string = data.title;
+        var self = this;
+        for(var i=0;i<4;++i){
+            (function(i){
+                var label = self._nodeNpcContent.getChildByName('label'+i).getComponent(cc.Label);
+                if(i<data.content.length){
+                    label.node.active = true;
+                    label.string = data.content[i];
+                    label.node.off(cc.Node.EventType.TOUCH_END);
+                    label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
+                        var npcStr = data.content[i];
+                        if(npcStr=='新手村' || npcStr=='土城' || npcStr=='BOSS之家'){
+                            var mapId = '';
+                            if(npcStr=='新手村'){
+                                mapId = 't0';
+                            }else if(npcStr=='土城'){
+                                mapId = 't1';
+                            }else if(npcStr=='BOSS之家'){
+                                mapId = 't2';
+                            }
+                            var map = ag.gameConst._terrainMap[mapId];
+                            ag.userInfo._data.mapId = mapId;
+                            var pos = ag.gameLayer.getStandLocation(mapId,map.born.x,map.born.y);
+                            ag.userInfo._data.x = pos.x;
+                            ag.userInfo._data.y = pos.y;
+                            self.changeMap();
+                        }
+                    });
+                }else{
+                    label.node.active = false;
+                }
+            })(i);
+        }
+    },
 });

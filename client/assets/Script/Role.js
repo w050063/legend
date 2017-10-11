@@ -96,11 +96,13 @@ cc.Class({
     //重置所有属性
     resetAllProp:function(){
         var mst = this.getMst();
-        var lv = this._data.level;
-        this._totalHP = mst.hp+mst.hpAdd*lv;
-        this._heal = mst.heal+mst.healAdd*lv;
-        this._attackSpeed = mst.attackSpeed;
-        this._moveSpeed = mst.moveSpeed;
+        if(mst){
+            var lv = this._data.level;
+            this._totalHP = mst.hp+mst.hpAdd*lv;
+            this._heal = mst.heal+mst.healAdd*lv;
+            this._attackSpeed = mst.attackSpeed;
+            this._moveSpeed = mst.moveSpeed;
+        }
     },
 
 
@@ -142,7 +144,7 @@ cc.Class({
         if(this._state!=ag.gameConst.stateDead){
             var x = ag.gameLayer._player._data.x,y = ag.gameLayer._player._data.y;
             if(ag.gameLayer._player == this){
-                ag.gameLayer._labelLocation.string = '新手村 '+this._data.x+','+this._data.y;
+                ag.gameLayer._labelLocation.string = mapData.name+' '+this._data.x+','+this._data.y;
                 for(var key in  ag.gameLayer._roleMap){
                     ag.gameLayer._roleMap[key].resetNearFlag(x,y);
                 }
@@ -161,10 +163,15 @@ cc.Class({
             }
             if(!this._propNode){
                 this._propNode = ag.jsUtil.getCacheNode('prefab/nodeRoleProp',this.node);
+                if(this._data.camp==ag.gameConst.campNpc){
+                    this._propNode._progressBarHP.progress = 1;
+                    this._propNode._labelHP.string = "npc";
+                }else{
+                    this._propNode._progressBarHP.progress = this._data.hp/this._totalHP;
+                    this._propNode._labelHP.string = ""+this._data.hp+"/"+this._totalHP+" Lv:"+(this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level);
+                }
                 this._propNode._labelName.string = this._data.name?this._data.name:ag.gameConst._roleMst[this._data.type].name;
                 this._propNode._labelName.node.color = ag.gameLayer.isEnemyCamp(this,ag.gameLayer._player)?cc.color(255,0,0):cc.color(255,255,255);
-                this._propNode._progressBarHP.progress = this._data.hp/this._totalHP;
-                this._propNode._labelHP.string = ""+this._data.hp+"/"+this._totalHP+" Lv:"+(this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level);
             }
         }else{
             if(this._agAni){
@@ -182,7 +189,11 @@ cc.Class({
     //无事可做动画
     idleAnimation:function(){
         if(this._nearFlag){
-            if(this._data.camp==ag.gameConst.campMonster){
+            if(this._data.camp==ag.gameConst.campNpc){
+                var array = AGAniClothes['clothgirl0'+ag.gameConst.stateIdle+4].split(',');
+                if(this._agAni)ag.agAniCache.put(this._agAni);
+                this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,0.3);
+            }else if(this._data.camp==ag.gameConst.campMonster){
                 var model = ag.gameConst._roleMst[this._data.type].model;
                 if(!model){
                     this.dead();
@@ -532,7 +543,12 @@ cc.Class({
 
     //血量变化
     changeHP:function(hp){
-        if(hp!=this._data.hp){
+        if(this._data.camp==ag.gameConst.campNpc){
+            if(this._nearFlag && this._propNode){
+                this._propNode._progressBarHP.progress = 1;
+                this._propNode._labelHP.string = "npc";
+            }
+        }else if(hp!=this._data.hp){
             if(this._nearFlag){
                 ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp)))});
                 this.flyAnimation();
@@ -565,6 +581,7 @@ cc.Class({
         }else{
             this.node.active = false;
             if(this==ag.gameLayer._player && !ag.gameLayer.bShowRelife){
+                ag.gameLayer.buttonEventNpcClose();
                 ag.gameLayer.bShowRelife = true;
                 ag.jsUtil.alert(ag.gameLayer.node,'重新复活!',function () {
                     ag.gameLayer.bShowRelife = undefined;
@@ -648,16 +665,15 @@ cc.Class({
         var locked = null;
         var map = ag.gameLayer._roleMap;
         for(var key in map){
-            var p = map[key].node.getPosition();
-            if(!locked || p.y<locked.node.getPositionY()){
-                if(ag.gameLayer.isEnemyCamp(map[key],this) && point.x>p.x-40 && point.x<p.x+40 && point.y>p.y && point.y< p.y+120){
-                    locked = map[key];
-                }
+            var role = map[key];
+            var p = role.node.getPosition();
+            if(point.x>p.x-40 && point.x<p.x+40 && point.y>p.y && point.y< p.y+120){
+                if(role._data.camp==ag.gameConst.campNpc)return role;
+                if((!locked || p.y<locked.node.getPositionY()) && ag.gameLayer.isEnemyCamp(role,this))locked = map[key];
             }
         }
         return locked;
     },
-
 
 
     // called every frame

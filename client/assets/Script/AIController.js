@@ -17,7 +17,6 @@ cc.Class({
         this._busy = false;
         this._spriteTouchArray = [];
         this._touchMoveDirection = -1;
-        this._setupAutoAttack = false;
 
         //加载
         cc.loader.loadRes('prefab/nodeTouchSprite',function(err,prefab){
@@ -35,20 +34,30 @@ cc.Class({
 
 
         var node = ag.gameLayer.node;
+        node.off(cc.Node.EventType.TOUCH_START);
         node.on(cc.Node.EventType.TOUCH_START, function (event) {
+            ag.gameLayer.buttonEventNpcClose();
             this._touchPointArray = this._touchPointArray.concat(event.getTouches());
             if(this._touchPointArray.length==3)this._touchPointArray.splice(0,1);//防止出现没有end的事件的情况
             this._locked = this._role.getPlayerForTouch(this._touchPointArray[0]);
-            this.resetTouchDirection();
-            this.changeTouchSprite(true);
+            if(this._locked && this._locked._data.camp==ag.gameConst.campNpc){
+                ag.gameLayer.showNodeNpcContent(this._locked._data);
+                this._locked = null;
+            }else{
+                this.resetTouchDirection();
+                this.changeTouchSprite(true);
+            }
         }.bind(this));
+        node.off(cc.Node.EventType.TOUCH_MOVE);
         node.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
+            if(ag.gameLayer._nodeNpcContent.active)return;
             var tempDirection = this._touchMoveDirection;
             this.resetTouchDirection();
             if(tempDirection!=this._touchMoveDirection){
                 this.changeTouchSprite();
             }
         }.bind(this));
+        node.off(cc.Node.EventType.TOUCH_END);
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
             var touches = event.getTouches();
             for(var i=this._touchPointArray.length-1;i>=0;--i)if(touches.indexOf(this._touchPointArray[i])!=-1){
@@ -57,7 +66,7 @@ cc.Class({
             this.resetTouchDirection();
             this.changeTouchSprite();
         }.bind(this));
-
+        node.off(cc.Node.EventType.TOUCH_CANCEL);
         node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
             var touches = event.getTouches();
             for(var i=this._touchPointArray.length-1;i>=0;--i)if(touches.indexOf(this._touchPointArray[i])!=-1){
@@ -67,7 +76,7 @@ cc.Class({
             this.changeTouchSprite();
         }.bind(this));
 
-        this._role.schedule(this.update05.bind(this),0.5);
+        this._role.schedule(this.update02.bind(this),0.2);
     },
 
 
@@ -168,10 +177,10 @@ cc.Class({
     },
 
 
-    update05: function (dt) {
+    update02: function (dt) {
         //执行玩家操作
         if(ag.gameLayer && this._busy==false && this._state != ag.gameConst.stateDead && !this._locked && this._touchMoveDirection==-1){
-            if(this._setupAutoAttack)this._locked = this.findLocked();
+            if(ag.gameLayer._setupAutoAttack)this._locked = this.findLocked();
         }
     },
 
@@ -186,13 +195,19 @@ cc.Class({
             var role = ag.gameLayer._roleMap[key];
             if(role._data.camp==ag.gameConst.campMonster){
                 var l2=role.getLocation();
-                var dis = Math.max(Math.abs(l1.x-l2.x),Math.abs(l1.y-l2.y));
-                if(dis<=checkDistance && dis<lockedDis && ag.gameLayer.isEnemyCamp(this._role,role)){
+                var x = Math.abs(l1.x-l2.x), y = Math.abs(l1.y-l2.y);
+                if(Math.max(x,y)<=checkDistance && x+y<lockedDis && ag.gameLayer.isEnemyCamp(this._role,role)){
                     locked = role;
-                    lockedDis = dis;
+                    lockedDis = x+y;
                 }
             }
         }
         return locked;
+    },
+
+
+    //查找npc
+    findNpcForLocation:function(){
+
     },
 });
