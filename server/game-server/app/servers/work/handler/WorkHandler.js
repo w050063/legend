@@ -143,4 +143,10 @@ var Handler = cc.Class.extend({
         ag.itemManager.equipItemToBag(msg,session.uid);
         next();
     },
+
+
+    bagItemRecycle:function (msg, session, next) {
+        ag.itemManager.bagItemRecycle(msg.split(','),session.uid);
+        next();
+    },
 });

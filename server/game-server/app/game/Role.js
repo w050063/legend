@@ -330,6 +330,18 @@ module.exports = ag.class.extend({
     },
 
 
+    addExp:function(count){
+        this._exp +=  count;
+        while(this._exp>=this._totalExp){
+            ++this._data.level;
+            var exp = this._exp-this._totalExp;
+            this.resetAllProp();
+            this._exp = exp;
+        }
+        ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp},this._data.mapId);
+    },
+
+
     dead:function (attacker) {
         if(this._state==ag.gameConst.stateDead)return;
         this._state = ag.gameConst.stateDead;
@@ -343,14 +355,7 @@ module.exports = ag.class.extend({
         
         
         if(attacker && attacker._data.camp!=ag.gameConst.campMonster){
-            attacker._exp +=  this.getMst().expDead;
-            while(attacker._exp>=attacker._totalExp){
-                ++attacker._data.level;
-                var exp = attacker._exp-attacker._totalExp;
-                attacker.resetAllProp();
-                attacker._exp = exp;
-            }
-            ag.jsUtil.sendDataAll("sAddExp",{id:attacker._data.id,level:attacker._data.level,exp:attacker._exp},this._data.mapId);
+            attacker.addExp(this.getMst().expDead);
 
             if(this._data.camp!=ag.gameConst.campMonster){
                 ag.jsUtil.sendDataAll("sSystemNotify",attacker._data.name+' 击杀 '+this._data.name,this._data.mapId);
