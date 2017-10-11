@@ -222,10 +222,16 @@ cc.Class({
 
     sItemDisappear:function (id) {
         var obj = ag.userInfo._itemMap[id];
-        if(obj && obj.comp){
-            obj._data.owner = undefined;
-            obj.comp.node.destroy();
-            obj.comp = undefined;
+        if(obj){
+            if(obj.comp){
+                obj.comp.node.destroy();
+                obj.comp = undefined;
+            }
+            if(obj._data.owner==this._player._data.id){
+                delete obj._data.owner;
+                this.refreshBag();
+            }
+            delete ag.userInfo._itemMap[id];
         }
     },
 
@@ -654,6 +660,23 @@ cc.Class({
                             ag.userInfo._data.x = pos.x;
                             ag.userInfo._data.y = pos.y;
                             self.changeMap();
+                        }else if(npcStr=='一级回收' || npcStr=='二级回收' || npcStr=='三级回收'){
+                            var curLevel = 1;
+                            if(npcStr=='一级回收'){
+                                curLevel = 1;
+                            }else if(npcStr=='二级回收'){
+                                curLevel = 2;
+                            }else if(npcStr=='三级回收'){
+                                curLevel = 3;
+                            }
+                            var array = [];
+                            for(var key in ag.userInfo._itemMap){
+                                var obj = ag.userInfo._itemMap[key];
+                                if(obj._data.owner==self._player._data.id && !obj._data.puton && ag.gameConst._itemMst[obj._data.mid].level==curLevel){
+                                    array.push(obj._data.id);
+                                }
+                            }
+                            if(array.length>0)ag.agSocket.send("bagItemRecycle",array.join(','));
                         }
                     });
                 }else{

@@ -112,7 +112,7 @@ cc.Class({
         this._data.level = level;
         if(last < this._data.level){
             this.resetAllProp();
-            this._data.hp = this._totalHP;
+            this._data.hp = 1;//确保可以进入改血量
             if(this==ag.gameLayer._player)ag.gameLayer.refreshEquip();
             this.changeHP(this._data.hp);
         }
