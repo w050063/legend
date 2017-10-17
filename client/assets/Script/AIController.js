@@ -11,7 +11,6 @@ cc.Class({
 
     //初始化角色
     init: function (role) {
-        this._touchPointArray = [];
         this._role = role;
         this._locked = null;
         this._busy = false;
@@ -19,61 +18,86 @@ cc.Class({
         this._touchMoveDirection = -1;
 
         //加载
-        cc.loader.loadRes('prefab/nodeTouchSprite',function(err,prefab){
-            var node = cc.instantiate(prefab);
-            node.parent = ag.gameLayer.node;
-            node.setLocalZOrder(100);
-            for(var i=0;i<8;++i){
-                var spriteTouch = node.getChildByName("spriteTouch"+i).getComponent(cc.Sprite);
-                var text = spriteTouch.node.getChildByName("labelText");
-                if(text)text.cascadeOpacity = false;
-                this._spriteTouchArray.push(spriteTouch);
-            }
-            this.changeTouchSprite(false);
-        }.bind(this));
+        var prefab = cc.loader.getRes('prefab/nodeTouchSprite');
+        var node = cc.instantiate(prefab);
+        node.parent = ag.gameLayer.node;
+        node.setLocalZOrder(100);
+        for(var i=0;i<8;++i){
+            var spriteTouch = node.getChildByName("spriteTouch"+i).getComponent(cc.Sprite);
+            this._spriteTouchArray.push(spriteTouch);
+        }
+        this.changeTouchSprite(false);
+        this._nodeRockBack = cc.find('Canvas/rockback');
+        this._nodeRock = cc.find('Canvas/rockback/rock');
 
 
         var node = ag.gameLayer.node;
         node.off(cc.Node.EventType.TOUCH_START);
         node.on(cc.Node.EventType.TOUCH_START, function (event) {
             ag.gameLayer.buttonEventNpcClose();
-            this._touchPointArray = this._touchPointArray.concat(event.getTouches());
-            if(this._touchPointArray.length==3)this._touchPointArray.splice(0,1);//防止出现没有end的事件的情况
-            this._locked = this._role.getPlayerForTouch(this._touchPointArray[0]);
+            var location = event.getLocation();
+            this._locked = this._role.getPlayerForTouch(location);
             if(this._locked && this._locked._data.camp==ag.gameConst.campNpc){
                 ag.gameLayer.showNodeNpcContent(this._locked._data);
                 this._locked = null;
             }else{
-                this.resetTouchDirection();
+                this.resetTouchDirection(location);
                 this.changeTouchSprite(true);
             }
         }.bind(this));
         node.off(cc.Node.EventType.TOUCH_MOVE);
         node.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
             if(ag.gameLayer._nodeNpcContent.active)return;
+            var location = event.getLocation();
             var tempDirection = this._touchMoveDirection;
-            this.resetTouchDirection();
+            this.resetTouchDirection(location);
             if(tempDirection!=this._touchMoveDirection){
                 this.changeTouchSprite();
             }
         }.bind(this));
         node.off(cc.Node.EventType.TOUCH_END);
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
-            var touches = event.getTouches();
-            for(var i=this._touchPointArray.length-1;i>=0;--i)if(touches.indexOf(this._touchPointArray[i])!=-1){
-                this._touchPointArray.splice(i,1);
-            }
-            this.resetTouchDirection();
+            this._touchMoveDirection = -1;
             this.changeTouchSprite();
         }.bind(this));
         node.off(cc.Node.EventType.TOUCH_CANCEL);
         node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
-            var touches = event.getTouches();
-            for(var i=this._touchPointArray.length-1;i>=0;--i)if(touches.indexOf(this._touchPointArray[i])!=-1){
-                this._touchPointArray.splice(i,1);
-            }
-            this.resetTouchDirection();
+            this._touchMoveDirection = -1;
             this.changeTouchSprite();
+        }.bind(this));
+
+
+        //摇杆
+        var node = this._nodeRockBack;
+        node.off(cc.Node.EventType.TOUCH_START);
+        node.on(cc.Node.EventType.TOUCH_START, function (event) {
+            ag.gameLayer.buttonEventNpcClose();
+            var location = event.getLocation();
+            var angle = cc.pToAngle(cc.pSub(location,cc.p(100,100)));//length:76
+            var dis = Math.min(76,cc.pDistance(location,cc.p(100,100)));
+            this._nodeRock.setPosition(cc.p(dis*Math.cos(angle),dis*Math.sin(angle)));
+            this._nodeRockBack.opacity = 255;
+            this.resetDirectionByRock(angle);
+        }.bind(this));
+        node.off(cc.Node.EventType.TOUCH_MOVE);
+        node.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
+            var location = event.getLocation();
+            var angle = cc.pToAngle(cc.pSub(location,cc.p(100,100)));//length:76
+            var dis = Math.min(76,cc.pDistance(location,cc.p(100,100)));
+            this._nodeRock.setPosition(cc.p(dis*Math.cos(angle),dis*Math.sin(angle)));
+            this.resetDirectionByRock(angle);
+        }.bind(this));
+        node.off(cc.Node.EventType.TOUCH_END);
+        node.on(cc.Node.EventType.TOUCH_END, function (event) {
+            this._nodeRock.setPosition(cc.p(0,0));
+            this._nodeRockBack.opacity = 100;
+            this._touchMoveDirection = -1;
+        }.bind(this));
+        node.off(cc.Node.EventType.TOUCH_CANCEL);
+        node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
+            this._nodeRock.setPosition(cc.p(0,0));
+            this._nodeRockBack.opacity = 100;
+            this._touchMoveDirection = -1;
         }.bind(this));
 
         this._role.schedule(this.update02.bind(this),0.2);
@@ -82,33 +106,30 @@ cc.Class({
 
 
     //获得当前移动方向
-    resetTouchDirection:function () {
+    resetTouchDirection:function (location) {
         if(!this._locked){
-            if(this._touchPointArray.length==2){
-                var offset1 = this._role.getTouchOffsetScreen(this._touchPointArray[0]);
-                var offset2 = this._role.getTouchOffsetScreen(this._touchPointArray[1]);
-                //if(cc.pointEqualToPoint(offset1,cc.p(-1,1)) && cc.pointEqualToPoint(offset2,cc.p(1,1))){
-                if((offset1.x==-1 && offset1.y==1 && offset2.x==1 && offset2.y==1) || (offset1.x==1 && offset1.y==1 && offset2.x==-1 && offset2.y==1)){
-                    this._touchMoveDirection = 0;
-                //}else if(cc.pointEqualToPoint(offset1,cc.p(-1,-1)) && cc.pointEqualToPoint(offset2,cc.p(1,-1))){
-                }else if((offset1.x==-1 && offset1.y==-1 && offset2.x==1 && offset2.y==-1) || (offset1.x==1 && offset1.y==-1 && offset2.x==-1 && offset2.y==-1)){
-                    this._touchMoveDirection = 4;
-                }else{
-                    this._touchMoveDirection = -1;
-                }
-            }else if(this._touchPointArray.length==1){
-                var offset1 = this._role.getTouchOffsetScreen(this._touchPointArray[0]);
-                if(offset1.x==0 && offset1.y==0){
-                    this._touchMoveDirection = -1;
-                }else{
-                    this._touchMoveDirection = ag.gameConst.directionStringArray.indexOf(""+offset1.x+","+offset1.y);
-                }
-            }else{
+            var offset1 = this._role.getTouchOffsetScreen(location);
+            if(offset1.x==0 && offset1.y==0){
                 this._touchMoveDirection = -1;
+            }else{
+                this._touchMoveDirection = ag.gameConst.directionStringArray.indexOf(""+offset1.x+","+offset1.y);
             }
         }else{
             this._touchMoveDirection = -1;
         }
+    },
+
+    resetDirectionByRock:function (angle) {
+        angle = angle/Math.PI/2;
+        if(angle<0)angle+=1;
+        if(angle<1/16 || angle>15/16)this._touchMoveDirection = 2;
+        else if(angle<3/16)this._touchMoveDirection = 1;
+        else if(angle<5/16)this._touchMoveDirection = 0;
+        else if(angle<7/16)this._touchMoveDirection = 7;
+        else if(angle<9/16)this._touchMoveDirection = 6;
+        else if(angle<11/16)this._touchMoveDirection = 5;
+        else if(angle<13/16)this._touchMoveDirection = 4;
+        else if(angle<15/16)this._touchMoveDirection = 3;
     },
 
 
@@ -117,8 +138,6 @@ cc.Class({
         if(this._touchMoveDirection!=-1){
             for(var i=0;i<this._spriteTouchArray.length;++i){
                 this._spriteTouchArray[i].node.stopAllActions();
-                var text = this._spriteTouchArray[i].node.getChildByName("labelText");
-                if(text)text.opacity = (i==this._touchMoveDirection?255:0);
                 if(bAction){
                     this._spriteTouchArray[i].node.opacity = 255*0.1;
                     if(i!=this._touchMoveDirection)this._spriteTouchArray[i].node.runAction(cc.fadeOut(1));
@@ -130,8 +149,6 @@ cc.Class({
             for(var i=0;i<this._spriteTouchArray.length;++i) {
                 this._spriteTouchArray[i].node.stopAllActions();
                 this._spriteTouchArray[i].node.opacity = 0;
-                var text = this._spriteTouchArray[i].node.getChildByName("labelText");
-                if(text)text.opacity = 0;
             }
         }
     },

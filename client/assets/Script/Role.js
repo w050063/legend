@@ -107,14 +107,17 @@ cc.Class({
 
 
     //增加经验
-    addExp:function(level,exp){
+    addExp:function(level,exp,source){
         var last = this._data.level;
         this._data.level = level;
         if(last < this._data.level){
             this.resetAllProp();
             this._data.hp = 1;//确保可以进入改血量
             if(this==ag.gameLayer._player)ag.gameLayer.refreshEquip();
-            this.changeHP(this._data.hp);
+            this.changeHP(this._data._totalHP);
+        }
+        if(source){
+            ag.jsUtil.showText(ag.gameLayer.node,'装备回收成功');
         }
     },
 
@@ -193,7 +196,7 @@ cc.Class({
                 var array = AGAniClothes['clothgirl0'+ag.gameConst.stateIdle+4].split(',');
                 if(this._agAni)ag.agAniCache.put(this._agAni);
                 this._agAni = ag.agAniCache.getNode(this.node,array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,0.3);
-            }else if(this._data.camp==ag.gameConst.campMonster){
+            }else if(this._data.camp==ag.gameConst.campMonster || (this._data.camp==ag.gameConst.campLiuxing && this._data.type=='m19')){
                 var model = ag.gameConst._roleMst[this._data.type].model;
                 if(!model){
                     this.dead();
@@ -282,7 +285,7 @@ cc.Class({
                     if(this._ai)this._ai._busy = false;
                 }
             }.bind(this))));
-            if(this._data.camp==ag.gameConst.campMonster){
+            if(this._data.camp==ag.gameConst.campMonster || (this._data.camp==ag.gameConst.campLiuxing && this._data.type=='m19')){
                 var clothes = ag.gameConst._roleMst[this._data.type].model+'0';
                 var array = AGAniClothes[clothes+ag.gameConst.stateMove+this._data.direction].split(',');
                 if(this._agAni)ag.agAniCache.put(this._agAni);
@@ -355,7 +358,7 @@ cc.Class({
         //攻击动画
         if(this._nearFlag){
             this.node.stopAllActions();
-            if(this._data.camp==ag.gameConst.campMonster){
+            if(this._data.camp==ag.gameConst.campMonster || (this._data.camp==ag.gameConst.campLiuxing && this._data.type=='m19')){
                 var clothes = ag.gameConst._roleMst[this._data.type].model+'0';
                 var array = AGAniClothes[clothes+ag.gameConst.stateAttack+this._data.direction].split(',');
                 if(this._agAni)ag.agAniCache.put(this._agAni);
@@ -642,10 +645,10 @@ cc.Class({
 
 
     //根据一个触摸点得到玩家方向向量
-    getTouchOffsetScreen:function(touch){
+    getTouchOffsetScreen:function(location){
         var size = cc.director.getWinSize();
-        var x = touch.getLocationX();
-        var y = touch.getLocationY();
+        var x = location.x;
+        var y = location.y;
         var center = 50;
         var offset = {};
         if(x<size.width/2-center)offset.x=-1;
@@ -659,8 +662,8 @@ cc.Class({
 
 
     //获得触摸的角色
-    getPlayerForTouch:function(touch){
-        var point = ag.gameLayer._map.node.convertToNodeSpaceAR(touch.getLocation());
+    getPlayerForTouch:function(location){
+        var point = ag.gameLayer._map.node.convertToNodeSpaceAR(location);
         //计算玩家选中的角色
         var locked = null;
         var map = ag.gameLayer._roleMap;

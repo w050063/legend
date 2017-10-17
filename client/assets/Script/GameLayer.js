@@ -25,7 +25,7 @@ cc.Class({
         this._roleMap = {};
         this._player = null;
         this._lastMapPosition = cc.p(0,0);
-        this._setupAutoAttack = false;
+        this._setupAutoAttack = true;
 
 
         this._flyBloodArray = [];//飘血数组
@@ -403,7 +403,8 @@ cc.Class({
 
     //是否攻击
     isEnemyCamp:function(role1,role2){
-        if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
+        if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead
+            && role1._data.camp!=ag.gameConst.campNpc && role2._data.camp!=ag.gameConst.campNpc){
             if(role1._data.camp!=role2._data.camp)return true;
             if(role1._data.camp==ag.gameConst.campLiuxing && role2._data.camp==ag.gameConst.campLiuxing)return true;
         }

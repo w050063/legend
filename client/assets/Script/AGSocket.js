@@ -153,7 +153,7 @@ module.exports={
             }else if(obj.key=='sAddExpArray'){
                 var player =  ag.gameLayer.getRole(obj.value.id);
                 if(player){
-                    player.addExp(obj.value.level,obj.value.exp);
+                    player.addExp(obj.value.level,obj.value.exp,obj.value.source);
                 }
             }else if(obj.key=='sDropArray'){
                 ag.gameLayer.dropItem(obj.value);
