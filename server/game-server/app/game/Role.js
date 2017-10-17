@@ -94,6 +94,9 @@ module.exports = ag.class.extend({
     changeMap:function(mapId){
         if(this._data.mapId != mapId){
             ag.jsUtil.sendDataExcept("sDeleteRole",this._data.id,this._data.id);
+            if(this._tiger)ag.jsUtil.sendDataExcept("sDeleteRole",this._tiger._data.id,this._data.id);
+
+            //更新地图数据
             var oldStr = this.getMapXYString();
             var map = ag.gameConst._terrainMap[mapId];
             var pos = ag.gameLayer.getStandLocation(mapId,map.born.x,map.born.y);
@@ -101,12 +104,20 @@ module.exports = ag.class.extend({
             this._data.x = pos.x;
             this._data.y = pos.y;
             var newStr = this.getMapXYString();
-
-            //更新xy数组信息
             ag.gameLayer._roleXYMap[oldStr].splice(ag.gameLayer._roleXYMap[oldStr].indexOf(this),1);
             if(ag.gameLayer._roleXYMap[oldStr].length==0)delete ag.gameLayer._roleXYMap[oldStr];
             if(!ag.gameLayer._roleXYMap[newStr])ag.gameLayer._roleXYMap[newStr] = [];
             ag.gameLayer._roleXYMap[newStr].push(this);
+            if(this._tiger){
+                oldStr = this._tiger.getMapXYString();
+                this._tiger._data.mapId = mapId;
+                this._tiger._data.x = pos.x;
+                this._tiger._data.y = pos.y;
+                ag.gameLayer._roleXYMap[oldStr].splice(ag.gameLayer._roleXYMap[oldStr].indexOf(this._tiger),1);
+                if(ag.gameLayer._roleXYMap[oldStr].length==0)delete ag.gameLayer._roleXYMap[oldStr];
+                if(!ag.gameLayer._roleXYMap[newStr])ag.gameLayer._roleXYMap[newStr] = [];
+                ag.gameLayer._roleXYMap[newStr].push(this._tiger);
+            }
         }
 
 
@@ -120,6 +131,7 @@ module.exports = ag.class.extend({
 
         //通知其他人。
         ag.jsUtil.sendDataExcept("sRole",this._data,this._data.id);
+        if(this._tiger)ag.jsUtil.sendDataExcept("sRole",this._tiger._data,this._data.id);
 
         //发送装备情况
         var map = ag.itemManager._itemMap.getMap();
@@ -174,14 +186,16 @@ module.exports = ag.class.extend({
 
 
         //捡装备,是玩家,地上有东西,背包没满
-        var array = ag.itemManager.getDropByLocation(this.getLocation());
-        var left = ag.gameConst.bagLength-ag.itemManager.getBagLength(this._data.id);
-        if(this._data.camp!=ag.gameConst.campMonster && array.length>0 && left>0){
-            for(var i=0;i<array.length && i<left;++i){
-                var id = array[i]._data.id;
-                ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
-                ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
-                ag.itemManager.addBagItem(id,this._data.id);
+        if(this._data.camp!=ag.gameConst.campMonster && !this._master){
+            var array = ag.itemManager.getDropByLocation(this.getLocation());
+            var left = ag.gameConst.bagLength-ag.itemManager.getBagLength(this._data.id);
+            if(array.length>0 && left>0){
+                for(var i=0;i<array.length && i<left;++i){
+                    var id = array[i]._data.id;
+                    ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
+                    ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
+                    ag.itemManager.addBagItem(id,this._data.id);
+                }
             }
         }
         this._state = ag.gameConst.stateMove;
@@ -194,12 +208,12 @@ module.exports = ag.class.extend({
         var data = locked._data;
         var x = data.x, y = data.y;
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
-
-
-        var sendArray = [];
+        if(this._tiger && this._tiger._state!=ag.gameConst.stateDead && !this._tiger._ai._locked)this._tiger._ai._locked = locked;//如果有老虎，操作老虎攻击敌人。
+        if(locked._tiger && locked._tiger._state!=ag.gameConst.stateDead && !locked._tiger._ai._locked)locked._tiger._ai._locked = this;//敌人有老虎，敌人老虎攻击自己。
 
 
         //伤害计算
+        var sendArray = [];
         if(this._data.type=='m0'){
             var dirPoint = ag.gameConst.directionArray[this._data.direction];
             var array = [];
@@ -210,7 +224,7 @@ module.exports = ag.class.extend({
             if(array){
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
-                    if(ag.gameLayer.isEnemyCamp(tempRole,this)){
+                    if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                         var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                         if(ag.buffManager.getCDForFireCrit(this)==false){
                             tempRole._data.hp -= Math.round(this._hurt/correct*3);
@@ -226,7 +240,7 @@ module.exports = ag.class.extend({
             if(array){
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
-                    if(ag.gameLayer.isEnemyCamp(tempRole,this)){
+                    if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                         if(ag.buffManager.getCDForFireCrit(this)==false){
                             var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                             tempRole._data.hp -=  Math.round(this._hurt/correct*3);
@@ -244,7 +258,7 @@ module.exports = ag.class.extend({
                     if(array){
                         for(var k=0;k<array.length;++k){
                             var tempRole = array[k];
-                            if(ag.gameLayer.isEnemyCamp(tempRole,this)){
+                            if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                                 var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                                 tempRole._data.hp -=  Math.round(this._hurt/correct);
                                 sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
@@ -262,7 +276,7 @@ module.exports = ag.class.extend({
             if(array){
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
-                    if(ag.gameLayer.isEnemyCamp(tempRole,this)){
+                    if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                         var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                         tempRole._data.hp -=  Math.round(this._hurt/correct);
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
@@ -277,7 +291,7 @@ module.exports = ag.class.extend({
             var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(),this.getMst().attackDistance);
             for (var i = 0; i < array.length; ++i) {
                 var tempRole = array[i];
-                if (ag.gameLayer.isEnemyCamp(tempRole,this)) {
+                if (ag.gameLayer.isEnemyForAttack(this,tempRole)) {
                     var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                     tempRole._data.hp -= Math.round(this._hurt/correct);
                     sendArray.push({id: tempRole._data.id, hp: tempRole._data.hp});
@@ -288,7 +302,7 @@ module.exports = ag.class.extend({
             if(array){
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
-                    if(ag.gameLayer.isEnemyCamp(tempRole,this)){
+                    if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                         var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                         tempRole._data.hp -=  Math.round(this._hurt/correct);
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
@@ -330,7 +344,7 @@ module.exports = ag.class.extend({
     },
 
 
-    addExp:function(count){
+    addExp:function(count,source){
         this._exp +=  count;
         while(this._exp>=this._totalExp){
             ++this._data.level;
@@ -338,7 +352,11 @@ module.exports = ag.class.extend({
             this.resetAllProp();
             this._exp = exp;
         }
-        ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp},this._data.mapId);
+        if(source){
+            ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp,source:source},this._data.mapId);
+        }else{
+            ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp},this._data.mapId);
+        }
     },
 
 
@@ -348,17 +366,17 @@ module.exports = ag.class.extend({
         
         //掉落装备
         var str = ag.gameConst._roleMst[this._data.type].drop;
-
         if(str){
             ag.itemManager.drop(str,this._data.mapId,this.getLocation());
         }
         
         
         if(attacker && attacker._data.camp!=ag.gameConst.campMonster){
-            attacker.addExp(this.getMst().expDead);
+            var master = attacker._master?attacker._master:attacker;
+            master.addExp(this.getMst().expDead);
 
             if(this._data.camp!=ag.gameConst.campMonster){
-                ag.jsUtil.sendDataAll("sSystemNotify",attacker._data.name+' 击杀 '+this._data.name,this._data.mapId);
+                ag.jsUtil.sendDataAll("sSystemNotify",master._data.name+' 击杀 '+this._data.name,this._data.mapId);
             }
         }
 
@@ -378,8 +396,22 @@ module.exports = ag.class.extend({
             if(ag.gameLayer._roleXYMap[str].length==0)delete ag.gameLayer._roleXYMap[str];
             delete ag.gameLayer._roleMap[this._data.id];
         }
-    },
 
+        if(this._tiger){
+            this._tiger._data.hp=0;
+            ag.jsUtil.sendDataAll("sHP",{id:this._tiger._data.id,hp:0},this._data.mapId);
+            this._tiger.dead();
+            this._tiger._ai._relifeCD = true;
+            ag.actionManager.runAction(this,10,function(){
+                this._tiger._ai._relifeCD = false;
+            }.bind(this));
+        }else if(this._master){
+            this._ai._relifeCD = true;
+            ag.actionManager.runAction(this,10,function(){
+                this._ai._relifeCD = false;
+            }.bind(this));
+        }
+    },
 
 
     relife: function () {

@@ -83,7 +83,7 @@ module.exports = {
             //"13,12;13,13;13,14;13,15;13,16;13,17;13,18;13,19;13,20;" +
             //"14,12;14,13;14,14;14,15;14,16;14,17;14,18;14,19;14,20;" +
             //"15,12;15,13;15,14;15,15;15,16;15,17;15,18;15,19;15,20",
-            refresh: [["m3", -1, -1, 60, 15],["m4", -1, -1, 60, 15]]
+            refresh: [["m3", -1, -1, 120, 20],["m4", -1, -1, 120, 20]]
         },
         t1:{
             id : "t1",
@@ -97,7 +97,7 @@ module.exports = {
             mapY: 28,
             born: {x:15,y:14},
             collision:"",
-            refresh: [["m5", -1, -1, 60, 15],["m6", -1, -1, 60, 5],["m7", -1, -1, 60, 5],["m9", -1, -1, 60, 3]]
+            refresh: [["m5", -1, -1, 120, 30],["m6", -1, -1, 120, 30],["m7", -1, -1, 120, 30],["m9", -1, -1, 120, 5]]
         },
         t2:{
             id : "t2",
@@ -110,8 +110,8 @@ module.exports = {
             mapY: 16,
             born: {x:8,y:8},
             collision:"",
-            refresh: [["m10", -1, -1, 60, 1],["m11", -1, -1, 60, 1],["m12", -1, -1, 60, 1],["m13", -1, -1, 60, 1],["m14", -1, -1, 60, 1],
-                ["m15", -1, -1, 60, 1],["m16", -1, -1, 90, 1],["m17", -1, -1, 90, 1],["m18", -1, -1, 90, 1]]
+            refresh: [["m10", -1, -1, 120, 1],["m11", -1, -1, 120, 1],["m12", -1, -1, 120, 1],["m13", -1, -1, 120, 1],["m14", -1, -1, 120, 1],
+                ["m15", -1, -1, 120, 1],["m16", -1, -1, 180, 1],["m17", -1, -1, 180, 1],["m18", -1, -1, 180, 1]]
         }},
 
 
@@ -153,6 +153,8 @@ module.exports = {
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"protectortwo",drop:'i023,20,i024,20,i025,20,i030,20,i031,20,i032,20',lv:3},
         m18:{id:"m18",name:"鹰卫",hp:3000,hpAdd:0,defense:100,defenseAdd:0,hurt:150,hurtAdd:0,exp:0,expAdd:0,expDead:300,heal:100,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:4,model:"protectorthree",drop:'i033,30,i034,30,i035,30',lv:3},
+        m19:{id:"m19",name:"白虎",hp:1600,hpAdd:0,defense:50,defenseAdd:0,hurt:100,hurtAdd:0,exp:0,expAdd:0,expDead:0,heal:10,healAdd:0,
+            moveSpeed:1,attackSpeed:0.7,checkDistance:3,visibleDistance:5,attackDistance:1.5,model:"tiger",drop:'',lv:1},
     },
 
 

@@ -72,7 +72,9 @@ var Handler = cc.Class.extend({
 
 
     chatYou : function(msg, session, next) {
-        ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,content:msg});
+        ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,content:msg},'t0');
+        ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,content:msg},'t1');
+        ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,content:msg},'t2');
         next();
     },
 

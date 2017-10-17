@@ -85,16 +85,20 @@ module.exports = ag.class.extend({
     //背包装备回收
     bagItemRecycle:function(array,rid){
         var expArray = [50,100,200];
-        for(var i=0;i<array.length;++i){
-            var id = array[i];
-            var obj = this._itemMap.get(id);
-            var role = ag.gameLayer.getRole(rid);
-            if(obj && role && obj._data.owner==rid){
-                ag.jsUtil.sendDataAll("sItemDisappear",obj._data.id,role._data.mapId);
-                role.addExp(expArray[ag.gameConst._itemMst[obj._data.mid].level-1]);
-                this._itemMap.del(id);
-                --this._bagLengthMap[rid];
+        var role = ag.gameLayer.getRole(rid);
+        if(role){
+            var sum = 0;
+            for(var i=0;i<array.length;++i){
+                var id = array[i];
+                var obj = this._itemMap.get(id);
+                if(obj && obj._data.owner==rid){
+                    ag.jsUtil.sendDataAll("sItemDisappear",obj._data.id,role._data.mapId);
+                    sum += expArray[ag.gameConst._itemMst[obj._data.mid].level-1];
+                    this._itemMap.del(id);
+                    --this._bagLengthMap[rid];
+                }
             }
+            role.addExp(sum,'recycle');
         }
     },
 

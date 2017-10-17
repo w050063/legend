@@ -111,7 +111,7 @@ module.exports = ag.class.extend({
                 array = ag.gameLayer.getRoleFromCenterXY(array[0],ag.jsUtil.p(parseInt(array[1]),parseInt(array[2])),0);
                 if(array){
                     for(var i=0;i<array.length;++i){
-                        if(ag.gameLayer.isEnemyCamp(attacker,array[i])){
+                        if(ag.gameLayer.isEnemyForAttack(attacker,array[i])){
                             array[i]._data.hp -= 1;
                         }
                     }
@@ -126,7 +126,7 @@ module.exports = ag.class.extend({
             var role = ag.gameLayer.getRole(key);
             var attacker = ag.gameLayer.getRole(this._poisonMap[key].id);
             if(role && attacker){
-                if(ag.gameLayer.isEnemyCamp(attacker,role)){
+                if(ag.gameLayer.isEnemyForAttack(attacker,role)){
                     role._data.hp -= 1;
                 }
             }

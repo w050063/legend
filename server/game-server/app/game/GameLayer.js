@@ -6,6 +6,7 @@
 
 var Role = require("./Role");
 var AIController = require("./AIController");
+var TigerAIController = require("./TigerAIController");
 module.exports = {
 	_gameTime:-1,//游戏时间
     _baseMonsterId:0,//怪物id递增标志
@@ -57,6 +58,31 @@ module.exports = {
             var xyStr = player.getMapXYString();
             if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
             this._roleXYMap[xyStr].push(player);
+
+            //如果是道士，还要增加宝宝
+            if(player._data.type=='m2'){
+                var dog = new Role();
+                dog._data = {};
+                dog._data.id = 'm'+(++this._baseMonsterId);
+                dog._data.type = 'm19';
+                var dirPos = ag.gameConst.directionArray[player._data.direction];
+                var pos = this.getStandLocation(player._data.mapId,player._data.x+dirPos.x,player._data.y+dirPos.y);
+                dog._data.x = pos.x;
+                dog._data.y = pos.y;
+                dog._data.name = '白虎';
+                dog._data.camp = player._data.camp;
+                dog._data.mapId = player._data.mapId;
+                dog._data.direction = 4;//默认朝下
+                dog._data.level = 0;
+                dog._master = player;
+                player._tiger = dog;
+                dog.resetAllProp();
+                this._roleMap[dog._data.id] = dog;
+                var xyStr = dog.getMapXYString();
+                if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
+                this._roleXYMap[xyStr].push(dog);
+                dog.setAIController(new TigerAIController(dog));
+            }
 		}
 
         //确认进入游戏成功。
@@ -258,10 +284,17 @@ module.exports = {
 
 
     //是否攻击
-    isEnemyCamp:function(role1,role2){
+    isEnemyForCheck:function(role1,role2){
         if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
             if(role1._data.camp!=role2._data.camp)return true;
-            if(role1._data.camp==ag.gameConst.campLiuxing && role2._data.camp==ag.gameConst.campLiuxing)return true;
+        }
+        return false;
+    },
+    isEnemyForAttack:function(role1,role2){
+        if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
+            if(role1._data.camp!=role2._data.camp)return true;
+            if(role1._data.camp==ag.gameConst.campLiuxing && role2._data.camp==ag.gameConst.campLiuxing
+                && role1._master!=role2 && role1._tiger!=role2)return true;
         }
         return false;
     },
