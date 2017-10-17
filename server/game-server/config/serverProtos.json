@@ -29,7 +29,8 @@
   "message sAddExp": {
     "required string id": 1,
     "required int32 level": 2,
-    "required int32 exp": 3
+    "required int32 exp": 3,
+    "optional string source": 4
   },
   "message sDrop": {
     "required string id": 1,
