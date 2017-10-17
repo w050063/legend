@@ -27,8 +27,9 @@ cc.Class({
             this._spriteTouchArray.push(spriteTouch);
         }
         this.changeTouchSprite(false);
-        this._nodeRockBack = cc.find('Canvas/rockback');
-        this._nodeRock = cc.find('Canvas/rockback/rock');
+        this._nodeRock = cc.find('Canvas/nodeRock');
+        this._rockBack = cc.find('Canvas/nodeRock/back');
+        this._rockPoint = cc.find('Canvas/nodeRock/back/rock');
 
 
         var node = ag.gameLayer.node;
@@ -68,35 +69,34 @@ cc.Class({
 
 
         //摇杆
-        var node = this._nodeRockBack;
+        var node = this._nodeRock;
         node.off(cc.Node.EventType.TOUCH_START);
         node.on(cc.Node.EventType.TOUCH_START, function (event) {
             ag.gameLayer.buttonEventNpcClose();
-            var location = event.getLocation();
-            var angle = cc.pToAngle(cc.pSub(location,cc.p(100,100)));//length:76
-            var dis = Math.min(76,cc.pDistance(location,cc.p(100,100)));
-            this._nodeRock.setPosition(cc.p(dis*Math.cos(angle),dis*Math.sin(angle)));
-            this._nodeRockBack.opacity = 255;
-            this.resetDirectionByRock(angle);
+            var location = this._nodeRock.convertToNodeSpaceAR(event.getLocation());
+            this._rockBack.setPosition(location);
+            this._rockBack.opacity = 255;
         }.bind(this));
         node.off(cc.Node.EventType.TOUCH_MOVE);
         node.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
-            var location = event.getLocation();
-            var angle = cc.pToAngle(cc.pSub(location,cc.p(100,100)));//length:76
-            var dis = Math.min(76,cc.pDistance(location,cc.p(100,100)));
-            this._nodeRock.setPosition(cc.p(dis*Math.cos(angle),dis*Math.sin(angle)));
+            var location = this._nodeRock.convertToNodeSpaceAR(event.getLocation());
+            var angle = cc.pToAngle(cc.pSub(location,this._rockBack.getPosition()));
+            var dis = Math.min(76,cc.pDistance(location,this._rockBack.getPosition()));
+            this._rockPoint.setPosition(cc.p(dis*Math.cos(angle),dis*Math.sin(angle)));
             this.resetDirectionByRock(angle);
         }.bind(this));
         node.off(cc.Node.EventType.TOUCH_END);
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
-            this._nodeRock.setPosition(cc.p(0,0));
-            this._nodeRockBack.opacity = 100;
+            this._rockPoint.setPosition(cc.p(0,0));
+            this._rockBack.setPosition(cc.p(0,0));
+            this._rockBack.opacity = 100;
             this._touchMoveDirection = -1;
         }.bind(this));
         node.off(cc.Node.EventType.TOUCH_CANCEL);
         node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
-            this._nodeRock.setPosition(cc.p(0,0));
-            this._nodeRockBack.opacity = 100;
+            this._rockPoint.setPosition(cc.p(0,0));
+            this._rockBack.setPosition(cc.p(0,0));
+            this._rockBack.opacity = 100;
             this._touchMoveDirection = -1;
         }.bind(this));
 
