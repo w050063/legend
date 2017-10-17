@@ -32,78 +32,54 @@ cc.Class({
         this._rockPoint = cc.find('Canvas/nodeRock/back/rock');
 
 
-        var node = ag.gameLayer.node;
-        node.off(cc.Node.EventType.TOUCH_START);
-        node.on(cc.Node.EventType.TOUCH_START, function (event) {
-            ag.gameLayer.buttonEventNpcClose();
-            var location = event.getLocation();
-            this._locked = this._role.getPlayerForTouch(location);
-            if(this._locked && this._locked._data.camp==ag.gameConst.campNpc){
-                ag.gameLayer.showNodeNpcContent(this._locked._data);
-                this._locked = null;
-            }else{
-                this.resetTouchDirection(location);
-                this.changeTouchSprite(true);
-            }
-        }.bind(this));
-        node.off(cc.Node.EventType.TOUCH_MOVE);
-        node.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
-            if(ag.gameLayer._nodeNpcContent.active)return;
-            var location = event.getLocation();
-            var tempDirection = this._touchMoveDirection;
-            this.resetTouchDirection(location);
-            if(tempDirection!=this._touchMoveDirection){
-                this.changeTouchSprite();
-            }
-        }.bind(this));
-        node.off(cc.Node.EventType.TOUCH_END);
-        node.on(cc.Node.EventType.TOUCH_END, function (event) {
-            this._touchMoveDirection = -1;
-            this.changeTouchSprite();
-        }.bind(this));
-        node.off(cc.Node.EventType.TOUCH_CANCEL);
-        node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
-            this._touchMoveDirection = -1;
-            this.changeTouchSprite();
-        }.bind(this));
-
-
-        //摇杆
-        var node = this._nodeRock;
-        node.off(cc.Node.EventType.TOUCH_START);
-        node.on(cc.Node.EventType.TOUCH_START, function (event) {
-            ag.gameLayer.buttonEventNpcClose();
-            var location = this._nodeRock.convertToNodeSpaceAR(event.getLocation());
-            this._rockBack.setPosition(location);
-            this._rockBack.opacity = 255;
-        }.bind(this));
-        node.off(cc.Node.EventType.TOUCH_MOVE);
-        node.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
-            var location = this._nodeRock.convertToNodeSpaceAR(event.getLocation());
-            var angle = cc.pToAngle(cc.pSub(location,this._rockBack.getPosition()));
-            var dis = Math.min(76,cc.pDistance(location,this._rockBack.getPosition()));
-            this._rockPoint.setPosition(cc.p(dis*Math.cos(angle),dis*Math.sin(angle)));
-            this.resetDirectionByRock(angle);
-        }.bind(this));
-        node.off(cc.Node.EventType.TOUCH_END);
-        node.on(cc.Node.EventType.TOUCH_END, function (event) {
-            this._rockPoint.setPosition(cc.p(0,0));
-            this._rockBack.setPosition(cc.p(0,0));
-            this._rockBack.opacity = 100;
-            this._touchMoveDirection = -1;
-        }.bind(this));
-        node.off(cc.Node.EventType.TOUCH_CANCEL);
-        node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
-            this._rockPoint.setPosition(cc.p(0,0));
-            this._rockBack.setPosition(cc.p(0,0));
-            this._rockBack.opacity = 100;
-            this._touchMoveDirection = -1;
-        }.bind(this));
-
         this._role.schedule(this.update02.bind(this),0.2);
     },
-
-
+	
+	touchStart:function(event){
+		ag.gameLayer.buttonEventNpcClose();
+		var location = event.getLocation();
+		this._locked = this._role.getPlayerForTouch(location);
+		if(this._locked && this._locked._data.camp==ag.gameConst.campNpc){
+			ag.gameLayer.showNodeNpcContent(this._locked._data);
+			this._locked = null;
+		}else{
+			this.resetTouchDirection(location);
+			this.changeTouchSprite(true);
+		}
+	},
+	touchMove:function(event){
+		if(ag.gameLayer._nodeNpcContent.active)return;
+		var location = event.getLocation();
+		var tempDirection = this._touchMoveDirection;
+		this.resetTouchDirection(location);
+		if(tempDirection!=this._touchMoveDirection){
+			this.changeTouchSprite();
+		}
+	},
+	touchEnd:function(event){
+		this._touchMoveDirection = -1;
+		this.changeTouchSprite();
+	},
+	rockStart:function(event){
+		ag.gameLayer.buttonEventNpcClose();
+		var location = this._nodeRock.convertToNodeSpaceAR(event.getLocation());
+		this._rockBack.setPosition(location);
+		this._rockBack.opacity = 255;
+	},
+	rockMove:function(event){
+		var location = this._nodeRock.convertToNodeSpaceAR(event.getLocation());
+		var angle = cc.pToAngle(cc.pSub(location,this._rockBack.getPosition()));
+		var dis = Math.min(76,cc.pDistance(location,this._rockBack.getPosition()));
+		this._rockPoint.setPosition(cc.p(dis*Math.cos(angle),dis*Math.sin(angle)));
+		this.resetDirectionByRock(angle);
+	},
+	rockEnd:function(event){
+		this._rockPoint.setPosition(cc.p(0,0));
+		this._rockBack.setPosition(cc.p(0,0));
+		this._rockBack.opacity = 100;
+		this._touchMoveDirection = -1;
+	},
+	
 
     //获得当前移动方向
     resetTouchDirection:function (location) {

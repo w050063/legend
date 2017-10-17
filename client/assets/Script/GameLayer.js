@@ -100,6 +100,37 @@ cc.Class({
 
 
         this.changeMap();
+		
+		
+		
+        this.node.on(cc.Node.EventType.TOUCH_START, function (event) {
+			this._player._ai.touchStart(event);
+        }.bind(this));
+        this.node.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
+			this._player._ai.touchMove(event);
+        }.bind(this));
+        this.node.on(cc.Node.EventType.TOUCH_END, function (event) {
+			this._player._ai.touchEnd(event);
+        }.bind(this));
+        this.node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
+			this._player._ai.touchEnd(event);
+        }.bind(this));
+
+
+        //摇杆
+        var rock = cc.find('Canvas/nodeRock');
+        rock.on(cc.Node.EventType.TOUCH_START, function (event) {
+			this._player._ai.rockStart(event);
+        }.bind(this));
+        rock.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
+			this._player._ai.rockMove(event);
+        }.bind(this));
+        rock.on(cc.Node.EventType.TOUCH_END, function (event) {
+			this._player._ai.rockEnd(event);
+        }.bind(this));
+        rock.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
+			this._player._ai.rockEnd(event);
+        }.bind(this));
 
 
 
