@@ -114,7 +114,7 @@ cc.Class({
             this.resetAllProp();
             this._data.hp = 1;//确保可以进入改血量
             if(this==ag.gameLayer._player)ag.gameLayer.refreshEquip();
-            this.changeHP(this._data._totalHP);
+            this.changeHP(this._totalHP);
         }
         if(source){
             ag.jsUtil.showText(ag.gameLayer.node,'装备回收成功');
@@ -672,7 +672,7 @@ cc.Class({
             var p = role.node.getPosition();
             if(point.x>p.x-40 && point.x<p.x+40 && point.y>p.y && point.y< p.y+120){
                 if(role._data.camp==ag.gameConst.campNpc)return role;
-                if((!locked || p.y<locked.node.getPositionY()) && ag.gameLayer.isEnemyCamp(role,this))locked = map[key];
+                if((!locked || p.y<locked.node.getPositionY()) && ag.gameLayer.isEnemyCamp(this,role))locked = map[key];
             }
         }
         return locked;

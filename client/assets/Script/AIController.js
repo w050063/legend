@@ -65,17 +65,22 @@ cc.Class({
 		var location = this._nodeRock.convertToNodeSpaceAR(event.getLocation());
 		this._rockBack.setPosition(location);
 		this._rockBack.opacity = 255;
+        this._locked = null;
 	},
 	rockMove:function(event){
 		var location = this._nodeRock.convertToNodeSpaceAR(event.getLocation());
 		var angle = cc.pToAngle(cc.pSub(location,this._rockBack.getPosition()));
 		var dis = Math.min(76,cc.pDistance(location,this._rockBack.getPosition()));
 		this._rockPoint.setPosition(cc.p(dis*Math.cos(angle),dis*Math.sin(angle)));
-		this.resetDirectionByRock(angle);
+		if(dis>30){
+            this.resetDirectionByRock(angle);
+        }else{
+            this._touchMoveDirection = -1;
+        }
 	},
 	rockEnd:function(event){
 		this._rockPoint.setPosition(cc.p(0,0));
-		this._rockBack.setPosition(cc.p(0,0));
+		this._rockBack.setPosition(cc.p(50,50));
 		this._rockBack.opacity = 100;
 		this._touchMoveDirection = -1;
 	},

@@ -32,9 +32,7 @@ cc.Class({
 
 
         //键盘事件注入
-        if(cc.sys.isBrowser){
-            cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
-        }
+        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
 
         //地图坐标
         this._labelLocation = cc.find('Canvas/labelLocation').getComponent(cc.Label);
@@ -262,7 +260,6 @@ cc.Class({
                 delete obj._data.owner;
                 this.refreshBag();
             }
-            delete ag.userInfo._itemMap[id];
         }
     },
 
@@ -574,7 +571,7 @@ cc.Class({
     //聊天按钮
     buttonShowChatNode:function(){
         cc.find('Canvas/nodeChat').active = true;
-        if(!cc.sys.isMobile && cc.sys.isBrowser){
+        if(!(cc.sys.isMobile && cc.sys.isBrowser)){
             var editbox = cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox);
             editbox.stayOnTop = true;
             editbox.setFocus();
