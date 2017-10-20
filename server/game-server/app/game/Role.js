@@ -208,7 +208,7 @@ module.exports = ag.class.extend({
         var data = locked._data;
         var x = data.x, y = data.y;
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
-        if(this._tiger && this._tiger._state!=ag.gameConst.stateDead && !this._tiger._ai._locked)this._tiger._ai._locked = locked;//如果有老虎，操作老虎攻击敌人。
+        if(this._tiger && this._tiger!=locked && this._tiger._state!=ag.gameConst.stateDead && !this._tiger._ai._locked)this._tiger._ai._locked = locked;//如果有老虎，操作老虎攻击敌人。
         if(locked._tiger && locked._tiger._state!=ag.gameConst.stateDead && !locked._tiger._ai._locked)locked._tiger._ai._locked = this;//敌人有老虎，敌人老虎攻击自己。
 
 

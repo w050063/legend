@@ -58,6 +58,13 @@ var Handler = cc.Class.extend({
         var code = 1;
         var player =  ag.gameLayer.getRole(session.uid);
         if(player){
+            if(player._tiger){
+                ag.itemManager.delItemByRoleId(player._tiger._data.id);
+                player._tiger._data.camp=ag.gameConst.campMonster;
+                player._tiger._state = ag.gameConst.stateIdle;
+                player._tiger.dead();
+                ag.jsUtil.sendDataExcept("sDeleteRole",player._tiger._data.id,player._data.id);
+            }
             ag.itemManager.delItemByRoleId(session.uid);
             player._data.camp=ag.gameConst.campMonster;
             player._state = ag.gameConst.stateIdle;
