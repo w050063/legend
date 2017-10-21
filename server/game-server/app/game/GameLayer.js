@@ -292,6 +292,13 @@ module.exports = {
     },
     isEnemyForAttack:function(role1,role2){
         if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
+            if(role2._data.camp==ag.gameConst.campLiuxing){
+                var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
+                if(safe){
+                    var lx = role2.getLocation().x,ly = role2.getLocation().y;
+                    if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+                }
+            }
             if(role1._data.camp!=role2._data.camp)return true;
             if(role1._data.camp==ag.gameConst.campLiuxing && role2._data.camp==ag.gameConst.campLiuxing
                 && role1._master!=role2 && role1._tiger!=role2)return true;
