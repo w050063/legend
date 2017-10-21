@@ -75,12 +75,6 @@ cc.Class({
             this._chatLabelArray[i].opacity = 0;
         }
 
-        var nodeHelp = cc.find('Canvas/nodeHelp');
-        nodeHelp.active = false;
-        nodeHelp.on(cc.Node.EventType.TOUCH_END, function (event) {
-            nodeHelp.active = false;
-        }.bind(this));
-
         //系统公告
         cc.find('Canvas/nodeChatContent/labelSystemNotify').opacity = 0;
 
@@ -142,6 +136,7 @@ cc.Class({
     //换地图
     changeMap:function(){
         var mapId = ag.userInfo._data.mapId;
+        var map = ag.gameConst._terrainMap[mapId];
         //清空所有内容
         ag.buffManager.changeMap();
         this.buttonEventNpcClose();
@@ -150,6 +145,26 @@ cc.Class({
 
         //地图更新
         this._map.test(mapId);
+        if(map.safe){
+            cc.loader.loadRes('map/safeTips',cc.SpriteFrame,function(err,spriteFrame){
+                var array = [];
+                for(var i=map.safe.x;i<=map.safe.xx;++i){
+                    array.push(this.getPositionForLocation(mapId,cc.p(i,map.safe.y)));
+                    array.push(this.getPositionForLocation(mapId,cc.p(i,map.safe.yy)));
+                }
+                for(var i=map.safe.y+1;i<map.safe.yy;++i){
+                    array.push(this.getPositionForLocation(mapId,cc.p(map.safe.x,i)));
+                    array.push(this.getPositionForLocation(mapId,cc.p(map.safe.xx,i)));
+                }
+                for(var i=0;i<array.length;++i){
+                    var node = new cc.Node();
+                    var sprite = node.addComponent(cc.Sprite);
+                    node.setPosition(array[i].x,array[i].y+30);
+                    this._map.node.addChild(node,1);
+                    sprite.spriteFrame = spriteFrame;
+                }
+            }.bind(this));
+        }
 
 
         //创建主角
@@ -161,7 +176,6 @@ cc.Class({
         this.refreshEquip();
 
         //增加npc
-        var map = ag.gameConst._terrainMap[mapId];
         for(var i=0;i<map.npc.length;++i){
             var npc = new cc.Node().addComponent(Role);
             this._map.node.addChild(npc.node);
@@ -463,8 +477,11 @@ cc.Class({
     },
 
 
-    buttonClose:function (sender) {
+    buttonBagClose:function (sender) {
         this._nodeBag.active = false;
+    },
+    buttonSettingClose:function (sender) {
+        cc.find('Canvas/nodeHelp').active = false;
     },
 
 
@@ -713,5 +730,14 @@ cc.Class({
                 }
             })(i);
         }
+    },
+
+
+    //根据location获得position
+    getPositionForLocation:function(mapId,location){
+        var mapData = ag.gameConst._terrainMap[mapId];
+        var x = parseInt(location.x)-mapData.mapX/2;
+        var y = parseInt(location.y)-mapData.mapY/2;
+        return cc.p(x*mapData.tileX,y*mapData.tileY);
     },
 });
