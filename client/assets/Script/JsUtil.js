@@ -3,7 +3,7 @@
  * 常用工具
  */
 
-
+var AGAni = require("AGAni");
 module.exports={
     //获取当前时间,begin
     _timeCounter: 0,
@@ -99,6 +99,23 @@ module.exports={
             node.removeFromParent();
             this._cacheNodeArray.push(node);
         }
+    },
+
+
+    getEffect:function(father,name,count,zorder,interval){
+        return this.getNode(father,name,count,zorder,interval,function(sender){sender.node.destroy();}.bind(this));
+    },
+
+
+    getNode:function(father,name,count,zorder,interval,callback){
+        var node = new cc.Node();
+        var ani = node.addComponent(AGAni);
+        ani.init(name,count);
+        father.addChild(node,zorder);
+        var ani = node.getComponent(AGAni);
+        ani.setInterval(interval);
+        ani.setFinishedCallback(callback);
+        return node;
     },
 
 

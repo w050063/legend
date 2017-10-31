@@ -19,7 +19,7 @@ cc.Class({
             (function (i) {
                 var nodeRole = cc.find('Canvas/layoutRole/nodeRole'+i);
                 var array = AGAniClothes[showClothes[i]].split(',');
-                nodeRole._modelNode = ag.agAniCache.getNode(nodeRole,array[0],parseInt(array[1]),0,0.3);
+                nodeRole._modelNode = ag.jsUtil.getNode(nodeRole,array[0],parseInt(array[1]),0,0.3);
                 nodeRole.on('touchend', function () {
                     this.setSelected(i);
                 }.bind(this));
@@ -34,9 +34,10 @@ cc.Class({
         //this._buttonStart.enableAutoGrayEffect = true;
         //this._buttonDelete.interactable = false;
         //this._buttonStart.interactable = true;
-        this.schedule(ag.altasTask.update001.bind(ag.altasTask),0.01);
+
 
         ag.agSocket.onSEnter();
+        this.schedule(ag.spriteCache.update001.bind(ag.spriteCache),0.01);
     },
 
 
@@ -53,12 +54,12 @@ cc.Class({
             var nodeRole = this._nodeRoleArray[i];
             nodeRole._modelNode.stopAllActions();
             if(index==i){
-                nodeRole._modelNode.getComponent(cc.Sprite)._sgNode.setState(0);
+                //nodeRole._modelNode.getComponent(cc.Sprite)._sgNode.setState(0);
                 nodeRole._modelNode.getComponent(AGAni).resume();
                 nodeRole._modelNode.setScale(2);
                 nodeRole._modelNode.runAction(cc.scaleTo(0.2,4));
             }else{
-                nodeRole._modelNode.getComponent(cc.Sprite)._sgNode.setState(1);
+                //nodeRole._modelNode.getComponent(cc.Sprite)._sgNode.setState(1);
                 nodeRole._modelNode.getComponent(AGAni).pause();
                 nodeRole._modelNode.setScale(2);
             }

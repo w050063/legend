@@ -16,7 +16,7 @@ cc.Class({
         var x = data.x-mapData.mapX/2;
         var y = data.y-mapData.mapY/2;
         this.node.setPosition(x*mapData.tileX,y*mapData.tileY);
-        this.node.setScale(2);
+        //this.node.setScale(2);
 
 
         var sprite = this.node.addComponent(cc.Sprite);

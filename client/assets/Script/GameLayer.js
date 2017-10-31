@@ -6,7 +6,7 @@
 
 var Role = require("Role");
 var Item = require("Item");
-var AGTerrain = require("AGTerrain");
+var AGMap = require("AGMap");
 var AGListView = require("AgListView");
 var baseNpcId = 5000;
 cc.Class({
@@ -86,9 +86,9 @@ cc.Class({
 
 
         //测试新地图
-        this._map = cc.find("Canvas/nodeMap").addComponent(AGTerrain);
+        this._map = cc.find("Canvas/nodeMap").addComponent(AGMap);
         //this._map.init(["resources/map/terrain0.png","resources/map/terrain1.png","resources/map/terrain2.png","resources/map/terrain3.png","resources/map/terrain4.png","resources/map/terrain5.png"]);
-        //node.setScale(0.2);
+        this._map.node.setScale(2);
 
 
         this.changeMap();
@@ -129,7 +129,7 @@ cc.Class({
         //启动定时器,每秒执行一次
         this.schedule(ag.buffManager.update1.bind(ag.buffManager),1);
         this.schedule(ag.buffManager.update5.bind(ag.buffManager),5);
-        this.schedule(ag.altasTask.update001.bind(ag.altasTask),0.01);
+        this.schedule(ag.spriteCache.update001.bind(ag.spriteCache),0.01);
     },
 
 
@@ -144,7 +144,8 @@ cc.Class({
         this._roleMap = {};
 
         //地图更新
-        this._map.test(mapId);
+        //this._map.test(mapId);
+        this._map.init();
         if(map.safe){
             cc.loader.loadRes('map/safeTips',cc.SpriteFrame,function(err,spriteFrame){
                 var array = [];

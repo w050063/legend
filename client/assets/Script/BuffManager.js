@@ -68,8 +68,8 @@ cc.Class({
         var x = parseInt(array[1])-mapData.mapX/2;
         var y = parseInt(array[2])-mapData.mapY/2;
         node.setPosition(x*mapData.tileX,y*mapData.tileY);
-        node._agani = ag.agAniCache.getNode(node,"ani/effect3/507000",4,0,0.05,function(sender){});
-        node.setScale(2);
+        node._agani = ag.jsUtil.getNode(node,"ani/effect3/507000",4,0,0.05,function(sender){});
+        //node.setScale(2);
 
         this._fireWallMap[mapXYString] = {id:role._data.id,tag:tag,node:node};
     },
@@ -86,7 +86,6 @@ cc.Class({
 
     delFireWall:function (key) {
         if(this._fireWallMap[key]){
-            ag.agAniCache.put(this._fireWallMap[key].node._agani);
             this._fireWallMap[key].node.destroy();
             ag.gameLayer.node.stopActionByTag(this._fireWallMap[key].tag);
             delete this._fireWallMap[key];

@@ -22,9 +22,9 @@ cc.Class({
             var BuffManager = require("BuffManager");
             ag.buffManager = new BuffManager();
             ag.buffManager.init();
-            var AltasTask = require("AltasTask");
-            ag.altasTask = new AltasTask();
-            ag.altasTask.init();
+            var AgSpriteCache = require("AgSpriteCache");
+            ag.spriteCache = new AgSpriteCache();
+            ag.spriteCache.init();
 
 
             //注册前后台切换事件
@@ -39,6 +39,7 @@ cc.Class({
                 }
             });
 
+            cc.director.setProjection(cc.Director.PROJECTION_2D);
             //cc.director.setDisplayStats(false);
         }
 
@@ -98,8 +99,8 @@ cc.Class({
         this._nodeLoading.setShow("图集资源加载中");
         this._nodeLoading.setPercent("(0%)");
         var array = [];
-        for(var i=1;i<=17;++i)if(i!=7 && i!=8)array.push("ani/hum"+i);
-        for(var i=1;i<=3;++i)array.push("ani/effect"+i);
+        //for(var i=1;i<=17;++i)if(i!=7 && i!=8)array.push("ani/hum"+i);
+        //for(var i=1;i<=3;++i)array.push("ani/effect"+i);
         array.push("ani/icon");
         cc.loader.loadResArray(array, cc.SpriteAtlas,function(num, totalNum, item){
             this._nodeLoading.setPercent("("+Math.floor(num/totalNum*100)+"%)");

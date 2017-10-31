@@ -12,54 +12,22 @@ cc.Class({
 
     //初始化角色
     init: function (str,n) {
-        this._willDoArray = [];
-        this._loadOver = false;
-        this.node._cukeName = str;
-        this.node.addComponent(cc.Sprite);
         this._spriteFrameArray = [];
         this._curIndex = 0;
         this._passTime = 0;
         this._running = true;
         this._interval = 1;
         this._finishedCallback = null;
-        this._totalCount = n;
         this._aniPosition = cc.p(0,0);
 
-        var urls = [];
-        var before = str.substr(0,str.length-7);//6是图片后面数字的长度,下同
-        var after = parseInt(str.substr(str.length-6));
+
+        var pos = str.lastIndexOf('/');
+        var before = str.substr(0,pos);//6是图片后面数字的长度,下同
+        var after = parseInt(str.substr(pos+1));
         for(var i=0;i<n;++i){
-            urls.push(this.pad(after+i,6));
-        }
-
-
-        var atlas = cc.loader.getRes(before,cc.SpriteAtlas);
-        for(var i=0;i<urls.length;++i){
-            this._spriteFrameArray.push({"key":urls[i],"value":atlas.getSpriteFrame(urls[i])});
+            this._spriteFrameArray.push(before+'/'+this.pad(after+i,6));
         }
         this.modifyFrame();
-
-        //ag.altasTask.addTask(before,function (err, atlas) {
-        //    if(!this._spriteFrameArray)return;//防止内存已经释放
-        //    for(var i=0;i<urls.length;++i){
-        //        this._spriteFrameArray.push({"key":urls[i],"value":atlas.getSpriteFrame(urls[i])});
-        //    }
-        //    this.modifyFrame();
-        //    this._loadOver = true;
-        //    for(var i=0;i<this._willDoArray.length;++i){
-        //        this._willDoArray[i]();
-        //    }
-        //    this._willDoArray = [];
-        //}.bind(this));
-    },
-
-    //加载完毕后指定参数任务
-    doCallback:function(callback){
-        if(this._loadOver){
-            callback(this);
-        }else{
-            this._willDoArray.push(callback);
-        }
     },
 
 
@@ -79,10 +47,6 @@ cc.Class({
         this._finishedCallback = callback;
     },
 
-    getTotalCount:function(){
-        return this._totalCount;
-    },
-
 
     setAniPosition:function(position){
         this._aniPosition = position;
@@ -91,12 +55,15 @@ cc.Class({
 
 
     modifyFrame:function(){
-        var sprite = this.node.getComponent(cc.Sprite);
-        sprite.spriteFrame = this._spriteFrameArray[this._curIndex].value;
-        var key = this._spriteFrameArray[this._curIndex].key;
-        var after = key.substr(key.length-6);
+        if(this.node.childrenCount>0)ag.spriteCache.put(this.node.children[0].getComponent(cc.Sprite));
+        var str = this._spriteFrameArray[this._curIndex];
+        var sprite = ag.spriteCache.get(str);
+        var pos = str.lastIndexOf('/');
+        var after = str.substr(pos+1);
         var array = AGAniOffset[after].split(",");
+        this.node.addChild(sprite.node);
         this.node.setPosition(cc.pAdd(this._aniPosition,cc.p(parseInt(array[0]),parseInt(array[1]))));
+
         if(this._controllArray){
             for(var i=0;i<this._controllArray.length;++i){
                 this._controllArray[i]._curIndex = this._curIndex;
@@ -109,7 +76,7 @@ cc.Class({
     // called every frame
     update: function (dt) {
         if(this._bBeControll)return;
-        if(this._running && this._spriteFrameArray.length>0){
+        if(this._running){
             this._passTime += dt;
             if(this._passTime>=this._interval){
                 this._passTime -= this._interval;
