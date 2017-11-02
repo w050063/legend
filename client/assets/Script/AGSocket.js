@@ -141,7 +141,6 @@ module.exports={
                 var player =  ag.gameLayer.getRole(obj.value.id);
                 if(player) {
                     player.myMoveByServer(cc.p(obj.value.x, obj.value.y));
-                    player.relife();
                 }
             }else if(obj.key=='sBFireCritArray'){
                 ag.buffManager.setCDForFireCritById(obj.value,false);
@@ -175,6 +174,11 @@ module.exports={
                 ag.gameLayer.chat(obj.value.id,obj.value.content);
             }else if(obj.key=='sSystemNotifyArray'){
                 ag.gameLayer.systemNotify(obj.value);
+            }else if(obj.key=='sRelifeArray'){
+                var player =  ag.gameLayer.getRole(obj.value.id);
+                if(player) {
+                    player.relife(obj.value);
+                }
             }
         }
         this._dataArray = [];

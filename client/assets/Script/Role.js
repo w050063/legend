@@ -141,7 +141,7 @@ cc.Class({
         this._data.x = location.x;
         this._data.y = location.y;
         var mapData = ag.gameConst._terrainMap[this._data.mapId];
-        this.node.setPosition((this._data.x-mapData.mapX/2)*mapData.tileX,(this._data.y-mapData.mapY/2)*mapData.tileY);
+        this.node.setPosition(this.getTruePosition());
 
 
         //优化显示和隐藏,上下左右各多两个地块,超过1.9就认为要更新了
@@ -268,19 +268,16 @@ cc.Class({
         }
 
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),location);
+        var lastLocation = this.getLocation();
         var mapData = ag.gameConst._terrainMap[this._data.mapId];
-        var temp = cc.p((this._data.x-mapData.mapX/2)*mapData.tileX,(this._data.y-mapData.mapY/2)*mapData.tileY);
         this.setLocation(location);
-        this.node.setPosition(temp);
 
 
         if(this._nearFlag){
-            var mapData = ag.gameConst._terrainMap[this._data.mapId];
-            var x = this._data.x - mapData.mapX / 2;
-            var y = this._data.y - mapData.mapY / 2;
+            this.node.setPosition(this.getTruePosition(lastLocation));
             var moveSpeed = this._data.camp==ag.gameConst.campMonster ? 0.8:this._moveSpeed;//怪物始终是一个播放速度，走完后等待
             this.node.stopAllActions();
-            this.node.runAction(cc.sequence(cc.moveTo(moveSpeed, cc.p(x * mapData.tileX, y * mapData.tileY)),cc.callFunc(function(){
+            this.node.runAction(cc.sequence(cc.moveTo(moveSpeed,this.getTruePosition(location)),cc.callFunc(function(){
                 if(bServer){
                     this.idle();
                 }else{
@@ -324,10 +321,6 @@ cc.Class({
 
             //最后变更状态
             this._state = ag.gameConst.stateMove;
-        }else{
-            var mapData = ag.gameConst._terrainMap[this._data.mapId];
-            this.node.stopAllActions();
-            this.node.setPosition(cc.p((this._data.x-mapData.mapX/2)*mapData.tileX,(this._data.y-mapData.mapY/2)*mapData.tileY));
         }
 
         //向服务器发送
@@ -342,12 +335,6 @@ cc.Class({
     //按方向移动,强制玩家位置
     myMoveByServer:function(location) {
         this.node.stopAllActions();
-        //this._data.x = location.x;
-        //this._data.y = location.y;
-        //var mapData = ag.gameConst._terrainMap[this._data.mapId];
-        //var x = this._data.x - mapData.mapX / 2;
-        //var y = this._data.y - mapData.mapY / 2;
-        //this.node.setPosition(cc.p(x * mapData.tileX, y * mapData.tileY));
         this.setLocation(location);
         this.idle();
         if(this._ai)this._ai._busy = false;
@@ -480,7 +467,6 @@ cc.Class({
             var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(pos2,pos1))));
             sprite.node.setRotation( 90-rotation);
             ag.gameLayer._map.node.addChild(sprite.node,ag.gameConst.roleEffectZorder);
-            sprite.spriteFrame = cc.loader.getRes("ani/effect3",cc.SpriteAtlas).getSpriteFrame('511000');
             sprite.node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
                 ag.spriteCache.put(sprite);
             })));
@@ -596,14 +582,24 @@ cc.Class({
 
 
     //复活
-    relife:function(){
+    relife:function(data){
         if(this._state == ag.gameConst.stateDead){
-            this.node.active = true;
+            var self = this;
             this.changeHP(this._totalHP);
-            this.idleAnimation();
-            this._state = ag.gameConst.stateIdle;
-            if(this._ai)this._ai._busy = false;
-            this.setLocation(this.getLocation());
+            if(this==ag.gameLayer._player){
+                ag.userInfo._data.mapId = data.mapId;
+                ag.userInfo._data.x = data.x;
+                ag.userInfo._data.y = data.y;
+                ag.gameLayer.changeMap();
+                self = ag.gameLayer._player;
+            }else{
+                this.node.active = true;
+                this.idleAnimation();
+                this._state = ag.gameConst.stateIdle;
+                if(this._ai)this._ai._busy = false;
+                this.setLocation(cc.p(data.x,data.y));
+            }
+
 
 
             if(this._nearFlag){
@@ -636,10 +632,11 @@ cc.Class({
 
 
     //获得逻辑上的position
-    getTruePosition:function () {
+    getTruePosition:function (location) {
+        if(!location)location = this.getLocation();
         var mapData = ag.gameConst._terrainMap[this._data.mapId];
-        var x = parseInt(this._data.x)-mapData.mapX/2;
-        var y = parseInt(this._data.y)-mapData.mapY/2;
+        var x = parseInt(location.x)-mapData.mapX/2+0.5;
+        var y = parseInt(location.y)-mapData.mapY/2+0.5;
         return cc.p(x*mapData.tileX,y*mapData.tileY);
     },
 

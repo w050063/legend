@@ -145,28 +145,7 @@ cc.Class({
 
         //地图更新
         //this._map.test(mapId);
-        this._map.init();
-        if(map.safe){
-            cc.loader.loadRes('map/safeTips',cc.SpriteFrame,function(err,spriteFrame){
-                var array = [];
-                for(var i=map.safe.x;i<=map.safe.xx;++i){
-                    array.push(this.getPositionForLocation(mapId,cc.p(i,map.safe.y)));
-                    array.push(this.getPositionForLocation(mapId,cc.p(i,map.safe.yy)));
-                }
-                for(var i=map.safe.y+1;i<map.safe.yy;++i){
-                    array.push(this.getPositionForLocation(mapId,cc.p(map.safe.x,i)));
-                    array.push(this.getPositionForLocation(mapId,cc.p(map.safe.xx,i)));
-                }
-                for(var i=0;i<array.length;++i){
-                    var node = new cc.Node();
-                    var sprite = node.addComponent(cc.Sprite);
-                    node.setPosition(array[i].x,array[i].y+30);
-                    this._map.node.addChild(node,1);
-                    sprite.spriteFrame = spriteFrame;
-                }
-            }.bind(this));
-        }
-
+        this._map.init(map.res);
 
         //创建主角
         var node = new cc.Node();
@@ -343,12 +322,7 @@ cc.Class({
 
     //碰撞检测
     isCollision:function(mapId,x,y){
-        var obj = ag.gameConst._terrainMap[mapId];
-        if(x<0 || x>obj.mapX || y<0 || y>obj.mapY)return true;
-        for(var i=0;i<obj.collision.length;++i){
-            if(obj.collision[i][0]==x && obj.collision[i][1]==y)return true;
-        }
-        return false;
+        return this._map.isCollision(cc.p(x,y));
     },
 
 

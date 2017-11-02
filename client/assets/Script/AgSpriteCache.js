@@ -32,7 +32,7 @@ cc.Class({
         var pos = name.lastIndexOf('/');
         var before = name.substr(0,pos);
         var atlas = cc.loader.getRes(before,cc.SpriteAtlas);
-        if(!atlas)this._downloadArray.push(before);
+        if(!atlas && this._downloadArray.indexOf(before)==-1)this._downloadArray.push(before);
         var sprite = new cc.Node().addComponent(cc.Sprite);
         this._waitFrameArray.push(sprite);
         sprite._agName = name;
@@ -92,7 +92,9 @@ cc.Class({
                 if(this._downloadArray.length>0){
                     if(this._bLoading==false){
                         this._bLoading = true;
+                        ag.jsUtil.startTime();
                         cc.loader.loadRes(this._downloadArray[0],cc.SpriteAtlas,function(err,atlas){
+                            ag.jsUtil.printTime('wweww '+this._downloadArray[0]);
                             this._downloadArray.splice(0,1);
                             this._bLoading = false;
                         }.bind(this));

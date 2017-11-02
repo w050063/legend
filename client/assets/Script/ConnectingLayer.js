@@ -13,7 +13,6 @@ cc.Class({
         if(!window.ag){
             window.ag = {};
             ag.jsUtil = require("JsUtil");
-            ag.agAniCache = require("AGAniCache");
             ag.userInfo = require("UserInfo");
             ag.userInfo.init();
             ag.gameConst = require("GameConst");
