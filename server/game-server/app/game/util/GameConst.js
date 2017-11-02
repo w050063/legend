@@ -3,8 +3,24 @@
  * 游戏常量相关
  */
 
-
+var fs = require('fs');
 module.exports = {
+    //显示的数据方便策划，init做转换。
+    init:function(){
+        for(var key in this._terrainMap){
+            var map = this._terrainMap[key];
+            var data = fs.readFileSync('./app/'+map.res+'.mapag', 'utf8');
+            var array = data.split(',');
+            map.collision = [];
+            var count = map.mapX*map.mapY;
+            for(var i=0;i<count;++i){
+                var x = i%map.mapY;
+                var y = Math.floor(i/map.mapY);
+                map.collision.push(array[(y*map.mapX+x)*3+4]);
+            }
+        }
+    },
+
 
 
     //阵营类型
@@ -23,11 +39,6 @@ module.exports = {
     //性别
     sexBoy:0,
     sexGirl:1,
-
-
-    //显示的数据方便策划，init做转换。
-    init:function(){
-    },
 
 
     //网络相关编码
@@ -83,20 +94,21 @@ module.exports = {
             safe:{x:7,y:27,xx:26,yy:46},
             refresh: [["m5", -1, -1, 120, 30],["m6", -1, -1, 120, 30],["m7", -1, -1, 120, 30],["m9", -1, -1, 120, 5]]
         },
-        t2:{
-            id : "t2",
-            name: "BOSS之家",
-            res: 'map/mapdirt',
-            npc:[{name:"传送员",x:10,y:6,title:"区域传送:",content:["土城"]}],
-            tileX: 100,
-            tileY: 60,
-            mapX: 16,
-            mapY: 16,
-            born: {x:8,y:8},
-            collision:"",
-            refresh: [["m10", -1, -1, 120, 1],["m11", -1, -1, 120, 1],["m12", -1, -1, 120, 1],["m13", -1, -1, 120, 1],["m14", -1, -1, 120, 1],
-                ["m15", -1, -1, 120, 1],["m16", -1, -1, 180, 1],["m17", -1, -1, 180, 1],["m18", -1, -1, 180, 1]]
-        }},
+        //t2:{
+        //    id : "t2",
+        //    name: "BOSS之家",
+        //    res: 'map/mapdirt',
+        //    npc:[{name:"传送员",x:10,y:6,title:"区域传送:",content:["土城"]}],
+        //    tileX: 100,
+        //    tileY: 60,
+        //    mapX: 16,
+        //    mapY: 16,
+        //    born: {x:8,y:8},
+        //    collision:"",
+        //    refresh: [["m10", -1, -1, 120, 1],["m11", -1, -1, 120, 1],["m12", -1, -1, 120, 1],["m13", -1, -1, 120, 1],["m14", -1, -1, 120, 1],
+        //        ["m15", -1, -1, 120, 1],["m16", -1, -1, 180, 1],["m17", -1, -1, 180, 1],["m18", -1, -1, 180, 1]]
+        //}
+    },
 
 
 

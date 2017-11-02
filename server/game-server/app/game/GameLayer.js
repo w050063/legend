@@ -167,7 +167,7 @@ module.exports = {
     isCollision:function(mapId,x,y){
         var obj = ag.gameConst._terrainMap[mapId];
         if(x<0 || x>=obj.mapX || y<0 || y>=obj.mapY)return true;
-        return false;
+        return obj.collision[y*obj.mapX+x]=='1';
     },
 
 
