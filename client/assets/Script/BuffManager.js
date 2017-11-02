@@ -64,12 +64,8 @@ cc.Class({
         var array = mapXYString.split(',');
         var node = new cc.Node();
         ag.gameLayer._map.node.addChild(node,9999999999);
-        var mapData = ag.gameConst._terrainMap[array[0]];
-        var x = parseInt(array[1])-mapData.mapX/2;
-        var y = parseInt(array[2])-mapData.mapY/2;
-        node.setPosition(x*mapData.tileX,y*mapData.tileY);
+        node.setPosition(ag.gameLayer._player.getTruePosition(cc.p(parseInt(array[1]),parseInt(array[2]))));
         node._agani = ag.jsUtil.getNode(node,"ani/effect3/507000",4,0,0.05,function(sender){});
-        //node.setScale(2);
 
         this._fireWallMap[mapXYString] = {id:role._data.id,tag:tag,node:node};
     },

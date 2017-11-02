@@ -43,7 +43,7 @@ cc.Class({
                 if(oldMapTile[str]){
                     this._mapTile[str] = oldMapTile[str];
                 }else{
-                    var name = this._dataArray[(j*this._width+this._height-1-i)*3+2];
+                    var name = this._dataArray[(i*this._width+j)*3+2];
                     if(name && name!='-1'){
                         var node = this.getTileSprite(name);
                         node.setPosition(w*(0.5+j-this._width/2),h*(0.5+i-this._height/2));
@@ -59,7 +59,7 @@ cc.Class({
                 if(oldMapObj[str]){
                     this._mapObj[str] = oldMapObj[str];
                 }else{
-                    var name = this._dataArray[(j*this._width+this._height-1-i)*3+3];
+                    var name = this._dataArray[(i*this._width+j)*3+3];
                     if(name && name!='0'){
                         var node = this.getObjectSprite(name);
                         node.setPosition(w*(0.5+j-this._width/2),h*(0.5+i-this._height/2));
@@ -92,7 +92,7 @@ cc.Class({
     //获取碰撞
     isCollision:function(location){
         if(location.x<0 || location.x>=this._width || location.y<0 || location.y>=this._height)return true;
-        return this._dataArray[(location.x*this._width+this._height-1-location.y)*3+4]=='1';
+        return this._dataArray[(location.y*this._width+location.x)*3+4]=='1';
     },
 
 
@@ -109,22 +109,11 @@ cc.Class({
 
 
     getObjectSprite:function(name){
-        var before = name.split('_');
-        var sprite = ag.spriteCache.get('map/object'+before[0]+'/'+name,function(sprite){
-            if(sprite.spriteFrame){
-                sprite.sizeMode = cc.Sprite.SizeMode.RAW;
-                sprite.trim = false;
-                sprite.spriteFrame.getTexture().setAliasTexParameters();
-                sprite.node.setAnchorPoint(cc.p(0.5,16.0/sprite.node.height));
-            }else{
-                var sprite2 = ag.spriteCache.get('map/object'+before[0]+'_1/'+name,function(sprite2){
-                    sprite2.sizeMode = cc.Sprite.SizeMode.RAW;
-                    sprite2.trim = false;
-                    sprite2.spriteFrame.getTexture().setAliasTexParameters();
-                    sprite2.node.setAnchorPoint(cc.p(0.5,16.0/sprite2.node.height));
-                }.bind(this));
-                sprite.node.addChild(sprite2.node);
-            }
+        var sprite = ag.spriteCache.get('map/object'+name,function(sprite){
+            sprite.sizeMode = cc.Sprite.SizeMode.RAW;
+            sprite.trim = false;
+            sprite.spriteFrame.getTexture().setAliasTexParameters();
+            sprite.node.setAnchorPoint(cc.p(0.5,16.0/sprite.node.height));
         }.bind(this));
         this.node.addChild(sprite.node);
         return sprite.node;

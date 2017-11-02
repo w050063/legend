@@ -4,7 +4,7 @@
     <dict>
         <key>frames</key>
         <dict>
-            <key>3_499.png</key>
+            <key>499.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{136,86},{48,32}}</string>
@@ -17,7 +17,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>3_500.png</key>
+            <key>500.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{52,2},{48,94}}</string>
@@ -30,7 +30,7 @@
                 <key>sourceSize</key>
                 <string>{48,128}</string>
             </dict>
-            <key>3_501.png</key>
+            <key>501.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{102,86},{48,32}}</string>
@@ -43,7 +43,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>3_502.png</key>
+            <key>502.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{52,142},{48,122}}</string>
@@ -56,7 +56,7 @@
                 <key>sourceSize</key>
                 <string>{48,128}</string>
             </dict>
-            <key>3_503.png</key>
+            <key>503.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{102,52},{48,32}}</string>
@@ -69,7 +69,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>3_504.png</key>
+            <key>504.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{2,192},{48,176}}</string>
@@ -82,7 +82,7 @@
                 <key>sourceSize</key>
                 <string>{48,192}</string>
             </dict>
-            <key>3_505.png</key>
+            <key>505.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{214,192},{48,32}}</string>
@@ -95,7 +95,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>3_506.png</key>
+            <key>506.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{2,2},{48,188}}</string>
@@ -108,7 +108,7 @@
                 <key>sourceSize</key>
                 <string>{48,192}</string>
             </dict>
-            <key>3_507.png</key>
+            <key>507.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{180,192},{48,32}}</string>
@@ -121,7 +121,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>3_508.png</key>
+            <key>508.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{210,142},{48,32}}</string>
@@ -134,7 +134,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>3_509.png</key>
+            <key>509.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{180,2},{48,138}}</string>
@@ -147,7 +147,7 @@
                 <key>sourceSize</key>
                 <string>{48,160}</string>
             </dict>
-            <key>3_510.png</key>
+            <key>510.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{176,142},{48,32}}</string>
@@ -160,7 +160,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>3_511.png</key>
+            <key>511.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{52,52},{48,86}}</string>
@@ -183,7 +183,7 @@
             <key>size</key>
             <string>{256,256}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:d0680c11b8315fd4be255ea6aa21590b:1/1$</string>
+            <string>$TexturePacker:SmartUpdate:7c597dff2ab04367ab586a70754d96b7:1/1$</string>
             <key>textureFileName</key>
             <string>object3.png</string>
         </dict>

@@ -25,18 +25,31 @@ cc.Class({
             var sprite = this._cacheArray[i];
             if(sprite._agName==name){
                 this._cacheArray.splice(i,1);
-                if(sprite._callback)sprite._callback(sprite);
+                if(callback)callback(sprite);
                 return sprite;
             }
         }
         var pos = name.lastIndexOf('/');
         var before = name.substr(0,pos);
-        var atlas = cc.loader.getRes(before,cc.SpriteAtlas);
-        if(!atlas && this._downloadArray.indexOf(before)==-1)this._downloadArray.push(before);
+        var after = name.substr(pos+1);
+        var i=0;
+        for(;i<100;++i){
+            var trueBefore = i==0?before:(before+'_'+i);
+            var atlas = cc.loader.getRes(trueBefore,cc.SpriteAtlas);
+            if(atlas){
+                if(atlas.getSpriteFrame(after)){
+                    break;
+                }
+            }else{
+                if(this._downloadArray.indexOf(trueBefore)==-1)this._downloadArray.push(trueBefore);
+                break;
+            }
+        }
         var sprite = new cc.Node().addComponent(cc.Sprite);
         this._waitFrameArray.push(sprite);
         sprite._agName = name;
-        sprite._callback = callback;
+        if(i!=0)sprite._agTime = i;
+        sprite._agCallback = callback;
         return sprite;
     },
 
@@ -72,13 +85,23 @@ cc.Class({
                     var name = sprite._agName;
                     var pos = name.lastIndexOf('/');
                     var before = name.substr(0,pos);
+                    if(sprite._agTime)before = before+'_'+sprite._agTime;
                     var after = name.substr(pos+1);
                     var atlas = cc.loader.getRes(before,cc.SpriteAtlas);
                     if(atlas){
-                        sprite.spriteFrame = atlas.getSpriteFrame(after);
-                        if(sprite._callback)sprite._callback(sprite);
-                        this._waitFrameArray.splice(index,1);
-                        ++bDisposeCount;
+                        var spriteFrame = atlas.getSpriteFrame(after);
+                        if(spriteFrame){
+                            sprite.spriteFrame = spriteFrame;
+                            if(sprite._agCallback){
+                                var temp = sprite._agCallback;
+                                sprite._agCallback = undefined;
+                                temp(sprite);
+                            }
+                            this._waitFrameArray.splice(index,1);
+                            ++bDisposeCount;
+                        }else{
+                            ++index;
+                        }
                     }else{
                         ++index;
                     }
@@ -92,20 +115,32 @@ cc.Class({
                 if(this._downloadArray.length>0){
                     if(this._bLoading==false){
                         this._bLoading = true;
-                        ag.jsUtil.startTime();
                         cc.loader.loadRes(this._downloadArray[0],cc.SpriteAtlas,function(err,atlas){
-                            ag.jsUtil.printTime('wweww '+this._downloadArray[0]);
                             this._downloadArray.splice(0,1);
                             this._bLoading = false;
                         }.bind(this));
                     }
                 }else{
-                    var array = this._waitFrameArray;
-                    this._waitFrameArray = [];
-                    for(var i=0;i<array.length;++i){
-                        var sprite = array[i];
+                    for(var i=this._waitFrameArray.length-1;i>=0;--i){
+                        var sprite = this._waitFrameArray[i];
                         if(cc.isValid(sprite) && cc.isValid(sprite.node)){
-                            if(sprite._callback)sprite._callback(sprite);
+                            var name = sprite._agName;
+                            var pos = name.lastIndexOf('/');
+                            var before = name.substr(0,pos);
+                            var trueBefore = before;
+                            if(sprite._agTime)trueBefore = before+'_'+sprite._agTime;
+                            var atlas = cc.loader.getRes(trueBefore,cc.SpriteAtlas);
+                            if(atlas){
+                                if(!sprite._agTime)sprite._agTime = 0;
+                                ++sprite._agTime;
+                                trueBefore = before+'_'+sprite._agTime;
+                                if(this._downloadArray.indexOf(trueBefore)==-1)this._downloadArray.push(trueBefore);
+                            }else{
+                                cc.log('not exist frame:'+name);
+                                this._waitFrameArray.splice(i,1);
+                            }
+                        }else{
+                            this._waitFrameArray.splice(i,1);
                         }
                     }
                 }

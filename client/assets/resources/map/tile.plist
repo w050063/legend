@@ -2149,71 +2149,6 @@
                 <key>sourceSize</key>
                 <string>{96,64}</string>
             </dict>
-            <key>900.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{2,1940},{96,64}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <true/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{96,64}}</string>
-                <key>sourceSize</key>
-                <string>{96,64}</string>
-            </dict>
-            <key>901.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{2,1842},{96,64}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <true/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{96,64}}</string>
-                <key>sourceSize</key>
-                <string>{96,64}</string>
-            </dict>
-            <key>902.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{2,1646},{96,64}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <true/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{96,64}}</string>
-                <key>sourceSize</key>
-                <string>{96,64}</string>
-            </dict>
-            <key>903.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{688,728},{96,64}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{96,64}}</string>
-                <key>sourceSize</key>
-                <string>{96,64}</string>
-            </dict>
-            <key>904.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{2,266},{96,64}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{96,64}}</string>
-                <key>sourceSize</key>
-                <string>{96,64}</string>
-            </dict>
             <key>950.png</key>
             <dict>
                 <key>frame</key>
@@ -2367,7 +2302,7 @@
             <key>size</key>
             <string>{1024,2048}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:37a7c99e5228c383339282f66e813d4b:1/1$</string>
+            <string>$TexturePacker:SmartUpdate:a6e125e5189a537cdea15eae151dcd0c:1/1$</string>
             <key>textureFileName</key>
             <string>tile.png</string>
         </dict>

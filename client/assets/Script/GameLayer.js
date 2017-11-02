@@ -706,13 +706,4 @@ cc.Class({
             })(i);
         }
     },
-
-
-    //根据location获得position
-    getPositionForLocation:function(mapId,location){
-        var mapData = ag.gameConst._terrainMap[mapId];
-        var x = parseInt(location.x)-mapData.mapX/2;
-        var y = parseInt(location.y)-mapData.mapY/2;
-        return cc.p(x*mapData.tileX,y*mapData.tileY);
-    },
 });
