@@ -418,10 +418,11 @@ module.exports = ag.class.extend({
         if(this._state == ag.gameConst.stateDead){
             this._state = ag.gameConst.stateIdle;
             this._data.hp = this._totalHP;
-            var map = ag.gameConst._terrainMap[ag.gameConst._bornMap];
-            var pos = ag.gameLayer.getStandLocation(ag.gameConst._bornMap,map.born.x,map.born.y);
+            var map = ag.gameConst._terrainMap[this._data.mapId=='t0'?'t0':'t1'];
+            this._data.mapId = map.id;
+            var pos = ag.gameLayer.getStandLocation(map.id,map.born.x,map.born.y);
             this.setLocation(pos);
-            ag.jsUtil.sendDataAll("sMoveForce",{id:this._data.id, x:this._data.x, y:this._data.y},this._data.mapId);
+            ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
             this._busy = false;
         }
     },

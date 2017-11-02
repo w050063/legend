@@ -27,15 +27,6 @@ module.exports = {
 
     //显示的数据方便策划，init做转换。
     init:function(){
-        for(var key in this._terrainMap){
-            var map = this._terrainMap[key];
-            var array = map.collision.split(";");
-            map.collision = [];
-            for(var i=0;i<array.length;++i){
-                var array2 = array[i].split(",");
-                map.collision.push([parseInt(array2[0]),parseInt(array2[1])]);
-            }
-        }
     },
 
 
@@ -68,37 +59,28 @@ module.exports = {
         t0:{
             id : "t0",
             name: "新手村",
-            res: 'map/mapgrass',
-            npc:[{name:"新手村接待员",x:17,y:12,title:"安全区域传送:",content:["土城"]}],
+            res: 'map/xinshoucun',
+            npc:[{name:"新手村接待员",x:32,y:9,title:"安全区域传送:",content:["土城"]}],
             tileX: 48,
             tileY: 32,
-            mapX: 150,
-            mapY: 150,
-            born: {x:15,y:14},
-            safe:{x:10,y:9,xx:20,yy:19},
-            collision:"",
-            //collision: "9,12;9,13;9,14;9,15;9,16;9,17;9,18;9,19;9,20;" +
-            //"10,12;10,13;10,14;10,15;10,16;10,17;10,18;10,19;10,20;" +
-            //"11,12;11,13;11,14;11,15;11,16;11,17;11,18;11,19;11,20;" +
-            //"12,12;12,13;12,14;12,15;12,16;12,17;12,18;12,19;12,20;" +
-            //"13,12;13,13;13,14;13,15;13,16;13,17;13,18;13,19;13,20;" +
-            //"14,12;14,13;14,14;14,15;14,16;14,17;14,18;14,19;14,20;" +
-            //"15,12;15,13;15,14;15,15;15,16;15,17;15,18;15,19;15,20",
+            mapX: 40,
+            mapY: 40,
+            born: {x:30,y:8},
+            safe:{x:25,y:4,xx:35,yy:12},
             refresh: [["m3", -1, -1, 120, 20],["m4", -1, -1, 120, 20]]
         },
         t1:{
             id : "t1",
             name: "土城",
-            res: 'map/mapsand',
-            npc:[{name:"传送员",x:17,y:12,title:"区域传送:",content:["新手村",'BOSS之家']},
+            res: 'map/tucheng',
+            npc:[{name:"传送员",x:25,y:33,title:"区域传送:",content:["新手村",'BOSS之家']},
                 {name:"装备回收",x:14,y:12,title:"装备回收:",content:["一级回收","二级回收","三级回收"]}],
-            tileX: 100,
-            tileY: 60,
-            mapX: 30,
-            mapY: 28,
-            born: {x:15,y:14},
-            safe:{x:10,y:9,xx:20,yy:19},
-            collision:"",
+            tileX: 48,
+            tileY: 32,
+            mapX: 60,
+            mapY: 60,
+            born: {x:16,y:36},
+            safe:{x:7,y:27,xx:26,yy:46},
             refresh: [["m5", -1, -1, 120, 30],["m6", -1, -1, 120, 30],["m7", -1, -1, 120, 30],["m9", -1, -1, 120, 5]]
         },
         t2:{
@@ -120,11 +102,11 @@ module.exports = {
 
     _roleMst: {
         m0:{id:"m0",name:"战士",hp:675,hpAdd:20,defense:5,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:1,
-            moveSpeed:0.7,attackSpeed:0.8,checkDistance:3,visibleDistance:7,attackDistance:0},
+            moveSpeed:0.5,attackSpeed:0.8,checkDistance:3,visibleDistance:7,attackDistance:0},
         m1:{id:"m1",name:"法师",hp:220,hpAdd:20,defense:50,defenseAdd:1,hurt:55,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:3,
-            moveSpeed:0.7,attackSpeed:1.2,checkDistance:3,visibleDistance:7,attackDistance:5},
+            moveSpeed:0.5,attackSpeed:1.2,checkDistance:3,visibleDistance:7,attackDistance:5},
         m2:{id:"m2",name:"道士",hp:400,hpAdd:20,defense:5,defenseAdd:1,hurt:100,hurtAdd:2,exp:100,expAdd:50,expDead:100,heal:1,healAdd:5,
-            moveSpeed:0.7,attackSpeed:1.2,checkDistance:3,visibleDistance:7,attackDistance:5},
+            moveSpeed:0.5,attackSpeed:1.2,checkDistance:3,visibleDistance:7,attackDistance:5},
         m3:{id:"m3",name:"甲壳虫",hp:220,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:1,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"beetle",drop:'i000,30,i001,30,i019,30',lv:1},
         m4:{id:"m4",name:"红野猪",hp:220,hpAdd:0,defense:5,defenseAdd:0,hurt:30,hurtAdd:0,exp:0,expAdd:0,expDead:50,heal:1,healAdd:0,

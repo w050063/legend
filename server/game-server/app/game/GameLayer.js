@@ -166,10 +166,7 @@ module.exports = {
     //碰撞检测
     isCollision:function(mapId,x,y){
         var obj = ag.gameConst._terrainMap[mapId];
-        if(x<0 || x>obj.mapX || y<0 || y>obj.mapY)return true;
-        for(var i=0;i<obj.collision.length;++i){
-            if(obj.collision[i][0]==x && obj.collision[i][1]==y)return true;
-        }
+        if(x<0 || x>=obj.mapX || y<0 || y>=obj.mapY)return true;
         return false;
     },
 
