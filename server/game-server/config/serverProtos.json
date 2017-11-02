@@ -72,6 +72,12 @@
     "optional int32 sex": 10,
     "optional string name": 11
   },
+  "message sRelife": {
+    "required string id": 1,
+    "required string mapId": 2,
+    "required int32 x": 3,
+    "required int32 y": 4
+  },
   "onData" : {
     "repeated sMove sMoveArray": 1,
     "repeated sAttack sAttackArray": 2,
@@ -91,6 +97,7 @@
     "repeated sBagItemToEquip sBagItemToEquipArray": 16,
     "repeated sEquipItemToBag sEquipItemToBagArray": 17,
     "repeated sChatYou sChatYouArray": 18,
-    "repeated string sSystemNotifyArray": 19
+    "repeated string sSystemNotifyArray": 19,
+    "repeated sRelife sRelifeArray": 20
   }
 }
