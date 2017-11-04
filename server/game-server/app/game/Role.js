@@ -91,15 +91,16 @@ module.exports = ag.class.extend({
 
 
     //更换地图
-    changeMap:function(mapId){
-        if(this._data.mapId != mapId){
+    changeMap:function(transferId){
+        var transferMst = ag.gameConst._transferMst[transferId];
+        if(transferMst){
+            var mapId = transferMst.mapId;
             ag.jsUtil.sendDataExcept("sDeleteRole",this._data.id,this._data.id);
             if(this._tiger)ag.jsUtil.sendDataExcept("sDeleteRole",this._tiger._data.id,this._data.id);
 
             //更新地图数据
             var oldStr = this.getMapXYString();
-            var map = ag.gameConst._terrainMap[mapId];
-            var pos = ag.gameLayer.getStandLocation(mapId,map.born.x,map.born.y);
+            var pos = ag.gameLayer.getStandLocation(mapId,transferMst.x,transferMst.y);
             this._data.mapId = mapId;
             this._data.x = pos.x;
             this._data.y = pos.y;
@@ -418,12 +419,9 @@ module.exports = ag.class.extend({
         if(this._state == ag.gameConst.stateDead){
             this._state = ag.gameConst.stateIdle;
             this._data.hp = this._totalHP;
-            var map = ag.gameConst._terrainMap[this._data.mapId=='t0'?'t0':'t1'];
-            this._data.mapId = map.id;
-            var pos = ag.gameLayer.getStandLocation(map.id,map.born.x,map.born.y);
-            this.setLocation(pos);
-            ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
             this._busy = false;
+            ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
+            this.changeMap(this._data.mapId=='t0'?'t0':'t1');
         }
     },
 
