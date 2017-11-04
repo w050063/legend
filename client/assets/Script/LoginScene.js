@@ -9,7 +9,7 @@ cc.Class({
     properties: {},
     onLoad: function () {
         cc.audioEngine.stopAll();
-        cc.audioEngine.play(cc.url.raw("resources/music/background.mp3"),true,1);
+        cc.audioEngine.play(cc.url.raw("resources/music/Dragon Rider.mp3"),true,1);
     },
 
     buttonTourist: function() {

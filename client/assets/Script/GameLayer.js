@@ -87,12 +87,13 @@ cc.Class({
 
         //测试新地图
         this._map = cc.find("Canvas/nodeMap").addComponent(AGMap);
-        //this._map.init(["resources/map/terrain0.png","resources/map/terrain1.png","resources/map/terrain2.png","resources/map/terrain3.png","resources/map/terrain4.png","resources/map/terrain5.png"]);
         this._map.node.setScale(2);
-
+        this._nameMap = cc.find("Canvas/nodeNameMap").addComponent(AGMap);
+        this._nameMap.node.setScale(2);
 
         this.changeMap();
-		
+        //请求本地图所有角色
+        ag.agSocket.send("changeMap",undefined);
 		
 		
         this.node.on(cc.Node.EventType.TOUCH_START, function (event) {
@@ -134,13 +135,26 @@ cc.Class({
 
 
     //换地图
-    changeMap:function(){
+    changeMap:function(transferId){
+        if(transferId){
+            var transferMst = ag.gameConst._transferMst[transferId];
+            ag.userInfo._data.mapId = transferMst.mapId;
+            ag.userInfo._data.x = transferMst.x;
+            ag.userInfo._data.y = transferMst.y;
+        }
         var mapId = ag.userInfo._data.mapId;
         var map = ag.gameConst._terrainMap[mapId];
+        if(this._backMusicName!=map.music){
+            this._backMusicName = map.music;
+            cc.audioEngine.stopAll();
+            cc.audioEngine.play(cc.url.raw("resources/music/"+map.music),true,1);
+        }
+
         //清空所有内容
         ag.buffManager.changeMap();
         this.buttonEventNpcClose();
         this._map.node.destroyAllChildren();
+        this._nameMap.node.destroyAllChildren();
         this._roleMap = {};
 
         //地图更新
@@ -170,10 +184,6 @@ cc.Class({
 
         //清空地上的道具，并更新
         ag.userInfo._itemMap = {};
-
-
-        //请求本地图所有角色
-        ag.agSocket.send("changeMap",mapId);
     },
 
 
@@ -181,6 +191,8 @@ cc.Class({
         pomelo.removeAllListeners('onData');
         ag.agSocket._dataArray = [];
         ag.userInfo._itemMap = {};
+        cc.audioEngine.stopAll();
+        cc.audioEngine.play(cc.url.raw("resources/music/Dragon Rider.mp3"),true,1);
         cc.director.loadScene('HallScene');
         ag.gameLayer = null;
     },
@@ -661,27 +673,13 @@ cc.Class({
             (function(i){
                 var label = self._nodeNpcContent.getChildByName('label'+i).getComponent(cc.Label);
                 if(i<data.content.length){
+                    var transferMst = ag.gameConst._transferMst[data.content[i]];
                     label.node.active = true;
-                    label.string = data.content[i];
+                    label.string = transferMst.name;
                     label.node.off(cc.Node.EventType.TOUCH_END);
                     label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
-                        var npcStr = data.content[i];
-                        if(npcStr=='新手村' || npcStr=='土城' || npcStr=='BOSS之家'){
-                            var mapId = '';
-                            if(npcStr=='新手村'){
-                                mapId = 't0';
-                            }else if(npcStr=='土城'){
-                                mapId = 't1';
-                            }else if(npcStr=='BOSS之家'){
-                                mapId = 't2';
-                            }
-                            var map = ag.gameConst._terrainMap[mapId];
-                            ag.userInfo._data.mapId = mapId;
-                            var pos = ag.gameLayer.getStandLocation(mapId,map.born.x,map.born.y);
-                            ag.userInfo._data.x = pos.x;
-                            ag.userInfo._data.y = pos.y;
-                            self.changeMap();
-                        }else if(npcStr=='一级回收' || npcStr=='二级回收' || npcStr=='三级回收'){
+                        var npcStr = transferMst.name;
+                        if(npcStr=='一级回收' || npcStr=='二级回收' || npcStr=='三级回收'){
                             var curLevel = 1;
                             if(npcStr=='一级回收'){
                                 curLevel = 1;
@@ -698,6 +696,10 @@ cc.Class({
                                 }
                             }
                             if(array.length>0)ag.agSocket.send("bagItemRecycle",array.join(','));
+                        }else{
+                            self.changeMap(transferMst.id);
+                            //请求本地图所有角色
+                            ag.agSocket.send("changeMap",transferMst.id);
                         }
                     });
                 }else{

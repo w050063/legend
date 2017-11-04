@@ -72,7 +72,7 @@ cc.Class({
 		var angle = cc.pToAngle(cc.pSub(location,this._rockBack.getPosition()));
 		var dis = Math.min(76,cc.pDistance(location,this._rockBack.getPosition()));
 		this._rockPoint.setPosition(cc.p(dis*Math.cos(angle),dis*Math.sin(angle)));
-		if(dis>30){
+		if(dis>20){
             this.resetDirectionByRock(angle);
         }else{
             this._touchMoveDirection = -1;
@@ -80,7 +80,7 @@ cc.Class({
 	},
 	rockEnd:function(event){
 		this._rockPoint.setPosition(cc.p(0,0));
-		this._rockBack.setPosition(cc.p(50,50));
+		this._rockBack.setPosition(cc.p(0,0));
 		this._rockBack.opacity = 100;
 		this._touchMoveDirection = -1;
 	},

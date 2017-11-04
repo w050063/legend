@@ -86,6 +86,7 @@ cc.Class({
         if(ag.gameLayer._player == this){
             var scale = ag.gameLayer._map.node.getScale();
             ag.gameLayer._map.node.setPosition(-this.node.x*scale,(-this.node.y-40)*scale);
+            ag.gameLayer._nameMap.node.setPosition(-this.node.x*scale,(-this.node.y-40)*scale);
         }
 
         var zorder = Math.round(10000-this.node.y);
@@ -167,7 +168,8 @@ cc.Class({
                 this.idleAnimation();
             }
             if(!this._propNode){
-                this._propNode = ag.jsUtil.getCacheNode('prefab/nodeRoleProp',this.node);
+                this._propNode = ag.jsUtil.getCacheNode('prefab/nodeRoleProp',ag.gameLayer._nameMap.node);
+                this._propNode.setPosition(this.node.getPosition());
                 if(this._data.camp==ag.gameConst.campNpc){
                     this._propNode._progressBarHP.progress = 1;
                     this._propNode._labelHP.string = "npc";
@@ -284,6 +286,9 @@ cc.Class({
                     if(this._ai)this._ai._busy = false;
                 }
             }.bind(this))));
+            if(this._propNode){
+                this._propNode.runAction(cc.moveTo(moveSpeed,this.getTruePosition(location)));
+            }
             if(this._data.camp==ag.gameConst.campMonster || (this._data.camp==ag.gameConst.campLiuxing && this._data.type=='m19')){
                 var clothes = ag.gameConst._roleMst[this._data.type].model+'0';
                 var array = AGAniClothes[clothes+ag.gameConst.stateMove+this._data.direction].split(',');
@@ -336,6 +341,7 @@ cc.Class({
     myMoveByServer:function(location) {
         this.node.stopAllActions();
         this.setLocation(location);
+        if(this._propNode)this._propNode.setPosition(this.node.getPosition());
         this.idle();
         if(this._ai)this._ai._busy = false;
     },
@@ -416,11 +422,7 @@ cc.Class({
                 ag.buffManager.setCDForFireCrit(this,true);
                 cc.audioEngine.play(cc.url.raw("resources/music/hit.mp3"),false,1);
             }else{
-                if(Math.random()>0.5){
-                    ag.jsUtil.getEffect(this.node,"ani/effect1/"+(500000+this._data.direction*6),6,ag.gameConst.roleEffectZorder,0.1);
-                }else{
-                    ag.jsUtil.getEffect(this.node,"ani/effect1/"+(501000+this._data.direction*6),6,ag.gameConst.roleEffectZorder,0.1);
-                }
+                ag.jsUtil.getEffect(this.node,"ani/effect1/"+(500000+this._data.direction*6),6,ag.gameConst.roleEffectZorder,0.1);
             }
         }else if(this._data.type=="m1"){
             var pos = locked.getTruePosition();
@@ -584,37 +586,15 @@ cc.Class({
     //复活
     relife:function(data){
         if(this._state == ag.gameConst.stateDead){
-            var self = this;
             this.changeHP(this._totalHP);
             if(this==ag.gameLayer._player){
-                ag.userInfo._data.mapId = data.mapId;
-                ag.userInfo._data.x = data.x;
-                ag.userInfo._data.y = data.y;
-                ag.gameLayer.changeMap();
-                self = ag.gameLayer._player;
+                ag.gameLayer.changeMap(this._data.mapId=='t0'?'t0':'t1');
             }else{
                 this.node.active = true;
                 this.idleAnimation();
                 this._state = ag.gameConst.stateIdle;
                 if(this._ai)this._ai._busy = false;
                 this.setLocation(cc.p(data.x,data.y));
-            }
-
-
-
-            if(this._nearFlag){
-                //复活飘字
-                var node = new cc.Node();
-                var tips = node.addComponent(cc.Label);
-                node.x = 0;
-                node.y = 87;
-                tips.fontSize = 12;
-                node.color = cc.color(0,255,0,255);
-                tips.string = "站起来还是一条好汉！！！";
-                this.node.addChild(node,30);
-                node.runAction(cc.sequence(cc.delayTime(3), cc.fadeOut(0.2),cc.callFunc(function(){
-                    node.destroy();
-                })));
             }
         }
     },
