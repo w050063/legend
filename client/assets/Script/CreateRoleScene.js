@@ -14,13 +14,14 @@ cc.Class({
         this._selectIndex = 0;
         //初始化按钮对象
         this._nodeRoleArray = [];
-        var showClothes = ['fighteroneboy004','fighteronegirl004','magicianoneboy004','magicianonegirl004','taoistoneboy004','taoistonegirl004'];
+        var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
+        var nameArray = ['ani/hum4/004','ani/hum5/005','ani/hum6/006','ani/hum7/007','ani/hum8/008','ani/hum9/009'];
         for(var i=0;i<6;++i){
             (function (i) {
                 var nodeRole = cc.find('Canvas/layoutRole/nodeRole'+i);
-                var array = AGAniClothes[showClothes[i]].split(',');
-                nodeRole._modelNode = ag.jsUtil.getNode(nodeRole,array[0],parseInt(array[1]),0,0.3);
+                nodeRole._modelNode = ag.jsUtil.getNode(nodeRole,nameArray[i]+array[0],parseInt(array[1]),0,0.3);
                 nodeRole.on('touchend', function () {
+                    cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
                     this.setSelected(i);
                 }.bind(this));
                 this._nodeRoleArray.push(nodeRole);
@@ -69,6 +70,7 @@ cc.Class({
 
     //开始游戏按钮
     buttonDelete: function () {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         if(ag.userInfo._accountData.type!=undefined && ag.userInfo._accountData.sex!=undefined){
             ag.jsUtil.request(this.node,'deleteRole',ag.agSocket._sessionId,function (data) {
                 ag.userInfo._accountData.type=undefined;
@@ -82,6 +84,7 @@ cc.Class({
 
     //开始游戏按钮
     buttonStart: function () {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         var prefab = cc.loader.getRes('prefab/nodeRequest',cc.Prefab);
         var node = cc.instantiate(prefab);
         node.parent = this.node;
@@ -114,6 +117,7 @@ cc.Class({
 
 
     back:function(){
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         cc.director.loadScene('HallScene');
     },
 });

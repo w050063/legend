@@ -4,231 +4,23 @@
     <dict>
         <key>frames</key>
         <dict>
-            <key>4924.png</key>
+            <key>4978.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{152,172},{48,32}}</string>
+                <string>{{36,486},{18,16}}</string>
                 <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4925.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{228,206},{26,22}}</string>
-                <key>offset</key>
-                <string>{11,-5}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{22,10},{26,22}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4926.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{218,252},{6,4}}</string>
-                <key>offset</key>
-                <string>{21,14}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{42,0},{6,4}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4927.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{102,172},{48,32}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4928.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{52,172},{48,32}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4929.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{2,172},{48,32}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4930.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{202,138},{48,32}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4931.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{152,138},{48,32}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4932.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{102,138},{48,32}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4933.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{218,258},{4,4}}</string>
-                <key>offset</key>
-                <string>{22,-14}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{44,28},{4,4}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4934.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{220,240},{6,4}}</string>
-                <key>offset</key>
-                <string>{21,14}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{42,0},{6,4}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4935.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{52,138},{48,32}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4936.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{2,138},{48,32}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4937.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{202,104},{48,32}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4938.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{152,104},{48,32}}</string>
-                <key>offset</key>
-                <string>{0,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{48,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4939.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{252,2},{2,2}}</string>
-                <key>offset</key>
-                <string>{23,-15}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{46,30},{2,2}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4940.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{250,172},{32,4}}</string>
-                <key>offset</key>
-                <string>{8,14}</string>
+                <string>{-15,8}</string>
                 <key>rotated</key>
                 <true/>
                 <key>sourceColorRect</key>
-                <string>{{16,0},{32,4}}</string>
+                <string>{{0,0},{18,16}}</string>
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4941.png</key>
+            <key>4979.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{102,104},{48,32}}</string>
+                <string>{{262,172},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -238,10 +30,10 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4942.png</key>
+            <key>4980.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{52,104},{48,32}}</string>
+                <string>{{212,172},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -251,62 +43,218 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4943.png</key>
+            <key>4981.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{188,234},{30,6}}</string>
+                <string>{{462,154},{48,32}}</string>
                 <key>offset</key>
-                <string>{9,-13}</string>
+                <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{18,26},{30,6}}</string>
+                <string>{{0,0},{48,32}}</string>
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4944.png</key>
+            <key>4982.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{228,230},{30,22}}</string>
+                <string>{{412,138},{48,32}}</string>
                 <key>offset</key>
-                <string>{9,5}</string>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4983.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{362,138},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4984.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{312,138},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4985.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{262,138},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4986.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{212,138},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4987.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{178,454},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
                 <key>rotated</key>
                 <true/>
                 <key>sourceColorRect</key>
-                <string>{{18,0},{30,22}}</string>
+                <string>{{0,0},{48,32}}</string>
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4945.png</key>
+            <key>4988.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{188,242},{28,20}}</string>
+                <string>{{172,404},{48,32}}</string>
                 <key>offset</key>
-                <string>{10,-6}</string>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4989.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{172,354},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4990.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{502,30},{6,4}}</string>
+                <key>offset</key>
+                <string>{-21,-14}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{20,12},{28,20}}</string>
+                <string>{{0,28},{6,4}}</string>
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4950.png</key>
+            <key>4991.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,206},{46,32}}</string>
+                <string>{{26,508},{1,1}}</string>
                 <key>offset</key>
-                <string>{-1,0}</string>
+                <string>{-23.5,15.5}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{46,32}}</string>
+                <string>{{0,0},{1,1}}</string>
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4951.png</key>
+            <key>4992.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,104},{48,32}}</string>
+                <string>{{172,304},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4993.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{172,254},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4994.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{172,204},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4995.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{172,154},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4996.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{478,104},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4997.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{428,104},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -316,49 +264,140 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4952.png</key>
+            <key>4998.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{178,250},{12,8}}</string>
+                <string>{{378,104},{48,32}}</string>
                 <key>offset</key>
-                <string>{-18,-12}</string>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>4999.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{328,104},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5000.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{278,104},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5001.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{228,104},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5002.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{178,104},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5003.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{144,454},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
                 <key>rotated</key>
                 <true/>
                 <key>sourceColorRect</key>
-                <string>{{0,24},{12,8}}</string>
+                <string>{{0,0},{48,32}}</string>
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4953.png</key>
+            <key>5004.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{224,262},{22,12}}</string>
+                <string>{{138,404},{48,32}}</string>
                 <key>offset</key>
-                <string>{-13,10}</string>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5005.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{138,354},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5006.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{138,304},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5007.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{440,70},{44,32}}</string>
+                <key>offset</key>
+                <string>{-2,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{22,12}}</string>
+                <string>{{0,0},{44,32}}</string>
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4954.png</key>
+            <key>5008.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{202,172},{46,32}}</string>
-                <key>offset</key>
-                <string>{-1,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{46,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4955.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{188,206},{38,26}}</string>
+                <string>{{70,454},{38,26}}</string>
                 <key>offset</key>
                 <string>{-5,-3}</string>
                 <key>rotated</key>
@@ -368,23 +407,296 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4956.png</key>
+            <key>5009.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{178,230},{18,8}}</string>
+                <string>{{502,2},{20,8}}</string>
                 <key>offset</key>
-                <string>{12,12}</string>
+                <string>{11,12}</string>
                 <key>rotated</key>
                 <true/>
                 <key>sourceColorRect</key>
-                <string>{{27,0},{18,8}}</string>
+                <string>{{25,0},{20,8}}</string>
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4957.png</key>
+            <key>5010.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{202,70},{48,32}}</string>
+                <string>{{138,254},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5011.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{138,204},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5012.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{138,154},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5013.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{138,104},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5014.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{110,454},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5015.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{104,404},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5016.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{104,354},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5017.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{104,304},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5018.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{104,254},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5019.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{104,204},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5020.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{104,154},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5021.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{104,104},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5022.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{70,404},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5023.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{70,354},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5024.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{70,304},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5025.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{70,254},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5026.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{70,204},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5027.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{502,24},{8,4}}</string>
+                <key>offset</key>
+                <string>{8,-14}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{28,28},{8,4}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5028.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,486},{24,16}}</string>
+                <key>offset</key>
+                <string>{12,8}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{24,0},{24,16}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5029.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{70,154},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5030.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{70,104},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5031.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{390,70},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -394,10 +706,10 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4958.png</key>
+            <key>5032.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{152,70},{48,32}}</string>
+                <string>{{340,70},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -407,10 +719,10 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4959.png</key>
+            <key>5033.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{102,70},{48,32}}</string>
+                <string>{{290,70},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -420,49 +732,10 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4960.png</key>
+            <key>5034.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{142,230},{34,32}}</string>
-                <key>offset</key>
-                <string>{-7,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{34,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4961.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{96,206},{44,32}}</string>
-                <key>offset</key>
-                <string>{-2,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{44,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4962.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{50,206},{44,32}}</string>
-                <key>offset</key>
-                <string>{-2,0}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{44,32}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4963.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{52,70},{48,32}}</string>
+                <string>{{240,70},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -472,10 +745,10 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4964.png</key>
+            <key>5035.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,70},{48,32}}</string>
+                <string>{{190,70},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -485,10 +758,10 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4965.png</key>
+            <key>5036.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{202,36},{48,32}}</string>
+                <string>{{140,70},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -498,36 +771,10 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4966.png</key>
+            <key>5037.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{218,246},{8,4}}</string>
-                <key>offset</key>
-                <string>{9,-14}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{29,28},{8,4}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4967.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{142,206},{44,22}}</string>
-                <key>offset</key>
-                <string>{-2,5}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,0},{44,22}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
-            <key>4968.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{152,36},{48,32}}</string>
+                <string>{{90,70},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -537,10 +784,140 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4969.png</key>
+            <key>5038.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{102,36},{48,32}}</string>
+                <string>{{36,436},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5039.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{36,386},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5040.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{36,336},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5041.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{36,286},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5042.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{36,236},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5043.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{36,186},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5044.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{486,36},{48,18}}</string>
+                <key>offset</key>
+                <string>{0,-7}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,14},{48,18}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5045.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{20,486},{20,14}}</string>
+                <key>offset</key>
+                <string>{-14,9}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{20,14}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5046.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{36,136},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5047.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{36,86},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5048.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{436,36},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -550,10 +927,10 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4970.png</key>
+            <key>5049.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{52,36},{48,32}}</string>
+                <string>{{386,36},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -563,20 +940,306 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4971.png</key>
+            <key>5050.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{336,36},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5051.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{286,36},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5052.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{236,36},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5053.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{186,36},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5054.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{136,36},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5055.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{86,36},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5056.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{36,36},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5057.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,436},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5058.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,386},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5059.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,336},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5060.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,286},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5061.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{20,508},{2,4}}</string>
+                <key>offset</key>
+                <string>{23,-14}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{46,28},{2,4}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5062.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{54,486},{34,16}}</string>
+                <key>offset</key>
+                <string>{7,8}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{14,0},{34,16}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5063.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,236},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5064.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,186},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5065.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,136},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5066.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,86},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5067.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{2,36},{48,32}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5068.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{452,2},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
                 <string>{{0,0},{48,32}}</string>
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4972.png</key>
+            <key>5069.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{402,2},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5070.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{352,2},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5071.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{302,2},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5072.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{252,2},{48,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,32}}</string>
+                <key>sourceSize</key>
+                <string>{48,32}</string>
+            </dict>
+            <key>5073.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{202,2},{48,32}}</string>
@@ -589,7 +1252,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4973.png</key>
+            <key>5074.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{152,2},{48,32}}</string>
@@ -602,7 +1265,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4974.png</key>
+            <key>5075.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{102,2},{48,32}}</string>
@@ -615,7 +1278,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4975.png</key>
+            <key>5076.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{52,2},{48,32}}</string>
@@ -628,7 +1291,7 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4976.png</key>
+            <key>5077.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{2,2},{48,32}}</string>
@@ -641,19 +1304,6 @@
                 <key>sourceSize</key>
                 <string>{48,32}</string>
             </dict>
-            <key>4977.png</key>
-            <dict>
-                <key>frame</key>
-                <string>{{220,234},{6,4}}</string>
-                <key>offset</key>
-                <string>{-21,-14}</string>
-                <key>rotated</key>
-                <false/>
-                <key>sourceColorRect</key>
-                <string>{{0,28},{6,4}}</string>
-                <key>sourceSize</key>
-                <string>{48,32}</string>
-            </dict>
         </dict>
         <key>metadata</key>
         <dict>
@@ -662,9 +1312,9 @@
             <key>realTextureFileName</key>
             <string>object4_1.png</string>
             <key>size</key>
-            <string>{256,512}</string>
+            <string>{512,512}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:ac3a128202d61481f56b509173c3f2c6:1/1$</string>
+            <string>$TexturePacker:SmartUpdate:bd167c41c35c91221025080e1b14f21f:1/1$</string>
             <key>textureFileName</key>
             <string>object4_1.png</string>
         </dict>

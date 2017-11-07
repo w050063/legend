@@ -25,7 +25,6 @@ module.exports={
 	_map:"mafa",
 	_skillLevel:[0,0,0,0],
 	_skillPointCount:1,
-	_bornLocation:cc.p(2,2),
     _direction:4,
 	_itemMap : {},
 

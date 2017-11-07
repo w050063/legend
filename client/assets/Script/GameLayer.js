@@ -44,6 +44,7 @@ cc.Class({
             (function(i){
                 self._equipArray.push(cc.find('Canvas/nodeBag/sprite'+i+'/sprite').getComponent(cc.Sprite));
                 cc.find('Canvas/nodeBag/sprite'+i).on(cc.Node.EventType.TOUCH_END, function (event) {
+                    cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
                     for(var key in ag.userInfo._itemMap){
                         var obj = ag.userInfo._itemMap[key];
                         var mst = ag.gameConst._itemMst[obj._data.mid];
@@ -65,6 +66,7 @@ cc.Class({
         var nodeChat = cc.find('Canvas/nodeChat');
         nodeChat.active = false;
         nodeChat.on(cc.Node.EventType.TOUCH_END, function (event) {
+            cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
             nodeChat.active = false;
             cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
         }.bind(this));
@@ -87,9 +89,9 @@ cc.Class({
 
         //测试新地图
         this._map = cc.find("Canvas/nodeMap").addComponent(AGMap);
-        this._map.node.setScale(2);
+        this._map.node.setScale(1.5);
         this._nameMap = cc.find("Canvas/nodeNameMap").addComponent(AGMap);
-        this._nameMap.node.setScale(2);
+        this._nameMap.node.setScale(1.5);
 
         this.changeMap();
         //请求本地图所有角色
@@ -460,14 +462,17 @@ cc.Class({
 
 
     buttonBagEvent:function (sender) {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         this._nodeBag.active = true;
     },
 
 
     buttonBagClose:function (sender) {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         this._nodeBag.active = false;
     },
     buttonSettingClose:function (sender) {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         cc.find('Canvas/nodeHelp').active = false;
     },
 
@@ -584,12 +589,14 @@ cc.Class({
 
     //聊天按钮
     buttonShowHelp:function(){
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         cc.find('Canvas/nodeHelp').active = true;
     },
 
 
     //回车发送信息
     editBoxConfirm: function (sender) {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         cc.find('Canvas/nodeChat').active = false;
         cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
         if(sender.string.length>0){
@@ -645,6 +652,7 @@ cc.Class({
 
 
     toggleAutoAttack: function (event) {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         this._setupAutoAttack = event.isChecked;
     },
 

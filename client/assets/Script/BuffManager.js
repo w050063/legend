@@ -65,7 +65,7 @@ cc.Class({
         var node = new cc.Node();
         ag.gameLayer._map.node.addChild(node,9999999999);
         node.setPosition(ag.gameLayer._player.getTruePosition(cc.p(parseInt(array[1]),parseInt(array[2]))));
-        node._agani = ag.jsUtil.getNode(node,"ani/effect3/507000",4,0,0.05,function(sender){});
+        node._agani = ag.jsUtil.getNode(node,"ani/effect4/507000",4,0,0.05,function(sender){});
 
         this._fireWallMap[mapXYString] = {id:role._data.id,tag:tag,node:node};
     },

@@ -7,7 +7,7 @@
   "subMetas": {
     "hum1": {
       "ver": "1.0.3",
-      "uuid": "54fb8335-2c9d-4744-a718-01664aae5a65",
+      "uuid": "84779991-c182-479a-9840-87a62f6a34f7",
       "rawTextureUuid": "25fe6120-1d1d-4ed9-bc54-f5b64f699862",
       "trimType": "auto",
       "trimThreshold": 1,
@@ -16,10 +16,10 @@
       "offsetY": 0,
       "trimX": 2,
       "trimY": 2,
-      "width": 2044,
-      "height": 2044,
-      "rawWidth": 2048,
-      "rawHeight": 2048,
+      "width": 508,
+      "height": 1020,
+      "rawWidth": 512,
+      "rawHeight": 1024,
       "borderTop": 0,
       "borderBottom": 0,
       "borderLeft": 0,

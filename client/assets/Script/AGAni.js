@@ -62,6 +62,7 @@ cc.Class({
         var after = str.substr(pos+1);
         var array = AGAniOffset[after].split(",");
         this.node.addChild(sprite.node);
+        sprite.node.setColor(this.node.getColor());
         this.node.setPosition(cc.pAdd(this._aniPosition,cc.p(parseInt(array[0]),parseInt(array[1]))));
 
         if(this._controllArray){

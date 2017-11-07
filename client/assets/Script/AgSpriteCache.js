@@ -12,7 +12,7 @@ cc.Class({
     //初始化角色
     init: function (str,n) {
         this._cacheArray = [];
-        this._cacheMaxCount = 500;
+        this._cacheMaxCount = 200;
         this._downloadArray = [];
         this._bLoading = false;
         this._waitFrameArray = [];

@@ -13,6 +13,7 @@ cc.Class({
     },
 
     buttonTourist: function() {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         ag.jsUtil.request(this.node,'ykLogin',ag.agSocket._sessionId,function (data) {
             UserInfo._accountData = data.data;
             cc.director.loadScene('HallScene');

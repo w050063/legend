@@ -45,6 +45,7 @@ cc.Class({
                     item.getChildByName('labelTime').getComponent(cc.Label).string = ''+Math.floor(array[index].time/60)+'分钟'+(array[index].time%60)+'秒';
                     item.off('touchend');
                     item.on('touchend', function () {
+                        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
                         existThis = false;
                         cc.director.loadScene('CreateRoleScene');
                     });
@@ -68,6 +69,7 @@ cc.Class({
 
     //回车发送信息
     editBoxConfirm: function (sender) {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         if(sender.string.length>=2){
             ag.jsUtil.request(this.node,'changeName',sender.string,function (data) {
                 ag.userInfo._accountData.name = sender.string;
@@ -79,10 +81,12 @@ cc.Class({
     },
 
     buttonClose:function(){
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         cc.find('Canvas/spriteHeadInfo').active = false;
     },
 
     back:function(){
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         existThis = false;
         cc.director.loadScene('LoginScene');
     },

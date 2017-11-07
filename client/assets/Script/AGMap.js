@@ -12,7 +12,7 @@ cc.Class({
         this._width = 0;
         this._height = 0;
         this._dataArray = [];
-        this._screenRadius = 8;
+        this._screenRadius = 10;
         this._mapTile = {};
         this._mapObj = {};
         this._center = cc.p(0,0);
@@ -29,7 +29,7 @@ cc.Class({
     setCenter:function(location){
         this._center = location;
         if(this._dataArray.length==0)return;
-        var w = 48,h=32;
+        var w = ag.gameConst.tileWidth,h=ag.gameConst.tileHeight;
         var oldMapTile = this._mapTile;
         this._mapTile = {};
         var oldMapObj = this._mapObj;
@@ -44,7 +44,7 @@ cc.Class({
                     this._mapTile[str] = oldMapTile[str];
                 }else{
                     var name = this._dataArray[(i*this._width+j)*3+2];
-                    if(name && name!='-1'){
+                    if(name && name!='0'){
                         var node = this.getTileSprite(name);
                         node.setPosition(w*(0.5+j-this._width/2),h*(0.5+i-this._height/2));
                         this._mapTile[str] = node;
@@ -97,7 +97,7 @@ cc.Class({
 
 
     getTileSprite:function(name){
-        var sprite = ag.spriteCache.get('map/tile/'+name,function(sprite){
+        var sprite = ag.spriteCache.get('map/tile'+name,function(sprite){
             sprite.sizeMode = cc.Sprite.SizeMode.RAW;
             sprite.trim = false;
             sprite.spriteFrame.getTexture().setAliasTexParameters();
