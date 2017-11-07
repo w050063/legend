@@ -43,8 +43,7 @@ module.exports = {
             player._data = {};
             player._data.id = uid;
             player._data.type = type;
-            var map = ag.gameConst._terrainMap[ag.gameConst._bornMap];
-            var pos = this.getStandLocation(ag.gameConst._bornMap,map.born.x,map.born.y);
+            var pos = this.getStandLocation(ag.gameConst._bornMap,ag.gameConst.born.x,ag.gameConst.born.y);
             player._data.x = pos.x;
             player._data.y = pos.y;
             player._data.name = name;
@@ -88,7 +87,7 @@ module.exports = {
         //确认进入游戏成功。
         player.relife();
         ag.jsUtil.send("sEnter",JSON.stringify(player._data),[uid]);
-        player.changeMap(player._data.mapId);
+        player.changeMap();
     },
 
 
@@ -108,8 +107,8 @@ module.exports = {
                         player._data.type = array[i][0];
                         var x= 0,y=0;
                         if(array[i][1]==-1 && array[i][2]==-1){
-                            x = Math.floor(Math.random()*(map.mapX+1));
-                            y = Math.floor(Math.random()*(map.mapY+1));
+                            x = Math.floor(Math.random()*map.mapX);
+                            y = Math.floor(Math.random()*map.mapY);
                         }else{
                             x = array[i][1];
                             y = array[i][2];

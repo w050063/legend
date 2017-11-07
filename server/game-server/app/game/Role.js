@@ -94,6 +94,7 @@ module.exports = ag.class.extend({
     changeMap:function(transferId){
         var transferMst = ag.gameConst._transferMst[transferId];
         if(transferMst){
+            console.log('transferId:'+transferId);
             var mapId = transferMst.mapId;
             ag.jsUtil.sendDataExcept("sDeleteRole",this._data.id,this._data.id);
             if(this._tiger)ag.jsUtil.sendDataExcept("sDeleteRole",this._tiger._data.id,this._data.id);
