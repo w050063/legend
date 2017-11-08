@@ -57,7 +57,8 @@
   },
   "message sChatYou": {
     "required string id": 1,
-    "required string content": 2
+    "required string name": 2,
+    "required string content": 3
   },
   "message sRole": {
     "required string id": 1,
