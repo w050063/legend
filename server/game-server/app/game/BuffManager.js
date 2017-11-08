@@ -42,7 +42,7 @@ module.exports = ag.class.extend({
         if(!this._fireWallMap[mapXYString]){
             var tag = ++this._baseTag;
             this._fireWallMap[mapXYString] = {id:role._data.id,tag:tag};
-            ag.actionManager.runAction(role,10,function(){
+            ag.actionManager.runAction(role,20,function(){
                 this.delFireWall(mapXYString);
             }.bind(this),tag);
             ag.jsUtil.sendDataAll("sFireWall",{id:mapXYString,rid:role._data.id},role._data.mapId);
@@ -75,8 +75,10 @@ module.exports = ag.class.extend({
             this.delPoison(role._data.id);
         }
         var tag = ++this._baseTag;
-        this._poisonMap[role._data.id] = {id:attacker._data.id,tag:tag};
-        ag.actionManager.runAction(role,10,function(){
+        var value = Math.round(attacker._hurt*0.1);
+        this._poisonMap[role._data.id] = {id:attacker._data.id,value:value,tag:tag};
+        role._data.defense -=value;
+        ag.actionManager.runAction(role,30,function(){
             this.delPoison(role._data.id);
         }.bind(this));
     },
@@ -94,8 +96,16 @@ module.exports = ag.class.extend({
     delPoison:function (key) {
         if(this._poisonMap[key]){
             ag.actionManager.stopActionByTag(this._poisonMap[key].tag);
+            var role = ag.gameLayer.getRole(key);
+            if(role)role._data.defense += this._poisonMap[key].value;
             delete this._poisonMap[key];
         }
+    },
+
+
+    getIsRelife:function(role){
+        if(this._poisonMap[role._data.id] && role._data.camp==ag.gameConst.campMonster)return false;
+        return true;
     },
 
 
@@ -111,8 +121,11 @@ module.exports = ag.class.extend({
                 array = ag.gameLayer.getRoleFromCenterXY(array[0],ag.jsUtil.p(parseInt(array[1]),parseInt(array[2])),0);
                 if(array){
                     for(var i=0;i<array.length;++i){
-                        if(ag.gameLayer.isEnemyForAttack(attacker,array[i])){
-                            array[i]._data.hp -= 1;
+                        var tempRole = array[i];
+                        if(ag.gameLayer.isEnemyForAttack(attacker,tempRole)){
+                            var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
+                            tempRole._data.hp -= Math.round(attacker._hurt/correct*0.5);
+                            ag.jsUtil.sendDataAll("sHP",{id:tempRole._data.id,hp:tempRole._data.hp},tempRole._data.mapId);
                         }
                     }
                 }
@@ -123,11 +136,14 @@ module.exports = ag.class.extend({
 
         //毒的伤害
         for(var key in this._poisonMap){
-            var role = ag.gameLayer.getRole(key);
+            var tempRole = ag.gameLayer.getRole(key);
             var attacker = ag.gameLayer.getRole(this._poisonMap[key].id);
-            if(role && attacker){
-                if(ag.gameLayer.isEnemyForAttack(attacker,role)){
-                    role._data.hp -= 1;
+            if(tempRole && attacker){
+                if(ag.gameLayer.isEnemyForAttack(attacker,tempRole)){
+                    tempRole._data.hp -= 1;
+                    var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
+                    tempRole._data.hp -= Math.round(attacker._hurt/correct*0.1);
+                    ag.jsUtil.sendDataAll("sHP",{id:tempRole._data.id,hp:tempRole._data.hp},tempRole._data.mapId);
                 }
             }
         }
@@ -139,8 +155,9 @@ module.exports = ag.class.extend({
         //自动回血
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
-            if(role._data.hp>0 && role._data.hp<role._totalHP){
+            if(role._data.hp>0 && role._data.hp<role._totalHP && this.getIsRelife(role)){
                 role._data.hp = Math.min(role._data.hp+role._heal,role._totalHP);
+                ag.jsUtil.sendDataAll("sHP",{id:role._data.id,hp:role._data.hp},role._data.mapId);
             }
         }
     }

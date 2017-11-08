@@ -26,6 +26,11 @@ module.exports = {
             ++this._gameTime;
             this.refresh();
         }.bind(this));
+
+        //每隔30秒发送一次在线人数
+        ag.actionManager.schedule(this,30,function (dt) {
+            ag.jsUtil.sendDataAll("sSystemNotify","当前在线人数："+ag.jsUtil.getClientCount());
+        }.bind(this));
 	},
 
 

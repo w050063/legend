@@ -59,14 +59,30 @@ module.exports = {
     init:function(){
         this._sendObj = {};
         setInterval(function () {
+            var channelService = pomelo.app.get('channelService');
+            var channel = channelService.getChannel(this.dataChannel, true);
             for(var id in this._sendObj){
-                var channelService = pomelo.app.get('channelService');
-                var channel = channelService.getChannel(this.dataChannel, true);
                 var userObj = channel.getMember(id);
                 if(userObj)channelService.pushMessageByUids('onData',this._sendObj[id],[{uid: id,sid: userObj['sid']}]);
             }
             this._sendObj = {};
         }.bind(this),50);
+    },
+
+
+    getClientCount:function(){
+        var sum = 0;
+        var channelService = pomelo.app.get('channelService');
+        var channel = channelService.getChannel(this.dataChannel, true);
+        for(var key in ag.gameLayer._roleMap){
+            var data = ag.gameLayer._roleMap[key]._data;
+            if(data.camp!=ag.gameConst.campMonster){
+                if(channel.getMember(data.id)){
+                    ++sum;
+                }
+            }
+        }
+        return sum;
     },
 
 
@@ -96,10 +112,19 @@ module.exports = {
 
     //发送要合并的数据
     sendDataAll : function(route,msg,mapId){
-        for(var key in ag.gameLayer._roleMap){
-            var data = ag.gameLayer._roleMap[key]._data;
-            if(data.camp!=ag.gameConst.campMonster && data.mapId==mapId){
-                this.sendData(route,msg,data.id);
+        if(mapId){
+            for(var key in ag.gameLayer._roleMap){
+                var data = ag.gameLayer._roleMap[key]._data;
+                if(data.camp!=ag.gameConst.campMonster && data.mapId==mapId){
+                    this.sendData(route,msg,data.id);
+                }
+            }
+        }else{
+            for(var key in ag.gameLayer._roleMap){
+                var data = ag.gameLayer._roleMap[key]._data;
+                if(data.camp!=ag.gameConst.campMonster){
+                    this.sendData(route,msg,data.id);
+                }
             }
         }
     },

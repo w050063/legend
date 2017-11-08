@@ -289,7 +289,7 @@ module.exports = ag.class.extend({
 
             //启动毒
             ag.buffManager.setPoison(locked,this);
-        }else if(this._data.type=='m9') {
+        }else if(this._data.type=='m8' || this._data.type=='m9') {
             var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(),this.getMst().attackDistance);
             for (var i = 0; i < array.length; ++i) {
                 var tempRole = array[i];
@@ -421,8 +421,14 @@ module.exports = ag.class.extend({
             this._state = ag.gameConst.stateIdle;
             this._data.hp = this._totalHP;
             this._busy = false;
-            ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
-            this.changeMap(this._data.mapId=='t0'?'t0':'t1');
+            if(this._master){
+                this.changeMap();
+                this.setLocation(this._master.getLocation());
+                ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
+            }else{
+                ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
+                this.changeMap(this._data.mapId=='t0'?'t0':'t1');
+            }
         }
     },
 

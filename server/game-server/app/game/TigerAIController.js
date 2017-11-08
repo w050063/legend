@@ -48,7 +48,7 @@ module.exports = ag.class.extend({
                 if(this._role._data.mapId==this._locked._data.mapId && lx<=vd && ly<=vd){
                     if(lx<=ad && ly<=ad){
                         this._role.attack(this._locked);
-                    }else if(this._role._data._type!="m9"){
+                    }else if(this._role._data.type=='m8' || this._role._data.type!="m9"){
                         this.doMoveOperate(this._locked.getLocation());
                     }
                 }else{
@@ -82,7 +82,6 @@ module.exports = ag.class.extend({
             }
         }else if(this._relifeCD==false && this._role._master._state!=ag.gameConst.stateDead){
             this._role.relife();
-            this._role.setLocation(this._role._master.getLocation());
         }
     },
 

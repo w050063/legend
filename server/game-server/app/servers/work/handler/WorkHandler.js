@@ -79,9 +79,10 @@ var Handler = cc.Class.extend({
 
 
     chatYou : function(msg, session, next) {
-        ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,content:msg},'t0');
-        ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,content:msg},'t1');
-        ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,content:msg},'t2');
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player){
+            ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,name:player._data.name+'('+ag.gameConst._roleMst[player._data.type].name+')',content:msg});
+        }
         next();
     },
 
