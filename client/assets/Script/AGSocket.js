@@ -3,13 +3,10 @@
  * 通讯相关处理
  */
 
-
-//require("boot");
-//require("pomelo_cocos2d_js");
-
 module.exports={
     _sessionId:null,
     _dataArray:[],
+    _step : 0,
 
     //setup socket.
     init: function(callback) {
@@ -20,31 +17,37 @@ module.exports={
             cc.sys.localStorage.setItem('id',id);
         }
         self._sessionId=id;
-        //var tempId = null;
+        if(self._step != 0)pomelo.disconnect();
+        self._step = 0;
         pomelo.init({host: "192.168.99.174",port: 3014,log: true}, function() {
             pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
-                //tempId=data.uid;
-                pomelo.disconnect(function () {
-                    pomelo.init({host: data.host,port: data.port,log: true}, function() {
-                        pomelo.request("conn.ConnHandler.connect", {uid:self._sessionId}, function(data) {
-                            cc.log("网关 successed!");
-                            //self._sessionId=tempId;
-                            if(callback)callback(data);
-                        });
+                pomelo.disconnect();
+                self._step = 1;
+                pomelo.init({host: data.host,port: data.port,log: true}, function() {
+                    pomelo.request("conn.ConnHandler.connect", {uid:self._sessionId}, function(data) {
+                        self._step = 2;
+                        cc.log("网关 successed!");
+                        if(callback)callback(data);
                     });
                 });
             });
         });
-	},
 
 
-    //设置断开逻辑
-    setDisconnect:function (callback) {
+        //设置断开逻辑
         pomelo.on('disconnect',function () {
-            pomelo.removeAllListeners('disconnect');
-            callback();
+            if(self._step == 0){
+            }else if(self._step == 1){
+            }else if(self._step == 2){
+                pomelo.removeAllListeners('onData');
+                ag.agSocket._dataArray = [];
+                ag.userInfo._itemMap = {};
+                cc.audioEngine.stopAll();
+                cc.director.loadScene('ConnectingLayer');
+                ag.gameLayer = null;
+            }
         });
-    },
+	},
 
 
     //发送数据封装
@@ -171,7 +174,7 @@ module.exports={
             }else if(obj.key=='sEquipItemToBagArray'){
                 ag.gameLayer.equipItemToBag(obj.value.id,obj.value.rid);
             }else if(obj.key=='sChatYouArray'){
-                ag.gameLayer.chat(obj.value.id,obj.value.content);
+                ag.gameLayer.chat(obj.value.id,obj.value.name,obj.value.content);
             }else if(obj.key=='sSystemNotifyArray'){
                 ag.gameLayer.systemNotify(obj.value);
             }else if(obj.key=='sRelifeArray'){

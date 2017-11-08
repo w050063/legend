@@ -59,7 +59,7 @@ module.exports={
         tips.string = str;
         father.addChild(node);
         node.setLocalZOrder(109);
-        node.runAction(cc.sequence(cc.moveBy(0.5, cc.p(0, 200)), cc.delayTime(0.4),
+        node.runAction(cc.sequence(cc.moveBy(0.3, cc.p(0, 160)), cc.delayTime(0.5),
             cc.spawn(cc.moveBy(0.4, cc.p(0, 100)), cc.fadeOut(0.4)),
             cc.callFunc(function () {
                 node.destroy();

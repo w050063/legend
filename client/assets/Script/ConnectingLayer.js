@@ -57,21 +57,12 @@ cc.Class({
                 ++times;
                 ag.agSocket.init(function(){
                     self.unschedule(scheduleFunc);
-                    ag.agSocket.setDisconnect(function () {
-                        pomelo.removeAllListeners('onData');
-                        ag.agSocket._dataArray = [];
-                        ag.userInfo._itemMap = {};
-                        cc.audioEngine.stopAll();
-                        cc.director.loadScene('ConnectingLayer');
-                        ag.gameLayer = null;
-                    });
                     self.loadPrefab();
                 });
             }
             self._nodeLoading.setPercent('第'+times+'次'+sec+'秒');
         };
         this.schedule(scheduleFunc,1);
-        scheduleFunc();
     },
 
 

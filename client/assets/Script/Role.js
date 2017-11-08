@@ -91,6 +91,7 @@ cc.Class({
 
         var zorder = Math.round(10000-this.node.y);
         this.node.setLocalZOrder(zorder);
+        if(this._propNode)this._propNode.setPosition(this.node.getPosition());
     },
 
 
@@ -110,6 +111,7 @@ cc.Class({
 
     //增加经验
     addExp:function(level,exp,source){
+        var bShowLevelUp = false;
         var last = this._data.level;
         this._data.level = level;
         if(last < this._data.level){
@@ -118,10 +120,12 @@ cc.Class({
             if(this==ag.gameLayer._player){
                 ag.gameLayer.refreshEquip();
                 cc.audioEngine.play(cc.url.raw("resources/voice/levelup.mp3"),false,1);
+                ag.jsUtil.showText(ag.gameLayer.node,'升级！！！');
+                bShowLevelUp = true;
             }
             this.changeHP(this._totalHP);
         }
-        if(source){
+        if(source && this==ag.gameLayer._player && bShowLevelUp==false){
             ag.jsUtil.showText(ag.gameLayer.node,'装备回收成功');
         }
     },
@@ -185,7 +189,13 @@ cc.Class({
                 else if(this._data.camp==ag.gameConst.campMonster)name = ag.gameConst._roleMst[this._data.type].name;
                 else name = this._data.name+'('+ag.gameConst._roleMst[this._data.type].name+')';
                 this._propNode._labelName.string = name;
-                this._propNode._labelName.node.color = ag.gameLayer.isEnemyCamp(this,ag.gameLayer._player)?cc.color(255,0,0):cc.color(255,255,255);
+                if(this._data.camp==ag.gameConst.campMonster || this._data.camp==ag.gameConst.campNpc){
+                    this._propNode._labelName.node.color = cc.color(255,255,255);
+                }else if(ag.gameLayer.isEnemyCamp(this,ag.gameLayer._player)){
+                    this._propNode._labelName.node.color = cc.color(183,103,66);
+                }else{
+                    this._propNode._labelName.node.color = cc.color(0,0,255);
+                }
             }
         }else{
             if(this._agAni){
@@ -211,7 +221,7 @@ cc.Class({
                 this._agAni.setColor(this._aniColor);
             }else if(this._data.camp==ag.gameConst.campMonster || (this._data.camp==ag.gameConst.campLiuxing && this._data.type=='m19')){
                 var str = 'nudeboy0'+ag.gameConst.stateIdle+this._data.direction;
-                if(this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
+                if(this._data.type=='m8' || this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
                 var array = AGAniClothes[str].split(',');
                 var name = ag.gameConst._roleMst[this._data.type].model;
                 if(this._agAni)this._agAni.destroy();
@@ -291,12 +301,9 @@ cc.Class({
                     if(this._ai)this._ai._busy = false;
                 }
             }.bind(this))));
-            if(this._propNode){
-                this._propNode.runAction(cc.moveTo(moveSpeed,this.getTruePosition(location)));
-            }
             if(this._data.camp==ag.gameConst.campMonster || (this._data.camp==ag.gameConst.campLiuxing && this._data.type=='m19')){
                 var str = 'nudeboy0'+ag.gameConst.stateMove+this._data.direction;
-                if(this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
+                if(this._data.type=='m8' || this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
                 var array = AGAniClothes[str].split(',');
                 var name = ag.gameConst._roleMst[this._data.type].model;
                 if(this._agAni)this._agAni.destroy();
@@ -347,7 +354,6 @@ cc.Class({
     myMoveByServer:function(location) {
         this.node.stopAllActions();
         this.setLocation(location);
-        if(this._propNode)this._propNode.setPosition(this.node.getPosition());
         this.idle();
         if(this._ai)this._ai._busy = false;
     },
@@ -361,7 +367,7 @@ cc.Class({
             this.node.stopAllActions();
             if(this._data.camp==ag.gameConst.campMonster || (this._data.camp==ag.gameConst.campLiuxing && this._data.type=='m19')){
                 var str = 'nudeboy0'+ag.gameConst.stateAttack+this._data.direction;
-                if(this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
+                if(this._data.type=='m8' || this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
                 var array = AGAniClothes[str].split(',');
                 var name = ag.gameConst._roleMst[this._data.type].model;
                 if(this._agAni)this._agAni.destroy();
@@ -437,13 +443,13 @@ cc.Class({
             if(Math.random()>0.5){
                 ag.jsUtil.getNode(this.node,"ani/effect4/504000",6,ag.gameConst.roleEffectUnderZorder,0.05,function(sender){
                     sender.node.destroy();
-                    var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect4/504006",13,ag.gameConst.roleEffectZorder,0.05);
+                    var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect4/504006",13,9999999,0.05);
                     node.getComponent(AGAni).setAniPosition(pos);
                 }.bind(this));
             }else{
                 ag.jsUtil.getNode(this.node,"ani/effect4/505000",10,ag.gameConst.roleEffectUnderZorder,0.05,function(sender){
                     sender.node.destroy();
-                    var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect4/505010",13,ag.gameConst.roleEffectZorder,0.05);
+                    var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect4/505010",13,9999999,0.05);
                     node.getComponent(AGAni).setAniPosition(pos);
                 }.bind(this));
             }
@@ -480,7 +486,7 @@ cc.Class({
             sprite.node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
                 ag.spriteCache.put(sprite);
             })));
-        }else if(this._data.type=="m9") {
+        }else if(this._data.type=='m8' || this._data.type=="m9") {
             var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(), this.getMst().attackDistance);
             for (var i = 0; i < array.length; ++i) {
                 if(ag.gameLayer.isEnemyCamp(this,array[i])){
@@ -545,6 +551,7 @@ cc.Class({
 
     //血量变化
     changeHP:function(hp){
+        var bVoice = this._data.hp > 0;
         if(this._data.camp==ag.gameConst.campNpc){
             if(this._nearFlag && this._propNode){
                 this._propNode._progressBarHP.progress = 1;
@@ -563,13 +570,13 @@ cc.Class({
             this._data.hp = hp;
         }
         if(this._data.hp<=0){//判断死亡
-            this.dead();
+            this.dead(bVoice);
         }
     },
 
 
     //死亡
-    dead:function () {
+    dead:function (bVoice) {
         if(this._state==ag.gameConst.stateDead)return;
         this._state = ag.gameConst.stateDead;
         ag.buffManager.delFireWallByDead(this);
@@ -582,7 +589,7 @@ cc.Class({
             this.node.destroy();
             delete ag.gameLayer._roleMap[this._data.id];
         }else{
-            cc.audioEngine.play(cc.url.raw(this._data.sex==1?"resources/voice/dead1.mp3":"resources/voice/dead0.mp3"),false,1);
+            if(bVoice)cc.audioEngine.play(cc.url.raw(this._data.sex==1?"resources/voice/dead1.mp3":"resources/voice/dead0.mp3"),false,1);
             if(this._propNode)this._propNode.active = false;
             this.node.active = false;
             if(this==ag.gameLayer._player && !ag.gameLayer.bShowRelife){
@@ -659,10 +666,11 @@ cc.Class({
         //计算玩家选中的角色
         var locked = null;
         var map = ag.gameLayer._roleMap;
+        var w = ag.gameConst.tileWidth/ 2,h = ag.gameConst.tileHeight*2;
         for(var key in map){
             var role = map[key];
             var p = role.node.getPosition();
-            if(point.x>p.x-40 && point.x<p.x+40 && point.y>p.y && point.y< p.y+120){
+            if(point.x>p.x-w && point.x<p.x+w && point.y>p.y && point.y< p.y+h){
                 if(role._data.camp==ag.gameConst.campNpc)return role;
                 if((!locked || p.y<locked.node.getPositionY()) && ag.gameLayer.isEnemyCamp(this,role))locked = map[key];
             }

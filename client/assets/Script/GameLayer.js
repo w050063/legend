@@ -606,7 +606,7 @@ cc.Class({
         this._bEditBoxKey = true;
     },
 
-    chat:function(id,content){
+    chat:function(id,name,content){
         var role = this.getRole(id);
         if(role){
             var node = new cc.Node();
@@ -620,25 +620,21 @@ cc.Class({
             node.runAction(cc.sequence(cc.delayTime(3), cc.fadeOut(0.2),cc.callFunc(function(){
                 node.destroy();
             })));
-
-
-            //this._chatContentArray.push(id+':'+content);
-            var lb = this._chatLabelArray[0];
-            var y = this._chatLabelArray[0].y;
-            for(var i=0;i<4;++i){
-                this._chatLabelArray[i] = this._chatLabelArray[i+1];
-                var tempY = this._chatLabelArray[i].y;
-                this._chatLabelArray[i].y = y;
-                y = tempY;
-            }
-            this._chatLabelArray[4] = lb;
-            lb.y = y;
-
-            lb.opacity = 255;
-            lb.getComponent(cc.Label).string = role._data.name+' : '+content;
-            lb.stopAllActions();
-            lb.runAction(cc.sequence(cc.delayTime(15),cc.fadeOut(2)));
         }
+        var lb = this._chatLabelArray[0];
+        var y = this._chatLabelArray[0].y;
+        for(var i=0;i<4;++i){
+            this._chatLabelArray[i] = this._chatLabelArray[i+1];
+            var tempY = this._chatLabelArray[i].y;
+            this._chatLabelArray[i].y = y;
+            y = tempY;
+        }
+        this._chatLabelArray[4] = lb;
+        lb.y = y;
+        lb.opacity = 255;
+        lb.getComponent(cc.Label).string = ""+name+' : '+content;
+        lb.stopAllActions();
+        lb.runAction(cc.sequence(cc.delayTime(15),cc.fadeOut(2)));
     },
 
 
@@ -655,6 +651,11 @@ cc.Class({
         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         this._setupAutoAttack = event.isChecked;
     },
+    toggleEventSetupRock: function (event) {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        cc.find('Canvas/nodeRock').active = event.isChecked;
+    },
+
 
     onKeyUp: function (event) {
         switch(event.keyCode) {

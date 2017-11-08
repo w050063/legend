@@ -101,7 +101,7 @@ cc.Class({
             sprite.sizeMode = cc.Sprite.SizeMode.RAW;
             sprite.trim = false;
             sprite.spriteFrame.getTexture().setAliasTexParameters();
-            sprite.node.setAnchorPoint(cc.p(24/sprite.node.width,(sprite.node.height-16)/sprite.node.height));
+            sprite.node.setAnchorPoint(cc.p(0.25,0.75));
         }.bind(this));
         this.node.addChild(sprite.node);
         return sprite.node;
@@ -113,7 +113,7 @@ cc.Class({
             sprite.sizeMode = cc.Sprite.SizeMode.RAW;
             sprite.trim = false;
             sprite.spriteFrame.getTexture().setAliasTexParameters();
-            sprite.node.setAnchorPoint(cc.p(0.5,16.0/sprite.node.height));
+            sprite.node.setAnchorPoint(cc.p(0.5,ag.gameConst.tileHeight/2/sprite.node.height));
         }.bind(this));
         this.node.addChild(sprite.node);
         return sprite.node;
