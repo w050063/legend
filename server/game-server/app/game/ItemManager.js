@@ -84,7 +84,7 @@ module.exports = ag.class.extend({
 
     //背包装备回收
     bagItemRecycle:function(array,rid){
-        var expArray = [50,100,200];
+        var expArray = [20,50,300];
         var role = ag.gameLayer.getRole(rid);
         if(role){
             var sum = 0;

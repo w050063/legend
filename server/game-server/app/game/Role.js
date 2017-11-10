@@ -21,22 +21,45 @@ module.exports = ag.class.extend({
     resetAllProp:function(){
         var mst = this.getMst();
         var lv = this._data.level;
-        this._totalHP = mst.hp+mst.hpAdd*lv;
+        this._totalHP = this.getTotalHPFromDataBase();
         this._data.hp = this._totalHP;
-        this._totalExp = mst.exp+mst.expAdd*lv;
+        this._totalExp = this.getTotalExpFromDataBase();
         this._exp = 0;
-        this._heal = mst.heal+mst.healAdd*lv;
+        this._heal = mst.heal+Math.floor(mst.healAdd*lv);
         this._attackSpeed = mst.attackSpeed;
         this._moveSpeed = mst.moveSpeed;
         this.refreshItemProp();
     },
 
 
+    getTotalHPFromDataBase:function(){
+        var mst = this.getMst();
+        if(this._data.camp==ag.gameConst.campMonster || this._data.type=='m19')return mst.hp;
+        var lv = this._data.level;
+        if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51));
+        if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47));
+        if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43));
+        if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35));
+        return Math.floor(mst.hp+mst.hpAdd[0]*lv);
+    },
+
+    getTotalExpFromDataBase:function(){
+        if(this._data.camp==ag.gameConst.campMonster || this._data.type=='m19')return 0;
+        var lv = this._data.level;
+        var array = ag.gameConst.expDatabase;
+        if(lv>50)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*4+array[5]*(lv-50));
+        if(lv>46)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*(lv-46));
+        if(lv>42)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*(lv-42));
+        if(lv>34)return Math.floor(array[0]+array[1]*34+array[2]*(lv-34));
+        return Math.floor(array[0]+array[1]*lv);
+    },
+
+
     refreshItemProp:function(){
         var mst = this.getMst();
         var lv = this._data.level;
-        var hurt = mst.hurt+mst.hurtAdd*lv;
-        var defense = mst.defense+mst.defenseAdd*lv;
+        var hurt = mst.hurt+Math.floor(mst.hurtAdd*lv);
+        var defense = mst.defense+Math.floor(mst.defenseAdd*lv);
         var map = ag.itemManager._itemMap.getMap();
         for (var key in map) {
             var obj = map[key]._data;
@@ -121,7 +144,7 @@ module.exports = ag.class.extend({
                 ag.gameLayer._roleXYMap[newStr].push(this._tiger);
             }
         }
-
+        ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp},this._data.mapId);
 
         //返回当前地图非自己的角色。
         for(var key in ag.gameLayer._roleMap){
