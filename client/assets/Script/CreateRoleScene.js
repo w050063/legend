@@ -37,6 +37,23 @@ cc.Class({
         //this._buttonStart.interactable = true;
 
 
+        //个人信息相关
+        cc.find('Canvas/spriteIconButton').on('touchend', function () {
+            cc.find('Canvas/spriteHeadInfo').active = true;
+            this.nextUpdateInfo();
+        }, this);
+
+
+        //是否第一次改名字
+        if(!cc.sys.localStorage.getItem('firstChangeName')){
+            cc.sys.localStorage.setItem('firstChangeName','1');
+            ag.jsUtil.showText(this.node,'欢迎大侠，给您起个霸气的名字吧！');
+        }else{
+            cc.find('Canvas/spriteHeadInfo').active = false;
+        }
+        this.firstUpdateInfo();
+
+
         ag.agSocket.onSEnter();
         this.schedule(ag.spriteCache.update001.bind(ag.spriteCache),0.01);
     },
@@ -114,10 +131,36 @@ cc.Class({
         return 0;
     },
 
+    //更新个人资料数据
+    firstUpdateInfo:function(){
+        cc.find('Canvas/spriteHeadInfo/labelId').getComponent(cc.Label).string = 'ID：'+ag.userInfo._accountData.id;
+        cc.find('Canvas/spriteHeadInfo/labelSessions').getComponent(cc.Label).string = '场次：'+ag.userInfo._accountData.sessions;
+        this.nextUpdateInfo();
+    },
+    nextUpdateInfo:function(){
+        cc.find('Canvas/spriteHeadInfo/editBoxName').getComponent(cc.EditBox).string = ag.userInfo._accountData.name;
+    },
 
+    //回车发送信息
+    editBoxConfirm: function (sender) {
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        if(sender.string.length>=2){
+            ag.jsUtil.request(this.node,'changeName',sender.string,function (data) {
+                ag.userInfo._accountData.name = sender.string;
+                ag.jsUtil.showText(this.node,'名字更新成功');
+            }.bind(this));
+        }else{
+            ag.jsUtil.showText(this.node,'名字至少2个字符');
+        }
+    },
+
+    buttonClose:function(){
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        cc.find('Canvas/spriteHeadInfo').active = false;
+    },
 
     back:function(){
         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
-        cc.director.loadScene('HallScene');
+        cc.director.loadScene('LoginScene');
     },
 });

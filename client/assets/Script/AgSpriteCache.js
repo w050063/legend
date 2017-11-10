@@ -12,16 +12,18 @@ cc.Class({
     //初始化角色
     init: function (str,n) {
         this._cacheArray = [];
-        this._cacheMaxCount = 200;
+        this._cacheMaxCount = 100;
         this._downloadArray = [];
         this._bLoading = false;
         this._waitFrameArray = [];
+        //this._test = 0;
+        //this._atlasArray = [];
     },
     
     
     //增加一个任务,挂一个组建监听销毁  onDestroy
     get:function (name,callback) {
-        for(var i=0;i<this._cacheArray.length;++i){
+        for(var i=this._cacheArray.length-1;i>=0;--i){
             var sprite = this._cacheArray[i];
             if(sprite._agName==name){
                 this._cacheArray.splice(i,1);
@@ -55,6 +57,8 @@ cc.Class({
 
     //将一个用完的节点放回池中
     put : function(sprite){
+        //sprite.node.destroy();
+        //return;
         if(cc.isValid(sprite) && cc.isValid(sprite.node)){
             if(sprite && sprite._agName && sprite.spriteFrame){
                 if(this._cacheArray.length>=this._cacheMaxCount){
@@ -116,6 +120,9 @@ cc.Class({
                     if(this._bLoading==false){
                         this._bLoading = true;
                         cc.loader.loadRes(this._downloadArray[0],cc.SpriteAtlas,function(err,atlas){
+                            //this._atlasArray.push(this._downloadArray[0]);
+                            //++this._test;
+                            //cc.log("heihei2:"+this._test);
                             this._downloadArray.splice(0,1);
                             this._bLoading = false;
                         }.bind(this));
@@ -146,5 +153,63 @@ cc.Class({
                 }
             }
         }
+    },
+
+
+    release:function(){
+        return;
+        for(var i=0;i<this._atlasArray.length;++i){
+            //var deps = cc.loader.getDependsRecursively(this._atlasArray[i]);
+            //cc.loader.release(deps);
+            //cc.loader.releaseRes(this._atlasArray[i], cc.Texture2D);
+
+
+
+
+            //cc.log("ww:"+cc.loader.getResCount());
+            var atlas = cc.loader.getRes(this._atlasArray[i],cc.SpriteAtlas);
+            ////cc.log("ww2:"+cc.loader.getResCount());
+            var deps = cc.loader.getDependsRecursively(atlas);
+            //cc.loader.release(deps);
+
+            //var obj = {};
+            //for(var key in cc.loader._cache){
+            //    obj[key] = "1";
+            //}
+            //for(var i=0;i<deps.length;++i){
+            //    if(obj[deps[i]]){
+            //        delete obj[deps[i]];
+            //    }
+            //}
+            //cc.log(obj);
+
+            //cc.loader.releaseAsset(this.weapon.getComponent(cc.Sprite).spriteFrame);
+            //cc.loader.releaseAsset(atlas);
+
+            //for(var j=0;j<deps.length;++j){
+            //    cc.loader.release(deps[j],cc.SpriteFrame);
+            //    cc.loader.release(deps[j],cc.SpriteAtlas);
+            //    cc.loader.release(deps[j], cc.Texture2D);
+            //}
+            //cc.loader.releaseRes(this._atlasArray[i],cc.SpriteFrame);
+            //cc.loader.releaseRes(this._atlasArray[i],cc.SpriteAtlas);
+            //cc.loader.releaseRes(this._atlasArray[i], cc.Texture2D);
+        }
+        //for(var key in cc.loader._cache){
+        //    var array = cc.loader._cache[key].dependKeys;
+        //    if(Array.isArray(array)){
+        //        for(var i=array.length-1;i>=0;--i){
+        //            if(array[i].indexOf('resources/map')!=-1 || array[i].indexOf('resources/ani/effect')!=-1 || array[i].indexOf('resources/ani/hum')!=-1){
+        //                var array2 = cc.loader.getDependsRecursively(key);
+        //                for(var j=array2.length;j>=0;--j){
+        //                    cc.loader.release(array2[j]);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+        cc.sys.garbageCollect();
+        //this._atlasArray = [];
+        //this._test = 0;
     },
 });

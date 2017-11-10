@@ -35,8 +35,17 @@ cc.Class({
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
 
         //地图坐标
-        this._labelLocation = cc.find('Canvas/labelLocation').getComponent(cc.Label);
+        this._labelLocation = cc.find('Canvas/nodeMinMap/labelLocation').getComponent(cc.Label);
         this._nodeNpcContent = cc.find('Canvas/nodeNpcContent');
+        this._spriteTopRight = cc.find('Canvas/nodeMinMap/spriteTopRight').getComponent(cc.Sprite);
+        this._nodeMinMapBack = cc.find('Canvas/nodeMinMap/spriteMinMapBack');
+        this._nodeMinMapBack.active = false;
+        this._spriteMinMap = cc.find('Canvas/nodeMinMap/spriteMinMapBack/spriteMinMap').getComponent(cc.Sprite);
+        this._nodeMinMapPlayer = cc.find('Canvas/nodeMinMap/spriteMinMapBack/spritePlayer');
+        this._spriteTopRight.node.on(cc.Node.EventType.TOUCH_END, function (event) {
+            this._nodeMinMapBack.active = !this._nodeMinMapBack.active;
+        }.bind(this));
+
 
         this._equipArray = [];
         var self = this;
@@ -61,6 +70,8 @@ cc.Class({
         }
         this._equipArray.push(cc.find('Canvas/nodeBag/labelAttack').getComponent(cc.Label));
         this._equipArray.push(cc.find('Canvas/nodeBag/labelDefense').getComponent(cc.Label));
+        this._equipArray.push(cc.find('Canvas/nodeBag/labelLevel').getComponent(cc.Label));
+        this._equipArray.push(cc.find('Canvas/nodeBag/labelExp').getComponent(cc.Label));
 
         //聊天相关
         var nodeChat = cc.find('Canvas/nodeChat');
@@ -138,6 +149,15 @@ cc.Class({
 
     //换地图
     changeMap:function(transferId){
+        //清空所有内容
+        ag.buffManager.changeMap();
+        this.buttonEventNpcClose();
+        this._map.node.destroyAllChildren();
+        this._nameMap.node.destroyAllChildren();
+        ag.gameLayer._spriteTopRight.node.destroyAllChildren();
+        this._roleMap = {};
+        ag.spriteCache.release();
+
         if(transferId){
             var transferMst = ag.gameConst._transferMst[transferId];
             ag.userInfo._data.mapId = transferMst.mapId;
@@ -152,12 +172,6 @@ cc.Class({
             cc.audioEngine.play(cc.url.raw("resources/music/"+map.music),true,1);
         }
 
-        //清空所有内容
-        ag.buffManager.changeMap();
-        this.buttonEventNpcClose();
-        this._map.node.destroyAllChildren();
-        this._nameMap.node.destroyAllChildren();
-        this._roleMap = {};
 
         //地图更新
         //this._map.test(mapId);
@@ -186,16 +200,54 @@ cc.Class({
 
         //清空地上的道具，并更新
         ag.userInfo._itemMap = {};
+
+        var minMap = map.res;
+        minMap = 'minMap'+minMap.substr(minMap.indexOf('/'));
+        cc.loader.loadRes(minMap, cc.SpriteFrame,function (err, spriteFrame) {
+            this._spriteMinMap.spriteFrame = spriteFrame;
+            this._spriteTopRight.spriteFrame = spriteFrame.clone();
+            this.resetMinMapPos();
+        }.bind(this));
+    },
+
+
+    resetMinMapPos:function(){
+        var map = ag.gameConst._terrainMap[this._player._data.mapId];
+        this._labelLocation.string = map.name+' '+this._player._data.x+','+this._player._data.y;
+        var spriteFrame = this._spriteTopRight.spriteFrame;
+        if(spriteFrame){
+            spriteFrame = spriteFrame.clone();
+            var nodeSize = this._spriteTopRight.node.getContentSize();
+            var size = spriteFrame.getOriginalSize();
+
+            var left = Math.max((this._player.getLocation().x+0.5)/map.mapX*size.width-nodeSize.width/2,0);
+            left = Math.floor(Math.min(left,size.width-nodeSize.width));
+            var top = Math.max(size.height-(this._player.getLocation().y+0.5)/map.mapY*size.height-nodeSize.height/2,0);
+            top = Math.floor(Math.min(top,size.height-nodeSize.height));
+            spriteFrame.setRect(cc.rect(left,top,nodeSize.width,nodeSize.height));
+            this._spriteTopRight.spriteFrame = spriteFrame;
+
+            //设置小地图上人的坐标
+            var truePos = this._player.getTruePosition();
+            this._nodeMinMapPlayer.setPosition(((this._player._data.x+0.5)/map.mapX-0.5)*size.width,((this._player._data.y+0.5)/map.mapY-0.5)*size.height);
+        }
     },
 
 
     gotoHall:function(sender){
         pomelo.removeAllListeners('onData');
+        //清空所有内容
+        ag.buffManager.changeMap();
+        this.buttonEventNpcClose();
+        this._map.node.destroyAllChildren();
+        this._nameMap.node.destroyAllChildren();
+        this._roleMap = {};
         ag.agSocket._dataArray = [];
         ag.userInfo._itemMap = {};
         cc.audioEngine.stopAll();
         cc.audioEngine.play(cc.url.raw("resources/music/Dragon Rider.mp3"),true,1);
-        cc.director.loadScene('HallScene');
+        ag.spriteCache.release();
+        cc.director.loadScene('CreateRoleScene');
         ag.gameLayer = null;
     },
 
@@ -555,8 +607,8 @@ cc.Class({
         //属性显示
         var mst = this._player.getMst();
         var lv = this._player._data.level;
-        var hurt = mst.hurt+mst.hurtAdd*lv;
-        var defense = mst.defense+mst.defenseAdd*lv;
+        var hurt = mst.hurt+Math.floor(mst.hurtAdd*lv);
+        var defense = mst.defense+Math.floor(mst.defenseAdd*lv);
         for(var i=0;i<5;++i){
             if(this._player._equipArray[i]){
                 var itemMst = ag.gameConst._itemMst[this._player._equipArray[i]];

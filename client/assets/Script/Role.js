@@ -82,6 +82,7 @@ cc.Class({
 
     //刷新层级关系,设置地图位置
     setZorderAndMapPos:function(){
+        if(!ag.gameLayer)return;
         //更新位置
         if(ag.gameLayer._player == this){
             var scale = ag.gameLayer._map.node.getScale();
@@ -101,11 +102,34 @@ cc.Class({
         var mst = this.getMst();
         if(mst){
             var lv = this._data.level;
-            this._totalHP = mst.hp+mst.hpAdd*lv;
-            this._heal = mst.heal+mst.healAdd*lv;
+            this._totalHP = this.getTotalHPFromDataBase();
+            this._totalExp = this.getTotalExpFromDataBase();
+            this._heal = mst.heal+Math.floor(mst.healAdd*lv);
             this._attackSpeed = mst.attackSpeed;
             this._moveSpeed = mst.moveSpeed;
         }
+    },
+
+    getTotalHPFromDataBase:function(){
+        var mst = this.getMst();
+        if(this._data.camp==ag.gameConst.campMonster || this._data.type=='m19')return mst.hp;
+        var lv = this._data.level;
+        if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51));
+        if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47));
+        if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43));
+        if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35));
+        return Math.floor(mst.hp+mst.hpAdd[0]*lv);
+    },
+
+    getTotalExpFromDataBase:function(){
+        if(this._data.camp==ag.gameConst.campMonster || this._data.type=='m19')return 0;
+        var lv = this._data.level;
+        var array = ag.gameConst.expDatabase;
+        if(lv>50)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*4+array[5]*(lv-50));
+        if(lv>46)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*(lv-46));
+        if(lv>42)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*(lv-42));
+        if(lv>34)return Math.floor(array[0]+array[1]*34+array[2]*(lv-34));
+        return Math.floor(array[0]+array[1]*lv);
     },
 
 
@@ -119,14 +143,18 @@ cc.Class({
             this._data.hp = 1;//确保可以进入改血量
             if(this==ag.gameLayer._player){
                 ag.gameLayer.refreshEquip();
-                cc.audioEngine.play(cc.url.raw("resources/voice/levelup.mp3"),false,1);
                 ag.jsUtil.showText(ag.gameLayer.node,'升级！！！');
-                bShowLevelUp = true;
             }
+            cc.audioEngine.play(cc.url.raw("resources/voice/levelup.mp3"),false,1);
+            bShowLevelUp = true;
             this.changeHP(this._totalHP);
         }
-        if(source && this==ag.gameLayer._player && bShowLevelUp==false){
-            ag.jsUtil.showText(ag.gameLayer.node,'装备回收成功');
+        if(this==ag.gameLayer._player){
+            ag.gameLayer._equipArray[7].string = '等级:'+this._data.level;
+            ag.gameLayer._equipArray[8].string = '经验:'+exp+'/'+this._totalExp+' ('+(100*exp/this._totalExp).toFixed(2)+'%)';
+            if(source && bShowLevelUp==false){
+                ag.jsUtil.showText(ag.gameLayer.node,'装备回收成功');
+            }
         }
     },
 
@@ -157,7 +185,7 @@ cc.Class({
             var x = ag.gameLayer._player._data.x,y = ag.gameLayer._player._data.y;
             if(ag.gameLayer._player == this){
                 ag.gameLayer._map.setCenter(location);
-                ag.gameLayer._labelLocation.string = mapData.name+' '+this._data.x+','+this._data.y;
+                ag.gameLayer.resetMinMapPos();
                 for(var key in  ag.gameLayer._roleMap){
                     ag.gameLayer._roleMap[key].resetNearFlag(x,y);
                 }
@@ -174,6 +202,8 @@ cc.Class({
             if(!this._agAni){
                 this.idleAnimation();
             }
+
+            //人名字创建
             if(!this._propNode && this.node.active){
                 this._propNode = ag.jsUtil.getCacheNode('prefab/nodeRoleProp',ag.gameLayer._nameMap.node);
                 this._propNode.setPosition(this.node.getPosition());
@@ -196,7 +226,34 @@ cc.Class({
                 }else{
                     this._propNode._labelName.node.color = cc.color(0,0,255);
                 }
+                if(this._data.camp==ag.gameConst.campMonster || this._data.type=='19'){
+                    this._propNode._labelHP.node.opacity = 0;
+                    this._propNode._progressBarHP.node.opacity = 0;
+                }else{
+                    this._propNode._labelHP.node.opacity = 255;
+                    this._propNode._progressBarHP.node.opacity = 255;
+                }
             }
+
+            //小地图上的点创建
+            if(!this._minMapNode && this.node.active){
+                this._minMapNode = new cc.Node();
+                var sprite = this._minMapNode.addComponent(cc.Sprite);
+                sprite.spriteFrame = ag.gameLayer._nodeMinMapPlayer.getComponent(cc.Sprite).spriteFrame.clone();
+                sprite.sizeMode = cc.Sprite.SizeMode.CUSTOM;
+                this._minMapNode.setContentSize(ag.gameLayer._nodeMinMapPlayer.getContentSize());
+                ag.gameLayer._spriteTopRight.node.addChild(this._minMapNode);
+                if(this==ag.gameLayer._player){
+                    this._minMapNode.color = cc.color(0,255,0);
+                }else if(this._data.camp==ag.gameConst.campNpc){
+                    this._minMapNode.color = cc.color(0,0,255);
+                }else if(this._data.camp==ag.gameConst.campMonster || this._data.type=='19'){
+                    this._minMapNode.color = cc.color(255,0,0);
+                }else if(this._data.camp==ag.gameConst.campLiuxing){
+                    this._minMapNode.color = cc.color(255,255,0);
+                }
+            }
+            this.updateMinMapNodePos();
         }else{
             if(this._agAni){
                 this._agAni.destroy();
@@ -205,6 +262,29 @@ cc.Class({
             if(this._propNode){
                 ag.jsUtil.putCacheNode(this._propNode);
                 this._propNode = null;
+            }
+            if(this._minMapNode){
+                this._minMapNode.destroy();
+                this._minMapNode = null;
+            }
+        }
+    },
+
+
+    updateMinMapNodePos:function(){
+        if(this._minMapNode){
+            var spriteFrame = ag.gameLayer._spriteTopRight.spriteFrame;
+            if(spriteFrame){
+                var map = ag.gameConst._terrainMap[this._data.mapId];
+                var nodeSize = ag.gameLayer._spriteTopRight.node.getContentSize();
+                var size = spriteFrame.getOriginalSize();
+                var left = Math.max((ag.gameLayer._player.getLocation().x+0.5)/map.mapX*size.width-nodeSize.width/2,0);
+                left = Math.floor(Math.min(left,size.width-nodeSize.width));
+                left+=nodeSize.width/2;
+                var top = Math.max(size.height-(ag.gameLayer._player.getLocation().y+0.5)/map.mapY*size.height-nodeSize.height/2,0);
+                top = Math.floor(Math.min(top,size.height-nodeSize.height));
+                top=size.height-(top+nodeSize.height/2);
+                this._minMapNode.setPosition(((this._data.x+0.5)/map.mapX)*size.width-left,((this._data.y+0.5)/map.mapY)*size.height-top);
             }
         }
     },
@@ -564,6 +644,14 @@ cc.Class({
                 if(this._propNode){
                     this._propNode._progressBarHP.progress = hp/this._totalHP;
                     this._propNode._labelHP.string = ""+hp+"/"+this._totalHP+" Lv:"+(this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level);
+                    if(hp<this._data.hp && (this._data.camp==ag.gameConst.campMonster || this._data.type=='m19')){
+                        this._propNode._progressBarHP.node.stopAllActions();
+                        this._propNode._progressBarHP.node.opacity = 255;
+                        this._propNode._progressBarHP.node.runAction(cc.sequence(cc.delayTime(10),cc.callFunc((function(sender){sender.opacity=0;}))));
+                        this._propNode._labelHP.node.stopAllActions();
+                        this._propNode._labelHP.node.opacity = 255;
+                        this._propNode._labelHP.node.runAction(cc.sequence(cc.delayTime(10),cc.callFunc((function(sender){sender.opacity=0;}))));
+                    }
                 }
             }
 
@@ -586,11 +674,16 @@ cc.Class({
         if(this._ai)this._ai._locked = null;
         if(this._data.camp==ag.gameConst.campMonster){
             if(this._propNode)ag.jsUtil.putCacheNode(this._propNode);
+            if(this._minMapNode){
+                this._minMapNode.destroy();
+                this._minMapNode = null;
+            }
             this.node.destroy();
             delete ag.gameLayer._roleMap[this._data.id];
         }else{
             if(bVoice)cc.audioEngine.play(cc.url.raw(this._data.sex==1?"resources/voice/dead1.mp3":"resources/voice/dead0.mp3"),false,1);
             if(this._propNode)this._propNode.active = false;
+            if(this._minMapNode)this._minMapNode.active = false;
             this.node.active = false;
             if(this==ag.gameLayer._player && !ag.gameLayer.bShowRelife){
                 ag.gameLayer.buttonEventNpcClose();
@@ -612,6 +705,7 @@ cc.Class({
                 ag.gameLayer.changeMap(this._data.mapId=='t0'?'t0':'t1');
             }else{
                 if(this._propNode)this._propNode.active = true;
+                if(this._minMapNode)this._minMapNode.active = true;
                 this.node.active = true;
                 this.idleAnimation();
                 this._state = ag.gameConst.stateIdle;
