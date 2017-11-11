@@ -9,9 +9,8 @@ module.exports = ag.class.extend({
         this._role = role;
         this._locked = null;
         this._relifeCD = false;
-        this._bfollow = false;
         ag.actionManager.schedule(this,0.001,this.update.bind(this));
-        ag.actionManager.schedule(this,0.2,this.update02s.bind(this));
+        ag.actionManager.schedule(this,1,this.update1s.bind(this));
     },
 
 
@@ -23,16 +22,14 @@ module.exports = ag.class.extend({
     //返回移动到锁定角色的的方向,每次移动操作，怪物有一定1/4几率重新锁定目标
     doMoveOperate:function (location) {
         var myLocation = this._role.getLocation();
-        if(myLocation.x==location.x && myLocation.y==location.y){
-            this._bfollow = false;
-            return;
-        }
-        var direction = ag.gameLayer.getDirection(myLocation,location);
-        direction = ag.gameLayer.getOffsetWithColloison(this._role, direction);
-        if (direction!=-1){
-            this._role.move(ag.jsUtil.pAdd(this._role.getLocation(),ag.gameConst.directionArray[direction]));
-        }else{
-            this._role.idle();
+        if(myLocation.x!=location.x || myLocation.y!=location.y){
+            var direction = ag.gameLayer.getDirection(myLocation,location);
+            direction = ag.gameLayer.getOffsetWithColloison(this._role, direction);
+            if (direction!=-1){
+                this._role.move(ag.jsUtil.pAdd(this._role.getLocation(),ag.gameConst.directionArray[direction]));
+            }else{
+                this._role.idle();
+            }
         }
     },
 
@@ -70,14 +67,15 @@ module.exports = ag.class.extend({
 
 
     // called every frame
-    update02s: function () {
+    update1s: function () {
         //执行玩家操作
         if(this._role._state != ag.gameConst.stateDead){
             var l1 = this._role.getLocation(), l2 = this._role._master.getLocation();
             if(Math.max(Math.abs(l1.x-l2.x),Math.abs(l1.y-l2.y))>this._role.getMst().visibleDistance){
                 this._locked = null;
-                this._bfollow = true;
-            }else if(!this._bfollow && !this._locked){//无锁定目标,查找最近的目标
+            }else if(!this._locked){//无锁定目标,查找最近的目标
+                this._locked = this.findLocked();
+            }else if(this._locked && this._locked._data.camp==ag.gameConst.campLiuxing && Math.random()<0.1){//如果是玩家，则有一定几率停止攻击
                 this._locked = this.findLocked();
             }
         }else if(this._relifeCD==false && this._role._master._state!=ag.gameConst.stateDead){

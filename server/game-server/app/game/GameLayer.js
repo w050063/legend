@@ -29,7 +29,11 @@ module.exports = {
 
         //每隔30秒发送一次在线人数
         ag.actionManager.schedule(this,30,function (dt) {
-            ag.jsUtil.sendDataAll("sSystemNotify","当前在线人数："+ag.jsUtil.getClientCount());
+            if(Math.random()>0.5){
+                ag.jsUtil.sendDataAll("sSystemNotify","当前在线人数："+ag.jsUtil.getClientCount());
+            }else{
+                ag.jsUtil.sendDataAll("sSystemNotify","特别提醒：安全区外可随意杀人！");
+            }
         }.bind(this));
 	},
 
@@ -93,6 +97,7 @@ module.exports = {
         player.relife();
         ag.jsUtil.send("sEnter",JSON.stringify(player._data),[uid]);
         player.changeMap();
+        ag.jsUtil.sendDataAll("sSystemNotify","玩家【"+player._data.name+"】上线！");
     },
 
 

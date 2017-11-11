@@ -72,6 +72,7 @@ module.exports = {
         t0:{
             id : "t0",
             name: "新手村",
+            level:0,
             res: 'map/0',
             music:'Heart Of Courage.mp3',
             npc:[{name:"新手村接待员",x:32,y:9,title:"安全区域传送:",content:['t1']}],
@@ -83,6 +84,7 @@ module.exports = {
         t1:{
             id : "t1",
             name: "盟城土城",
+            level:35,
             res: 'map/3',
             music:'Victory.mp3',
             npc:[{name:"传送员",x:25,y:33,title:"区域传送:",content:['t0','t2','t5','t11']},
@@ -91,11 +93,12 @@ module.exports = {
             mapX: 60,
             mapY: 60,
             safe:{x:7,y:27,xx:26,yy:46},
-            refresh: [["m4", -1, -1, 300, 20],["m8", 40, 29, 600, 1],["m9", 31, 0, 600, 1]]
+            refresh: [["m8", 40, 29, 600, 1],["m9", 31, 0, 600, 1]]
         },
         t2:{
             id : "t2",
             name: "BOSS之家一层",
+            level:35,
             res: 'map/d5071',
             music:'For The Win.mp3',
             npc:[{name:"传送员",x:7,y:40,title:"传送:",content:['t1']},{name:"传送员",x:41,y:12,title:"传送:",content:['t4','t1']}],
@@ -106,6 +109,7 @@ module.exports = {
         t3:{
             id : "t3",
             name: "BOSS之家二层",
+            level:35,
             res: 'map/d515',
             music:'For The Win.mp3',
             npc:[{name:"传送员",x:29,y:24,title:"传送:",content:['t3','t1']}],
@@ -116,6 +120,7 @@ module.exports = {
         t4:{
             id : "t4",
             name: "皇家陵墓一层",
+            level:43,
             res: 'map/d717',
             music:'Star Sky.mp3',
             npc:[{name:"传送员",x:25,y:24,title:"传送:",content:['t1']},{name:"传送员",x:83,y:74,title:"传送:",content:['t7','t1']}],
@@ -126,6 +131,7 @@ module.exports = {
         t5:{
             id : "t5",
             name: "皇家陵墓二层",
+            level:43,
             res: 'map/dm002',
             music:'Star Sky.mp3',
             npc:[{name:"传送员",x:7,y:9,title:"传送:",content:['t6','t1']}],
@@ -136,6 +142,7 @@ module.exports = {
         t6:{
             id : "t6",
             name: "鼠洞",
+            level:43,
             res: 'map/d2052',
             music:'Strength Of A Thousand Men.mp3',
             npc:[{name:"传送员",x:87,y:32,title:"传送:",content:['t1']}],
@@ -146,6 +153,7 @@ module.exports = {
         t7:{
             id : "t7",
             name: "牛魔洞",
+            level:43,
             res: 'map/d2079',
             music:'Strength Of A Thousand Men.mp3',
             npc:[{name:"传送员",x:14,y:86,title:"传送:",content:['t1']}],
@@ -156,6 +164,7 @@ module.exports = {
         t8:{
             id : "t8",
             name: "魔窟圣地",
+            level:43,
             res: 'map/d2063',
             music:'Strength Of A Thousand Men.mp3',
             npc:[{name:"传送员",x:106,y:52,title:"传送:",content:['t1']}],
@@ -166,6 +175,7 @@ module.exports = {
         t9:{
             id : "t9",
             name: "真天宫一层",
+            level:43,
             res: 'map/d2013',
             music:'Never Back Down.mp3',
             npc:[{name:"传送员",x:79,y:21,title:"传送:",content:['t1']},{name:"传送员",x:24,y:74,title:"传送:",content:['t13','t1']}],
@@ -176,6 +186,7 @@ module.exports = {
         t10:{
             id : "t10",
             name: "真天宫二层",
+            level:43,
             res: 'map/d2013',
             music:'Never Back Down.mp3',
             npc:[{name:"传送员",x:79,y:21,title:"传送:",content:['t12','t1']},{name:"传送员",x:24,y:74,title:"传送:",content:['t15','t1']}],
@@ -186,6 +197,7 @@ module.exports = {
         t11:{
             id : "t11",
             name: "真天宫三层",
+            level:43,
             res: 'map/d2013',
             music:'Never Back Down.mp3',
             npc:[{name:"传送员",x:79,y:21,title:"传送:",content:['t14','t1']},{name:"传送员",x:24,y:74,title:"传送:",content:['t1']}],
@@ -222,11 +234,11 @@ module.exports = {
 
     _roleMst: {
         m0:{id:"m0",name:"战",hp:19,hpAdd:[15,28,31,34,35],defense:0,defenseAdd:0.2,hurt:3,hurtAdd:0.45,expDead:0,heal:5,healAdd:2,
-            moveSpeed:0.5,attackSpeed:0.8,checkDistance:6,visibleDistance:8,attackDistance:0},
+            moveSpeed:0.5,attackSpeed:0.8,checkDistance:5,visibleDistance:8,attackDistance:0},
         m1:{id:"m1",name:"法",hp:16,hpAdd:[4,7,8,9,9],defense:0,defenseAdd:0.4,hurt:2,hurtAdd:0.5,expDead:0,heal:5,healAdd:1.5,
-            moveSpeed:0.5,attackSpeed:1.2,checkDistance:6,visibleDistance:8,attackDistance:5},
+            moveSpeed:0.5,attackSpeed:1.2,checkDistance:5,visibleDistance:8,attackDistance:5},
         m2:{id:"m2",name:"道",hp:17,hpAdd:[8,17,17,16,20],defense:0,defenseAdd:0.1,hurt:5,hurtAdd:0.45,expDead:0,heal:5,healAdd:2,
-            moveSpeed:0.5,attackSpeed:1.2,checkDistance:6,visibleDistance:8,attackDistance:5},
+            moveSpeed:0.5,attackSpeed:1.2,checkDistance:5,visibleDistance:8,attackDistance:5},
         m3:{id:"m3",name:"甲壳虫",hp:10,hpAdd:0,defense:0,defenseAdd:0,hurt:1,hurtAdd:0,expDead:10,heal:1,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"ani/hum16/016",drop:'i000,30,i001,30,i019,30,i014,30,i026,30',lv:1},
         m4:{id:"m4",name:"红野猪",hp:330,hpAdd:0,defense:0,defenseAdd:0,hurt:43,hurtAdd:0,expDead:33,heal:1,healAdd:0,

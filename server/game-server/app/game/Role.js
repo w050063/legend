@@ -214,8 +214,12 @@ module.exports = ag.class.extend({
         if(this._data.camp!=ag.gameConst.campMonster && !this._master){
             var array = ag.itemManager.getDropByLocation(this.getLocation());
             var left = ag.gameConst.bagLength-ag.itemManager.getBagLength(this._data.id);
-            if(array.length>0 && left>0){
-                for(var i=0;i<array.length && i<left;++i){
+            if(array.length>left){
+                ag.jsUtil.sendData("sSystemNotify","背包已满!",this._data.id);
+            }
+            if(left>0){
+                var count = Math.min(array.length,left);
+                for(var i=count-1;i>=0;--i){
                     var id = array[i]._data.id;
                     ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
                     ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
