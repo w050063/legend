@@ -54,7 +54,22 @@ cc.Class({
         this.firstUpdateInfo();
 
 
-        ag.agSocket.onSEnter();
+        pomelo.on('sEnter',function(data) {
+            for(var i=0;i<6;++i){
+                this._nodeRoleArray[i]._modelNode.getComponent(AGAni).putCache();
+            }
+            var msg = JSON.parse(data.msg);
+            ag.userInfo._id = msg.id;
+            ag.userInfo._name = msg.name;
+            ag.userInfo._x = msg.x;
+            ag.userInfo._y = msg.y;
+            ag.userInfo._data = msg;
+            ag.userInfo._accountData.sex = msg.sex;
+            ag.userInfo._accountData.type = msg.type;
+            pomelo.removeAllListeners('sEnter');
+            ag.agSocket.onBattleEvent();
+            cc.director.loadScene("GameLayer");
+        }.bind(this));
         this.schedule(ag.spriteCache.update001.bind(ag.spriteCache),0.01);
     },
 

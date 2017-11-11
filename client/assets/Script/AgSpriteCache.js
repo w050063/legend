@@ -12,7 +12,7 @@ cc.Class({
     //初始化角色
     init: function (str,n) {
         this._cacheArray = [];
-        this._cacheMaxCount = 100;
+        this._cacheMaxCount = 300;
         this._downloadArray = [];
         this._bLoading = false;
         this._waitFrameArray = [];
@@ -48,6 +48,7 @@ cc.Class({
             }
         }
         var sprite = new cc.Node().addComponent(cc.Sprite);
+        sprite.sizeMode = cc.Sprite.SizeMode.RAW;
         this._waitFrameArray.push(sprite);
         sprite._agName = name;
         if(i!=0)sprite._agTime = i;

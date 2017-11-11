@@ -25,7 +25,27 @@ cc.Class({
         this._roleMap = {};
         this._player = null;
         this._lastMapPosition = cc.p(0,0);
-        this._setupAutoAttack = true;
+
+        //自动攻击
+        var temp = cc.sys.localStorage.getItem('setupAutoAttack');
+        if(!temp){
+            cc.sys.localStorage.setItem('setupAutoAttack','true');
+            this._setupAutoAttack = true;
+        }else if(temp=='true'){
+            this._setupAutoAttack = true;
+        }else{
+            this._setupAutoAttack = false;
+            cc.find('Canvas/nodeHelp/toggleAutoAttack').getComponent(cc.Toggle).isChecked = false;
+        }
+
+        //启用摇杆
+        var temp = cc.sys.localStorage.getItem('setupRock');
+        if(!temp){
+            cc.sys.localStorage.setItem('setupRock','true');
+        }else if(temp=='false'){
+            cc.find('Canvas/nodeHelp/toggleSetupRock').getComponent(cc.Toggle).isChecked = false;
+            cc.find('Canvas/nodeRock').active = false;
+        }
 
 
         this._flyBloodArray = [];//飘血数组
@@ -152,6 +172,9 @@ cc.Class({
         //清空所有内容
         ag.buffManager.changeMap();
         this.buttonEventNpcClose();
+        for(var key in this._roleMap){
+            this._roleMap[key].putCache();
+        }
         this._map.node.destroyAllChildren();
         this._nameMap.node.destroyAllChildren();
         ag.gameLayer._spriteTopRight.node.destroyAllChildren();
@@ -347,6 +370,7 @@ cc.Class({
             obj.comp.node.destroy();
             obj.comp = undefined;
             this.refreshBag();
+            this.systemNotify(ag.gameConst._itemMst[obj._data.mid].name+'被发现！');
         }
     },
 
@@ -702,10 +726,12 @@ cc.Class({
     toggleAutoAttack: function (event) {
         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         this._setupAutoAttack = event.isChecked;
+        cc.sys.localStorage.setItem('setupAutoAttack',''+event.isChecked);
     },
     toggleEventSetupRock: function (event) {
         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         cc.find('Canvas/nodeRock').active = event.isChecked;
+        cc.sys.localStorage.setItem('setupRock',''+event.isChecked);
     },
 
 
@@ -757,10 +783,18 @@ cc.Class({
                                 }
                             }
                             if(array.length>0)ag.agSocket.send("bagItemRecycle",array.join(','));
+                            else{
+                                ag.jsUtil.showText(this.node,"没有可回收的装备！");
+                            }
                         }else{
-                            self.changeMap(transferMst.id);
-                            //请求本地图所有角色
-                            ag.agSocket.send("changeMap",transferMst.id);
+                            var level = ag.gameConst._terrainMap[transferMst.mapId].level;
+                            if(self._player._data.level>=level){
+                                self.changeMap(transferMst.id);
+                                //请求本地图所有角色
+                                ag.agSocket.send("changeMap",transferMst.id);
+                            }else{
+                                ag.jsUtil.showText(self.node,'此地图要求等级'+level+'!!!');
+                            }
                         }
                     });
                 }else{

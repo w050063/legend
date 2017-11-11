@@ -18,7 +18,6 @@ cc.Class({
         this._running = true;
         this._interval = 1;
         this._finishedCallback = null;
-        this._aniPosition = cc.p(0,0);
 
 
         var pos = str.lastIndexOf('/');
@@ -48,12 +47,6 @@ cc.Class({
     },
 
 
-    setAniPosition:function(position){
-        this._aniPosition = position;
-        this.modifyFrame();
-    },
-
-
     modifyFrame:function(){
         if(this.node.childrenCount>0)ag.spriteCache.put(this.node.children[0].getComponent(cc.Sprite));
         var str = this._spriteFrameArray[this._curIndex];
@@ -63,7 +56,7 @@ cc.Class({
         var array = AGAniOffset[after].split(",");
         this.node.addChild(sprite.node);
         sprite.node.setColor(this.node.getColor());
-        this.node.setPosition(cc.pAdd(this._aniPosition,cc.p(parseInt(array[0]),parseInt(array[1]))));
+        sprite.node.setPosition(cc.p(parseInt(array[0]),parseInt(array[1])));
 
         if(this._controllArray){
             for(var i=0;i<this._controllArray.length;++i){
@@ -71,6 +64,15 @@ cc.Class({
                 this._controllArray[i].modifyFrame();
             }
         }
+    },
+
+    putCache:function(){
+        if(this.node.childrenCount>0){
+            var sprite = this.node.children[0].getComponent(cc.Sprite);
+            ag.spriteCache.put(sprite);
+        }
+        this._finishedCallback = undefined;
+        this.node.destroy();
     },
 
 

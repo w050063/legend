@@ -793,8 +793,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 200,
-      "height": 200
+      "width": 240,
+      "height": 160
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -802,8 +802,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": 468,
-      "y": 220
+      "x": 448,
+      "y": 240
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -888,7 +888,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 568,
-      "y": 105.6
+      "y": 140
     },
     "_skewX": 0,
     "_skewY": 0,

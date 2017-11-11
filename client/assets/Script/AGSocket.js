@@ -56,29 +56,6 @@ module.exports={
     },
 
 
-    //监听进入游戏
-    onSEnter:function(){
-        pomelo.on('sEnter',function(data) {
-            var msg = JSON.parse(data.msg);
-            ag.userInfo._id = msg.id;
-            ag.userInfo._name = msg.name;
-            ag.userInfo._x = msg.x;
-            ag.userInfo._y = msg.y;
-            ag.userInfo._data = msg;
-            ag.userInfo._accountData.sex = msg.sex;
-            ag.userInfo._accountData.type = msg.type;
-            //ag.agSocket.offSChat();
-            ag.agSocket.offSEnter();
-            ag.agSocket.onBattleEvent();
-            cc.director.loadScene("GameLayer");
-        });
-    },
-    offSEnter:function(){
-        //pomelo.on('sEnter',undefined);
-        pomelo.removeAllListeners('sEnter');
-    },
-
-
     //启动战斗中网络
     onBattleEvent:function(){
         pomelo.on('onData',function(data) {

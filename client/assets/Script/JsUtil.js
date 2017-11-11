@@ -96,6 +96,7 @@ module.exports={
     //将一个用完的动画节点放回池中
     putCacheNode : function(node){
         if(node && node._agName){
+            node.active = true;
             node.removeFromParent();
             this._cacheNodeArray.push(node);
         }

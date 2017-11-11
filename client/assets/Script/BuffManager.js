@@ -2,6 +2,7 @@
  * Created by bot.su on 2017/6/21.
  * 游戏角色状态管理类
  */
+var AGAni = require("AGAni");
 cc.Class({
     extends: cc.Component,
     properties: {},
@@ -82,7 +83,7 @@ cc.Class({
 
     delFireWall:function (key) {
         if(this._fireWallMap[key]){
-            this._fireWallMap[key].node.destroy();
+            this._fireWallMap[key].node.getComponent(AGAni).putCache();
             ag.gameLayer.node.stopActionByTag(this._fireWallMap[key].tag);
             delete this._fireWallMap[key];
         }
