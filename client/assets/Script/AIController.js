@@ -36,7 +36,6 @@ cc.Class({
     },
 	
 	touchStart:function(event){
-		ag.gameLayer.buttonEventNpcClose();
 		var location = event.getLocation();
 		this._locked = this._role.getPlayerForTouch(location);
 		if(this._locked && this._locked._data.camp==ag.gameConst.campNpc){
@@ -48,7 +47,6 @@ cc.Class({
 		}
 	},
 	touchMove:function(event){
-		if(ag.gameLayer._nodeNpcContent.active)return;
 		var location = event.getLocation();
 		var tempDirection = this._touchMoveDirection;
 		this.resetTouchDirection(location);
@@ -61,7 +59,6 @@ cc.Class({
 		this.changeTouchSprite();
 	},
 	rockStart:function(event){
-		ag.gameLayer.buttonEventNpcClose();
 		var location = this._nodeRock.convertToNodeSpaceAR(event.getLocation());
 		this._rockBack.setPosition(location);
 		this._rockBack.opacity = 255;
@@ -140,6 +137,7 @@ cc.Class({
         var direction = ag.gameLayer.getDirection(this._role.getLocation(),location);
         direction = ag.gameLayer.getOffsetWithColloison(this._role, direction);
         if (direction!=-1){
+            ag.gameLayer.buttonEventNpcClose();
             this._role.move(cc.pAdd(this._role.getLocation(),ag.gameConst.directionArray[direction]));
             this._busy = true;
         }else{

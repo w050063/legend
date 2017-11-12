@@ -140,9 +140,9 @@ cc.Class({
         if(last < this._data.level){
             this.resetAllProp();
             this._data.hp = 1;//确保可以进入改血量
-            if(this==ag.gameLayer._player){
+            if(this==ag.gameLayer._player) {
                 ag.gameLayer.refreshEquip();
-                ag.jsUtil.showText(ag.gameLayer.node,'升级！！！');
+                ag.jsUtil.showText(ag.gameLayer.node, '升级！！！');
             }
             cc.audioEngine.play(cc.url.raw("resources/voice/levelup.mp3"),false,1);
             var node = ag.jsUtil.getEffect(this.node,"ani/effect12/512000",14,ag.gameConst.roleEffectUnderZorder,0.1);
@@ -156,6 +156,10 @@ cc.Class({
             if(source && bShowLevelUp==false){
                 ag.jsUtil.showText(ag.gameLayer.node,'装备回收成功');
             }
+        }
+        if(last < this._data.level && this==ag.gameLayer._player && this._data.mapId=='t12' && this._data.level>=35){
+            ag.gameLayer.changeMap('t1');
+            ag.agSocket.send("changeMap",'t1');
         }
     },
 
@@ -723,7 +727,7 @@ cc.Class({
         if(this._state == ag.gameConst.stateDead){
             this.changeHP(this._totalHP);
             if(this==ag.gameLayer._player){
-                ag.gameLayer.changeMap(this._data.mapId=='t0'?'t0':'t1');
+                ag.gameLayer.changeMap((this._data.mapId=='t0' || this._data.mapId=='t12')?'t0':'t1');
             }else{
                 if(this._propNode)this._propNode.active = true;
                 if(this._minMapNode)this._minMapNode.active = true;

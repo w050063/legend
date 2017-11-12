@@ -261,7 +261,6 @@ cc.Class({
         pomelo.removeAllListeners('onData');
         //清空所有内容
         ag.buffManager.changeMap();
-        this.buttonEventNpcClose();
         this._map.node.destroyAllChildren();
         this._nameMap.node.destroyAllChildren();
         this._roleMap = {};
@@ -788,7 +787,9 @@ cc.Class({
                             }
                         }else{
                             var level = ag.gameConst._terrainMap[transferMst.mapId].level;
-                            if(self._player._data.level>=level){
+                            var maxLevel = ag.gameConst._terrainMap[transferMst.mapId].maxLevel;
+                            if(!maxLevel)maxLevel = 65535;
+                            if(self._player._data.level>=level && self._player._data.level<=maxLevel){
                                 self.changeMap(transferMst.id);
                                 //请求本地图所有角色
                                 ag.agSocket.send("changeMap",transferMst.id);
