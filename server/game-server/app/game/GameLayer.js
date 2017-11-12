@@ -117,13 +117,16 @@ module.exports = {
                         player._data.type = array[i][0];
                         var x= 0,y=0;
                         if(array[i][1]==-1 && array[i][2]==-1){
-                            x = Math.floor(Math.random()*map.mapX);
-                            y = Math.floor(Math.random()*map.mapY);
+                            while(true){
+                                x = Math.floor(Math.random()*map.mapX);
+                                y = Math.floor(Math.random()*map.mapY);
+                                if(this.isCollision(key,x,y)==false)break;
+                            };
                         }else{
                             x = array[i][1];
                             y = array[i][2];
                         }
-                        var position = this.getStandLocation(key,x,y);
+                        var position = ag.jsUtil.p(x,y);//this.getStandLocation(key,x,y);
                         player._data.x = position.x;
                         player._data.y = position.y;
                         player._data.camp = ag.gameConst.campMonster;

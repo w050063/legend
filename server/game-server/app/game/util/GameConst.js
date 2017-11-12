@@ -75,11 +75,11 @@ module.exports = {
             level:0,
             res: 'map/0',
             music:'Heart Of Courage.mp3',
-            npc:[{name:"新手村接待员",x:32,y:9,title:"安全区域传送:",content:['t1']}],
+            npc:[{name:"新手村接待员",x:32,y:9,title:"安全区域传送:",content:['t16','t1']}],
             mapX: 40,
             mapY: 40,
             safe:{x:25,y:4,xx:35,yy:12},
-            refresh: [["m3", -1, -1, 120, 80]]
+            refresh: []
         },
         t1:{
             id : "t1",
@@ -87,9 +87,9 @@ module.exports = {
             level:35,
             res: 'map/3',
             music:'Victory.mp3',
-            npc:[{name:"传送员",x:25,y:33,title:"区域传送:",content:['t0','t2','t5','t11']},
-                {name:"装备回收",x:7,y:27,title:"装备回收:",content:['t1000','t1001','t1002']},
-                {name:"苍月使者",x:9,y:27,title:"区域传送:",content:['t8','t9','t10']}],
+            npc:[{name:"传送员",x:26,y:25,title:"区域传送:",content:['t0','t2','t5','t11']},
+                {name:"装备回收",x:30,y:25,title:"装备回收:",content:['t1000','t1001','t1002']},
+                {name:"苍月使者",x:28,y:25,title:"区域传送:",content:['t8','t9','t10']}],
             mapX: 60,
             mapY: 60,
             safe:{x:7,y:27,xx:26,yy:46},
@@ -205,6 +205,18 @@ module.exports = {
             mapY: 100,
             refresh: [["m5", -1, -1, 300, 60],["m6", -1, -1, 300, 20],["m9", 37, 60, 600, 1]]
         },
+        t12:{
+            id : "t12",
+            name: "新手村训练基地",
+            level:0,
+            maxLevel:35,
+            res: 'map/d515',
+            music:'Heart Of Courage.mp3',
+            npc:[{name:"传送员",x:29,y:24,title:"传送:",content:['t0']}],
+            mapX: 40,
+            mapY: 40,
+            refresh: [["m3", -1, -1, 30, 100]]
+        },
     },
 
 
@@ -225,6 +237,7 @@ module.exports = {
         t13:{id:'t13',name:'天宫二层',mapId:'t10',x:78,y:19},
         t14:{id:'t14',name:'天宫二层',mapId:'t10',x:23,y:72},
         t15:{id:'t15',name:'天宫三层',mapId:'t11',x:78,y:19},
+        t16:{id:'t16',name:'训练基地',mapId:'t12',x:26,y:21},
         t1000:{id:'t1000',name:'一级回收'},
         t1001:{id:'t1001',name:'二级回收'},
         t1002:{id:'t1002',name:'三级回收'},

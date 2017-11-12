@@ -454,7 +454,7 @@ module.exports = ag.class.extend({
                 ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
             }else{
                 ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
-                this.changeMap(this._data.mapId=='t0'?'t0':'t1');
+                this.changeMap((this._data.mapId=='t0' || this._data.mapId=='t12')?'t0':'t1');
             }
         }
     },
