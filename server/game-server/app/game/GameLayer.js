@@ -91,6 +91,9 @@ module.exports = {
                 this._roleXYMap[xyStr].push(dog);
                 dog.setAIController(new TigerAIController(dog));
             }
+
+            //新手送装备
+            ag.itemManager.presentWith(player._data.id);
 		}
 
         //确认进入游戏成功。

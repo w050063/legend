@@ -16,6 +16,7 @@ module.exports = ag.class.extend({
 
         //启动定时器,每秒执行一次
         ag.actionManager.schedule(this,1,this.update1.bind(this));
+        ag.actionManager.schedule(this,2,this.update2.bind(this));
         ag.actionManager.schedule(this,5,this.update5.bind(this));
     },
 
@@ -42,7 +43,7 @@ module.exports = ag.class.extend({
         if(!this._fireWallMap[mapXYString]){
             var tag = ++this._baseTag;
             this._fireWallMap[mapXYString] = {id:role._data.id,tag:tag};
-            ag.actionManager.runAction(role,20,function(){
+            ag.actionManager.runAction(role,10,function(){
                 this.delFireWall(mapXYString);
             }.bind(this),tag);
             ag.jsUtil.sendDataAll("sFireWall",{id:mapXYString,rid:role._data.id},role._data.mapId);
@@ -126,6 +127,9 @@ module.exports = ag.class.extend({
                             var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                             tempRole._data.hp -= Math.round(attacker._hurt/correct*0.5);
                             ag.jsUtil.sendDataAll("sHP",{id:tempRole._data.id,hp:tempRole._data.hp},tempRole._data.mapId);
+                            if(tempRole._data.hp<=0){
+                                tempRole.dead(attacker);
+                            }
                         }
                     }
                 }
@@ -144,6 +148,9 @@ module.exports = ag.class.extend({
                     var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                     tempRole._data.hp -= Math.round(attacker._hurt/correct*0.1);
                     ag.jsUtil.sendDataAll("sHP",{id:tempRole._data.id,hp:tempRole._data.hp},tempRole._data.mapId);
+                    if(tempRole._data.hp<=0){
+                        tempRole.dead(attacker);
+                    }
                 }
             }
         }
@@ -151,11 +158,21 @@ module.exports = ag.class.extend({
 
 
     //更新数据
-    update5: function (dt) {
-        //自动回血
+    update2: function (dt) {
+        //玩家自动回血
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
-            if(role._data.hp>0 && role._data.hp<role._totalHP && this.getIsRelife(role)){
+            if(role._data.camp!=ag.gameConst.campMonster && role._data.hp>0 && role._data.hp<role._totalHP){
+                role._data.hp = Math.min(role._data.hp+role._heal,role._totalHP);
+                ag.jsUtil.sendDataAll("sHP",{id:role._data.id,hp:role._data.hp},role._data.mapId);
+            }
+        }
+    },
+    update5: function (dt) {
+        //怪物自动回血
+        for(var key in ag.gameLayer._roleMap){
+            var role = ag.gameLayer._roleMap[key];
+            if(role._data.camp==ag.gameConst.campMonster && role._data.hp>0 && role._data.hp<role._totalHP && this.getIsRelife(role)){
                 role._data.hp = Math.min(role._data.hp+role._heal,role._totalHP);
                 ag.jsUtil.sendDataAll("sHP",{id:role._data.id,hp:role._data.hp},role._data.mapId);
             }

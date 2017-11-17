@@ -29,6 +29,23 @@ module.exports = ag.class.extend({
         }
     },
 
+
+    //为初始化准备道具
+    presentWith:function(id){
+        var role = ag.gameLayer.getRole(id);
+        if(role){
+            var array = ['i000','i001','i014'];
+            for(var i=0;i<array.length;++i){
+                var item = new Item(array[i]);
+                item._duration = 0;
+                item._data.owner = id;
+                this._itemMap.add(item);
+                ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
+            }
+        }
+    },
+
+
     drop:function (str,mapId,location) {
         var array = str.split(',');
         for(var i=0;i<array.length;++i){

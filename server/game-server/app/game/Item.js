@@ -10,8 +10,10 @@ module.exports = ag.class.extend({
         this._data = {};
         this._data.id = 'i'+(++baseItemId);
         this._data.mid = mid;
-        this._data.mapId = mapId;
-        this._data.x = location.x;
-        this._data.y = location.y;
+        if(mapId)this._data.mapId = mapId;
+        if(location){
+            this._data.x = location.x;
+            this._data.y = location.y;
+        }
     },
 });

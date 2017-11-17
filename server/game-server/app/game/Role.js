@@ -117,7 +117,6 @@ module.exports = ag.class.extend({
     changeMap:function(transferId){
         var transferMst = ag.gameConst._transferMst[transferId];
         if(transferMst){
-            console.log('transferId:'+transferId);
             var mapId = transferMst.mapId;
             ag.jsUtil.sendDataExcept("sDeleteRole",this._data.id,this._data.id);
             if(this._tiger)ag.jsUtil.sendDataExcept("sDeleteRole",this._tiger._data.id,this._data.id);
@@ -162,16 +161,9 @@ module.exports = ag.class.extend({
         var map = ag.itemManager._itemMap.getMap();
         for(var key in map){
             var itemData = map[key]._data;
-            if(itemData.mapId==this._data.mapId){
-                ag.jsUtil.sendData("sItem",itemData,this._data.id);
-            }else{
-                var role = ag.gameLayer.getRole(itemData.owner);
-                if(role && role._data.mapId==this._data.mapId){
-                    ag.jsUtil.sendData("sItem",itemData,this._data.id);
-                }
-            }
-            if(itemData.owner==this._data.id){
-                ag.jsUtil.sendDataExcept("sItem",itemData,this._data.id);
+            var role = ag.gameLayer.getRole(itemData.owner);
+            if(itemData.mapId==this._data.mapId || (role && role._data.mapId==this._data.mapId)){
+                ag.jsUtil.sendDataAll("sItem",itemData,this._data.mapId);
             }
         }
     },
@@ -299,7 +291,13 @@ module.exports = ag.class.extend({
 
 
             //启动火墙
-            ag.buffManager.setFireWall(locked.getMapXYString(),this);
+            var tempArray = ag.gameConst.searchEnemypath;
+            for(var i=0;i<9;++i){
+                var x = locked._data.x+tempArray[i][0],y = locked._data.y+tempArray[i][1];
+                if(ag.gameLayer.isCollision(this._data.mapId,x,y)==false){
+                    ag.buffManager.setFireWall(this.getMapXYString(this._data.mapId,x,y),this);
+                }
+            }
         }else if(this._data.type=='m2'){
             var array = ag.gameLayer._roleXYMap[''+data.mapId+','+x+','+y];
             if(array){
@@ -461,8 +459,13 @@ module.exports = ag.class.extend({
 
 
 
-    getMapXYString:function(){
-        return ''+this._data.mapId+','+this._data.x+','+this._data.y;
+    getMapXYString:function(mapId,x,y){
+        if(!mapId){
+            mapId = this._data.mapId;
+            x = this._data.x;
+            y = this._data.y;
+        }
+        return ''+mapId+','+x+','+y;
     },
 
 
