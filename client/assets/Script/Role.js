@@ -220,7 +220,7 @@ cc.Class({
                     this._propNode._labelHP.string = ""+this._data.hp+"/"+this._totalHP+" Lv:"+(this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level);
                 }
                 var name = '';
-                if(this._data.camp==ag.gameConst.campNpc)name = this._data.name;
+                if(this._data.camp==ag.gameConst.campNpc || this._data.type=='m19')name = this._data.name;
                 else if(this._data.camp==ag.gameConst.campMonster)name = ag.gameConst._roleMst[this._data.type].name;
                 else name = this._data.name+'('+ag.gameConst._roleMst[this._data.type].name+')';
                 this._propNode._labelName.string = name;

@@ -57,17 +57,14 @@ cc.Class({
             this.delFireWall(mapXYString);
         }
         var tag = ++this._baseTag;
-        ag.gameLayer.tagAction(cc.sequence(cc.delayTime(20),cc.callFunc(function(){
+        ag.gameLayer.tagAction(cc.sequence(cc.delayTime(10),cc.callFunc(function(){
             this.delFireWall(mapXYString);
         }.bind(this))),tag);
 
 
         var array = mapXYString.split(',');
-        var node = new cc.Node();
-        ag.gameLayer._map.node.addChild(node,ag.gameConst.roleEffectZorder);
+        var node = ag.jsUtil.getNode(ag.gameLayer._map.node,"ani/effect4/507000",4,ag.gameConst.roleEffectZorder,0.05,function(sender){});
         node.setPosition(ag.gameLayer._player.getTruePosition(cc.p(parseInt(array[1]),parseInt(array[2]))));
-        node._agani = ag.jsUtil.getNode(node,"ani/effect4/507000",4,0,0.05,function(sender){});
-
         this._fireWallMap[mapXYString] = {id:role._data.id,tag:tag,node:node};
     },
 
@@ -83,7 +80,9 @@ cc.Class({
 
     delFireWall:function (key) {
         if(this._fireWallMap[key]){
-            this._fireWallMap[key].node.getComponent(AGAni).putCache();
+            if(this._fireWallMap[key].node && this._fireWallMap[key].node.getComponent(AGAni)){
+                this._fireWallMap[key].node.getComponent(AGAni).putCache();
+            }
             ag.gameLayer.node.stopActionByTag(this._fireWallMap[key].tag);
             delete this._fireWallMap[key];
         }

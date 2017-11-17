@@ -16,6 +16,7 @@ cc.Class({
         this._busy = false;
         this._spriteTouchArray = [];
         this._touchMoveDirection = -1;
+        this._dirBackUp = -1;
 
         //加载
         var prefab = cc.loader.getRes('prefab/nodeTouchSprite');
@@ -44,6 +45,7 @@ cc.Class({
 		}else{
 			this.resetTouchDirection(location);
 			this.changeTouchSprite(true);
+            this._dirBackUp = this._touchMoveDirection;
 		}
 	},
 	touchMove:function(event){
@@ -149,9 +151,11 @@ cc.Class({
     // called every frame
     update: function (dt) {
         //执行玩家操作
-        if(ag.gameLayer && this._busy==false && this._state != ag.gameConst.stateDead){
-            if(this._touchMoveDirection!=-1){
-                this.doMoveOperate(cc.pAdd(this._role.getLocation(),ag.gameConst.directionArray[this._touchMoveDirection]));
+        if(this._busy==false && this._state != ag.gameConst.stateDead){
+            if(this._touchMoveDirection!=-1 || (this._touchMoveDirection==-1 && this._dirBackUp!=-1)){
+                this.doMoveOperate(cc.pAdd(this._role.getLocation(),ag.gameConst.directionArray[this._touchMoveDirection!=-1?this._touchMoveDirection:this._dirBackUp]));
+                this._dirBackUp = -1;
+                this.changeTouchSprite();
             }else if(this._locked){
                 var l1 = this._role.getLocation(), l2 = this._locked.getLocation(),vd = this._role.getMst().visibleDistance,ad = this._role.getMst().attackDistance;
                 var lx = Math.abs(l1.x-l2.x), ly = Math.abs(l1.y-l2.y);
@@ -199,11 +203,5 @@ cc.Class({
             }
         }
         return locked;
-    },
-
-
-    //查找npc
-    findNpcForLocation:function(){
-
     },
 });

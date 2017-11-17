@@ -14,6 +14,7 @@ cc.Class({
     properties: {},
 
     onDestroy:function(){
+        pomelo.removeAllListeners('onData');
         if(cc.sys.isBrowser){
             cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
         }
@@ -25,6 +26,7 @@ cc.Class({
         this._roleMap = {};
         this._player = null;
         this._lastMapPosition = cc.p(0,0);
+        this._stableMinMapNpcBoss = [];
 
         //自动攻击
         var temp = cc.sys.localStorage.getItem('setupAutoAttack');
@@ -170,11 +172,18 @@ cc.Class({
     //换地图
     changeMap:function(transferId){
         //清空所有内容
+        for(var i=0;i<this._stableMinMapNpcBoss.length;++i){
+            this._stableMinMapNpcBoss[i].destroy();
+        }
+        this._stableMinMapNpcBoss = [];
         ag.buffManager.changeMap();
         this.buttonEventNpcClose();
         for(var key in this._roleMap){
-            this._roleMap[key].putCache();
+            if(this._roleMap[key]!=this._player){
+                this._roleMap[key].putCache();
+            }
         }
+        if(this._player)this._player.putCache();
         this._map.node.destroyAllChildren();
         this._nameMap.node.destroyAllChildren();
         ag.gameLayer._spriteTopRight.node.destroyAllChildren();
@@ -253,6 +262,32 @@ cc.Class({
             //设置小地图上人的坐标
             var truePos = this._player.getTruePosition();
             this._nodeMinMapPlayer.setPosition(((this._player._data.x+0.5)/map.mapX-0.5)*size.width,((this._player._data.y+0.5)/map.mapY-0.5)*size.height);
+
+            //设置boss和npc坐标
+            if(this._stableMinMapNpcBoss.length==0){
+                for(var i=0;i<map.npc.length;++i){
+                    var node = new cc.Node();
+                    var label = node.addComponent(cc.Label);
+                    label.fontSize = 20;
+                    label.string = map.npc[i].name;
+                    this._nodeMinMapBack.addChild(node);
+                    node.color = cc.color(0,0,255);
+                    node.setPosition(((map.npc[i].x+0.5)/map.mapX-0.5)*size.width,((map.npc[i].y+0.5)/map.mapY-0.5)*size.height);
+                    this._stableMinMapNpcBoss.push(node);
+                }
+                for(var i=0;i<map.refresh.length;++i){
+                    if(map.refresh[i][1]!=-1 && map.refresh[i][2]!=-1){
+                        var node = new cc.Node();
+                        var label = node.addComponent(cc.Label);
+                        label.fontSize = 20;
+                        label.string = ag.gameConst._roleMst[map.refresh[i][0]].name;
+                        this._nodeMinMapBack.addChild(node);
+                        node.color = cc.color(255,0,0);
+                        node.setPosition(((map.refresh[i][1]+0.5)/map.mapX-0.5)*size.width,((map.refresh[i][2]+0.5)/map.mapY-0.5)*size.height);
+                        this._stableMinMapNpcBoss.push(node);
+                    }
+                }
+            }
         }
     },
 
@@ -764,6 +799,7 @@ cc.Class({
                     label.string = transferMst.name;
                     label.node.off(cc.Node.EventType.TOUCH_END);
                     label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
+                        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
                         var npcStr = transferMst.name;
                         if(npcStr=='一级回收' || npcStr=='二级回收' || npcStr=='三级回收'){
                             var curLevel = 1;
@@ -774,6 +810,7 @@ cc.Class({
                             }else if(npcStr=='三级回收'){
                                 curLevel = 3;
                             }
+
                             var array = [];
                             for(var key in ag.userInfo._itemMap){
                                 var obj = ag.userInfo._itemMap[key];
@@ -783,7 +820,7 @@ cc.Class({
                             }
                             if(array.length>0)ag.agSocket.send("bagItemRecycle",array.join(','));
                             else{
-                                ag.jsUtil.showText(this.node,"没有可回收的装备！");
+                                ag.jsUtil.showText(self.node,"没有可回收的装备！");
                             }
                         }else{
                             var level = ag.gameConst._terrainMap[transferMst.mapId].level;

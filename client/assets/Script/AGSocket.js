@@ -35,16 +35,19 @@ module.exports={
 
 
         //设置断开逻辑
+        pomelo.removeAllListeners('disconnect');
         pomelo.on('disconnect',function () {
             if(self._step == 0){
             }else if(self._step == 1){
             }else if(self._step == 2){
-                pomelo.removeAllListeners('onData');
+                var node = cc.director.getScene();
                 ag.agSocket._dataArray = [];
                 ag.userInfo._itemMap = {};
                 cc.audioEngine.stopAll();
-                cc.director.loadScene('ConnectingLayer');
                 ag.gameLayer = null;
+                if(node.name!='ConnectingLayer'){
+                    cc.director.loadScene('ConnectingLayer');
+                }
             }
         });
 	},

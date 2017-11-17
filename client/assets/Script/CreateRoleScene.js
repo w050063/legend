@@ -9,6 +9,10 @@ cc.Class({
     extends: cc.Component,
     properties: {},
 
+    onDestroy:function(){
+        pomelo.removeAllListeners('sEnter');
+    },
+
     // use this for initialization
     onLoad: function () {
         this._selectIndex = 0;
@@ -66,7 +70,6 @@ cc.Class({
             ag.userInfo._data = msg;
             ag.userInfo._accountData.sex = msg.sex;
             ag.userInfo._accountData.type = msg.type;
-            pomelo.removeAllListeners('sEnter');
             ag.agSocket.onBattleEvent();
             cc.director.loadScene("GameLayer");
         }.bind(this));

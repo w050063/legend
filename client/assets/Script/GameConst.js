@@ -43,6 +43,7 @@ module.exports= {
     tileHeight:(cc && cc.sys && cc.sys.isBrowser)?30:32,
 
 
+
     //基础等级，后面接着递增等级，35,43,47,51
     expDatabase:[10,0,10,1000,10000,100000],
 
@@ -83,7 +84,7 @@ module.exports= {
             npc:[{name:"传送员",x:7,y:40,title:"传送:",content:['t1']},{name:"传送员",x:41,y:12,title:"传送:",content:['t4','t1']}],
             mapX: 50,
             mapY: 50,
-            refresh: [["m4", -1, -1, 300, 30],["m5", -1, -1, 300, 30],["m6", -1, -1, 300, 20],["m7", -1, -1, 300, 20],["m8", -1, -1, 600, 3]]
+            refresh: [["m4", -1, -1, 300, 10],["m5", -1, -1, 300, 10],["m6", -1, -1, 300, 10],["m7", -1, -1, 300, 10],["m8", 26, 20, 600, 1]]
         },
         t3:{
             id : "t3",
@@ -121,10 +122,10 @@ module.exports= {
         t6:{
             id : "t6",
             name: "鼠洞",
-            level:43,
+            level:35,
             res: 'map/d2052',
             music:'Strength Of A Thousand Men.mp3',
-            npc:[{name:"传送员",x:87,y:32,title:"传送:",content:['t1']}],
+            npc:[{name:"传送员",x:87,y:32,title:"传送:",content:['t1']},{name:"传送员",x:18,y:18,title:"传送:",content:['t1']},{name:"传送员",x:50,y:75,title:"传送:",content:['t1']}],
             mapX: 100,
             mapY: 100,
             refresh: [["m5", -1, -1, 300, 60],["m6", -1, -1, 300, 20],["m10", -1, -1, 600, 1],["m11", -1, -1, 600, 1]]
@@ -132,24 +133,24 @@ module.exports= {
         t7:{
             id : "t7",
             name: "牛魔洞",
-            level:43,
+            level:35,
             res: 'map/d2079',
             music:'Strength Of A Thousand Men.mp3',
-            npc:[{name:"传送员",x:14,y:86,title:"传送:",content:['t1']}],
+            npc:[{name:"传送员",x:14,y:86,title:"传送:",content:['t1']},{name:"传送员",x:15,y:12,title:"传送:",content:['t1']},{name:"传送员",x:52,y:48,title:"传送:",content:['t1']},{name:"传送员",x:89,y:84,title:"传送:",content:['t1']},{name:"传送员",x:89,y:10,title:"传送:",content:['t1']}],
             mapX: 100,
             mapY: 100,
-            refresh: [["m4", -1, -1, 300, 30],["m5", -1, -1, 300, 30],["m6", -1, -1, 300, 10],["m7", -1, -1, 300, 10],["m12", -1, -1, 600, 1],["m13", -1, -1, 600, 1]]
+            refresh: [["m4", -1, -1, 300, 60],["m6", -1, -1, 300, 30],["m7", -1, -1, 300, 30],["m12", -1, -1, 600, 1],["m13", -1, -1, 600, 1]]
         },
         t8:{
             id : "t8",
             name: "魔窟圣地",
-            level:43,
+            level:35,
             res: 'map/d2063',
             music:'Strength Of A Thousand Men.mp3',
-            npc:[{name:"传送员",x:106,y:52,title:"传送:",content:['t1']}],
+            npc:[{name:"传送员",x:106,y:52,title:"传送:",content:['t1']},{name:"传送员",x:19,y:33,title:"传送:",content:['t1']}],
             mapX: 130,
             mapY: 60,
-            refresh: [["m4", -1, -1, 300, 60],["m7", -1, -1, 300, 20],["m14", -1, -1, 600, 1],["m15", -1, -1, 600, 1]]
+            refresh: [["m4", -1, -1, 300, 30],["m5", -1, -1, 300, 30],["m7", -1, -1, 300, 20],["m14", -1, -1, 600, 1],["m15", -1, -1, 600, 1]]
         },
         t9:{
             id : "t9",
@@ -232,15 +233,15 @@ module.exports= {
         m2:{id:"m2",name:"道",hp:17,hpAdd:[8,17,17,16,20],defense:0,defenseAdd:0.1,hurt:5,hurtAdd:0.45,expDead:0,heal:5,healAdd:2,
             moveSpeed:0.5,attackSpeed:1.2,checkDistance:5,visibleDistance:8,attackDistance:5},
         m3:{id:"m3",name:"甲壳虫",hp:10,hpAdd:0,defense:0,defenseAdd:0,hurt:1,hurtAdd:0,expDead:10,heal:1,healAdd:0,
-            moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"ani/hum16/016",drop:'i000,30,i001,30,i019,30,i014,30,i026,30',lv:1},
+            moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"ani/hum16/016",drop:'',lv:1},
         m4:{id:"m4",name:"红野猪",hp:330,hpAdd:0,defense:0,defenseAdd:0,hurt:43,hurtAdd:0,expDead:33,heal:1,healAdd:0,
-            moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum17/017",drop:'i014,50',lv:1},
+            moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum17/017",drop:'i000,20,i001,20,i019,20,i014,20,i026,20',lv:1},
         m5:{id:"m5",name:"祖玛羊",hp:385,hpAdd:0,defense:10,defenseAdd:0,hurt:30,hurtAdd:0,expDead:38,heal:1,healAdd:0,
-            moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:4,model:"ani/hum18/018",drop:'i020,20,i021,20,i022,20',lv:1},
+            moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:4,model:"ani/hum18/018",drop:'i000,20,i001,20,i019,20,i014,20,i026,20',lv:1},
         m6:{id:"m6",name:"祖玛卫士",hp:495,hpAdd:0,defense:15,defenseAdd:0,hurt:56,hurtAdd:0,expDead:50,heal:1,healAdd:0,
-            moveSpeed:1,attackSpeed:1,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum19/019",drop:'i027,20,i028,20,i029,20',lv:2},
+            moveSpeed:1,attackSpeed:1,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum19/019",drop:'i002,10,i003,10,i004,10,i005,10,i006,10,i007,10,i020,10,i021,10,i022,10,i027,10,i028,10,i029,10',lv:2},
         m7:{id:"m7",name:"白野猪",hp:1000,hpAdd:0,defense:15,defenseAdd:0,hurt:85,hurtAdd:0,expDead:100,heal:10,healAdd:0,
-            moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum20/020",drop:'i002,20,i003,20,i004,20,i005,20,i006,20,i007,20',lv:2},
+            moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum20/020",drop:'i002,10,i003,10,i004,10,i005,10,i006,10,i007,10,i020,10,i021,10,i022,10,i027,10,i028,10,i029,10',lv:2},
         m8:{id:"m8",name:"千年树妖",hp:1800,hpAdd:0,defense:20,defenseAdd:0,hurt:70,hurtAdd:0,expDead:180,heal:20,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:5,visibleDistance:5,attackDistance:5,model:"ani/hum21/022",drop:'i015,50,i016,50,i017,50',lv:2},
         m9:{id:"m9",name:"万年树妖",hp:8000,hpAdd:0,defense:20,defenseAdd:0,hurt:150,hurtAdd:0,expDead:800,heal:100,healAdd:0,
