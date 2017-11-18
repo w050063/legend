@@ -46,7 +46,7 @@ cc.Class({
                     var name = this._dataArray[(i*this._width+j)*3+2];
                     if(name && name!='0'){
                         var node = this.getTileSprite(name);
-                        node.setPosition(w*(0.5+j-this._width/2),h*(0.5+i-this._height/2));
+                        node.setPosition(w*(1+j-this._width/2),h*(i-this._height/2));
                         this._mapTile[str] = node;
                     }
                 }
@@ -64,7 +64,7 @@ cc.Class({
                         var node = this.getObjectSprite(name);
                         node.setPosition(w*(0.5+j-this._width/2),h*(0.5+i-this._height/2));
                         var zorder = Math.round(10000-node.y);
-                        node.setLocalZOrder(zorder);
+                        node.setLocalZOrder(zorder-1);//-1确保人在建筑上面
                         this._mapObj[str] = node;
                     }
                 }
@@ -98,10 +98,10 @@ cc.Class({
 
     getTileSprite:function(name){
         var sprite = ag.spriteCache.get('map/tile'+name,function(sprite){
-            sprite.sizeMode = cc.Sprite.SizeMode.RAW;
-            sprite.trim = false;
+            //sprite.sizeMode = cc.Sprite.SizeMode.RAW;
+            //sprite.trim = false;
             sprite.spriteFrame.getTexture().setAliasTexParameters();
-            sprite.node.setAnchorPoint(cc.p(0.25,0.75));
+            //sprite.node.setAnchorPoint(cc.p(0.25,0.75));
         }.bind(this));
         this.node.addChild(sprite.node);
         return sprite.node;

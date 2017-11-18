@@ -49,6 +49,7 @@ cc.Class({
         }
         var sprite = new cc.Node().addComponent(cc.Sprite);
         sprite.sizeMode = cc.Sprite.SizeMode.RAW;
+        sprite.trim = false;
         this._waitFrameArray.push(sprite);
         sprite._agName = name;
         if(i!=0)sprite._agTime = i;

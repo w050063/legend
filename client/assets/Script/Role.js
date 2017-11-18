@@ -85,8 +85,8 @@ cc.Class({
         //更新位置
         if(ag.gameLayer._player == this){
             var scale = ag.gameLayer._map.node.getScale();
-            ag.gameLayer._map.node.setPosition(-this.node.x*scale,(-this.node.y-40)*scale);
-            ag.gameLayer._nameMap.node.setPosition(-this.node.x*scale,(-this.node.y-40)*scale);
+            ag.gameLayer._map.node.setPosition(Math.round(-this.node.x*scale),Math.round((-this.node.y-40)*scale));
+            ag.gameLayer._nameMap.node.setPosition(Math.round(-this.node.x*scale),Math.round((-this.node.y-40)*scale));
         }
 
         var zorder = Math.round(10000-this.node.y);
@@ -304,7 +304,7 @@ cc.Class({
         if(this._nearFlag){
             if(this._data.camp==ag.gameConst.campNpc){
                 var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
-                var name = 'ani/hum3/003';
+                var name = 'ani/hum41/041';
                 if(this._agAni)this._agAni.getComponent(AGAni).putCache();
                 this._agAni = ag.jsUtil.getNode(this.node,name+array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,0.3);
                 this._agAni.setColor(this._aniColor);
@@ -767,7 +767,7 @@ cc.Class({
         var size = cc.director.getWinSize();
         var x = location.x;
         var y = location.y;
-        var center = 50;
+        var center = 80;
         var offset = {};
         if(x<size.width/2-center)offset.x=-1;
         else if(x>size.width/2+center)offset.x=1;

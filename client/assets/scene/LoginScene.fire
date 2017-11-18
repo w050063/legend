@@ -483,7 +483,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 700,
-      "height": 450
+      "height": 510
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -517,7 +517,7 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_N$string": "名字：乱世传奇\n\n\n\n介绍：本游戏致力于做简单，精品传奇，无任务，无广告，无计费，上来就是干，突出一个激情，信念不灭！目前开发阶段，请勿进行人民币交易！\n\n网页（支持电脑和手机）：待定\n安卓下载：待定\n电脑版下载：待定\n\n\n\n个人QQ：469222092",
+    "_N$string": "名字：乱世传奇\n\n\n\n介绍：本游戏致力于做简单，精品传奇，无任务，无广告，无计费，上来就是干，突出一个激情，信念不灭！\n\n\n目前demo阶段：\n网页（支持电脑和手机）：待定\n安卓下载：待定\n电脑版下载：待定\n\n\n\n个人QQ：469222092",
     "_N$horizontalAlign": 0,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",

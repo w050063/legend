@@ -2673,12 +2673,12 @@
     "_anchorPoint": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 0.5
+      "y": 1
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 260,
-      "height": 40
+      "width": 300,
+      "height": 60
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -2686,8 +2686,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": -120.7,
-      "y": 20.5
+      "x": -123.7,
+      "y": 29
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -2707,12 +2707,12 @@
     "_useOriginalSize": false,
     "_actualFontSize": 20,
     "_fontSize": 20,
-    "_lineHeight": 40,
+    "_lineHeight": 30,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_N$string": "描述：描述描述描述描述描述",
+    "_N$string": "描述：描述描述描述描述描述服服孤鸿寡鹄",
     "_N$horizontalAlign": 0,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",

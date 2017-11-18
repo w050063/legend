@@ -11,6 +11,11 @@ cc.Class({
     // use this for initialization
     onLoad: function () {
         if(!window.ag){
+            //if (cc._renderType === cc.game.RENDER_TYPE_WEBGL) {
+            //    cc.director.setProjection(cc.Director.PROJECTION_2D);
+            //}else{
+            //    cc.renderer.enableDirtyRegion(false);
+            //}
             window.ag = {};
             ag.jsUtil = require("JsUtil");
             ag.userInfo = require("UserInfo");
@@ -38,7 +43,6 @@ cc.Class({
                 }
             });
 
-            cc.director.setProjection(cc.Director.PROJECTION_2D);
             //cc.director.setDisplayStats(false);
         }
 
