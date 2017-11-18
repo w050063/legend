@@ -243,7 +243,6 @@ module.exports = {
         t1002:{id:'t1002',name:'三级回收'},
     },
 
-
     _roleMst: {
         m0:{id:"m0",name:"战",hp:19,hpAdd:[15,28,31,34,35],defense:0,defenseAdd:0.2,hurt:3,hurtAdd:0.45,expDead:0,heal:5,healAdd:2,
             moveSpeed:0.5,attackSpeed:0.8,checkDistance:5,visibleDistance:8,attackDistance:0},
@@ -252,7 +251,7 @@ module.exports = {
         m2:{id:"m2",name:"道",hp:17,hpAdd:[8,17,17,16,20],defense:0,defenseAdd:0.1,hurt:5,hurtAdd:0.45,expDead:0,heal:5,healAdd:2,
             moveSpeed:0.5,attackSpeed:1.2,checkDistance:5,visibleDistance:8,attackDistance:5},
         m3:{id:"m3",name:"甲壳虫",hp:10,hpAdd:0,defense:0,defenseAdd:0,hurt:1,hurtAdd:0,expDead:10,heal:1,healAdd:0,
-            moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"ani/hum16/016",drop:'',lv:1},
+            moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"ani/hum16/016",drop:'i036,100,i037,100,i033,100',lv:1},
         m4:{id:"m4",name:"红野猪",hp:330,hpAdd:0,defense:0,defenseAdd:0,hurt:43,hurtAdd:0,expDead:33,heal:1,healAdd:0,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum17/017",drop:'i000,20,i001,20,i019,20,i014,20,i026,20',lv:1},
         m5:{id:"m5",name:"祖玛羊",hp:385,hpAdd:0,defense:10,defenseAdd:0,hurt:30,hurtAdd:0,expDead:38,heal:1,healAdd:0,
@@ -328,5 +327,7 @@ module.exports = {
         i033 : {id:'i033',name:'羽翼(战)',type:2,hurt:10,defense:10,exclusive:[0,1],model:'ani/hum32/033',level:3},
         i034 : {id:'i034',name:'羽翼(法)',type:2,hurt:10,defense:10,exclusive:[2,3],model:'ani/hum33/034',level:3},
         i035 : {id:'i035',name:'羽翼(道)',type:2,hurt:10,defense:10,exclusive:[4,5],model:'ani/hum34/035',level:3},
+        i036 : {id:'i036',name:'四级甲(男)',type:1,hurt:10,defense:10,exclusive:[0,2,4],model:'ani/hum42/042',level:4},
+        i037 : {id:'i037',name:'四级甲(女)',type:1,hurt:10,defense:10,exclusive:[1,3,5],model:'ani/hum43/043',level:4},
     },
 };
