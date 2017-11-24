@@ -27,6 +27,7 @@ module.exports={
 	_skillPointCount:1,
     _direction:4,
 	_itemMap : {},
+    backGroundPos :cc.p(-100,-330),
 
 	init:function () {
 

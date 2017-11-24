@@ -47,6 +47,15 @@ cc.Class({
         }
 
 
+        var node = cc.find("Canvas/door");
+        node.setPosition(ag.userInfo.backGroundPos);
+        var dis0 = cc.pDistance(cc.p(280,230),cc.p(-100,-330));
+        var dis1 = cc.pDistance(cc.p(280,230),ag.userInfo.backGroundPos);
+        node.runAction(cc.sequence(cc.moveTo(20*dis1/dis0,cc.p(280,230)),cc.callFunc(function(){
+            node.runAction(cc.repeatForever(cc.sequence(cc.moveTo(20,cc.p(-100,-330)),cc.moveTo(20,cc.p(280,230)))));
+        })));
+
+
         this._nodeLoading = cc.find("Canvas/nodeLoading").getComponent(NodeLoading);
         this._nodeLoading.setShow("正在连接网络...");
         this._nodeLoading.setPercent(".");
@@ -99,6 +108,7 @@ cc.Class({
         cc.loader.loadResArray(array, cc.SpriteAtlas,function(num, totalNum, item){
             this._nodeLoading.setPercent("("+Math.floor(num/totalNum*100)+"%)");
         }.bind(this),function (err, atlas) {
+            ag.userInfo.backGroundPos = cc.find("Canvas/door").getPosition();
             cc.director.loadScene('LoginScene',function () {cc.loader.onProgress = null;});
         }.bind(this));
     },

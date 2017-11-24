@@ -21,14 +21,17 @@ cc.Class({
             this._dataArray = array;
             this._width = parseInt(array[0]);
             this._height = parseInt(array[1]);
-            this.setCenter(this._center);
+            //this.setCenter(this._center);
+            if(ag.gameLayer && ag.gameLayer._player){
+                ag.gameLayer._player.setLocation(ag.gameLayer._player.getLocation());
+            }
         }.bind(this));
     },
 
 
     setCenter:function(location){
         this._center = location;
-        if(this._dataArray.length==0)return;
+        if(!this._dataArray || this._dataArray.length==0)return;
         var w = ag.gameConst.tileWidth,h=ag.gameConst.tileHeight;
         var oldMapTile = this._mapTile;
         this._mapTile = {};

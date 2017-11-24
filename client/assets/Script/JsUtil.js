@@ -15,6 +15,13 @@ module.exports={
     },
 
 
+    secondInterfaceAnimation:function(node){
+        node.stopAllActions();
+        node.scaleY = 0;
+        node.runAction(cc.sequence(cc.scaleTo(0.1,1,1.1),cc.scaleTo(0.02,1,1)));
+    },
+
+
     alert:function (father,content,callback) {
         //加载
         cc.loader.loadRes('prefab/nodeAlert',function(err,prefab){

@@ -15,6 +15,14 @@ cc.Class({
 
     // use this for initialization
     onLoad: function () {
+        var node = cc.find("Canvas/door");
+        node.setPosition(ag.userInfo.backGroundPos);
+        var dis0 = cc.pDistance(cc.p(280,230),cc.p(-100,-330));
+        var dis1 = cc.pDistance(cc.p(280,230),ag.userInfo.backGroundPos);
+        node.runAction(cc.sequence(cc.moveTo(20*dis1/dis0,cc.p(280,230)),cc.callFunc(function(){
+            node.runAction(cc.repeatForever(cc.sequence(cc.moveTo(20,cc.p(-100,-330)),cc.moveTo(20,cc.p(280,230)))));
+        })));
+
         this._selectIndex = 0;
         //初始化按钮对象
         this._nodeRoleArray = [];
@@ -93,7 +101,7 @@ cc.Class({
                 //nodeRole._modelNode.getComponent(cc.Sprite)._sgNode.setState(0);
                 nodeRole._modelNode.getComponent(AGAni).resume();
                 nodeRole._modelNode.setScale(2);
-                nodeRole._modelNode.runAction(cc.scaleTo(0.2,4));
+                nodeRole._modelNode.runAction(cc.scaleTo(0.2,3));
             }else{
                 //nodeRole._modelNode.getComponent(cc.Sprite)._sgNode.setState(1);
                 nodeRole._modelNode.getComponent(AGAni).pause();
@@ -179,6 +187,7 @@ cc.Class({
 
     back:function(){
         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.userInfo.backGroundPos = cc.find("Canvas/door").getPosition();
         cc.director.loadScene('LoginScene');
     },
 });

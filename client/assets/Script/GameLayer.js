@@ -8,6 +8,7 @@ var Role = require("Role");
 var Item = require("Item");
 var AGMap = require("AGMap");
 var AGListView = require("AgListView");
+var ItemInfoNode = require('ItemInfoNode');
 var baseNpcId = 5000;
 cc.Class({
     extends: cc.Component,
@@ -27,6 +28,10 @@ cc.Class({
         this._player = null;
         this._lastMapPosition = cc.p(0,0);
         this._stableMinMapNpcBoss = [];
+        this._bagArray = [];
+        for(var i=0;i<ag.gameConst.bagMaxCount;++i){
+            this._bagArray.push(-1);
+        }
 
         //自动攻击
         var temp = cc.sys.localStorage.getItem('setupAutoAttack');
@@ -70,26 +75,29 @@ cc.Class({
 
 
         this._equipArray = [];
-        var self = this;
         for(var i=0;i<5;++i){
-            (function(i){
-                self._equipArray.push(cc.find('Canvas/nodeBag/sprite'+i+'/sprite').getComponent(cc.Sprite));
-                cc.find('Canvas/nodeBag/sprite'+i).on(cc.Node.EventType.TOUCH_END, function (event) {
-                    cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
-                    for(var key in ag.userInfo._itemMap){
-                        var obj = ag.userInfo._itemMap[key];
-                        var mst = ag.gameConst._itemMst[obj._data.mid];
-                        if(obj._data.owner==self._player._data.id && obj._data.puton && mst.type==i){
-                            delete obj._data.puton;
-                            self._player.delEquip(i);
-                            self.refreshBag();
-                            self.refreshEquip();
-                            ag.agSocket.send("equipItemToBag",obj._data.id);
-                        }
-                    }
-                });
-            })(i);
+            this._equipArray.push(0);
         }
+        //var self = this;
+        //for(var i=0;i<5;++i){
+        //    (function(i){
+        //        self._equipArray.push(cc.find('Canvas/nodeBag/sprite'+i+'/sprite').getComponent(cc.Sprite));
+        //        cc.find('Canvas/nodeBag/sprite'+i).on(cc.Node.EventType.TOUCH_END, function (event) {
+        //            cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        //            for(var key in ag.userInfo._itemMap){
+        //                var obj = ag.userInfo._itemMap[key];
+        //                var mst = ag.gameConst._itemMst[obj._data.mid];
+        //                if(obj._data.owner==self._player._data.id && obj._data.puton && mst.type==i){
+        //                    delete obj._data.puton;
+        //                    self._player.delEquip(i);
+        //                    self.refreshBag();
+        //                    self.refreshEquip();
+        //                    ag.agSocket.send("equipItemToBag",obj._data.id);
+        //                }
+        //            }
+        //        });
+        //    })(i);
+        //}
         this._equipArray.push(cc.find('Canvas/nodeBag/labelAttack').getComponent(cc.Label));
         this._equipArray.push(cc.find('Canvas/nodeBag/labelDefense').getComponent(cc.Label));
         this._equipArray.push(cc.find('Canvas/nodeBag/labelLevel').getComponent(cc.Label));
@@ -115,9 +123,9 @@ cc.Class({
 
         this._nodeBag = cc.find("Canvas/nodeBag");
         this._nodeBag.active = false;
-        this._scrollViewList = cc.find("Canvas/nodeBag/scrollViewList").getComponent(AGListView);
-        this._scrollViewList.setSpace(2);
-        this.refreshBag();
+        //this._scrollViewList = cc.find("Canvas/nodeBag/scrollViewList").getComponent(AGListView);
+        //this._scrollViewList.setSpace(2);
+        //this.refreshBag();
 
 
         //测试新地图
@@ -125,6 +133,14 @@ cc.Class({
         this._map.node.setScale(1.5);
         this._nameMap = cc.find("Canvas/nodeNameMap").addComponent(AGMap);
         this._nameMap.node.setScale(1.5);
+
+
+        //创建主角
+        var node = new cc.Node();
+        this._player = node.addComponent(Role);
+        this._map.node.addChild(node);
+        this._roleMap[ag.userInfo._data.id] = this._player;
+        this._player.init(ag.userInfo._data);
 
         this.changeMap();
         //请求本地图所有角色
@@ -181,13 +197,15 @@ cc.Class({
         for(var key in this._roleMap){
             if(this._roleMap[key]!=this._player){
                 this._roleMap[key].putCache();
+                delete this._roleMap[key];
             }
         }
-        if(this._player)this._player.putCache();
-        this._map.node.destroyAllChildren();
-        this._nameMap.node.destroyAllChildren();
-        ag.gameLayer._spriteTopRight.node.destroyAllChildren();
-        this._roleMap = {};
+        for(var i=this._map.node.childrenCount-1;i>=0;--i){
+            var node = this._map.node.children[i];
+            if(node!=this._player.node){
+                node.destroy();
+            }
+        }
         ag.spriteCache.release();
 
         if(transferId){
@@ -209,13 +227,6 @@ cc.Class({
         //this._map.test(mapId);
         this._map.init(map.res);
 
-        //创建主角
-        var node = new cc.Node();
-        this._player = node.addComponent(Role);
-        this._map.node.addChild(node);
-        this._roleMap[ag.userInfo._data.id] = this._player;
-        this._player.init(ag.userInfo._data);
-        this.refreshEquip();
 
         //增加npc
         for(var i=0;i<map.npc.length;++i){
@@ -231,7 +242,11 @@ cc.Class({
         }
 
         //清空地上的道具，并更新
-        ag.userInfo._itemMap = {};
+        for(var key in ag.userInfo._itemMap){
+            if(ag.userInfo._itemMap[key]._data.owner!=this._player._data.id){
+                delete ag.userInfo._itemMap[key];
+            }
+        }
 
         var minMap = map.res;
         minMap = 'minMap'+minMap.substr(minMap.indexOf('/'));
@@ -336,17 +351,18 @@ cc.Class({
 
     //初始化道具
     initItem:function(data){
-        if(!data.owner){
-            this.dropItem(data);
-        }else if(!data.puton){
+        if(!ag.userInfo._itemMap[data.id]){
             ag.userInfo._itemMap[data.id]={_data:data};
-            if(data.owner==this._player._data.id)this.refreshBag();
-        }else{
-            ag.userInfo._itemMap[data.id]={_data:data};
-            var role = this.getRole(data.owner);
-            if(role){
-                role.addEquip(data.mid);
-                if(role == this._player)this.refreshEquip();
+            if(data.owner){
+                var role = this._roleMap[data.owner];
+                if(typeof data.puton=='number'){
+                    if(role==this._player)this.itemBagToEquip(data.id);
+                    role.addEquip(data.id);
+                }else{
+                    if(role==this._player)this.itemEquipToBag(data.id);
+                }
+            }else{
+                this.dropItem(data);
             }
         }
     },
@@ -403,7 +419,7 @@ cc.Class({
             obj._data.owner = this._player._data.id;
             obj.comp.node.destroy();
             obj.comp = undefined;
-            this.refreshBag();
+            this.addItemToBag(id);
             this.systemNotify(ag.gameConst._itemMst[obj._data.mid].name+'被发现！');
         }
     },
@@ -415,7 +431,7 @@ cc.Class({
         if(obj && role){
             obj._data.owner = rid;
             obj._data.puton = 1;
-            role.addEquip(obj._data.mid);
+            role.addEquip(obj._data.id);
         }
     },
 
@@ -425,7 +441,15 @@ cc.Class({
         var role = ag.gameLayer.getRole(rid);
         if(obj && role){
             delete obj._data.puton;
-            role.delEquip(ag.gameConst._itemMst[obj._data.mid].type);
+            var success = role.delEquip(id);
+            if(success){
+                var data = obj._data;
+                var mst = ag.gameConst._itemMst[data.mid];
+                var puton = ag.gameConst.putonTypes.indexOf(mst.type);
+                var father = cc.find('Canvas/nodeBag/equip');
+                var node = father.getChildByName('equip'+puton);
+                if(node)node.destroy();
+            }
         }
     },
 
@@ -587,7 +611,123 @@ cc.Class({
     },
 
 
+    addItemToBag:function(id){
+        for(var i=0;i<this._bagArray.length;++i){
+            if(this._bagArray[i].id==id){
+                cc.log('error: bag have already had!');
+                return;
+            }
+        }
+
+        var index = this._bagArray.indexOf(-1);
+        if(index==-1){
+            cc.log('error: The bag is full!');
+            return;
+        }
+        var bag = cc.find('Canvas/nodeBag/bag');
+        var startPos = cc.p(-125,61);
+        var disPos = cc.p(36,32);
+        var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
+        var node = new cc.Node();
+        var sprite = node.addComponent(cc.Sprite);
+        sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+mst.id.substr(1));
+        node.setPosition(startPos.x+disPos.x*(index%8),startPos.y-disPos.y*Math.floor(index/8));
+        sprite.sizeMode = cc.Sprite.SizeMode.RAW;
+        sprite.trim = false;
+        bag.addChild(node);
+        this._bagArray[index] = {id:id,node:node};
+        node.off(cc.Node.EventType.TOUCH_END);
+        node.on(cc.Node.EventType.TOUCH_END, function (event) {
+            cc.find('Canvas/nodeItemInfo').active = true;
+            cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
+        }.bind(this));
+    },
+
+
+    //删除一件道具
+    delItemFormBag:function(id){
+        var index = -1;
+        for(var i=0;i<this._bagArray.length;++i){
+            if(this._bagArray[i].id==id){
+                index = i;
+                break;
+            }
+        }
+        if(index!=-1){
+            this._bagArray[index].node.destroy();
+            this._bagArray[index] = -1;
+        }
+    },
+
+
+    //卸下一件道具
+    itemEquipToBag:function(id){
+        this.addItemToBag(id);
+        var data = ag.userInfo._itemMap[id]._data;
+        var success = this._player.delEquip(id);
+        if(success){
+            var mst = ag.gameConst._itemMst[data.mid];
+            var puton = ag.gameConst.putonTypes.indexOf(mst.type);
+            var father = cc.find('Canvas/nodeBag/equip');
+            var node = father.getChildByName('equip'+puton);
+            if(node)node.destroy();
+        }
+    },
+
+
+    //穿戴一件道具
+    itemBagToEquip:function(id,puton){
+        var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
+        if(!puton)puton = ag.gameConst.putonTypes.indexOf(mst.type);
+        this.delItemFormBag(id);
+
+
+        //如果有装备，则切换装备
+        var role = this._roleMap[ag.userInfo._itemMap[id]._data.owner];
+        if(role && role._equipArray[puton]){
+            this.addItemToBag(role._equipArray[puton]);
+        }
+
+
+        var father = cc.find('Canvas/nodeBag/equip');
+        var node = father.getChildByName('equip'+puton);
+        if(!node){
+            node = new cc.Node();
+            node.name = 'equip'+puton;
+            node.setPosition(ag.gameConst.putonPositionArray[puton]);
+            node.addComponent(cc.Sprite);
+            father.addChild(node);
+        }
+        var sprite = node.getComponent(cc.Sprite);
+        sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+mst.id.substr(1));
+        node.off(cc.Node.EventType.TOUCH_END);
+        node.on(cc.Node.EventType.TOUCH_END, function (event) {
+            cc.find('Canvas/nodeItemInfo').active = true;
+            cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
+        }.bind(this));
+
+        return;
+        //属性显示
+        var mst = this._player.getMst();
+        var lv = this._player._data.level;
+        var hurt = mst.hurt+Math.floor(mst.hurtAdd*lv);
+        var defense = mst.defense+Math.floor(mst.defenseAdd*lv);
+        for(var i=0;i<5;++i){
+            if(this._player._equipArray[i]){
+                var itemMst = ag.gameConst._itemMst[this._player._equipArray[i]];
+                if(itemMst.hurt)hurt+=itemMst.hurt;
+                if(itemMst.defense)defense+=itemMst.defense;
+            }
+        }
+        this._equipArray[5].string = '攻击:'+hurt;
+        this._equipArray[6].string = '防御:'+defense;
+        this._player._hurt = hurt;
+        this._player._defense = defense;
+    },
+
+
     refreshBag:function () {
+        return;
         var array = [];
         for(var key in ag.userInfo._itemMap){
             var obj = ag.userInfo._itemMap[key];
@@ -595,6 +735,20 @@ cc.Class({
                 array.push(obj);
             }
         }
+
+        var bag = cc.find('Canvas/nodeBag/bag');
+        bag.destroyAllChildren();
+        var startPos = cc.p(-100,100);
+        var disPos = cc.p(100,100);
+        for(var i=0;i<array.length;++i){
+            var mst = ag.gameConst._itemMst[array[i]._data.mid];
+            var node = new cc.Node();
+            var sprite = node.addComponent(cc.Sprite);
+            sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+mst.id.substr(1));
+            bag.addChild(node);
+        }
+
+
         this._scrollViewList.setCount(array.length);
         this._scrollViewList.setCallback(function(item,index){
             var data = ag.gameConst._itemMst[array[index]._data.mid];
@@ -620,7 +774,7 @@ cc.Class({
                         }
                     }
                     ag.userInfo._itemMap[id]._data.puton = 1;
-                    this._player.addEquip(mst.id);
+                    this._player.addEquip(id);
                     this.refreshBag();
                     this.refreshEquip();
                 }else{
@@ -642,6 +796,7 @@ cc.Class({
 
 
     refreshEquip:function () {
+        return;
         var array = [];
         for(var key in ag.userInfo._itemMap){
             var obj = ag.userInfo._itemMap[key];
@@ -683,7 +838,7 @@ cc.Class({
 
     //获得属性显示
     getItemBagShow:function (data) {
-        return data.name+(data.hurt?' 攻击力:'+data.hurt:' ')+(data.defense?' 防御:'+data.defense:' ');
+        return data.name+(data.hurt?'\n攻击力:'+data.hurt:'')+(data.defense?'\n防御:'+data.defense:'');
     },
 
 
