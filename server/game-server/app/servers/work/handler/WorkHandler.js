@@ -144,7 +144,7 @@ var Handler = cc.Class.extend({
 
 
     bagItemToEquip:function (msg, session, next) {
-        ag.itemManager.bagItemToEquip(msg,session.uid);
+        ag.itemManager.bagItemToEquip(msg.id,msg.puton,session.uid);
         next();
     },
 

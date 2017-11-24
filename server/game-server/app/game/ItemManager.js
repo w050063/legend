@@ -120,7 +120,7 @@ module.exports = ag.class.extend({
     },
 
 
-    bagItemToEquip:function (id,rid) {
+    bagItemToEquip:function (id,puton,rid) {
         var item = this._itemMap.get(id);
         var role = ag.gameLayer.getRole(rid);
         if(item && role){
@@ -129,13 +129,13 @@ module.exports = ag.class.extend({
                 var map = this._itemMap.getMap();
                 for (var key in map) {
                     var obj = map[key]._data;
-                    if (obj.owner == rid && obj.puton && mst.type == ag.gameConst._itemMst[obj.mid].type) {
+                    if (obj.owner == rid && obj.puton==puton && mst.type == ag.gameConst._itemMst[obj.mid].type) {
                         delete obj.puton;
                         ++this._bagLengthMap[rid];
                         break;
                     }
                 }
-                item._data.puton = 1;
+                item._data.puton = puton;
                 --this._bagLengthMap[rid];
                 ag.jsUtil.sendDataExcept("sBagItemToEquip",{id:id,rid:rid},rid);
                 role.refreshItemProp();

@@ -63,7 +63,7 @@ module.exports = ag.class.extend({
         var map = ag.itemManager._itemMap.getMap();
         for (var key in map) {
             var obj = map[key]._data;
-            if (obj.owner == this._data.id && obj.puton) {
+            if (obj.owner == this._data.id && typeof obj.puton=='number') {
                 var itemMst = ag.gameConst._itemMst[obj.mid];
                 if(itemMst.hurt)hurt+=itemMst.hurt;
                 if(itemMst.defense)defense+=itemMst.defense;
