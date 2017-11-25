@@ -32,6 +32,7 @@ cc.Class({
             (function (i) {
                 var nodeRole = cc.find('Canvas/layoutRole/nodeRole'+i);
                 nodeRole._modelNode = ag.jsUtil.getNode(nodeRole,nameArray[i]+array[0],parseInt(array[1]),0,0.3);
+                nodeRole._modelNode.y = -50;
                 nodeRole.on('touchend', function () {
                     cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
                     this.setSelected(i);

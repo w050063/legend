@@ -9,6 +9,8 @@ var Item = require("Item");
 var AGMap = require("AGMap");
 var AGListView = require("AgListView");
 var ItemInfoNode = require('ItemInfoNode');
+var AGAniClothes = require("AGAniClothes");
+var AGAni = require("AGAni");
 var baseNpcId = 5000;
 cc.Class({
     extends: cc.Component,
@@ -141,6 +143,7 @@ cc.Class({
         this._map.node.addChild(node);
         this._roleMap[ag.userInfo._data.id] = this._player;
         this._player.init(ag.userInfo._data);
+        this.defaultRoleAni();
 
         this.changeMap();
         //请求本地图所有角色
@@ -356,8 +359,8 @@ cc.Class({
             if(data.owner){
                 var role = this._roleMap[data.owner];
                 if(typeof data.puton=='number'){
-                    if(role==this._player)this.itemBagToEquip(data.id);
                     role.addEquip(data.id);
+                    if(role==this._player)this.itemBagToEquip(data.id);
                 }else{
                     if(role==this._player)this.itemEquipToBag(data.id);
                 }
@@ -638,6 +641,7 @@ cc.Class({
         this._bagArray[index] = {id:id,node:node};
         node.off(cc.Node.EventType.TOUCH_END);
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
+            cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
             cc.find('Canvas/nodeItemInfo').active = true;
             cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
         }.bind(this));
@@ -664,6 +668,7 @@ cc.Class({
     itemEquipToBag:function(id){
         this.addItemToBag(id);
         var data = ag.userInfo._itemMap[id]._data;
+        var mst = ag.gameConst._itemMst[data.mid];
         var success = this._player.delEquip(id);
         if(success){
             var mst = ag.gameConst._itemMst[data.mid];
@@ -671,7 +676,30 @@ cc.Class({
             var father = cc.find('Canvas/nodeBag/equip');
             var node = father.getChildByName('equip'+puton);
             if(node)node.destroy();
+
+            //衣服
+            if(mst.type==5){
+                if(father.clothe){
+                    father.clothe.getComponent(AGAni).putCache();
+                    this.defaultRoleAni();
+                }
+            }
+            //武器
+            if(mst.type==4){
+                if(father.weapon){
+                    father.weapon.getComponent(AGAni).putCache();
+                    father.weapon = undefined;
+                }
+            }
+            //翅膀
+            if(mst.type==7){
+                if(father.wing){
+                    father.wing.getComponent(AGAni).putCache();
+                    father.wing = undefined;
+                }
+            }
         }
+        this.resetPlayerProp();
     },
 
 
@@ -680,13 +708,7 @@ cc.Class({
         var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
         if(!puton)puton = ag.gameConst.putonTypes.indexOf(mst.type);
         this.delItemFormBag(id);
-
-
-        //如果有装备，则切换装备
         var role = this._roleMap[ag.userInfo._itemMap[id]._data.owner];
-        if(role && role._equipArray[puton]){
-            this.addItemToBag(role._equipArray[puton]);
-        }
 
 
         var father = cc.find('Canvas/nodeBag/equip');
@@ -702,27 +724,100 @@ cc.Class({
         sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+mst.id.substr(1));
         node.off(cc.Node.EventType.TOUCH_END);
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
+            cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
             cc.find('Canvas/nodeItemInfo').active = true;
             cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
         }.bind(this));
 
-        return;
-        //属性显示
+
+        if(role == this._player){
+            if(!father.title){
+                var node = new cc.Node();
+                var tips = node.addComponent(cc.Label);
+                node.setPosition(0, 91);
+                tips.fontSize = 16;
+                tips.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
+                father.addChild(node)
+                var outline = node.addComponent(cc.LabelOutline);
+                outline.color = cc.color(0, 0, 0);
+                outline.width = 1;
+                father.title = node;
+            }
+
+
+            //衣服
+            var aniPos = cc.p(-2,-50);
+            var scale = 1.5;
+            var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
+            if(mst.type==5){
+                if(father.clothe)father.clothe.getComponent(AGAni).putCache();
+                var name = (role._data.sex==0?'ani/hum0/000':'ani/hum1/001');
+                name = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid].model;
+                var node = ag.jsUtil.getNode(father,name+array[0],parseInt(array[1]),1,0.3);
+                node.setPosition(aniPos);
+                node.scale = scale;
+                father.clothe = node;
+                if(father.weapon)father.clothe.getComponent(AGAni).addControl(father.weapon.getComponent(AGAni));
+                if(father.wing)father.clothe.getComponent(AGAni).addControl(father.wing.getComponent(AGAni));
+            }
+            //武器
+            if(mst.type==4){
+                if(father.weapon)father.weapon.getComponent(AGAni).putCache();
+                var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
+                var node1 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),0,0.3);
+                if(father.clothe)father.clothe.getComponent(AGAni).addControl(node1.getComponent(AGAni));
+                node1.setPosition(aniPos);
+                node1.scale = scale;
+                father.weapon = node1;
+            }
+            //翅膀
+            if(mst.type==7){
+                if(father.wing)father.wing.getComponent(AGAni).putCache();
+                var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
+                var node2 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),2,0.3);
+                if(father.clothe)father.clothe.getComponent(AGAni).addControl(node2.getComponent(AGAni));
+                node2.setPosition(aniPos);
+                node2.scale = scale;
+                father.wing = node2;
+            }
+        }
+        this.resetPlayerProp();
+    },
+
+
+    //默认的角色模型
+    defaultRoleAni:function(){
+        var role = this._player;
+        var father = cc.find('Canvas/nodeBag/equip');
+        var aniPos = cc.p(-2,-50);
+        var scale = 1.5;
+        var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
+        if(father.clothe)father.clothe.getComponent(AGAni).putCache();
+        var name = (role._data.sex==0?'ani/hum0/000':'ani/hum1/001');
+        var node = ag.jsUtil.getNode(father,name+array[0],parseInt(array[1]),1,0.3);
+        node.setPosition(aniPos);
+        node.scale = scale;
+        father.clothe = node;
+        if(father.weapon)father.clothe.getComponent(AGAni).addControl(father.weapon.getComponent(AGAni));
+        if(father.wing)father.clothe.getComponent(AGAni).addControl(father.wing.getComponent(AGAni));
+    },
+
+
+    //属性显示
+    resetPlayerProp:function(){
         var mst = this._player.getMst();
         var lv = this._player._data.level;
         var hurt = mst.hurt+Math.floor(mst.hurtAdd*lv);
         var defense = mst.defense+Math.floor(mst.defenseAdd*lv);
-        for(var i=0;i<5;++i){
+        for(var i=0;i<this._player._equipArray.length;++i){
             if(this._player._equipArray[i]){
-                var itemMst = ag.gameConst._itemMst[this._player._equipArray[i]];
+                var itemMst = ag.gameConst._itemMst[ag.userInfo._itemMap[this._player._equipArray[i]]._data.mid];
                 if(itemMst.hurt)hurt+=itemMst.hurt;
                 if(itemMst.defense)defense+=itemMst.defense;
             }
         }
         this._equipArray[5].string = '攻击:'+hurt;
         this._equipArray[6].string = '防御:'+defense;
-        this._player._hurt = hurt;
-        this._player._defense = defense;
     },
 
 

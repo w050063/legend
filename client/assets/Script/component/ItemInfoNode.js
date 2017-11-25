@@ -44,6 +44,7 @@ cc.Class({
 
 
     buttonDisposeEvent:function(event){
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         var buttonNode = event.target;
         var label = buttonNode.getChildByName('label').getComponent(cc.Label);
         if(label.string=='确定'){
@@ -65,22 +66,26 @@ cc.Class({
                 var index = ag.gameConst.putonTypes.indexOf(mst.type);
                 ag.agSocket.send("bagItemToEquip",{id:id,puton:index});
 
+
+                //如果有装备，则切换装备
+                var tempId = -1;
                 for(var key in ag.userInfo._itemMap){
                     var obj = ag.userInfo._itemMap[key]._data;
                     if(obj.owner==ag.gameLayer._player._data.id && obj.puton==index && mst.type==ag.gameConst._itemMst[obj.mid].type){
                         delete obj.puton;
+                        tempId = obj.id;
                         break;
                     }
                 }
                 ag.userInfo._itemMap[id]._data.puton = index;
-                ag.gameLayer.itemBagToEquip(id,index);
                 ag.gameLayer._player.addEquip(id);
-
+                ag.gameLayer.itemBagToEquip(id,index);
+                if(tempId!=-1)ag.gameLayer.addItemToBag(obj.id);
 
                 //this._player.addEquip(mst.id);
                 //this.refreshEquip();
             }else{
-                ag.jsUtil.showText(this.node,'不能穿戴');
+                ag.jsUtil.showText(ag.gameLayer.node,'不能穿戴');
             }
         }
         this.node.active = false;

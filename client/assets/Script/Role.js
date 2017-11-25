@@ -21,8 +21,8 @@ cc.Class({
             var data = ag.userInfo._itemMap[key]._data;
             if(data.owner==this){
                 if(typeof data.puton=='number'){
-                    if(this==ag.gameLayer._player)ag.gameLayer.itemBagToEquip(data.id);
                     this.addEquip(data.id);
+                    if(this==ag.gameLayer._player)ag.gameLayer.itemBagToEquip(data.id);
                 }else{
                     if(this==ag.gameLayer._player)ag.gameLayer.itemEquipToBag(data.id);
                 }

@@ -60,12 +60,14 @@ module.exports={
         //文字提示
         var node = new cc.Node();
         var tips = node.addComponent(cc.Label);
-        node.x = 0;
-        node.y = 0;
+        tips.fontSize = 40;
         node.color = cc.color(255,0,0,255);
         tips.string = str;
         father.addChild(node);
         node.setLocalZOrder(109);
+        var outline = node.addComponent(cc.LabelOutline);
+        outline.color = cc.color(255, 255, 255);
+        outline.width = 1;
         node.runAction(cc.sequence(cc.moveBy(0.3, cc.p(0, 160)), cc.delayTime(0.5),
             cc.spawn(cc.moveBy(0.4, cc.p(0, 100)), cc.fadeOut(0.4)),
             cc.callFunc(function () {
@@ -120,7 +122,6 @@ module.exports={
         var ani = node.addComponent(AGAni);
         ani.init(name,count);
         father.addChild(node,zorder);
-        var ani = node.getComponent(AGAni);
         ani.setInterval(interval);
         ani.setFinishedCallback(callback);
         return node;

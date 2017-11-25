@@ -85,7 +85,7 @@ cc.Class({
             //先显示图片10张，再进行下载，最后处理无法显示的图片
             var bDisposeCount = 0;
             var index = 0;
-            while(index<this._waitFrameArray.length && bDisposeCount<10){
+            while(index<this._waitFrameArray.length && bDisposeCount<20){
                 var sprite = this._waitFrameArray[index];
                 if(cc.isValid(sprite) && cc.isValid(sprite.node)){
                     var name = sprite._agName;

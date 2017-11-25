@@ -3,7 +3,6 @@
  * 动画
  */
 
-
 var AGAniOffset = require("AGAniOffset");
 cc.Class({
     extends: cc.Component,
@@ -12,6 +11,7 @@ cc.Class({
 
     //初始化角色
     init: function (str,n) {
+        this._name = str;
         this._spriteFrameArray = [];
         this._curIndex = 0;
         this._passTime = 0;
@@ -27,6 +27,18 @@ cc.Class({
             this._spriteFrameArray.push(before+'/'+this.pad(after+i,6));
         }
         this.modifyFrame();
+    },
+
+
+    clone:function(father){
+        var node = new cc.Node();
+        var AGAni = require("AGAni");
+        var ani = node.addComponent(AGAni);
+        ani.init(this._name,this._spriteFrameArray.length);
+        father.addChild(node,this.getLocalZOrder());
+        if(this._interval)ani.setInterval(this._interval);
+        if(this._finishedCallback)ani.setFinishedCallback(this._finishedCallback);
+        return node;
     },
 
 
@@ -59,9 +71,15 @@ cc.Class({
         sprite.node.setPosition(cc.p(parseInt(array[0]),parseInt(array[1])));
 
         if(this._controllArray){
-            for(var i=0;i<this._controllArray.length;++i){
-                this._controllArray[i]._curIndex = this._curIndex;
-                this._controllArray[i].modifyFrame();
+            for(var i=this._controllArray.length-1;i>=0;--i){
+                if(this._controllArray[i]){
+                    if(this._controllArray[i]._bBeControll){
+                        this._controllArray[i]._curIndex = this._curIndex;
+                        this._controllArray[i].modifyFrame();
+                    }else{
+                        this._controllArray.splice(i,1);
+                    }
+                }
             }
         }
     },
@@ -72,6 +90,8 @@ cc.Class({
             ag.spriteCache.put(sprite);
         }
         this._finishedCallback = undefined;
+        this.delControll();
+        delete this._bBeControll;
         this.node.destroy();
     },
 
