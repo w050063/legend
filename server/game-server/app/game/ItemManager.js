@@ -34,7 +34,7 @@ module.exports = ag.class.extend({
     presentWith:function(id){
         var role = ag.gameLayer.getRole(id);
         if(role){
-            var array = ['i000','i000','i001','i014'];
+            var array = ['i000','i001','i014'];
             for(var i=0;i<array.length;++i){
                 var item = new Item(array[i]);
                 item._duration = 0;
