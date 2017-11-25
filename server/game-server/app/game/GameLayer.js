@@ -207,7 +207,7 @@ module.exports = {
 
 
         if(role._data.camp==ag.gameConst.campMonster){//怪物
-            var percent = [10000,1000,100,10,1];//权重比例
+            var percent = [10000,100,10,1];//权重比例
             var weight=[];
             var max = 0;
             for(var i=0;i<8;++i){
