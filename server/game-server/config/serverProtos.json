@@ -49,7 +49,8 @@
   },
   "message sBagItemToEquip": {
     "required string id": 1,
-    "required string rid": 2
+    "required string rid": 2,
+    "required int32 puton": 3
   },
   "message sEquipItemToBag": {
     "required string id": 1,
