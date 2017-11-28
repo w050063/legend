@@ -67,7 +67,7 @@ cc.Class({
                         var node = this.getObjectSprite(name);
                         node.setPosition(w*(0.5+j-this._width/2),h*(0.5+i-this._height/2));
                         var zorder = Math.round(10000-node.y);
-                        node.setLocalZOrder(zorder-1);//-1确保人在建筑上面
+                        node.setLocalZOrder(zorder-2);//-1确保人在建筑上面
                         this._mapObj[str] = node;
                     }
                 }

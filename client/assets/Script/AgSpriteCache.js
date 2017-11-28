@@ -12,6 +12,7 @@ cc.Class({
     //初始化角色
     init: function (str,n) {
         this._cacheArray = [];
+        this._cacheNobilityArray = [];
         this._cacheMaxCount = 200;
         this._downloadArray = [];
         this._bLoading = false;
@@ -22,7 +23,15 @@ cc.Class({
     
     
     //增加一个任务,挂一个组建监听销毁  onDestroy
-    get:function (name,callback) {
+    get:function (name,callback,bNobility) {
+        for(var i=this._cacheNobilityArray.length-1;i>=0;--i){
+            var sprite = this._cacheNobilityArray[i];
+            if(sprite._agName==name){
+                this._cacheNobilityArray.splice(i,1);
+                if(callback)callback(sprite);
+                return sprite;
+            }
+        }
         for(var i=this._cacheArray.length-1;i>=0;--i){
             var sprite = this._cacheArray[i];
             if(sprite._agName==name){
@@ -43,7 +52,13 @@ cc.Class({
                     break;
                 }
             }else{
-                if(this._downloadArray.indexOf(trueBefore)==-1)this._downloadArray.push(trueBefore);
+                if(this._downloadArray.indexOf(trueBefore)==-1){
+                    if(bNobility){
+                        this._downloadArray.splice(0,0,trueBefore);
+                    }else{
+                        this._downloadArray.push(trueBefore);
+                    }
+                }
                 break;
             }
         }
@@ -52,6 +67,7 @@ cc.Class({
         sprite.trim = false;
         this._waitFrameArray.push(sprite);
         sprite._agName = name;
+        if(bNobility)sprite._bNobility = true;
         if(i!=0)sprite._agTime = i;
         sprite._agCallback = callback;
         return sprite;
@@ -63,15 +79,28 @@ cc.Class({
         //return;
         if(cc.isValid(sprite) && cc.isValid(sprite.node)){
             if(sprite && sprite._agName && sprite.spriteFrame){
-                if(this._cacheArray.length>=this._cacheMaxCount){
-                    this._cacheArray[0].destroy();
-                    this._cacheArray.splice(0,1);
-                }
                 sprite.node.setPosition(cc.p(0,0));
                 sprite.node.setScale(1);
                 sprite.node.setColor(cc.color(255,255,255));
                 sprite.node.removeFromParent();
-                this._cacheArray.push(sprite);
+                if(sprite._bNobility){
+                    if(this._cacheNobilityArray.length>=this._cacheMaxCount){
+                        var temp = this._cacheNobilityArray[0];
+                        this._cacheNobilityArray.splice(0,1);
+                        if(this._cacheArray.length>=this._cacheMaxCount){
+                            this._cacheArray[0].destroy();
+                            this._cacheArray.splice(0,1);
+                        }
+                        this._cacheArray.push(temp);
+                    }
+                    this._cacheNobilityArray.push(sprite);
+                }else{
+                    if(this._cacheArray.length>=this._cacheMaxCount){
+                        this._cacheArray[0].destroy();
+                        this._cacheArray.splice(0,1);
+                    }
+                    this._cacheArray.push(sprite);
+                }
             }else{
                 sprite.node.destroy();
             }

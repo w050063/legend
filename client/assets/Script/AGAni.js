@@ -18,6 +18,7 @@ cc.Class({
         this._running = true;
         this._interval = 1;
         this._finishedCallback = null;
+        this._bNobility = undefined;
 
 
         var pos = str.lastIndexOf('/');
@@ -58,11 +59,15 @@ cc.Class({
         this._finishedCallback = callback;
     },
 
+    setNobility:function(b){
+        this._bNobility = b;
+    },
+
 
     modifyFrame:function(){
         if(this.node.childrenCount>0)ag.spriteCache.put(this.node.children[0].getComponent(cc.Sprite));
         var str = this._spriteFrameArray[this._curIndex];
-        var sprite = ag.spriteCache.get(str);
+        var sprite = ag.spriteCache.get(str,undefined,this._bNobility);
         var pos = str.lastIndexOf('/');
         var after = str.substr(pos+1);
         var array = AGAniOffset[after].split(",");

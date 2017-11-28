@@ -37,8 +37,9 @@ cc.Class({
         var label = buttonNode.getChildByName('label').getComponent(cc.Label);
         label.string = str;
         var label1 = back.getChildByName('buttonDispose1').getChildByName('label').getComponent(cc.Label);
-        label1.node.active = bOther;
+        back.getChildByName('buttonDispose1').active = bOther;
         this._obj = obj;
+        ag.userInfo.operatePuton = ag.userInfo.operatePuton=='left'?'right':'left';
         ag.jsUtil.secondInterfaceAnimation(back);
     },
 
@@ -57,13 +58,16 @@ cc.Class({
             var id = this._obj._data.id;
             var mst = ag.gameConst._itemMst[this._obj._data.mid];
             ag.agSocket.send("equipItemToBag",id);
+            var puton = ag.userInfo._itemMap[id]._data.puton;
             delete ag.userInfo._itemMap[id]._data.puton;
-            ag.gameLayer.itemEquipToBag(id);
+            ag.gameLayer.itemEquipToBag(id,puton);
         }else if(label.string=='穿戴'){
             var id = this._obj._data.id;
             var mst = ag.gameConst._itemMst[this._obj._data.mid];
             if(mst.exclusive.indexOf(ag.gameLayer._player.getTypeNum())!=-1){
                 var index = ag.gameConst.putonTypes.indexOf(mst.type);
+                if((mst.type==4 || mst.type==5) && ag.userInfo.operatePuton=='right')++index;
+                cc.log('chuan:'+index);
                 ag.agSocket.send("bagItemToEquip",{id:id,puton:index});
 
 
@@ -79,11 +83,8 @@ cc.Class({
                 }
                 ag.userInfo._itemMap[id]._data.puton = index;
                 ag.gameLayer._player.addEquip(id);
-                ag.gameLayer.itemBagToEquip(id,index);
+                ag.gameLayer.itemBagToEquip(id);
                 if(tempId!=-1)ag.gameLayer.addItemToBag(obj.id);
-
-                //this._player.addEquip(mst.id);
-                //this.refreshEquip();
             }else{
                 ag.jsUtil.showText(ag.gameLayer.node,'不能穿戴');
             }

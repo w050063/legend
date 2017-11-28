@@ -76,6 +76,21 @@ cc.Class({
         }.bind(this));
 
 
+        //查看他人装备
+        var node = cc.find('Canvas/buttonBag');
+        node.on(cc.Node.EventType.TOUCH_CANCEL, function (event) {
+            var location = event.getLocation();
+            var role = this._player.getPlayerForSeeEquip(location);
+            if(role){
+                this.showOtherEquip(role._data.id);
+            }
+        }.bind(this));
+
+        cc.find('Canvas/otherBag').on(cc.Node.EventType.TOUCH_END, function (event) {
+            cc.find('Canvas/otherBag').active = false;
+        }.bind(this));
+
+
         this._equipArray = [];
         for(var i=0;i<5;++i){
             this._equipArray.push(0);
@@ -143,7 +158,7 @@ cc.Class({
         this._map.node.addChild(node);
         this._roleMap[ag.userInfo._data.id] = this._player;
         this._player.init(ag.userInfo._data);
-        this.defaultRoleAni();
+        this.defaultRoleAni(this._player);
 
         this.changeMap();
         //请求本地图所有角色
@@ -190,6 +205,7 @@ cc.Class({
 
     //换地图
     changeMap:function(transferId){
+        this._player._ai._locked = null;
         //清空所有内容
         for(var i=0;i<this._stableMinMapNpcBoss.length;++i){
             this._stableMinMapNpcBoss[i].destroy();
@@ -358,11 +374,13 @@ cc.Class({
             ag.userInfo._itemMap[data.id]={_data:data};
             if(data.owner){
                 var role = this._roleMap[data.owner];
-                if(typeof data.puton=='number'){
-                    role.addEquip(data.id);
-                    if(role==this._player)this.itemBagToEquip(data.id);
-                }else{
-                    if(role==this._player)this.itemEquipToBag(data.id);
+                if(role){
+                    if(typeof data.puton=='number'){
+                        role.addEquip(data.id);
+                        if(role==this._player)this.itemBagToEquip(data.id);
+                    }else{
+                        if(role==this._player)this.itemEquipToBag(data.id);
+                    }
                 }
             }else{
                 this.dropItem(data);
@@ -428,12 +446,12 @@ cc.Class({
     },
 
 
-    bagItemToEquip:function(id,rid){
+    bagItemToEquip:function(id,rid,puton){
         var obj = ag.userInfo._itemMap[id];
         var role = ag.gameLayer.getRole(rid);
         if(obj && role){
             obj._data.owner = rid;
-            obj._data.puton = 1;
+            obj._data.puton = puton;
             role.addEquip(obj._data.id);
         }
     },
@@ -665,34 +683,41 @@ cc.Class({
 
 
     //卸下一件道具
-    itemEquipToBag:function(id){
+    itemEquipToBag:function(id,puton){
         this.addItemToBag(id);
         var data = ag.userInfo._itemMap[id]._data;
         var mst = ag.gameConst._itemMst[data.mid];
         var success = this._player.delEquip(id);
+        cc.log('success:'+success);
         if(success){
-            var mst = ag.gameConst._itemMst[data.mid];
-            var puton = ag.gameConst.putonTypes.indexOf(mst.type);
-            var father = cc.find('Canvas/nodeBag/equip');
-            var node = father.getChildByName('equip'+puton);
-            if(node)node.destroy();
+            //var puton = ag.gameConst.putonTypes.indexOf(mst.type);
+            cc.log('puton:'+puton);
+            if(typeof puton=='number'){
+                var father = cc.find('Canvas/nodeBag/equip');
+                var node = father.getChildByName('equip'+puton);
+                if(node){
+                    cc.log('del ok');
+                    node.removeFromParent();
+                    node.destroy();
+                }
+            }
 
             //衣服
-            if(mst.type==5){
+            if(mst.type==2){
                 if(father.clothe){
                     father.clothe.getComponent(AGAni).putCache();
-                    this.defaultRoleAni();
+                    this.defaultRoleAni(this._player);
                 }
             }
             //武器
-            if(mst.type==4){
+            if(mst.type==0){
                 if(father.weapon){
                     father.weapon.getComponent(AGAni).putCache();
                     father.weapon = undefined;
                 }
             }
             //翅膀
-            if(mst.type==7){
+            if(mst.type==6){
                 if(father.wing){
                     father.wing.getComponent(AGAni).putCache();
                     father.wing = undefined;
@@ -704,14 +729,17 @@ cc.Class({
 
 
     //穿戴一件道具
-    itemBagToEquip:function(id,puton){
-        var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
-        if(!puton)puton = ag.gameConst.putonTypes.indexOf(mst.type);
-        this.delItemFormBag(id);
+    itemBagToEquip:function(id){
+        var data = ag.userInfo._itemMap[id]._data;
+        var mst = ag.gameConst._itemMst[data.mid];
+        var puton = data.puton;
+        if(typeof puton!='number')return;
+        //if(!puton)puton = ag.gameConst.putonTypes.indexOf(mst.type);
         var role = this._roleMap[ag.userInfo._itemMap[id]._data.owner];
+        if(role==this._player)this.delItemFormBag(id);
 
 
-        var father = cc.find('Canvas/nodeBag/equip');
+        var father = cc.find(role==this._player?'Canvas/nodeBag/equip':'Canvas/otherBag/equip');
         var node = father.getChildByName('equip'+puton);
         if(!node){
             node = new cc.Node();
@@ -725,70 +753,90 @@ cc.Class({
         node.off(cc.Node.EventType.TOUCH_END);
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
             cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
-            cc.find('Canvas/nodeItemInfo').active = true;
-            cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
+            var nodeItemInfo = cc.find('Canvas/nodeItemInfo');
+            nodeItemInfo.active = true;
+            nodeItemInfo.getComponent('ItemInfoNode').setItemId(id);
         }.bind(this));
 
 
-        if(role == this._player){
-            if(!father.title){
-                var node = new cc.Node();
-                var tips = node.addComponent(cc.Label);
-                node.setPosition(0, 91);
-                tips.fontSize = 16;
-                tips.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
-                father.addChild(node)
-                var outline = node.addComponent(cc.LabelOutline);
-                outline.color = cc.color(0, 0, 0);
-                outline.width = 1;
-                father.title = node;
-            }
+        //衣服
+        var aniPos = cc.p(-2,-80);
+        var scale = 2;
+        var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
+        if(mst.type==2){
+            if(father.clothe)father.clothe.getComponent(AGAni).putCache();
+            var name = (role._data.sex==0?'ani/hum0/000':'ani/hum1/001');
+            name = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid].model;
+            var node = ag.jsUtil.getNode(father,name+array[0],parseInt(array[1]),1,0.3);
+            node.setPosition(aniPos);
+            node.scale = scale;
+            father.clothe = node;
+            if(father.weapon)father.clothe.getComponent(AGAni).addControl(father.weapon.getComponent(AGAni));
+            if(father.wing)father.clothe.getComponent(AGAni).addControl(father.wing.getComponent(AGAni));
+        }
+        //武器
+        if(mst.type==0){
+            if(father.weapon)father.weapon.getComponent(AGAni).putCache();
+            var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
+            var node1 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),0,0.3);
+            if(father.clothe)father.clothe.getComponent(AGAni).addControl(node1.getComponent(AGAni));
+            node1.setPosition(aniPos);
+            node1.scale = scale;
+            father.weapon = node1;
+        }
+        //翅膀
+        if(mst.type==6){
+            if(father.wing)father.wing.getComponent(AGAni).putCache();
+            var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
+            var node2 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),2,0.3);
+            if(father.clothe)father.clothe.getComponent(AGAni).addControl(node2.getComponent(AGAni));
+            node2.setPosition(aniPos);
+            node2.scale = scale;
+            father.wing = node2;
+        }
+        if(role == this._player)this.resetPlayerProp();
+    },
 
 
-            //衣服
-            var aniPos = cc.p(-2,-50);
-            var scale = 1.5;
-            var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
-            if(mst.type==5){
-                if(father.clothe)father.clothe.getComponent(AGAni).putCache();
-                var name = (role._data.sex==0?'ani/hum0/000':'ani/hum1/001');
-                name = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid].model;
-                var node = ag.jsUtil.getNode(father,name+array[0],parseInt(array[1]),1,0.3);
-                node.setPosition(aniPos);
-                node.scale = scale;
-                father.clothe = node;
-                if(father.weapon)father.clothe.getComponent(AGAni).addControl(father.weapon.getComponent(AGAni));
-                if(father.wing)father.clothe.getComponent(AGAni).addControl(father.wing.getComponent(AGAni));
-            }
-            //武器
-            if(mst.type==4){
-                if(father.weapon)father.weapon.getComponent(AGAni).putCache();
-                var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
-                var node1 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),0,0.3);
-                if(father.clothe)father.clothe.getComponent(AGAni).addControl(node1.getComponent(AGAni));
-                node1.setPosition(aniPos);
-                node1.scale = scale;
-                father.weapon = node1;
-            }
-            //翅膀
-            if(mst.type==7){
-                if(father.wing)father.wing.getComponent(AGAni).putCache();
-                var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
-                var node2 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),2,0.3);
-                if(father.clothe)father.clothe.getComponent(AGAni).addControl(node2.getComponent(AGAni));
-                node2.setPosition(aniPos);
-                node2.scale = scale;
-                father.wing = node2;
+    showOtherEquip:function(playerId){
+        var role = this._roleMap[playerId];
+        cc.find('Canvas/otherBag').active = true;
+        var father = cc.find('Canvas/otherBag/equip');
+        if(father.clothe)father.clothe.getComponent(AGAni).putCache();
+        father.weapon=undefined;
+        father.wing=undefined;
+        father.title = undefined;
+        father.destroyAllChildren();
+        father.removeAllChildren();
+        this.defaultRoleAni(role);
+        for(var key in ag.userInfo._itemMap){
+            var data = ag.userInfo._itemMap[key]._data;
+            if(data.owner==playerId && typeof data.puton=='number'){
+                this.itemBagToEquip(data.id);
             }
         }
-        this.resetPlayerProp();
     },
 
 
     //默认的角色模型
-    defaultRoleAni:function(){
-        var role = this._player;
-        var father = cc.find('Canvas/nodeBag/equip');
+    defaultRoleAni:function(role){
+        var father = cc.find(role==this._player?'Canvas/nodeBag/equip':'Canvas/otherBag/equip');
+
+
+        if(!father.title){
+            var node = new cc.Node();
+            var tips = node.addComponent(cc.Label);
+            node.setPosition(0, 91);
+            tips.fontSize = 16;
+            father.addChild(node,99);
+            var outline = node.addComponent(cc.LabelOutline);
+            outline.color = cc.color(0, 0, 0);
+            outline.width = 1;
+            father.title = node;
+            tips.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
+        }
+
+
         var aniPos = cc.p(-2,-50);
         var scale = 1.5;
         var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
@@ -1064,11 +1112,16 @@ cc.Class({
                             var array = [];
                             for(var key in ag.userInfo._itemMap){
                                 var obj = ag.userInfo._itemMap[key];
-                                if(obj._data.owner==self._player._data.id && !obj._data.puton && ag.gameConst._itemMst[obj._data.mid].level==curLevel){
-                                    array.push(obj._data.id);
+                                if(obj._data.owner==self._player._data.id && typeof obj._data.puton!='number' && ag.gameConst._itemMst[obj._data.mid].level==curLevel){
+                                    var id = obj._data.id;
+                                    array.push(id);
+                                    ag.userInfo._itemMap[id]._data.owner = undefined;
+                                    ag.gameLayer.delItemFormBag(id);
                                 }
                             }
-                            if(array.length>0)ag.agSocket.send("bagItemRecycle",array.join(','));
+                            if(array.length>0){
+                                ag.agSocket.send("bagItemRecycle",array.join(','));
+                            }
                             else{
                                 ag.jsUtil.showText(self.node,"没有可回收的装备！");
                             }

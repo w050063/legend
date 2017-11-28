@@ -7,6 +7,7 @@
 var AGAniClothes = require("AGAniClothes");
 var AIController = require("AIController");
 var AGAni = require("AGAni");
+var AGAniOffset = require("AGAniOffset");
 cc.Class({
     extends: cc.Component,
     properties: {},
@@ -16,7 +17,7 @@ cc.Class({
     init: function (data) {
         this._data=data;
         this.resetAllProp();
-        this._equipArray = [null,null,null,null,null,null,null,null,null,null];//装备序列
+        this._equipArray = [null,null,null,null,null,null,null,null,null,null,null,null,null];//装备序列
         for(var key in ag.userInfo._itemMap){
             var data = ag.userInfo._itemMap[key]._data;
             if(data.owner==this){
@@ -40,6 +41,16 @@ cc.Class({
         this.changeHP(this._data.hp);
 
 
+        //法师的盾
+        if(this._data.type=='m1'){
+            var sprite = ag.spriteCache.get('ani/effect8/513000');
+            var array = AGAniOffset[513000].split(',');
+            sprite.node.setPosition(array[0],array[1]);
+            //sprite.node.opacity = 128;
+            this.node.addChild(sprite.node,ag.gameConst.roleEffectZorder);
+        }
+
+
 
         //增加AI
         if(this == ag.gameLayer._player){
@@ -59,8 +70,9 @@ cc.Class({
     addEquip:function(id){
         var data = ag.userInfo._itemMap[id]._data;
         var mst = ag.gameConst._itemMst[data.mid];
-        var puton = ag.gameConst.putonTypes.indexOf(mst.type);
-        this._equipArray[puton] = id;
+        //var puton = ag.gameConst.putonTypes.indexOf(mst.type);
+        var puton = data.puton;
+            this._equipArray[puton] = id;
         if(this._state==ag.gameConst.stateIdle){
             this.idleAnimation();
         }
@@ -154,7 +166,7 @@ cc.Class({
                 ag.jsUtil.showText(ag.gameLayer.node, '升级！！！');
             }
             cc.audioEngine.play(cc.url.raw("resources/voice/levelup.mp3"),false,1);
-            var node = ag.jsUtil.getEffect(this.node,"ani/effect12/512000",14,ag.gameConst.roleEffectUnderZorder,0.1);
+            var node = ag.jsUtil.getEffect(this.node,"ani/effect8/512000",15,ag.gameConst.roleEffectZorder,0.1);
             node.setScale(0.5);
             bShowLevelUp = true;
             this.changeHP(this._totalHP);
@@ -335,6 +347,7 @@ cc.Class({
                 if(id)name = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid].model;
                 if(this._agAni)this._agAni.getComponent(AGAni).putCache();
                 this._agAni = ag.jsUtil.getNode(this.node,name+array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,0.3);
+                this._agAni.getComponent(AGAni).setNobility(this==ag.gameLayer._player);
                 this._agAni.setColor(this._aniColor);
                 //武器
                 if(this._weaponAni){this._weaponAni.getComponent(AGAni).putCache();this._weaponAni = undefined;}
@@ -343,6 +356,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
                     this._weaponAni = ag.jsUtil.getNode(this.node,mst.model+array[0],parseInt(array[1]),ag.gameConst.roleWeaponZorder[this._data.direction],0.3);
                     this._weaponAni.setColor(this._aniColor);
+                    this._weaponAni.getComponent(AGAni).setNobility(this==ag.gameLayer._player);
                     this._agAni.getComponent(AGAni).addControl(this._weaponAni.getComponent(AGAni));
                 }
                 //翅膀
@@ -352,6 +366,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
                     this._wingAni = ag.jsUtil.getNode(this.node,mst.model+array[0],parseInt(array[1]),ag.gameConst.roleWingZorder,0.3);
                     this._wingAni.setColor(this._aniColor);
+                    this._wingAni.getComponent(AGAni).setNobility(this==ag.gameLayer._player);
                     this._agAni.getComponent(AGAni).addControl(this._wingAni.getComponent(AGAni));
                 }
             }
@@ -423,6 +438,7 @@ cc.Class({
                 if(this._agAni)this._agAni.getComponent(AGAni).putCache();
                 this._agAni = ag.jsUtil.getNode(this.node,name+array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,moveSpeed/count);
                 this._agAni.setColor(this._aniColor);
+                this._agAni.getComponent(AGAni).setNobility(this==ag.gameLayer._player);
                 //武器
                 if(this._weaponAni){this._weaponAni.getComponent(AGAni).putCache();this._weaponAni = undefined;}
                 var id = this._equipArray[ag.gameConst.itemEquipWeapon];
@@ -430,6 +446,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
                     this._weaponAni = ag.jsUtil.getNode(this.node,mst.model+array[0],count,ag.gameConst.roleWeaponZorder[this._data.direction],moveSpeed/count);
                     this._weaponAni.setColor(this._aniColor);
+                    this._weaponAni.getComponent(AGAni).setNobility(this==ag.gameLayer._player);
                     this._agAni.getComponent(AGAni).addControl(this._weaponAni.getComponent(AGAni));
                 }
                 //翅膀
@@ -439,6 +456,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
                     this._wingAni = ag.jsUtil.getNode(this.node,mst.model+array[0],count,ag.gameConst.roleWingZorder,moveSpeed/count);
                     this._wingAni.setColor(this._aniColor);
+                    this._wingAni.getComponent(AGAni).setNobility(this==ag.gameLayer._player);
                     this._agAni.getComponent(AGAni).addControl(this._wingAni.getComponent(AGAni));
                 }
             }
@@ -494,6 +512,7 @@ cc.Class({
                     this.idle();
                 }.bind(this));
                 this._agAni.setColor(this._aniColor);
+                this._agAni.getComponent(AGAni).setNobility(this==ag.gameLayer._player);
                 //武器
                 if(this._weaponAni){this._weaponAni.getComponent(AGAni).putCache();this._weaponAni = undefined;}
                 var id = this._equipArray[ag.gameConst.itemEquipWeapon];
@@ -501,6 +520,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
                     this._weaponAni = ag.jsUtil.getNode(this.node,mst.model+array[0],parseInt(array[1]),ag.gameConst.roleWeaponZorder[this._data.direction],0.1);
                     this._weaponAni.setColor(this._aniColor);
+                    this._weaponAni.getComponent(AGAni).setNobility(this==ag.gameLayer._player);
                     this._agAni.getComponent(AGAni).addControl(this._weaponAni.getComponent(AGAni));
                 }
                 //翅膀
@@ -510,6 +530,7 @@ cc.Class({
                     var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
                     this._wingAni = ag.jsUtil.getNode(this.node,mst.model+array[0],parseInt(array[1]),ag.gameConst.roleWingZorder,0.1);
                     this._wingAni.setColor(this._aniColor);
+                    this._wingAni.getComponent(AGAni).setNobility(this==ag.gameLayer._player);
                     this._agAni.getComponent(AGAni).addControl(this._wingAni.getComponent(AGAni));
                 }
             }
@@ -754,15 +775,16 @@ cc.Class({
     relife:function(data){
         if(this._state == ag.gameConst.stateDead){
             this.changeHP(this._totalHP);
+            if(this._propNode)this._propNode.active = true;
+            if(this._minMapNode)this._minMapNode.active = true;
+            this.node.active = true;
+            this.idleAnimation();
+            this._state = ag.gameConst.stateIdle;
+            if(this._ai)this._ai._busy = false;
+
             if(this==ag.gameLayer._player){
                 ag.gameLayer.changeMap((this._data.mapId=='t0' || this._data.mapId=='t12')?'t0':'t1');
             }else{
-                if(this._propNode)this._propNode.active = true;
-                if(this._minMapNode)this._minMapNode.active = true;
-                this.node.active = true;
-                this.idleAnimation();
-                this._state = ag.gameConst.stateIdle;
-                if(this._ai)this._ai._busy = false;
                 this.setLocation(cc.p(data.x,data.y));
             }
         }
@@ -820,6 +842,23 @@ cc.Class({
             if(point.x>p.x-w && point.x<p.x+w && point.y>p.y && point.y< p.y+h){
                 if(role._data.camp==ag.gameConst.campNpc)return role;
                 if((!locked || p.y<locked.node.getPositionY()) && ag.gameLayer.isEnemyCamp(this,role))locked = map[key];
+            }
+        }
+        return locked;
+    },
+
+    //获得选中玩家
+    getPlayerForSeeEquip:function(location){
+        var point = ag.gameLayer._map.node.convertToNodeSpaceAR(location);
+        //计算玩家选中的角色
+        var locked = null;
+        var map = ag.gameLayer._roleMap;
+        var w = ag.gameConst.tileWidth/ 2,h = ag.gameConst.tileHeight*2;
+        for(var key in map){
+            var role = map[key];
+            var p = role.node.getPosition();
+            if(point.x>p.x-w && point.x<p.x+w && point.y>p.y && point.y< p.y+h && role!=ag.gameLayer._player && role._data.camp==ag.gameConst.campLiuxing && role._data.type!='m19'){
+                if(!locked || p.y<locked.node.getPositionY())locked = map[key];
             }
         }
         return locked;

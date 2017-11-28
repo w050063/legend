@@ -28,6 +28,7 @@ module.exports={
     _direction:4,
 	_itemMap : {},
     backGroundPos :cc.p(-100,-330),
+    operatePuton:'right',
 
 	init:function () {
 

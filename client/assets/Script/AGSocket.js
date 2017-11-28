@@ -150,7 +150,7 @@ module.exports={
             }else if(obj.key=='sDeleteRoleArray'){
                 ag.gameLayer.deleteRoleByServer(obj.value);
             }else if(obj.key=='sBagItemToEquipArray'){
-                ag.gameLayer.bagItemToEquip(obj.value.id,obj.value.rid);
+                ag.gameLayer.bagItemToEquip(obj.value.id,obj.value.rid,obj.value.puton);
             }else if(obj.key=='sEquipItemToBagArray'){
                 ag.gameLayer.equipItemToBag(obj.value.id,obj.value.rid);
             }else if(obj.key=='sChatYouArray'){
