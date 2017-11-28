@@ -16,7 +16,7 @@ module.exports = ag.class.extend({
 
         //启动定时器,每秒执行一次
         ag.actionManager.schedule(this,1,this.update1.bind(this));
-        ag.actionManager.schedule(this,2,this.update2.bind(this));
+        ag.actionManager.schedule(this,3,this.update3.bind(this));
         ag.actionManager.schedule(this,5,this.update5.bind(this));
     },
 
@@ -158,7 +158,7 @@ module.exports = ag.class.extend({
 
 
     //更新数据
-    update2: function (dt) {
+    update3: function (dt) {
         //玩家自动回血
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];

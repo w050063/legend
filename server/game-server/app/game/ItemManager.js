@@ -34,6 +34,7 @@ module.exports = ag.class.extend({
     presentWith:function(id){
         var role = ag.gameLayer.getRole(id);
         if(role){
+            //var array = ['i000','i001','i014','i019','i026','i033','i038','i045','i048','i055','i059','i063','i066'];
             var array = ['i000','i001','i014'];
             for(var i=0;i<array.length;++i){
                 var item = new Item(array[i]);
@@ -137,7 +138,7 @@ module.exports = ag.class.extend({
                 }
                 item._data.puton = puton;
                 --this._bagLengthMap[rid];
-                ag.jsUtil.sendDataExcept("sBagItemToEquip",{id:id,rid:rid},rid);
+                ag.jsUtil.sendDataExcept("sBagItemToEquip",{id:id,puton:puton,rid:rid},rid);
                 role.refreshItemProp();
             }
         }

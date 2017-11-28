@@ -207,7 +207,7 @@ module.exports = {
 
 
         if(role._data.camp==ag.gameConst.campMonster){//怪物
-            var percent = [10000,100,10,1];//权重比例
+            var percent = [10000,100,10,1,1];//权重比例
             var weight=[];
             var max = 0;
             for(var i=0;i<8;++i){
@@ -225,7 +225,6 @@ module.exports = {
             //遍历权重，计算返回哪一个方向
             var curWeight = 0;
             var randNum=Math.random()*max;
-
             for(var i=0;i<8;++i){
                 curWeight += weight[i];
                 if(randNum<curWeight)return i;

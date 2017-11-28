@@ -248,7 +248,7 @@ module.exports = ag.class.extend({
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                         var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            tempRole._data.hp -= Math.round(this._hurt/correct*3);
+                            tempRole._data.hp -= Math.round(this._hurt/correct*5);
                         }else{
                             tempRole._data.hp -=  Math.round(this._hurt/correct);
                         }
