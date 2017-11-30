@@ -59,18 +59,18 @@ var Handler = cc.Class.extend({
         var player =  ag.gameLayer.getRole(session.uid);
         if(player){
             if(player._tiger){
+                ag.jsUtil.sendDataExcept("sDeleteRole",player._tiger._data.id,player._data.id);
                 ag.itemManager.delItemByRoleId(player._tiger._data.id);
                 player._tiger._data.camp=ag.gameConst.campMonster;
                 player._tiger._state = ag.gameConst.stateIdle;
                 player._tiger.dead();
-                ag.jsUtil.sendDataExcept("sDeleteRole",player._tiger._data.id,player._data.id);
             }
+            ag.jsUtil.sendDataExcept("sDeleteRole",player._data.id,player._data.id);
             ag.itemManager.delItemByRoleId(session.uid);
             player._data.camp=ag.gameConst.campMonster;
             player._state = ag.gameConst.stateIdle;
             player.dead();
             code = 0;
-            ag.jsUtil.sendDataExcept("sDeleteRole",player._data.id,player._data.id);
         }
         next(null, {
             code: code
@@ -157,6 +157,16 @@ var Handler = cc.Class.extend({
 
     bagItemRecycle:function (msg, session, next) {
         ag.itemManager.bagItemRecycle(msg.split(','),session.uid);
+        next();
+    },
+
+
+    //更换阵营
+    camp:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player){
+            player.changeCamp(msg);
+        }
         next();
     },
 });

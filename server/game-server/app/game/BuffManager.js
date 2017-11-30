@@ -105,11 +105,9 @@ module.exports = ag.class.extend({
 
 
     getIsRelife:function(role){
-        if(this._poisonMap[role._data.id] && role._data.camp==ag.gameConst.campMonster)return false;
+        if(this._poisonMap[role._data.id] && role.getIsMonster())return false;
         return true;
     },
-
-
 
 
     //更新数据
@@ -172,7 +170,7 @@ module.exports = ag.class.extend({
         //怪物自动回血
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
-            if(role._data.camp==ag.gameConst.campMonster && role._data.hp>0 && role._data.hp<role._totalHP && this.getIsRelife(role)){
+            if(role.getIsMonster() && role._data.hp>0 && role._data.hp<role._totalHP && this.getIsRelife(role)){
                 role._data.hp = Math.min(role._data.hp+role._heal,role._totalHP);
                 ag.jsUtil.sendDataAll("sHP",{id:role._data.id,hp:role._data.hp},role._data.mapId);
             }

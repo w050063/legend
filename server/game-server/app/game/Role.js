@@ -34,24 +34,28 @@ module.exports = ag.class.extend({
 
     getTotalHPFromDataBase:function(){
         var mst = this.getMst();
-        if(this._data.camp==ag.gameConst.campMonster || this._data.type=='m19')return mst.hp;
-        var lv = this._data.level;
-        if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51));
-        if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47));
-        if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43));
-        if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35));
-        return Math.floor(mst.hp+mst.hpAdd[0]*lv);
+        if(this.getIsPlayer()){
+            var lv = this._data.level;
+            if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51));
+            if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47));
+            if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43));
+            if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35));
+            return Math.floor(mst.hp+mst.hpAdd[0]*lv);
+        }
+        return mst.hp;
     },
 
     getTotalExpFromDataBase:function(){
-        if(this._data.camp==ag.gameConst.campMonster || this._data.type=='m19')return 0;
-        var lv = this._data.level;
-        var array = ag.gameConst.expDatabase;
-        if(lv>50)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*4+array[5]*(lv-50));
-        if(lv>46)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*(lv-46));
-        if(lv>42)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*(lv-42));
-        if(lv>34)return Math.floor(array[0]+array[1]*34+array[2]*(lv-34));
-        return Math.floor(array[0]+array[1]*lv);
+        if(this.getIsPlayer()){
+            var lv = this._data.level;
+            var array = ag.gameConst.expDatabase;
+            if(lv>50)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*4+array[5]*(lv-50));
+            if(lv>46)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*(lv-46));
+            if(lv>42)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*(lv-42));
+            if(lv>34)return Math.floor(array[0]+array[1]*34+array[2]*(lv-34));
+            return Math.floor(array[0]+array[1]*lv);
+        }
+        return 0;
     },
 
 
@@ -142,6 +146,11 @@ module.exports = ag.class.extend({
                 if(!ag.gameLayer._roleXYMap[newStr])ag.gameLayer._roleXYMap[newStr] = [];
                 ag.gameLayer._roleXYMap[newStr].push(this._tiger);
             }
+
+            var map = ag.gameConst._terrainMap[mapId];
+            if(!map.safe){
+                ag.jsUtil.sendDataAll("sSystemNotify",'玩家【'+this._data.name+'】冲向'+map.name+'寻宝去啦！');
+            }
         }
         ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp},this._data.mapId);
 
@@ -203,7 +212,7 @@ module.exports = ag.class.extend({
 
 
         //捡装备,是玩家,地上有东西,背包没满
-        if(this._data.camp!=ag.gameConst.campMonster && !this._master){
+        if(this.getIsPlayer()){
             var array = ag.itemManager.getDropByLocation(this.getLocation());
             var left = ag.gameConst.bagLength-ag.itemManager.getBagLength(this._data.id);
             if(array.length>left){
@@ -402,7 +411,7 @@ module.exports = ag.class.extend({
             var master = attacker._master?attacker._master:attacker;
             master.addExp(this.getMst().expDead);
 
-            if(this._data.camp!=ag.gameConst.campMonster){
+            if(this.getIsPlayer()){
                 ag.jsUtil.sendDataAll("sSystemNotify",master._data.name+' 击杀 '+this._data.name,this._data.mapId);
             }
         }
@@ -414,7 +423,7 @@ module.exports = ag.class.extend({
         //取消所有锁定自己的AI
         ag.gameLayer.delLockedRole(this);
         if(this._ai)this._ai._locked = null;
-        if(this._data.camp==ag.gameConst.campMonster){
+        if(this.getIsMonster()){
             ag.actionManager.delAll(this._ai);
             ag.actionManager.delAll(this);
 
@@ -457,6 +466,30 @@ module.exports = ag.class.extend({
         }
     },
 
+
+    //更换阵营
+    changeCamp:function(camp){
+        if(camp==ag.gameConst.campPlayerNone || camp==ag.gameConst.campPlayerQinglong || camp==ag.gameConst.campPlayerBaihu || camp==ag.gameConst.campPlayerZhuque || camp==ag.gameConst.campPlayerXuanwu){
+            this._data.camp = camp;
+            ag.jsUtil.sendDataAll("sCamp",{id:this._data.id, camp:camp},this._data.mapId);
+            if(this._tiger){
+                this._tiger._data.camp = camp;
+                ag.jsUtil.sendDataAll("sCamp",{id:this._tiger._data.id, camp:camp},this._data.mapId);
+            }
+        }
+    },
+
+    getIsPlayer:function() {
+        return this._data.camp != ag.gameConst.campMonster && this._data.camp != ag.gameConst.campNpc && this._data.type != 'm19';
+    },
+
+    getIsMonster:function() {
+        return this._data.camp == ag.gameConst.campMonster;
+    },
+
+    getIsTiger:function() {
+        return this._data.camp != ag.gameConst.campMonster && this._data.camp != ag.gameConst.campNpc && this._data.type=='m19';
+    },
 
 
     getMapXYString:function(mapId,x,y){

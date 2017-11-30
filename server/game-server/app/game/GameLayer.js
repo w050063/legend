@@ -57,7 +57,7 @@ module.exports = {
             player._data.y = pos.y;
             player._data.name = name;
             player._data.sex = sex;
-            player._data.camp = ag.gameConst.campLiuxing;
+            player._data.camp = ag.gameConst.campPlayerNone;
             player._data.mapId = ag.gameConst._bornMap;
             player._data.direction = 4;//默认朝下
             player._data.level = 0;
@@ -196,7 +196,7 @@ module.exports = {
         if(direction==-1)return -1;
         var offset = ag.gameConst.directionArray[direction];
         if(this.isCollision(role._data.mapId,role._data.x+offset.x,role._data.y+offset.y)==false){
-            if(role._data.camp==ag.gameConst.campMonster){
+            if(role.getIsMonster()){
                 if(!this._roleXYMap[''+role._data.mapId+','+(role._data.x+offset.x)+','+(role._data.y+offset.y)])return direction;
             }else{
                 return direction;
@@ -206,7 +206,7 @@ module.exports = {
         var index = direction;
 
 
-        if(role._data.camp==ag.gameConst.campMonster){//怪物
+        if(role.getIsMonster()){//怪物
             var percent = [10000,100,10,1,1];//权重比例
             var weight=[];
             var max = 0;
@@ -303,7 +303,7 @@ module.exports = {
     },
     isEnemyForAttack:function(role1,role2){
         if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
-            if(role2._data.camp==ag.gameConst.campLiuxing){
+            if(role2.getIsPlayer()){
                 var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
                 if(safe){
                     var lx = role2.getLocation().x,ly = role2.getLocation().y;
@@ -311,8 +311,7 @@ module.exports = {
                 }
             }
             if(role1._data.camp!=role2._data.camp)return true;
-            if(role1._data.camp==ag.gameConst.campLiuxing && role2._data.camp==ag.gameConst.campLiuxing
-                && role1._master!=role2 && role1._tiger!=role2)return true;
+            if(role2._data.camp==ag.gameConst.campPlayerNone)return true;
         }
         return false;
     },

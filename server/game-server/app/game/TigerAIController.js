@@ -75,7 +75,7 @@ module.exports = ag.class.extend({
                 this._locked = null;
             }else if(!this._locked){//无锁定目标,查找最近的目标
                 this._locked = this.findLocked();
-            }else if(this._locked && this._locked._data.camp==ag.gameConst.campLiuxing && Math.random()<0.1){//如果是玩家，则有一定几率停止攻击
+            }else if(this._locked && this._locked._data.camp!=ag.gameConst.campMonster && Math.random()<0.1){//如果是玩家，则有一定几率停止攻击
                 this._locked = this.findLocked();
             }
         }else if(this._relifeCD==false && this._role._master._state!=ag.gameConst.stateDead){
@@ -93,7 +93,7 @@ module.exports = ag.class.extend({
             var array = ag.gameLayer._roleXYMap[''+this._role._data.mapId+','+(this._role._data.x+searchEnemypath[i][0])+','+(this._role._data.y+searchEnemypath[i][1])];
             if(array){
                 for(var k=0;k<array.length;++k){
-                    if(ag.gameLayer.isEnemyForCheck(this._role,array[k])){
+                    if(ag.gameLayer.isEnemyForCheck(this._role,array[k]) && array[k].getIsMonster()){
                         return array[k];
                     }
                 }

@@ -75,9 +75,9 @@ module.exports = {
         var channelService = pomelo.app.get('channelService');
         var channel = channelService.getChannel(this.dataChannel, true);
         for(var key in ag.gameLayer._roleMap){
-            var data = ag.gameLayer._roleMap[key]._data;
-            if(data.camp!=ag.gameConst.campMonster){
-                if(channel.getMember(data.id)){
+            var role = ag.gameLayer._roleMap[key];
+            if(role.getIsPlayer()){
+                if(channel.getMember(role._data.id)){
                     ++sum;
                 }
             }
@@ -101,29 +101,28 @@ module.exports = {
         var role = ag.gameLayer._roleMap[id];
         var mapId = role?role._data.mapId:'t0';
         for(var key in ag.gameLayer._roleMap){
-            var data = ag.gameLayer._roleMap[key]._data;
-            if(data.camp!=ag.gameConst.campMonster && data.id!==id && data.mapId==mapId){
-                this.sendData(route,msg,data.id);
+            var role = ag.gameLayer._roleMap[key];
+            if(role.getIsPlayer() && role._data.mapId==mapId && role._data.id!==id){
+                this.sendData(route,msg,role._data.id);
             }
         }
     },
-
 
 
     //发送要合并的数据
     sendDataAll : function(route,msg,mapId){
         if(mapId){
             for(var key in ag.gameLayer._roleMap){
-                var data = ag.gameLayer._roleMap[key]._data;
-                if(data.camp!=ag.gameConst.campMonster && data.mapId==mapId){
-                    this.sendData(route,msg,data.id);
+                var role = ag.gameLayer._roleMap[key];
+                if(role.getIsPlayer() && role._data.mapId==mapId){
+                    this.sendData(route,msg,role._data.id);
                 }
             }
         }else{
             for(var key in ag.gameLayer._roleMap){
-                var data = ag.gameLayer._roleMap[key]._data;
-                if(data.camp!=ag.gameConst.campMonster){
-                    this.sendData(route,msg,data.id);
+                var role = ag.gameLayer._roleMap[key];
+                if(role.getIsPlayer()){
+                    this.sendData(route,msg,role._data.id);
                 }
             }
         }

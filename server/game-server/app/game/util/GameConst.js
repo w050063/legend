@@ -24,10 +24,14 @@ module.exports = {
 
 
     //阵营类型
-    campMonster:0,
-    campLiuxing:1,
-    campHudie:2,
-    campNpc:3,
+    campNpc:0,
+    campMonster:1,
+    campPlayerNone:2,
+    campPlayerQinglong:3,
+    campPlayerBaihu:4,
+    campPlayerZhuque:5,
+    campPlayerXuanwu:6,
+    campPlayerArray:['青龙堂','白虎堂','朱雀堂','玄武堂'],
 
 
     stateIdle : 0,
@@ -89,6 +93,7 @@ module.exports = {
             music:'Victory.mp3',
             npc:[{name:"传送员",x:26,y:25,title:"区域传送:",content:['t0','t2','t5','t11']},
                 {name:"装备回收",x:30,y:25,title:"装备回收:",content:['t1000','t1001','t1002']},
+                {name:"门派使者",x:30,y:30,title:"加入门派:",content:['t2001','t2002','t2003','t2004','t2000']},
                 {name:"苍月使者",x:28,y:25,title:"区域传送:",content:['t8','t9','t10']}],
             mapX: 60,
             mapY: 60,
@@ -241,6 +246,11 @@ module.exports = {
         t1000:{id:'t1000',name:'一级回收'},
         t1001:{id:'t1001',name:'二级回收'},
         t1002:{id:'t1002',name:'三级回收'},
+        t2000:{id:'t2000',name:'退出门派'},
+        t2001:{id:'t2001',name:'青龙堂'},
+        t2002:{id:'t2002',name:'白虎堂'},
+        t2003:{id:'t2003',name:'朱雀堂'},
+        t2004:{id:'t2004',name:'玄武堂'},
     },
 
     _roleMst: {
@@ -285,7 +295,7 @@ module.exports = {
         m19:{id:"m19",name:"白虎",hp:2400,hpAdd:0,defense:10,defenseAdd:0,hurt:71,hurtAdd:0,expDead:0,heal:10,healAdd:0,
             moveSpeed:1,attackSpeed:0.7,checkDistance:4,visibleDistance:6,attackDistance:1.5,model:"ani/hum31/032",drop:'',lv:1},
         m20:{id:"m20",name:"重装使者",hp:3600,hpAdd:0,defense:12,defenseAdd:0,hurt:90,hurtAdd:0,expDead:360,heal:60,healAdd:0,
-            moveSpeed:2,attackSpeed:2,checkDistance:5,visibleDistance:9,attackDistance:1.5,model:"ani/hum29/030",drop:'i008,20,i009,20,i0010,20,i011,20,i012,20,i013,20',lv:3},
+            moveSpeed:2,attackSpeed:2,checkDistance:5,visibleDistance:9,attackDistance:1.5,model:"ani/hum29/030",drop:'i008,20,i009,20,i010,20,i011,20,i012,20,i013,20',lv:3},
     },
 
 
