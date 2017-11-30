@@ -139,7 +139,7 @@ cc.Class({
         var direction = ag.gameLayer.getDirection(this._role.getLocation(),location);
         direction = ag.gameLayer.getOffsetWithColloison(this._role, direction);
         if (direction!=-1){
-            ag.gameLayer.buttonEventNpcClose();
+            //ag.gameLayer.buttonEventNpcClose();
             this._role.move(cc.pAdd(this._role.getLocation(),ag.gameConst.directionArray[direction]));
             this._busy = true;
         }else{
@@ -193,10 +193,10 @@ cc.Class({
         var l1=this._role.getLocation();
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
-            if(role._data.camp==ag.gameConst.campMonster){
+            if(role.getIsMonster()){
                 var l2=role.getLocation();
                 var x = Math.abs(l1.x-l2.x), y = Math.abs(l1.y-l2.y);
-                if(Math.max(x,y)<=checkDistance && x+y<lockedDis && ag.gameLayer.isEnemyCamp(this._role,role)){
+                if(Math.max(x,y)<=checkDistance && x+y<lockedDis){
                     locked = role;
                     lockedDis = x+y;
                 }

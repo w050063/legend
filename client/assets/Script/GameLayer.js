@@ -58,6 +58,8 @@ cc.Class({
 
 
         this._flyBloodArray = [];//飘血数组
+        this._labelNumAddClone = cc.find('Canvas/clone/labelNumAddClone');
+        this._labelNumMinuteClone = cc.find('Canvas/clone/labelNumMinuteClone');
 
 
         //键盘事件注入
@@ -135,8 +137,6 @@ cc.Class({
             this._chatLabelArray[i].opacity = 0;
         }
 
-        //系统公告
-        cc.find('Canvas/nodeChatContent/labelSystemNotify').opacity = 0;
 
         this._nodeBag = cc.find("Canvas/nodeBag");
         this._nodeBag.active = false;
@@ -506,7 +506,7 @@ cc.Class({
         if(direction==-1)return -1;
         var offset = ag.gameConst.directionArray[direction];
         if(this.isCollision(role._data.mapId,role._data.x+offset.x,role._data.y+offset.y)==false){
-            if(role._data.camp==ag.gameConst.campMonster){
+            if(role.getIsMonster()){
                 if(!this._roleXYMap[''+role._data.mapId+','+(role._data.x+offset.x)+','+(role._data.y+offset.y)])return direction;
             }else{
                 return direction;
@@ -516,7 +516,7 @@ cc.Class({
         var index = direction;
 
 
-        if(role._data.camp==ag.gameConst.campMonster){//怪物
+        if(role.getIsMonster()){//怪物
             var percent = [10000,1000,100,10,1];//权重比例
             var weight=[];
             var max = 0;
@@ -587,12 +587,13 @@ cc.Class({
     },
 
 
-    //是否攻击
+
+    //是否敌人阵营
     isEnemyCamp:function(role1,role2){
         if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead
             && role1._data.camp!=ag.gameConst.campNpc && role2._data.camp!=ag.gameConst.campNpc){
             if(role1._data.camp!=role2._data.camp)return true;
-            if(role1._data.camp==ag.gameConst.campLiuxing && role2._data.camp==ag.gameConst.campLiuxing)return true;
+            if(role2._data.camp==ag.gameConst.campPlayerNone)return true;
         }
         return false;
     },
@@ -1047,11 +1048,24 @@ cc.Class({
 
 
     systemNotify:function(content){
-        var node = cc.find('Canvas/nodeChatContent/labelSystemNotify');
-        node.opacity = 255;
+        var callback = function(){
+            this._systemNotifyArray[0].destroy();
+            this._systemNotifyArray.splice(0,1);
+            for(var i=0;i<this._systemNotifyArray.length;++i){
+                this._systemNotifyArray[i].y = 233-35*i;
+            }
+        }
+        if(!this._systemNotifyArray)this._systemNotifyArray = [];
+        var node = cc.instantiate(cc.find('Canvas/clone/labelSystemNotifyClone'));
+        cc.find('Canvas/nodeChatContent').addChild(node);
         node.getComponent(cc.Label).string = content;
-        node.stopAllActions();
-        node.runAction(cc.sequence(cc.delayTime(3),cc.fadeOut(2)));
+        node.runAction(cc.sequence(cc.delayTime(3),cc.fadeOut(1),cc.callFunc((callback.bind(this)))));
+        this._systemNotifyArray.push(node);
+        if(this._systemNotifyArray.length>=6){
+            callback.call(this);
+        }else{
+            node.y = 233-35*(this._systemNotifyArray.length-1);
+        }
     },
 
 
@@ -1081,14 +1095,19 @@ cc.Class({
 
 
     buttonEventNpcClose:function(){
+        this._nodeNpcContent.stopAllActions();
         this._nodeNpcContent.active = false;
     },
 
     showNodeNpcContent:function(data){
         this._nodeNpcContent.active = true;
+        this._nodeNpcContent.stopAllActions();
+        this._nodeNpcContent.runAction(cc.sequence(cc.delayTime(30),cc.callFunc(function(){
+            this.buttonEventNpcClose();
+        }.bind(this))));
         this._nodeNpcContent.getChildByName('labelTitle').getComponent(cc.Label).string = data.title;
         var self = this;
-        for(var i=0;i<4;++i){
+        for(var i=0;i<6;++i){
             (function(i){
                 var label = self._nodeNpcContent.getChildByName('label'+i).getComponent(cc.Label);
                 if(i<data.content.length){
@@ -1124,6 +1143,24 @@ cc.Class({
                             }
                             else{
                                 ag.jsUtil.showText(self.node,"没有可回收的装备！");
+                            }
+                        }else if(npcStr=='青龙堂' || npcStr=='白虎堂' || npcStr=='朱雀堂' || npcStr=='玄武堂' || npcStr=='退出门派'){
+                            var camp = ag.gameConst.campPlayerNone;
+                            if(npcStr=='青龙堂'){
+                                camp = ag.gameConst.campPlayerQinglong;
+                            }else if(npcStr=='白虎堂'){
+                                camp = ag.gameConst.campPlayerBaihu;
+                            }else if(npcStr=='朱雀堂'){
+                                camp = ag.gameConst.campPlayerZhuque;
+                            }else if(npcStr=='玄武堂'){
+                                camp = ag.gameConst.campPlayerXuanwu;
+                            }else if(npcStr=='退出门派'){
+                                camp = ag.gameConst.campPlayerNone;
+                            }
+                            if(self._player._data.camp != camp){
+                                ag.agSocket.send("camp",camp);
+                            }else{
+                                ag.jsUtil.showText(self.node,'操作无效！');
                             }
                         }else{
                             var level = ag.gameConst._terrainMap[transferMst.mapId].level;

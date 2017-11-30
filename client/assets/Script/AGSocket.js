@@ -162,6 +162,21 @@ module.exports={
                 if(player) {
                     player.relife(obj.value);
                 }
+            }else if(obj.key=='sCampArray'){
+                var player =  ag.gameLayer.getRole(obj.value.id);
+                if(player) {
+                    if(player.getIsPlayer()){
+                        if(obj.value.camp>=ag.gameConst.campPlayerQinglong && obj.value.camp<=ag.gameConst.campPlayerXuanwu){
+                            ag.gameLayer.systemNotify("恭喜玩家【"+player._data.name+"】加入"+ag.gameConst.campPlayerArray[obj.value.camp-ag.gameConst.campPlayerQinglong]+"！");
+                        }else{
+                            if(player==ag.gameLayer._player){
+                                ag.jsUtil.showText(ag.gameLayer.node,"您已退出"+ag.gameConst.campPlayerArray[player._data.camp-ag.gameConst.campPlayerQinglong]+"！");
+                            }
+                        }
+                    }
+                    player._data.camp = obj.value.camp;
+                    player.resetNameColor();
+                }
             }
         }
         this._dataArray = [];

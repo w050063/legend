@@ -132,24 +132,28 @@ cc.Class({
 
     getTotalHPFromDataBase:function(){
         var mst = this.getMst();
-        if(this._data.camp==ag.gameConst.campMonster || this._data.type=='m19')return mst.hp;
-        var lv = this._data.level;
-        if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51));
-        if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47));
-        if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43));
-        if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35));
-        return Math.floor(mst.hp+mst.hpAdd[0]*lv);
+        if(this.getIsPlayer()){
+            var lv = this._data.level;
+            if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51));
+            if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47));
+            if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43));
+            if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35));
+            return Math.floor(mst.hp+mst.hpAdd[0]*lv);
+        }
+        return mst.hp;
     },
 
     getTotalExpFromDataBase:function(){
-        if(this._data.camp==ag.gameConst.campMonster || this._data.type=='m19')return 0;
-        var lv = this._data.level;
-        var array = ag.gameConst.expDatabase;
-        if(lv>50)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*4+array[5]*(lv-50));
-        if(lv>46)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*(lv-46));
-        if(lv>42)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*(lv-42));
-        if(lv>34)return Math.floor(array[0]+array[1]*34+array[2]*(lv-34));
-        return Math.floor(array[0]+array[1]*lv);
+        if(this.getIsPlayer()){
+            var lv = this._data.level;
+            var array = ag.gameConst.expDatabase;
+            if(lv>50)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*4+array[5]*(lv-50));
+            if(lv>46)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*(lv-46));
+            if(lv>42)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*(lv-42));
+            if(lv>34)return Math.floor(array[0]+array[1]*34+array[2]*(lv-34));
+            return Math.floor(array[0]+array[1]*lv);
+        }
+        return 0;
     },
 
 
@@ -222,6 +226,27 @@ cc.Class({
     },
 
 
+    resetNameColor:function(){
+        if(this._propNode){
+            var color = cc.color(255,255,255);
+            var colorOut = cc.color(0,0,0);
+            if(this._data.camp==ag.gameConst.campPlayerQinglong){
+                color = cc.color(0,255,255);
+            }else if(this._data.camp==ag.gameConst.campPlayerBaihu){
+                color = cc.color(255,255,255);
+                colorOut = cc.color(128,128,0);
+            }else if(this._data.camp==ag.gameConst.campPlayerZhuque){
+                color = cc.color(242,101,34);
+            }else if(this._data.camp==ag.gameConst.campPlayerXuanwu){
+                color = cc.color(0,0,0);
+                colorOut = cc.color(64,0,0);
+            }
+            this._propNode._labelName.node.color = color;
+            this._propNode._labelName.node.getComponent(cc.LabelOutline).color = colorOut;
+        }
+    },
+
+
     resetNearFlag:function(x,y){
         this._nearFlag = !!(Math.abs(this._data.x-x)<9 && Math.abs(this._data.y-y)<9);
         if(this._nearFlag){
@@ -238,19 +263,15 @@ cc.Class({
                     this._propNode._labelHP.string = "npc";
                 }else{
                     this._propNode._progressBarHP.progress = this._data.hp/this._totalHP;
-                    this._propNode._labelHP.string = ""+this._data.hp+"/"+this._totalHP+" Lv:"+(this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level);
+                    this._propNode._labelHP.string = ""+this._data.hp+"/"+this._totalHP+" Lv:"+(this.getIsMonster()?this.getMst().lv:this._data.level);
                 }
                 var name = '';
                 if(this._data.camp==ag.gameConst.campNpc || this._data.type=='m19')name = this._data.name;
-                else if(this._data.camp==ag.gameConst.campMonster)name = ag.gameConst._roleMst[this._data.type].name;
+                else if(this.getIsMonster())name = ag.gameConst._roleMst[this._data.type].name;
                 else name = this._data.name+'('+ag.gameConst._roleMst[this._data.type].name+')';
                 this._propNode._labelName.string = name;
-                if(this._data.camp==ag.gameConst.campMonster || this._data.camp==ag.gameConst.campNpc){
-                    this._propNode._labelName.node.color = cc.color(255,255,255);
-                }else{
-                    this._propNode._labelName.node.color = cc.color(255,255,255);
-                }
-                if(this._data.camp==ag.gameConst.campMonster || this._data.type=='19'){
+                this.resetNameColor();
+                if(this.getIsMonster()){
                     this._propNode._labelHP.node.opacity = 0;
                     this._propNode._labelName.node.opacity = 0;
                 }else{
@@ -271,9 +292,9 @@ cc.Class({
                     this._minMapNode.color = cc.color(0,255,0);
                 }else if(this._data.camp==ag.gameConst.campNpc){
                     this._minMapNode.color = cc.color(0,0,255);
-                }else if(this._data.camp==ag.gameConst.campMonster || this._data.type=='19'){
+                }else if(this.getIsMonster() || this.getIsTiger()){
                     this._minMapNode.color = cc.color(255,0,0);
-                }else if(this._data.camp==ag.gameConst.campLiuxing){
+                }else if(this.getIsPlayer()){
                     this._minMapNode.color = cc.color(255,255,0);
                 }
             }
@@ -331,7 +352,7 @@ cc.Class({
                 if(this._agAni)this._agAni.getComponent(AGAni).putCache();
                 this._agAni = ag.jsUtil.getNode(this.node,name+array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,0.3);
                 this._agAni.setColor(this._aniColor);
-            }else if(this._data.camp==ag.gameConst.campMonster || (this._data.camp==ag.gameConst.campLiuxing && this._data.type=='m19')){
+            }else if(this.getIsMonster() || this.getIsTiger()){
                 var str = 'nudeboy0'+ag.gameConst.stateIdle+this._data.direction;
                 if(this._data.type=='m8' || this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
                 var array = AGAniClothes[str].split(',');
@@ -378,7 +399,7 @@ cc.Class({
     idle:function(){
         if(this._state != ag.gameConst.stateIdle && this._state != ag.gameConst.stateDead){
             this.node.stopAllActions();
-            if(this._data.camp!=ag.gameConst.campMonster && this._state == ag.gameConst.stateAttack){
+            if(this.getIsPlayer() && this._state == ag.gameConst.stateAttack){
                 if(this._agAni)this._agAni.getComponent(AGAni).pause();
                 if(this._weaponAni)this._weaponAni.getComponent(AGAni).pause();
                 if(this._wingAni)this._wingAni.getComponent(AGAni).pause();
@@ -410,7 +431,7 @@ cc.Class({
 
         if(this._nearFlag){
             this.node.setPosition(this.getTruePosition(lastLocation));
-            var moveSpeed = this._data.camp==ag.gameConst.campMonster ? 0.8:this._moveSpeed;//怪物始终是一个播放速度，走完后等待
+            var moveSpeed = (this.getIsMonster() || this.getIsTiger()) ? 0.8:this._moveSpeed;//怪物始终是一个播放速度，走完后等待
             this.node.stopAllActions();
             this.node.runAction(cc.sequence(cc.moveTo(moveSpeed,this.getTruePosition(location)),cc.callFunc(function(){
                 if(bServer){
@@ -419,7 +440,7 @@ cc.Class({
                     if(this._ai)this._ai._busy = false;
                 }
             }.bind(this))));
-            if(this._data.camp==ag.gameConst.campMonster || (this._data.camp==ag.gameConst.campLiuxing && this._data.type=='m19')){
+            if(this.getIsMonster() || this.getIsTiger()){
                 var str = 'nudeboy0'+ag.gameConst.stateMove+this._data.direction;
                 if(this._data.type=='m8' || this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
                 var array = AGAniClothes[str].split(',');
@@ -489,7 +510,7 @@ cc.Class({
         //攻击动画
         if(this._nearFlag){
             this.node.stopAllActions();
-            if(this._data.camp==ag.gameConst.campMonster || (this._data.camp==ag.gameConst.campLiuxing && this._data.type=='m19')){
+            if(this.getIsMonster() || this.getIsTiger()){
                 var str = 'nudeboy0'+ag.gameConst.stateAttack+this._data.direction;
                 if(this._data.type=='m8' || this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
                 var array = AGAniClothes[str].split(',');
@@ -625,7 +646,7 @@ cc.Class({
                 }
             }
         }
-        if(locked._data.camp!=ag.gameConst.campMonster && locked._data.type!='m19'){
+        if(locked.getIsPlayer()){
             cc.audioEngine.play(cc.url.raw(locked._data.sex==1?"resources/voice/behit1.mp3":"resources/voice/behit0.mp3"),false,1);
         }
     },
@@ -642,15 +663,14 @@ cc.Class({
                     break;
                 }
             }
-
             if(hpStr){
                 this._flyBloodFlag = true;
-                var node = new cc.Node();
-                var tips = node.addComponent(cc.Label);
+                var node = cc.instantiate(hpStr[0]=='+'?ag.gameLayer._labelNumAddClone:ag.gameLayer._labelNumMinuteClone);
+                var tips = node.getComponent(cc.Label);
                 node.x = 0;
                 node.y = 71;
-                tips.string = hpStr;
-                node.color = (hpStr[0]=='+')?cc.color(0,255,0,255):cc.color(255,0,0,255);
+                tips.string = ':'+hpStr.substr(1);
+                //node.color = (hpStr[0]=='+')?cc.color(0,255,0,255):cc.color(255,0,0,255);
                 this.node.addChild(node,30);
                 node.runAction(cc.sequence(cc.moveBy(0.4, cc.p(0,30)), cc.fadeOut(0.2),cc.callFunc(function(){
                     node.destroy();
@@ -691,8 +711,8 @@ cc.Class({
                 this.flyAnimation();
                 if(this._propNode){
                     this._propNode._progressBarHP.progress = hp/this._totalHP;
-                    this._propNode._labelHP.string = ""+hp+"/"+this._totalHP+" Lv:"+(this._data.camp==ag.gameConst.campMonster?this.getMst().lv:this._data.level);
-                    if(hp<this._data.hp && (this._data.camp==ag.gameConst.campMonster || this._data.type=='m19')){
+                    this._propNode._labelHP.string = ""+hp+"/"+this._totalHP+" Lv:"+(this.getIsMonster()?this.getMst().lv:this._data.level);
+                    if(hp<this._data.hp && (this.getIsMonster())){
                         this._propNode._labelHP.node.stopAllActions();
                         this._propNode._labelHP.node.opacity = 255;
                         this._propNode._labelHP.node.runAction(cc.sequence(cc.delayTime(10),cc.callFunc((function(sender){sender.opacity=0;}))));
@@ -721,7 +741,7 @@ cc.Class({
         //取消所有锁定自己的AI
         ag.gameLayer.delLockedRole(this);
         if(this._ai)this._ai._locked = null;
-        if(this._data.camp==ag.gameConst.campMonster){
+        if(this.getIsMonster()){
             if(this._propNode)ag.jsUtil.putCacheNode(this._propNode);
             if(this._minMapNode){
                 this._minMapNode.destroy();
@@ -857,11 +877,24 @@ cc.Class({
         for(var key in map){
             var role = map[key];
             var p = role.node.getPosition();
-            if(point.x>p.x-w && point.x<p.x+w && point.y>p.y && point.y< p.y+h && role!=ag.gameLayer._player && role._data.camp==ag.gameConst.campLiuxing && role._data.type!='m19'){
+            if(point.x>p.x-w && point.x<p.x+w && point.y>p.y && point.y< p.y+h && role!=ag.gameLayer._player && role.getIsPlayer()){
                 if(!locked || p.y<locked.node.getPositionY())locked = map[key];
             }
         }
         return locked;
+    },
+
+
+    getIsPlayer:function() {
+        return this._data.camp != ag.gameConst.campMonster && this._data.camp != ag.gameConst.campNpc && this._data.type != 'm19';
+    },
+
+    getIsMonster:function() {
+        return this._data.camp == ag.gameConst.campMonster;
+    },
+
+    getIsTiger:function() {
+        return this._data.camp != ag.gameConst.campMonster && this._data.camp != ag.gameConst.campNpc && this._data.type=='m19';
     },
 
 
