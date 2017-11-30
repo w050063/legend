@@ -80,6 +80,10 @@
     "required int32 x": 3,
     "required int32 y": 4
   },
+  "message sCamp": {
+    "required string id": 1,
+    "required int32 camp": 2
+  },
   "onData" : {
     "repeated sMove sMoveArray": 1,
     "repeated sAttack sAttackArray": 2,
@@ -100,6 +104,7 @@
     "repeated sEquipItemToBag sEquipItemToBagArray": 17,
     "repeated sChatYou sChatYouArray": 18,
     "repeated string sSystemNotifyArray": 19,
-    "repeated sRelife sRelifeArray": 20
+    "repeated sRelife sRelifeArray": 20,
+    "repeated sCamp sCampArray": 21
   }
 }
