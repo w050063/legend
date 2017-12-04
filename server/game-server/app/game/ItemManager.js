@@ -40,7 +40,7 @@ module.exports = ag.class.extend({
                 var item = new Item(array[i]);
                 item._duration = 0;
                 item._data.owner = id;
-                this._itemMap.add(item);
+                this.addItem(item);
                 ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
             }
         }
@@ -72,9 +72,7 @@ module.exports = ag.class.extend({
             obj._data.owner = rid;
             obj._data.x = undefined;
             obj._data.y = undefined;
-            this._itemMap.add(obj);
-            if(!this._bagLengthMap[rid])this._bagLengthMap[rid] = 0;
-            ++this._bagLengthMap[rid];
+            this.addItem(obj);
         }
     },
 
@@ -166,12 +164,21 @@ module.exports = ag.class.extend({
                 this._itemMap.del(key);
             }
         }
-        this._bagLengthMap[rid]=0;
+        delete this._bagLengthMap[rid];
     },
 
 
     getBagLength:function (id) {
         return this._bagLengthMap[id] || 0;
+    },
+
+    addItem:function(item){
+        ag.itemManager._itemMap.add(item);
+        var rid = item._data.owner;
+        if(rid){
+            if(!this._bagLengthMap[rid])this._bagLengthMap[rid] = 0;
+            ++this._bagLengthMap[rid];
+        }
     },
 
 

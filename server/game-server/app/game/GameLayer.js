@@ -35,34 +35,55 @@ module.exports = {
                 ag.jsUtil.sendDataAll("sSystemNotify","特别提醒：安全区外可随意杀人！");
             }
         }.bind(this));
+
+
+        //定时保存到数据库
+        ag.actionManager.schedule(this,5,function (dt) {
+            var array = [];
+            for(var key in this._roleMap){
+                var role = this._roleMap[key];
+                if(role.getIsPlayer()){
+                    array.push(role);
+                }
+            }
+            ag.db.setRoles(array);//角色保存
+            ag.db.setItems();//道具保存
+        }.bind(this));
 	},
 
 
     //获得某玩家
-    getRole:function(uid){
-        return this._roleMap[uid];
+    getRole:function(id){
+        return this._roleMap[id];
     },
 	
 	
 	//增加一个玩家
-    addPlayer:function(uid,name,type,sex){
-		var player = this._roleMap[uid];
+    addPlayer:function(id,map_id,x,y,type,camp,sex,direction,level,exp){
+        var name = ag.userManager.getName(id);
+		var player = this._roleMap[id];
 		if(!player){
 			player = new Role();
             player._data = {};
-            player._data.id = uid;
+            player._data.id = id;
             player._data.type = type;
-            var pos = this.getStandLocation(ag.gameConst._bornMap,ag.gameConst.born.x,ag.gameConst.born.y);
-            player._data.x = pos.x;
-            player._data.y = pos.y;
+            if(map_id){
+                player._data.mapId = map_id;
+                player._data.x = x;
+                player._data.y = y;
+            }else{
+                player._data.mapId = ag.gameConst._bornMap;
+                var pos = this.getStandLocation(ag.gameConst._bornMap,ag.gameConst.born.x,ag.gameConst.born.y);
+                player._data.x = pos.x;
+                player._data.y = pos.y;
+            }
             player._data.name = name;
             player._data.sex = sex;
-            player._data.camp = ag.gameConst.campPlayerNone;
-            player._data.mapId = ag.gameConst._bornMap;
-            player._data.direction = 4;//默认朝下
-            player._data.level = 0;
-            player.resetAllProp();
-			this._roleMap[uid] = player;
+            player._data.camp = camp?camp:ag.gameConst.campPlayerNone;
+            player._data.direction = direction!=undefined?direction:4;//默认朝下
+            player._data.level = level?level:0;
+            player.resetAllProp(exp);
+			this._roleMap[id] = player;
             var xyStr = player.getMapXYString();
             if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
             this._roleXYMap[xyStr].push(player);
@@ -98,7 +119,7 @@ module.exports = {
 
         //确认进入游戏成功。
         player.relife();
-        ag.jsUtil.send("sEnter",JSON.stringify(player._data),[uid]);
+        ag.jsUtil.send("sEnter",JSON.stringify(player._data),[id]);
         //player.changeMap();
         ag.jsUtil.sendDataAll("sSystemNotify","玩家【"+player._data.name+"】上线！");
     },

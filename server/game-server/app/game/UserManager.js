@@ -12,9 +12,10 @@ module.exports = ag.class.extend({
     },
     
     
-    add:function (id) {
+    add:function (id,name) {
         if(!this._infoMap[id]){
-            this._infoMap[id] = {id:id,name:'r'+this._nLength,sessions:0,score:0};
+            name = name?name:'r'+this._nLength;
+            this._infoMap[id] = {id:id,name:name,sessions:0,score:0};
             ++this._nLength;
         }
         return this._infoMap[id];
@@ -34,6 +35,7 @@ module.exports = ag.class.extend({
             role._data.name = name;
             if(role._tiger)role._tiger._data.name = '白虎('+name+')';
         }
+        ag.db.setAccountName(id,name);
         return 0;
     },
     getName:function(id){

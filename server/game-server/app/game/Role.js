@@ -18,13 +18,13 @@ module.exports = ag.class.extend({
 
 
     //重置所有属性
-    resetAllProp:function(){
+    resetAllProp:function(exp){
         var mst = this.getMst();
         var lv = this._data.level;
         this._totalHP = this.getTotalHPFromDataBase();
         this._data.hp = this._totalHP;
         this._totalExp = this.getTotalExpFromDataBase();
-        this._exp = 0;
+        this._exp = exp?exp:0;
         this._heal = mst.heal+Math.floor(mst.healAdd*lv);
         this._attackSpeed = mst.attackSpeed;
         this._moveSpeed = mst.moveSpeed;
@@ -385,8 +385,7 @@ module.exports = ag.class.extend({
         while(this._exp>=this._totalExp){
             ++this._data.level;
             var exp = this._exp-this._totalExp;
-            this.resetAllProp();
-            this._exp = exp;
+            this.resetAllProp(exp);
         }
         if(source){
             ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp,source:source},this._data.mapId);

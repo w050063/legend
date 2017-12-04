@@ -21,11 +21,23 @@ var Handler = cc.Class.extend({
     ykLogin:function(msg, session, next) {
         var data = null;
         if(session.uid){
-            data = ag.userManager.add(session.uid,session.uid,0,0);
+            var exist = ag.userManager.getName(session.uid)!='';
+
+
+            data = ag.userManager.add(session.uid);
             var player =  ag.gameLayer.getRole(session.uid);
             if(player){
                 data.type = player._data.type;
                 data.sex = player._data.sex;
+            }
+
+
+            //写进数据库
+            var timeCounter = ''+new Date().getTime();
+            if(!exist){
+                ag.db.createAccount(session.uid,'111111',data.name,timeCounter,timeCounter);
+            }else{
+                ag.db.setAccountLastTime(session.uid,timeCounter);
             }
         }
         next(null, {
@@ -81,6 +93,7 @@ var Handler = cc.Class.extend({
     chatYou : function(msg, session, next) {
         var player =  ag.gameLayer.getRole(session.uid);
         if(player){
+            ag.db.insertChat(session.uid,msg,''+new Date().getTime());
             ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,name:player._data.name+'('+ag.gameConst._roleMst[player._data.type].name+')',content:msg});
         }
         next();
@@ -99,7 +112,14 @@ var Handler = cc.Class.extend({
 
     //进入游戏
     enter:function(msg, session, next) {
-        ag.gameLayer.addPlayer(session.uid,ag.userManager.getName(session.uid),msg.type,msg.sex);
+        var role = ag.gameLayer.getRole(session.uid);
+        var exist = !!role;
+        ag.gameLayer.addPlayer(session.uid,undefined,undefined,undefined,msg.type,undefined,msg.sex,undefined,undefined,undefined);
+        if(!exist){
+            role = ag.gameLayer.getRole(session.uid);
+            var data = role._data;
+            ag.db.insertRole(data.id,data.mapId,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,role._exp);
+        }
         next();
     },
 
