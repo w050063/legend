@@ -12,7 +12,7 @@ cc.Class({
         this._width = 0;
         this._height = 0;
         this._dataArray = [];
-        this._screenRadius = 10;
+        this._screenRadius = 11;
         this._mapTile = {};
         this._mapObj = {};
         this._center = cc.p(0,0);

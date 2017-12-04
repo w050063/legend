@@ -147,9 +147,9 @@ cc.Class({
 
         //测试新地图
         this._map = cc.find("Canvas/nodeMap").addComponent(AGMap);
-        this._map.node.setScale(1.5);
+        this._map.node.setScale(1.27);
         this._nameMap = cc.find("Canvas/nodeNameMap").addComponent(AGMap);
-        this._nameMap.node.setScale(1.5);
+        this._nameMap.node.setScale(1.27);
 
 
         //创建主角
