@@ -7,7 +7,7 @@
 var AGAniClothes = require("AGAniClothes");
 var AIController = require("AIController");
 var AGAni = require("AGAni");
-var AGAniOffset = require("AGAniOffset");
+//var AGAniOffset = require("AGAniOffset");
 cc.Class({
     extends: cc.Component,
     properties: {},
@@ -182,7 +182,7 @@ cc.Class({
                 ag.jsUtil.showText(ag.gameLayer.node,'装备回收成功');
             }
         }
-        if(last < this._data.level && this==ag.gameLayer._player && this._data.mapId=='t12' && this._data.level>=35){
+        if(last < this._data.level && this==ag.gameLayer._player && this._data.level==35){
             ag.gameLayer.changeMap('t1');
             ag.agSocket.send("changeMap",'t1');
         }
@@ -260,7 +260,10 @@ cc.Class({
                 this._propNode.setPosition(this.node.getPosition());
                 if(this._data.camp==ag.gameConst.campNpc){
                     this._propNode._progressBarHP.progress = 1;
-                    this._propNode._labelHP.string = "npc";
+                    this._propNode._labelHP.string = "点我";
+                    this._propNode._labelHP.node.runAction(cc.repeatForever(cc.sequence(cc.delayTime(0.5),cc.callFunc(function(){
+                        if(this._propNode)this._propNode._labelHP.node.color = cc.color(Math.random()>0.5?255:0,Math.random()>0.5?255:0,Math.random()>0.5?255:0);
+                    }.bind(this)))));
                 }else{
                     this._propNode._progressBarHP.progress = this._data.hp/this._totalHP;
                     this._propNode._labelHP.string = ""+this._data.hp+"/"+this._totalHP+" Lv:"+(this.getIsMonster()?this.getMst().lv:this._data.level);
@@ -313,7 +316,7 @@ cc.Class({
                 this._wingAni = null;
             }
             if(this._propNode){
-                ag.jsUtil.putCacheNode(this._propNode);
+                this._propNode.destroy();
                 this._propNode = null;
             }
             if(this._minMapNode){
@@ -354,7 +357,7 @@ cc.Class({
                 this._agAni.setColor(this._aniColor);
             }else if(this.getIsMonster() || this.getIsTiger()){
                 var str = 'nudeboy0'+ag.gameConst.stateIdle+this._data.direction;
-                if(this._data.type=='m8' || this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
+                if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27")str = 'nudeboy0'+ag.gameConst.stateIdle+0;
                 var array = AGAniClothes[str].split(',');
                 var name = ag.gameConst._roleMst[this._data.type].model;
                 if(this._agAni)this._agAni.getComponent(AGAni).putCache();
@@ -442,7 +445,7 @@ cc.Class({
             }.bind(this))));
             if(this.getIsMonster() || this.getIsTiger()){
                 var str = 'nudeboy0'+ag.gameConst.stateMove+this._data.direction;
-                if(this._data.type=='m8' || this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
+                if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27")str = 'nudeboy0'+ag.gameConst.stateIdle+0;
                 var array = AGAniClothes[str].split(',');
                 var name = ag.gameConst._roleMst[this._data.type].model;
                 if(this._agAni)this._agAni.getComponent(AGAni).putCache();
@@ -512,7 +515,7 @@ cc.Class({
             this.node.stopAllActions();
             if(this.getIsMonster() || this.getIsTiger()){
                 var str = 'nudeboy0'+ag.gameConst.stateAttack+this._data.direction;
-                if(this._data.type=='m8' || this._data.type=='m9')str = 'nudeboy0'+ag.gameConst.stateIdle+0;
+                if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27")str = 'nudeboy0'+ag.gameConst.stateIdle+0;
                 var array = AGAniClothes[str].split(',');
                 var name = ag.gameConst._roleMst[this._data.type].model;
                 if(this._agAni)this._agAni.getComponent(AGAni).putCache();
@@ -635,7 +638,7 @@ cc.Class({
             sprite.node.runAction(cc.sequence(cc.delayTime(6*0.15),cc.moveTo(cc.pDistance(pos1,pos2)/1000,pos2),cc.callFunc(function () {
                 ag.spriteCache.put(sprite);
             })));
-        }else if(this._data.type=='m8' || this._data.type=="m9") {
+        }else if(this._data.type=='m8' || this._data.type=="m9" || this._data.type=="m27") {
             var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(), this.getMst().attackDistance);
             for (var i = 0; i < array.length; ++i) {
                 if(ag.gameLayer.isEnemyCamp(this,array[i])){
@@ -701,10 +704,7 @@ cc.Class({
     changeHP:function(hp){
         var bVoice = this._data.hp > 0;
         if(this._data.camp==ag.gameConst.campNpc){
-            if(this._nearFlag && this._propNode){
-                this._propNode._progressBarHP.progress = 1;
-                this._propNode._labelHP.string = "npc";
-            }
+
         }else if(hp!=this._data.hp){
             if(this._nearFlag){
                 ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp)))});
@@ -742,7 +742,10 @@ cc.Class({
         ag.gameLayer.delLockedRole(this);
         if(this._ai)this._ai._locked = null;
         if(this.getIsMonster()){
-            if(this._propNode)ag.jsUtil.putCacheNode(this._propNode);
+            if(this._propNode){
+                this._propNode.destroy();
+                this._propNode = null;
+            }
             if(this._minMapNode){
                 this._minMapNode.destroy();
                 this._minMapNode = null;
@@ -780,7 +783,7 @@ cc.Class({
             this._wingAni = null;
         }
         if(this._propNode){
-            ag.jsUtil.putCacheNode(this._propNode);
+            this._propNode.destroy();
             this._propNode = null;
         }
         if(this._minMapNode){

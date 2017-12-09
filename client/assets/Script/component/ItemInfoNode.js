@@ -20,7 +20,7 @@ cc.Class({
         var obj = ag.userInfo._itemMap[id];
         var mst = ag.gameConst._itemMst[obj._data.mid];
         var back = this.node.getChildByName('back');
-        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+mst.id.substr(1));
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
         back.getChildByName('labelContent').getComponent(cc.Label).string = ag.gameLayer.getItemBagShow(mst);
         var str = '确定';
         var bOther = false;
@@ -86,7 +86,13 @@ cc.Class({
                 ag.gameLayer.itemBagToEquip(id);
                 if(tempId!=-1)ag.gameLayer.addItemToBag(obj.id);
             }else{
-                ag.jsUtil.showText(ag.gameLayer.node,'不能穿戴');
+                var tempArray = ['男战','女战','男法','女法','男道','女道'];
+                var str = '此装备限于：';
+                for(var i=0;i<mst.exclusive.length;++i){
+                    str = str+tempArray[mst.exclusive[i]];
+                    if(i!=mst.exclusive.length-1)str = str+'，';
+                }
+                ag.jsUtil.showText(ag.gameLayer.node,str);
             }
         }
         this.node.active = false;

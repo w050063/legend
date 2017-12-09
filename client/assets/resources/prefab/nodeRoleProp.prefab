@@ -118,7 +118,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 71
+      "y": 78
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -307,7 +307,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 26,
-      "height": 10
+      "height": 14
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -316,7 +316,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 77
+      "y": 84
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -336,7 +336,7 @@
     "_useOriginalSize": false,
     "_actualFontSize": 10,
     "_fontSize": 10,
-    "_lineHeight": 10,
+    "_lineHeight": 14,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,
@@ -380,7 +380,7 @@
       "__id__": 15
     },
     "_id": "",
-    "_opacity": 255,
+    "_opacity": 254.5,
     "_color": {
       "__type__": "cc.Color",
       "r": 0,
@@ -397,7 +397,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 37,
-      "height": 20
+      "height": 18
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -406,9 +406,9 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 35
+      "y": 32
     },
-    "_skewX": 0,
+    "_skewX": -0.1,
     "_skewY": 0,
     "_localZOrder": 0,
     "_globalZOrder": 0,
@@ -426,7 +426,7 @@
     "_useOriginalSize": false,
     "_actualFontSize": 14,
     "_fontSize": 14,
-    "_lineHeight": 20,
+    "_lineHeight": 18,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,

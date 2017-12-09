@@ -14,20 +14,11 @@ cc.Class({
         this._role = role;
         this._locked = null;
         this._busy = false;
-        this._spriteTouchArray = [];
         this._touchMoveDirection = -1;
         this._dirBackUp = -1;
+        this._bShowNPCMoment = false;
 
-        //加载
-        var prefab = cc.loader.getRes('prefab/nodeTouchSprite');
-        var node = cc.instantiate(prefab);
-        node.parent = ag.gameLayer.node;
-        node.setLocalZOrder(100);
-        for(var i=0;i<8;++i){
-            var spriteTouch = node.getChildByName("spriteTouch"+i).getComponent(cc.Sprite);
-            this._spriteTouchArray.push(spriteTouch);
-        }
-        this.changeTouchSprite(false);
+
         this._nodeRock = cc.find('Canvas/nodeRock');
         this._rockBack = cc.find('Canvas/nodeRock/back');
         this._rockPoint = cc.find('Canvas/nodeRock/back/rock');
@@ -42,23 +33,25 @@ cc.Class({
 		if(this._locked && this._locked._data.camp==ag.gameConst.campNpc){
 			ag.gameLayer.showNodeNpcContent(this._locked._data);
 			this._locked = null;
+            this._bShowNPCMoment = true;
+            ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(0.2),cc.callFunc(function(){
+                this._bShowNPCMoment = false;
+            }.bind(this))));
 		}else{
 			this.resetTouchDirection(location);
-			this.changeTouchSprite(true);
             this._dirBackUp = this._touchMoveDirection;
 		}
 	},
+
 	touchMove:function(event){
-		var location = event.getLocation();
-		var tempDirection = this._touchMoveDirection;
-		this.resetTouchDirection(location);
-		if(tempDirection!=this._touchMoveDirection){
-			this.changeTouchSprite();
-		}
+        if(this._bShowNPCMoment==false){
+            var location = event.getLocation();
+            var tempDirection = this._touchMoveDirection;
+            this.resetTouchDirection(location);
+        }
 	},
 	touchEnd:function(event){
 		this._touchMoveDirection = -1;
-		this.changeTouchSprite();
 	},
 	rockStart:function(event){
 		var location = this._nodeRock.convertToNodeSpaceAR(event.getLocation());
@@ -113,27 +106,6 @@ cc.Class({
     },
 
 
-    //改变触摸图片
-    changeTouchSprite:function (bAction) {
-        if(this._touchMoveDirection!=-1){
-            for(var i=0;i<this._spriteTouchArray.length;++i){
-                this._spriteTouchArray[i].node.stopAllActions();
-                if(bAction){
-                    this._spriteTouchArray[i].node.opacity = 255*0.1;
-                    if(i!=this._touchMoveDirection)this._spriteTouchArray[i].node.runAction(cc.fadeOut(1));
-                }else{
-                    this._spriteTouchArray[i].node.opacity = (i==this._touchMoveDirection?255*0.1:0);
-                }
-            }
-        }else{
-            for(var i=0;i<this._spriteTouchArray.length;++i) {
-                this._spriteTouchArray[i].node.stopAllActions();
-                this._spriteTouchArray[i].node.opacity = 0;
-            }
-        }
-    },
-
-
     //返回移动到锁定角色的的方向
     doMoveOperate:function (location) {
         var direction = ag.gameLayer.getDirection(this._role.getLocation(),location);
@@ -155,7 +127,6 @@ cc.Class({
             if(this._touchMoveDirection!=-1 || (this._touchMoveDirection==-1 && this._dirBackUp!=-1)){
                 this.doMoveOperate(cc.pAdd(this._role.getLocation(),ag.gameConst.directionArray[this._touchMoveDirection!=-1?this._touchMoveDirection:this._dirBackUp]));
                 this._dirBackUp = -1;
-                this.changeTouchSprite();
             }else if(this._locked){
                 var l1 = this._role.getLocation(), l2 = this._locked.getLocation(),vd = this._role.getMst().visibleDistance,ad = this._role.getMst().attackDistance;
                 var lx = Math.abs(l1.x-l2.x), ly = Math.abs(l1.y-l2.y);

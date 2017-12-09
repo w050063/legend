@@ -60,6 +60,8 @@ cc.Class({
         this._flyBloodArray = [];//飘血数组
         this._labelNumAddClone = cc.find('Canvas/clone/labelNumAddClone');
         this._labelNumMinuteClone = cc.find('Canvas/clone/labelNumMinuteClone');
+        this._nodeRolePropClone = cc.find('Canvas/clone/nodeRolePropClone');
+        this._nodeAlertClone = cc.find('Canvas/clone/nodeAlertClone');
 
 
         //键盘事件注入
@@ -117,19 +119,19 @@ cc.Class({
         //        });
         //    })(i);
         //}
-        this._equipArray.push(cc.find('Canvas/nodeBag/labelAttack').getComponent(cc.Label));
-        this._equipArray.push(cc.find('Canvas/nodeBag/labelDefense').getComponent(cc.Label));
+        this._equipArray.push(0);
+        this._equipArray.push(0);
         this._equipArray.push(cc.find('Canvas/nodeBag/labelLevel').getComponent(cc.Label));
         this._equipArray.push(cc.find('Canvas/nodeBag/labelExp').getComponent(cc.Label));
 
         //聊天相关
-        var nodeChat = cc.find('Canvas/nodeChat');
-        nodeChat.active = false;
-        nodeChat.on(cc.Node.EventType.TOUCH_END, function (event) {
-            cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
-            nodeChat.active = false;
-            cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
-        }.bind(this));
+        //var nodeChat = cc.find('Canvas/nodeChat');
+        //nodeChat.active = false;
+        //nodeChat.on(cc.Node.EventType.TOUCH_END, function (event) {
+        //    cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        //    nodeChat.active = false;
+        //    cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
+        //}.bind(this));
         this._chatContentArray = [];
         this._chatLabelArray = [];
         for(var i=0;i<5;++i){
@@ -652,7 +654,7 @@ cc.Class({
         var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
         var node = new cc.Node();
         var sprite = node.addComponent(cc.Sprite);
-        sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+mst.id.substr(1));
+        sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
         node.setPosition(startPos.x+disPos.x*(index%8),startPos.y-disPos.y*Math.floor(index/8));
         sprite.sizeMode = cc.Sprite.SizeMode.RAW;
         sprite.trim = false;
@@ -724,8 +726,8 @@ cc.Class({
                     father.wing = undefined;
                 }
             }
+            this.resetPlayerProp(this._player);
         }
-        this.resetPlayerProp();
     },
 
 
@@ -741,61 +743,63 @@ cc.Class({
 
 
         var father = cc.find(role==this._player?'Canvas/nodeBag/equip':'Canvas/otherBag/equip');
-        var node = father.getChildByName('equip'+puton);
-        if(!node){
-            node = new cc.Node();
-            node.name = 'equip'+puton;
-            node.setPosition(ag.gameConst.putonPositionArray[puton]);
-            node.addComponent(cc.Sprite);
-            father.addChild(node);
-        }
-        var sprite = node.getComponent(cc.Sprite);
-        sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+mst.id.substr(1));
-        node.off(cc.Node.EventType.TOUCH_END);
-        node.on(cc.Node.EventType.TOUCH_END, function (event) {
-            cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
-            var nodeItemInfo = cc.find('Canvas/nodeItemInfo');
-            nodeItemInfo.active = true;
-            nodeItemInfo.getComponent('ItemInfoNode').setItemId(id);
-        }.bind(this));
+        if(role==this._player || father.active){
+            var node = father.getChildByName('equip'+puton);
+            if(!node){
+                node = new cc.Node();
+                node.name = 'equip'+puton;
+                node.setPosition(ag.gameConst.putonPositionArray[puton]);
+                node.addComponent(cc.Sprite);
+                father.addChild(node);
+            }
+            var sprite = node.getComponent(cc.Sprite);
+            sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
+            node.off(cc.Node.EventType.TOUCH_END);
+            node.on(cc.Node.EventType.TOUCH_END, function (event) {
+                cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+                var nodeItemInfo = cc.find('Canvas/nodeItemInfo');
+                nodeItemInfo.active = true;
+                nodeItemInfo.getComponent('ItemInfoNode').setItemId(id);
+            }.bind(this));
 
 
-        //衣服
-        var aniPos = cc.p(-2,-80);
-        var scale = 2;
-        var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
-        if(mst.type==2){
-            if(father.clothe)father.clothe.getComponent(AGAni).putCache();
-            var name = (role._data.sex==0?'ani/hum0/000':'ani/hum1/001');
-            name = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid].model;
-            var node = ag.jsUtil.getNode(father,name+array[0],parseInt(array[1]),1,0.3);
-            node.setPosition(aniPos);
-            node.scale = scale;
-            father.clothe = node;
-            if(father.weapon)father.clothe.getComponent(AGAni).addControl(father.weapon.getComponent(AGAni));
-            if(father.wing)father.clothe.getComponent(AGAni).addControl(father.wing.getComponent(AGAni));
+            //衣服
+            var aniPos = cc.p(-2,-50);
+            var scale = 1.5;
+            var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
+            if(mst.type==2){
+                if(father.clothe)father.clothe.getComponent(AGAni).putCache();
+                var name = (role._data.sex==0?'ani/hum0/000':'ani/hum1/001');
+                name = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid].model;
+                var node = ag.jsUtil.getNode(father,name+array[0],parseInt(array[1]),1,0.3);
+                node.setPosition(aniPos);
+                node.scale = scale;
+                father.clothe = node;
+                if(father.weapon)father.clothe.getComponent(AGAni).addControl(father.weapon.getComponent(AGAni));
+                if(father.wing)father.clothe.getComponent(AGAni).addControl(father.wing.getComponent(AGAni));
+            }
+            //武器
+            if(mst.type==0){
+                if(father.weapon)father.weapon.getComponent(AGAni).putCache();
+                var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
+                var node1 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),0,0.3);
+                if(father.clothe)father.clothe.getComponent(AGAni).addControl(node1.getComponent(AGAni));
+                node1.setPosition(aniPos);
+                node1.scale = scale;
+                father.weapon = node1;
+            }
+            //翅膀
+            if(mst.type==6){
+                if(father.wing)father.wing.getComponent(AGAni).putCache();
+                var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
+                var node2 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),2,0.3);
+                if(father.clothe)father.clothe.getComponent(AGAni).addControl(node2.getComponent(AGAni));
+                node2.setPosition(aniPos);
+                node2.scale = scale;
+                father.wing = node2;
+            }
+            this.resetPlayerProp(role);
         }
-        //武器
-        if(mst.type==0){
-            if(father.weapon)father.weapon.getComponent(AGAni).putCache();
-            var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
-            var node1 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),0,0.3);
-            if(father.clothe)father.clothe.getComponent(AGAni).addControl(node1.getComponent(AGAni));
-            node1.setPosition(aniPos);
-            node1.scale = scale;
-            father.weapon = node1;
-        }
-        //翅膀
-        if(mst.type==6){
-            if(father.wing)father.wing.getComponent(AGAni).putCache();
-            var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
-            var node2 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),2,0.3);
-            if(father.clothe)father.clothe.getComponent(AGAni).addControl(node2.getComponent(AGAni));
-            node2.setPosition(aniPos);
-            node2.scale = scale;
-            father.wing = node2;
-        }
-        if(role == this._player)this.resetPlayerProp();
     },
 
 
@@ -804,11 +808,16 @@ cc.Class({
         cc.find('Canvas/otherBag').active = true;
         var father = cc.find('Canvas/otherBag/equip');
         if(father.clothe)father.clothe.getComponent(AGAni).putCache();
+        father.clothe=undefined;
         father.weapon=undefined;
         father.wing=undefined;
-        father.title = undefined;
-        father.destroyAllChildren();
-        father.removeAllChildren();
+        var array = father.children;
+        for(var i=array.length-1;i>=0;--i){
+            if(array[i].name!='labelTitle' && array[i].name!='labelProp'){
+                array[i].destroy();
+                array[i].removeFromParent();
+            }
+        }
         this.defaultRoleAni(role);
         for(var key in ag.userInfo._itemMap){
             var data = ag.userInfo._itemMap[key]._data;
@@ -822,21 +831,13 @@ cc.Class({
     //默认的角色模型
     defaultRoleAni:function(role){
         var father = cc.find(role==this._player?'Canvas/nodeBag/equip':'Canvas/otherBag/equip');
-
-
-        if(!father.title){
-            var node = new cc.Node();
-            var tips = node.addComponent(cc.Label);
-            node.setPosition(0, 91);
-            tips.fontSize = 16;
-            father.addChild(node,99);
-            var outline = node.addComponent(cc.LabelOutline);
-            outline.color = cc.color(0, 0, 0);
-            outline.width = 1;
-            father.title = node;
-            tips.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
+        if(!father.labelTitle){
+            father.labelTitle = father.getChildByName('labelTitle').getComponent(cc.Label);
         }
-
+        if(!father.labelProp){
+            father.labelProp = father.getChildByName('labelProp').getComponent(cc.Label);
+        }
+        this.resetPlayerProp(role);
 
         var aniPos = cc.p(-2,-50);
         var scale = 1.5;
@@ -853,20 +854,21 @@ cc.Class({
 
 
     //属性显示
-    resetPlayerProp:function(){
-        var mst = this._player.getMst();
-        var lv = this._player._data.level;
+    resetPlayerProp:function(role){
+        var father = cc.find(role==this._player?'Canvas/nodeBag/equip':'Canvas/otherBag/equip');
+        var mst = role.getMst();
+        var lv = role._data.level;
         var hurt = mst.hurt+Math.floor(mst.hurtAdd*lv);
         var defense = mst.defense+Math.floor(mst.defenseAdd*lv);
-        for(var i=0;i<this._player._equipArray.length;++i){
-            if(this._player._equipArray[i]){
-                var itemMst = ag.gameConst._itemMst[ag.userInfo._itemMap[this._player._equipArray[i]]._data.mid];
+        for(var i=0;i<role._equipArray.length;++i){
+            if(role._equipArray[i]){
+                var itemMst = ag.gameConst._itemMst[ag.userInfo._itemMap[role._equipArray[i]]._data.mid];
                 if(itemMst.hurt)hurt+=itemMst.hurt;
                 if(itemMst.defense)defense+=itemMst.defense;
             }
         }
-        this._equipArray[5].string = '攻击:'+hurt;
-        this._equipArray[6].string = '防御:'+defense;
+        father.labelTitle.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
+        father.labelProp.string = '攻击:'+hurt+' 防御:'+defense;
     },
 
 
@@ -888,7 +890,7 @@ cc.Class({
             var mst = ag.gameConst._itemMst[array[i]._data.mid];
             var node = new cc.Node();
             var sprite = node.addComponent(cc.Sprite);
-            sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+mst.id.substr(1));
+            sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
             bag.addChild(node);
         }
 
@@ -896,7 +898,7 @@ cc.Class({
         this._scrollViewList.setCount(array.length);
         this._scrollViewList.setCallback(function(item,index){
             var data = ag.gameConst._itemMst[array[index]._data.mid];
-            item.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+data.id.substr(1));
+            item.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+data.id.substr(1));
             item.getChildByName('spriteIcon').setScale(2);
             item.getChildByName('labelName').getComponent(cc.Label).string = this.getItemBagShow(data);
             item.off('touchstart');
@@ -956,7 +958,7 @@ cc.Class({
 
         for(var i=0;i<array.length;++i){
             var mst = ag.gameConst._itemMst[array[i]._data.mid];
-            this._equipArray[mst.type].spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('000'+mst.id.substr(1));
+            this._equipArray[mst.type].spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
             this._equipArray[mst.type].node.setScale(2);
         }
 
@@ -981,16 +983,46 @@ cc.Class({
 
 
     //获得属性显示
-    getItemBagShow:function (data) {
-        return data.name+(data.hurt?'\n攻击力:'+data.hurt:'')+(data.defense?'\n防御:'+data.defense:'');
+    getItemBagShow:function (mst) {
+        var str = '性别职业:';
+        if(mst.exclusive.length==1){
+            var tempArray = ['男战','女战','男法','女法','男道','女道'];
+            str = str+tempArray[mst.exclusive[0]];
+        }else if(mst.exclusive.length==2){
+            if(mst.exclusive[0]==0){
+                str = str+'战士';
+            }else if(mst.exclusive[0]==2){
+                str = str+'法师';
+            }else if(mst.exclusive[0]==4){
+                str = str+'道士';
+            }
+        }else if(mst.exclusive.length==3){
+            if(mst.exclusive[0]==0){
+                str = str+'男';
+            }else if(mst.exclusive[0]==1){
+                str = str+'女';
+            }
+        }else if(mst.exclusive.length==6){
+            str = str+'全部';
+        }
+        var prop = '\n';
+        if(mst.hurt){
+            prop = prop+'攻击:'+mst.hurt;
+            if(mst.defense) prop = prop+' ';
+        }
+        if(mst.defense){
+            prop = prop+'防御:'+mst.defense;
+        }
+        return mst.name+prop+'\n'+str+'\n等级:'+mst.level;
     },
 
 
     //聊天按钮
     buttonShowChatNode:function(){
-        cc.find('Canvas/nodeChat').active = true;
+        var node = cc.find('Canvas/nodeChatContent/spriteBack');
+        node.active = !node.active;
         if(!(cc.sys.isMobile && cc.sys.isBrowser)){
-            var editbox = cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox);
+            var editbox = cc.find('Canvas/nodeChatContent/spriteBack/editBoxName').getComponent(cc.EditBox);
             editbox.stayOnTop = true;
             editbox.setFocus();
         }
@@ -1006,8 +1038,8 @@ cc.Class({
     //回车发送信息
     editBoxConfirm: function (sender) {
         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
-        cc.find('Canvas/nodeChat').active = false;
-        cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
+        //cc.find('Canvas/nodeChat').active = false;
+        cc.find('Canvas/nodeChatContent/spriteBack/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
         if(sender.string.length>0){
             ag.agSocket.send("chatYou",sender.string);
             sender.string = '';
@@ -1026,7 +1058,7 @@ cc.Class({
             node.color = cc.color(255,255,255);
             tips.string = content;
             role.node.addChild(node,30);
-            node.runAction(cc.sequence(cc.delayTime(3), cc.fadeOut(0.2),cc.callFunc(function(){
+            node.runAction(cc.sequence(cc.delayTime(5), cc.fadeOut(0.2),cc.callFunc(function(){
                 node.destroy();
             })));
         }
@@ -1043,7 +1075,25 @@ cc.Class({
         lb.opacity = 255;
         lb.getComponent(cc.Label).string = ""+name+' : '+content;
         lb.stopAllActions();
-        lb.runAction(cc.sequence(cc.delayTime(15),cc.fadeOut(2)));
+        lb.runAction(cc.sequence(cc.delayTime(30),cc.fadeOut(2)));
+
+        //保存到聊天记录里面
+        var scrollview = cc.find('Canvas/nodeChatContent/spriteBack/scrollView').getComponent(cc.ScrollView);
+        var contentNode = scrollview.content;
+        var itemNode = contentNode.getChildByName('item');
+        if(!this._chatStringHistoryArray)this._chatStringHistoryArray = [];
+        this._chatStringHistoryArray.push(""+name+' : '+content);
+        if(this._chatStringHistoryArray.length>=50)this._chatStringHistoryArray.splice(0,1);
+        var str = '';
+        for(var i=0;i<this._chatStringHistoryArray.length;++i){
+            str = str + this._chatStringHistoryArray[i];
+            if(i!=this._chatStringHistoryArray.length-1)str = str + '\n';
+        }
+        itemNode.getComponent(cc.Label).string = str;
+        //itemNode.y = Math.max(0,itemNode.height-400);
+        contentNode.height = Math.max(itemNode.height,200);
+        scrollview.scrollToBottom();
+
     },
 
 
@@ -1118,20 +1168,14 @@ cc.Class({
                     label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
                         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
                         var npcStr = transferMst.name;
-                        if(npcStr=='一级回收' || npcStr=='二级回收' || npcStr=='三级回收'){
-                            var curLevel = 1;
-                            if(npcStr=='一级回收'){
-                                curLevel = 1;
-                            }else if(npcStr=='二级回收'){
-                                curLevel = 2;
-                            }else if(npcStr=='三级回收'){
-                                curLevel = 3;
-                            }
-
+                        if(npcStr=='比奇城市'){
+                            ag.jsUtil.showText(self.node,"比奇城限制52级以上！");
+                        }else if(npcStr=='四级以下回收' || npcStr=='五级回收' || npcStr=='六级回收' || npcStr=='七级回收' || npcStr=='八级回收' || npcStr=='九级回收'){
+                            var curLevels = transferMst.levels;
                             var array = [];
                             for(var key in ag.userInfo._itemMap){
                                 var obj = ag.userInfo._itemMap[key];
-                                if(obj._data.owner==self._player._data.id && typeof obj._data.puton!='number' && ag.gameConst._itemMst[obj._data.mid].level==curLevel){
+                                if(obj._data.owner==self._player._data.id && typeof obj._data.puton!='number' && curLevels.indexOf(ag.gameConst._itemMst[obj._data.mid].level)!=-1){
                                     var id = obj._data.id;
                                     array.push(id);
                                     ag.userInfo._itemMap[id]._data.owner = undefined;

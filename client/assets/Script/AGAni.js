@@ -3,7 +3,7 @@
  * 动画
  */
 
-var AGAniOffset = require("AGAniOffset");
+//var AGAniOffset = require("AGAniOffset");
 cc.Class({
     extends: cc.Component,
     properties: {},

@@ -84,7 +84,7 @@ cc.Class({
         //this._nodeLoading.active = true;
         //this._netState.active = false;
         this._nodeLoading.setShow("预制资源加载中");
-        var array = ['prefab/nodeAlert','prefab/nodeRoleProp','prefab/nodeTouchSprite','prefab/nodeRequest'];
+        var array = ['prefab/nodeRequest'];
         cc.loader.loadResArray(array, cc.Prefab,function(num, totalNum, item){
             this._nodeLoading.setPercent("("+Math.floor(num/totalNum*100)+"%)");
         }.bind(this),function (err, atlas) {
