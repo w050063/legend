@@ -247,8 +247,8 @@ module.exports = ag.class.extend({
             }
             for(var i=0;i<items.length;++i){
                 var i1 = items[i];
-                var i2 = map[i1.id]._data;
-                if(i2){
+                if(map[i1.id]){
+					var i2 = map[i1.id]._data;
                     var puton = (typeof i2.puton=='number')?i2.puton:-1;
                     if(i1.mid!=i2.mid || i1.owner!=i2.owner || i1.puton!=puton){
                         var sql = 'UPDATE t_items SET mid = "' + i2.mid

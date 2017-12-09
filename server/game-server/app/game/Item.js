@@ -8,7 +8,14 @@ var baseItemId = 0;
 module.exports = ag.class.extend({
     ctor:function (mid,mapId,location,id) {
         this._data = {};
-        this._data.id = id?id:('i'+(++baseItemId));
+        if(id){
+            this._data.id = id;
+        }else{
+            this._data.id = 'i'+(++baseItemId);
+            while(ag.itemManager._itemMap.get(this._data.id)){
+                this._data.id = 'i'+(++baseItemId);
+            }
+        }
         this._data.mid = mid;
         if(mapId)this._data.mapId = mapId;
         if(location){

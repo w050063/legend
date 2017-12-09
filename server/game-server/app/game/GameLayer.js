@@ -29,16 +29,19 @@ module.exports = {
 
         //每隔30秒发送一次在线人数
         ag.actionManager.schedule(this,30,function (dt) {
-            if(Math.random()>0.5){
-                ag.jsUtil.sendDataAll("sSystemNotify","当前在线人数："+ag.jsUtil.getClientCount());
+            var rand = Math.random();
+            if(rand<0.33){
+                ag.jsUtil.sendDataAll("sSystemNotify","当前在线人数："+(ag.jsUtil.getClientCount()*3+Math.floor(Math.random()*6)));
+            }else if(rand<0.66){
+                ag.jsUtil.sendDataAll("sSystemNotify","提示：战士刺杀第二格无视防御！");
             }else{
-                ag.jsUtil.sendDataAll("sSystemNotify","特别提醒：安全区外可随意杀人！");
+                ag.jsUtil.sendDataAll("sSystemNotify","提示：安全区外可随意杀人！");
             }
         }.bind(this));
 
 
         //定时保存到数据库
-        ag.actionManager.schedule(this,5,function (dt) {
+        ag.actionManager.schedule(this,120,function (dt) {
             var array = [];
             for(var key in this._roleMap){
                 var role = this._roleMap[key];

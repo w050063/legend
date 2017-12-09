@@ -35,7 +35,7 @@ module.exports = ag.class.extend({
         var role = ag.gameLayer.getRole(id);
         if(role){
             //var array = ['i000','i001','i014','i019','i026','i033','i038','i045','i048','i055','i059','i063','i066'];
-            var array = ['i000','i001','i014'];
+            var array = ['i001000','i001200','i001201'];
             for(var i=0;i<array.length;++i){
                 var item = new Item(array[i]);
                 item._duration = 0;
@@ -60,6 +60,41 @@ module.exports = ag.class.extend({
                     this._itemMap.add(item);
                     ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
                 }
+            }
+        }
+    },
+
+
+    dropByLevel:function (level,rate,mapId,location) {
+        var map = ag.gameConst._itemMst;
+        for(var key in map){
+            if(map[key].level==level){
+                var rand = Math.random()*100;
+                if(rand<rate){
+                    var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+                    pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+                    var item = new Item(key,mapId,pos);
+                    item._duration = ag.gameConst.itemDuration;
+                    this._itemMap.add(item);
+                    ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
+                }
+            }
+        }
+
+        //6级以上boss必爆圣战铜域系列装备2个
+        if(level>=6){
+            var tempArray = ['i001101','i001102','i001103','i001104','i001105','i001106',
+                'i001304','i001305','i001306','i001307','i001308','i001309',
+                'i001404','i001405','i001406','i001407','i001408','i001409',
+                'i001504','i001505','i001506','i001507','i001508','i001509'];
+            for(var i=0;i<2;++i){
+                var rand = Math.floor(Math.random()*tempArray.length);
+                var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+                pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+                var item = new Item(tempArray[rand],mapId,pos);
+                item._duration = ag.gameConst.itemDuration;
+                this._itemMap.add(item);
+                ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
             }
         }
     },
@@ -100,7 +135,7 @@ module.exports = ag.class.extend({
 
     //背包装备回收
     bagItemRecycle:function(array,rid){
-        var expArray = [20,50,300];
+        var expArray = [20,20,20,20,100,200,300,400,500];
         var role = ag.gameLayer.getRole(rid);
         if(role){
             var sum = 0;

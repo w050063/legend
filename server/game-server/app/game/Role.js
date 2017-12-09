@@ -25,7 +25,7 @@ module.exports = ag.class.extend({
         this._data.hp = this._totalHP;
         this._totalExp = this.getTotalExpFromDataBase();
         this._exp = exp?exp:0;
-        this._heal = mst.heal+Math.floor(mst.healAdd*lv);
+        this._heal = this.getIsPlayer()?(mst.heal+Math.floor(mst.healAdd*lv)):mst.heal;
         this._attackSpeed = mst.attackSpeed;
         this._moveSpeed = mst.moveSpeed;
         this.refreshItemProp();
@@ -61,20 +61,25 @@ module.exports = ag.class.extend({
 
     refreshItemProp:function(){
         var mst = this.getMst();
-        var lv = this._data.level;
-        var hurt = mst.hurt+Math.floor(mst.hurtAdd*lv);
-        var defense = mst.defense+Math.floor(mst.defenseAdd*lv);
-        var map = ag.itemManager._itemMap.getMap();
-        for (var key in map) {
-            var obj = map[key]._data;
-            if (obj.owner == this._data.id && typeof obj.puton=='number') {
-                var itemMst = ag.gameConst._itemMst[obj.mid];
-                if(itemMst.hurt)hurt+=itemMst.hurt;
-                if(itemMst.defense)defense+=itemMst.defense;
+        if(this.getIsPlayer()){
+            var lv = this._data.level;
+            var hurt = mst.hurt+Math.floor(mst.hurtAdd*lv);
+            var defense = mst.defense+Math.floor(mst.defenseAdd*lv);
+            var map = ag.itemManager._itemMap.getMap();
+            for (var key in map) {
+                var obj = map[key]._data;
+                if (obj.owner == this._data.id && typeof obj.puton=='number') {
+                    var itemMst = ag.gameConst._itemMst[obj.mid];
+                    if(itemMst.hurt)hurt+=itemMst.hurt;
+                    if(itemMst.defense)defense+=itemMst.defense;
+                }
             }
+            this._hurt = hurt;
+            this._defense = defense;
+        }else{
+            this._hurt = mst.hurt;
+            this._defense = mst.defense;
         }
-        this._hurt = hurt;
-        this._defense = defense;
     },
 
 
@@ -323,7 +328,7 @@ module.exports = ag.class.extend({
 
             //启动毒
             ag.buffManager.setPoison(locked,this);
-        }else if(this._data.type=='m8' || this._data.type=='m9') {
+        }else if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27") {
             var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(),this.getMst().attackDistance);
             for (var i = 0; i < array.length; ++i) {
                 var tempRole = array[i];
@@ -400,9 +405,17 @@ module.exports = ag.class.extend({
         this._state = ag.gameConst.stateDead;
         
         //掉落装备
-        var str = ag.gameConst._roleMst[this._data.type].drop;
-        if(str){
-            ag.itemManager.drop(str,this._data.mapId,this.getLocation());
+        if(this.getIsMonster()){
+            var str = ag.gameConst._roleMst[this._data.type].drop;
+            if(str){
+                ag.itemManager.drop(str,this._data.mapId,this.getLocation());
+            }
+            var array = ag.gameConst._roleMst[this._data.type].dropLevels;
+            if(array){
+                for(var i=0;i<array.length;i=i+2){
+                    ag.itemManager.dropByLevel(array[i],array[i+1],this._data.mapId,this.getLocation());
+                }
+            }
         }
         
         

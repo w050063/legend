@@ -29,7 +29,7 @@ module.exports = ag.class.extend({
             }
         }
         if(bFind)return 2;
-        this._infoMap[key].name = name;
+        this._infoMap[id].name = name;
         var role = ag.gameLayer.getRole(id);
         if(role){
             role._data.name = name;
