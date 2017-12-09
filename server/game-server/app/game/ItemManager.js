@@ -210,7 +210,7 @@ module.exports = ag.class.extend({
     addItem:function(item){
         ag.itemManager._itemMap.add(item);
         var rid = item._data.owner;
-        if(rid){
+        if(rid && typeof item._data.puton!='number'){
             if(!this._bagLengthMap[rid])this._bagLengthMap[rid] = 0;
             ++this._bagLengthMap[rid];
         }
