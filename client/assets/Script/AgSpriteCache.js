@@ -12,26 +12,17 @@ cc.Class({
     //初始化角色
     init: function (str,n) {
         this._cacheArray = [];
-        this._cacheNobilityArray = [];
-        this._cacheMaxCount = 200;
+        this._cacheMaxCount = 300;
         this._downloadArray = [];
         this._bLoading = false;
         this._waitFrameArray = [];
-        //this._test = 0;
-        //this._atlasArray = [];
+        this._fileMap = {};
     },
     
-    
+
     //增加一个任务,挂一个组建监听销毁  onDestroy
-    get:function (name,callback,bNobility) {
-        for(var i=this._cacheNobilityArray.length-1;i>=0;--i){
-            var sprite = this._cacheNobilityArray[i];
-            if(sprite._agName==name){
-                this._cacheNobilityArray.splice(i,1);
-                if(callback)callback(sprite);
-                return sprite;
-            }
-        }
+    get:function (name,callback) {
+        var timeCounter = new Date().getTime();
         for(var i=this._cacheArray.length-1;i>=0;--i){
             var sprite = this._cacheArray[i];
             if(sprite._agName==name){
@@ -44,21 +35,12 @@ cc.Class({
         var before = name.substr(0,pos);
         var after = name.substr(pos+1);
         var i=0;
-        for(;i<100;++i){
+        for(;i<3;++i){//默认顶多2个备用plist
             var trueBefore = i==0?before:(before+'_'+i);
-            var atlas = cc.loader.getRes(trueBefore,cc.SpriteAtlas);
-            if(atlas){
-                if(atlas.getSpriteFrame(after)){
-                    break;
-                }
+            if(this._fileMap[trueBefore]){
+                if(this._fileMap[trueBefore].indexOf(after)!=-1)break;
             }else{
-                if(this._downloadArray.indexOf(trueBefore)==-1){
-                    if(bNobility){
-                        this._downloadArray.splice(0,0,trueBefore);
-                    }else{
-                        this._downloadArray.push(trueBefore);
-                    }
-                }
+                if(this._downloadArray.indexOf(trueBefore)==-1)this._downloadArray.push(trueBefore);
                 break;
             }
         }
@@ -67,7 +49,6 @@ cc.Class({
         sprite.trim = false;
         this._waitFrameArray.push(sprite);
         sprite._agName = name;
-        if(bNobility)sprite._bNobility = true;
         if(i!=0)sprite._agTime = i;
         sprite._agCallback = callback;
         return sprite;
@@ -75,33 +56,19 @@ cc.Class({
 
     //将一个用完的节点放回池中
     put : function(sprite){
-        //sprite.node.destroy();
-        //return;
         if(cc.isValid(sprite) && cc.isValid(sprite.node)){
-            if(sprite && sprite._agName && sprite.spriteFrame){
+            if(sprite && sprite.spriteFrame){
                 sprite.node.setPosition(cc.p(0,0));
                 sprite.node.setScale(1);
                 sprite.node.setColor(cc.color(255,255,255));
                 sprite.node.removeFromParent();
-                if(sprite._bNobility){
-                    if(this._cacheNobilityArray.length>=this._cacheMaxCount){
-                        var temp = this._cacheNobilityArray[0];
-                        this._cacheNobilityArray.splice(0,1);
-                        if(this._cacheArray.length>=this._cacheMaxCount){
-                            this._cacheArray[0].destroy();
-                            this._cacheArray.splice(0,1);
-                        }
-                        this._cacheArray.push(temp);
-                    }
-                    this._cacheNobilityArray.push(sprite);
-                }else{
-                    if(this._cacheArray.length>=this._cacheMaxCount){
-                        this._cacheArray[0].destroy();
-                        this._cacheArray.splice(0,1);
-                    }
-                    this._cacheArray.push(sprite);
+                if(this._cacheArray.length>=this._cacheMaxCount){
+                    this._cacheArray[0].destroy();
+                    this._cacheArray.splice(0,1);
                 }
+                this._cacheArray.push(sprite);
             }else{
+                sprite.node.removeFromParent();
                 sprite.node.destroy();
             }
         }
@@ -114,7 +81,7 @@ cc.Class({
             //先显示图片10张，再进行下载，最后处理无法显示的图片
             var bDisposeCount = 0;
             var index = 0;
-            while(index<this._waitFrameArray.length && bDisposeCount<15){
+            while(index<this._waitFrameArray.length && bDisposeCount<10){
                 var sprite = this._waitFrameArray[index];
                 if(cc.isValid(sprite) && cc.isValid(sprite.node)){
                     var name = sprite._agName;
@@ -151,6 +118,13 @@ cc.Class({
                     if(this._bLoading==false){
                         this._bLoading = true;
                         cc.loader.loadRes(this._downloadArray[0],cc.SpriteAtlas,function(err,atlas){
+                            var tempArray = atlas.getSpriteFrames();
+                            var tempArray2 = [];
+                            for(var i=0;i<tempArray.length;++i){
+                                tempArray2.push(tempArray[i].name);
+                            }
+                            this._fileMap[this._downloadArray[0]] = tempArray2;
+
                             //this._atlasArray.push(this._downloadArray[0]);
                             //++this._test;
                             //cc.log("heihei2:"+this._test);
@@ -167,8 +141,7 @@ cc.Class({
                             var before = name.substr(0,pos);
                             var trueBefore = before;
                             if(sprite._agTime)trueBefore = before+'_'+sprite._agTime;
-                            var atlas = cc.loader.getRes(trueBefore,cc.SpriteAtlas);
-                            if(atlas){
+                            if(this._fileMap[trueBefore]){
                                 if(!sprite._agTime)sprite._agTime = 0;
                                 ++sprite._agTime;
                                 trueBefore = before+'_'+sprite._agTime;

@@ -86,7 +86,7 @@ module.exports={
 
 
     getEffect:function(father,name,count,zorder,interval){
-        return this.getNode(father,name,count,zorder,interval,function(sender){sender.node.destroy();}.bind(this));
+        return this.getNode(father,name,count,zorder,interval,function(sender){sender.putCache();}.bind(this));
     },
 
 

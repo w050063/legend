@@ -303,7 +303,7 @@ module.exports= {
         m23:{id:"m23",name:"鼠王",hp:10000,defense:10,hurt:100,expDead:1000,heal:100,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum54/054",drop:'i001902,100',dropLevels:[7,5],lv:7},
         m24:{id:"m24",name:"牛魔王",hp:10000,defense:10,hurt:100,expDead:1000,heal:100,
-            moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum25/026",drop:'i001900,100',dropLevels:[7,5],lv:7},
+            moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum26/026",drop:'i001900,100',dropLevels:[7,5],lv:7},
         m25:{id:"m25",name:"嗜血魔王",hp:8000,defense:10,hurt:100,expDead:800,heal:100,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum55/055",drop:'i001010,20,i001011,20,i001012,20',dropLevels:[],lv:6},
         m26:{id:"m26",name:"幻灵魔王",hp:8000,defense:10,hurt:100,expDead:800,heal:100,

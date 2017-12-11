@@ -354,7 +354,7 @@ cc.Class({
 
     //增加一个角色
     addRole:function(data){
-        if(!this.getRole(data.id)){
+        if(!this.getRole(data.id) && data.mapId==this._player._data.mapId){
             var node = new cc.Node();
             var role = node.addComponent(Role);
             this._map.node.addChild(node);
@@ -691,7 +691,6 @@ cc.Class({
         var data = ag.userInfo._itemMap[id]._data;
         var mst = ag.gameConst._itemMst[data.mid];
         var success = this._player.delEquip(id);
-        cc.log('success:'+success);
         if(success){
             //var puton = ag.gameConst.putonTypes.indexOf(mst.type);
             cc.log('puton:'+puton);

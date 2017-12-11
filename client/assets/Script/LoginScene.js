@@ -27,4 +27,9 @@ cc.Class({
             cc.director.loadScene('CreateRoleScene');
         });
     },
+
+
+    theCountryIsAtPeace: function() {
+        ag.agSocket.send("theCountryIsAtPeace",'');
+    },
 });

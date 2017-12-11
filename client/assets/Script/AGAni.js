@@ -18,14 +18,20 @@ cc.Class({
         this._running = true;
         this._interval = 1;
         this._finishedCallback = null;
-        this._bNobility = undefined;
 
 
         var pos = str.lastIndexOf('/');
         var before = str.substr(0,pos);//6是图片后面数字的长度,下同
         var after = parseInt(str.substr(pos+1));
         for(var i=0;i<n;++i){
-            this._spriteFrameArray.push(before+'/'+this.pad(after+i,6));
+            var curAfter = this.pad(after+i,6);
+            var curStr = before+'/'+curAfter;
+            var sprite = ag.spriteCache.get(curStr);
+            if(!sprite._customAniPosition){
+                var array = AGAniOffset[curAfter].split(",");
+                sprite._customAniPosition = cc.p(parseInt(array[0]),parseInt(array[1]));
+            }
+            this._spriteFrameArray.push(sprite);
         }
         this.modifyFrame();
     },
@@ -59,21 +65,16 @@ cc.Class({
         this._finishedCallback = callback;
     },
 
-    setNobility:function(b){
-        this._bNobility = b;
-    },
-
 
     modifyFrame:function(){
-        if(this.node.childrenCount>0)ag.spriteCache.put(this.node.children[0].getComponent(cc.Sprite));
-        var str = this._spriteFrameArray[this._curIndex];
-        var sprite = ag.spriteCache.get(str,undefined,this._bNobility);
-        var pos = str.lastIndexOf('/');
-        var after = str.substr(pos+1);
-        var array = AGAniOffset[after].split(",");
+        if(this.node.childrenCount>0){
+            this.node.children[0].removeFromParent();
+        }
+        var sprite = this._spriteFrameArray[this._curIndex];
         this.node.addChild(sprite.node);
         sprite.node.setColor(this.node.getColor());
-        sprite.node.setPosition(cc.p(parseInt(array[0]),parseInt(array[1])));
+        sprite.node.setPosition(sprite._customAniPosition);
+
 
         if(this._controllArray){
             for(var i=this._controllArray.length-1;i>=0;--i){
@@ -90,10 +91,10 @@ cc.Class({
     },
 
     putCache:function(){
-        if(this.node.childrenCount>0){
-            var sprite = this.node.children[0].getComponent(cc.Sprite);
-            ag.spriteCache.put(sprite);
+        for(var i=this._spriteFrameArray.length-1;i>=0;--i){
+            ag.spriteCache.put(this._spriteFrameArray[i]);
         }
+        this._spriteFrameArray = [];
         this._finishedCallback = undefined;
         this.delControll();
         delete this._bBeControll;
@@ -109,13 +110,16 @@ cc.Class({
             if(this._passTime>=this._interval){
                 this._passTime -= this._interval;
                 ++this._curIndex;
+                var bFinished = false;
                 if(this._curIndex>=this._spriteFrameArray.length) {
+                    bFinished = true;
                     this._curIndex = 0;
-                    if (this._finishedCallback){
-                        this._finishedCallback(this);
-                    }
                 }
                 this.modifyFrame();
+
+                if (bFinished && this._finishedCallback){
+                    this._finishedCallback(this);
+                }
             }
         }
     },
