@@ -26,6 +26,7 @@ module.exports = ag.class.extend({
         this.getRoles(function(rows){
             for(var i=0;i<rows.length;++i){
                 var data = rows[i];
+                if(data.camp==ag.gameConst.campNpc || data.camp==ag.gameConst.campMonster)data.camp=ag.gameConst.campPlayerNone;//防错处理
                 ag.gameLayer.addPlayer(data.id,data.map_id,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,data.exp);
             }
         });
@@ -40,6 +41,7 @@ module.exports = ag.class.extend({
                 var role = ag.gameLayer.getRole(data.owner);
                 if(role){
                     ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
+                    role.refreshItemProp();
                 }
             }
         });
@@ -102,7 +104,7 @@ module.exports = ag.class.extend({
 
 
     setAccountName:function(id,name,callback){
-        if(id && name && name.indexOf(';')!=-1){
+        if(id && name && name.indexOf(';')==-1){
             name = crypto.toBase64(name);
             var sql = 'UPDATE t_accounts SET name = "' + name + '" WHERE id = "' + id + '"';
             this.query(sql, function(err, rows) {
@@ -211,6 +213,23 @@ module.exports = ag.class.extend({
                 }
             });
         }
+    },
+
+    deleteRole:function(id,callback){
+        var sql = 'DELETE FROM t_roles WHERE id = "' + id + '";';
+        this.query(sql, function(err, rows) {
+            if (err) {
+                if(err.code == 'ER_DUP_ENTRY'){
+                    if(callback)callback(false);
+                    return;
+                }
+                if(callback)callback(false);
+                throw err;
+            }
+            else{
+                if(callback)callback(true);
+            }
+        });
     },
 
 

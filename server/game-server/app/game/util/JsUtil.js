@@ -86,6 +86,17 @@ module.exports = {
     },
 
 
+    //获取一个id是否在线
+    getIsOnline:function(id){
+        var channelService = pomelo.app.get('channelService');
+        var channel = channelService.getChannel(this.dataChannel, true);
+        if(channel.getMember(id)){
+            return true;
+        }
+        return false;
+    },
+
+
     //发送要合并的数据
     sendData : function(route,msg,id){
         if(!this._sendObj[id])this._sendObj[id] = {};

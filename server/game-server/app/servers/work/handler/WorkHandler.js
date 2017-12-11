@@ -17,6 +17,12 @@ var Handler = cc.Class.extend({
     },
 
 
+    theCountryIsAtPeace:function(msg, session, next){
+        ag.gameLayer.theCountryIsAtPeace();
+        next();
+    },
+
+
     //进入游戏,0正确,1Id为空,2ID已经存在
     ykLogin:function(msg, session, next) {
         var data = null;
@@ -67,23 +73,9 @@ var Handler = cc.Class.extend({
 
     //删除角色,0正常，1不存在角色
     deleteRole:function(msg, session, next) {
-        var code = 1;
-        var player =  ag.gameLayer.getRole(session.uid);
-        if(player){
-            if(player._tiger){
-                ag.jsUtil.sendDataExcept("sDeleteRole",player._tiger._data.id,player._data.id);
-                ag.itemManager.delItemByRoleId(player._tiger._data.id);
-                player._tiger._data.camp=ag.gameConst.campMonster;
-                player._tiger._state = ag.gameConst.stateIdle;
-                player._tiger.dead();
-            }
-            ag.jsUtil.sendDataExcept("sDeleteRole",player._data.id,player._data.id);
-            ag.itemManager.delItemByRoleId(session.uid);
-            player._data.camp=ag.gameConst.campMonster;
-            player._state = ag.gameConst.stateIdle;
-            player.dead();
-            code = 0;
-        }
+        var code = 0;
+        ag.gameLayer.deleteRole(session.uid);
+        ag.db.setItems();//道具保存
         next(null, {
             code: code
         });

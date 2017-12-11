@@ -55,6 +55,56 @@ module.exports = {
 	},
 
 
+    //所有离线角色，土城归一
+    theCountryIsAtPeace:function(){
+        var array = [];
+        for(var key in this._roleMap){
+            var role = this._roleMap[key];
+            if(role.getIsPlayer() && ag.jsUtil.getIsOnline(role._data.id)==false){
+                if(role._state == ag.gameConst.stateDead){
+                    role.relife();
+                }
+                if(role._data.level<35){
+                    this.deleteRole(role._data.id);
+                }else{
+                    role.changeMap('t1');
+                    var x,y;
+                    for(var i=0;i<10;++i){
+                        x = 7+Math.floor(Math.random()*(26-7+1));
+                        y = 27+Math.floor(Math.random()*(46-27+1));
+                        if(!this._roleXYMap['t1'+','+x+','+y])break;
+                    }
+                    role.setLocation(ag.jsUtil.p(x,y));
+                }
+                array.push(role);
+            }
+        }
+        ag.db.setRoles(array);//角色保存
+        ag.db.setItems();//道具保存
+    },
+
+
+    //删除角色
+    deleteRole:function(id) {
+        var player =  this.getRole(id);
+        if(player){
+            if(player._tiger){
+                ag.jsUtil.sendDataExcept("sDeleteRole",player._tiger._data.id,player._data.id);
+                ag.itemManager.delItemByRoleId(player._tiger._data.id);
+                player._tiger._data.camp=ag.gameConst.campMonster;
+                player._tiger._state = ag.gameConst.stateIdle;
+                player._tiger.dead();
+            }
+            ag.jsUtil.sendDataExcept("sDeleteRole",player._data.id,player._data.id);
+            ag.itemManager.delItemByRoleId(id);
+            player._data.camp=ag.gameConst.campMonster;
+            player._state = ag.gameConst.stateIdle;
+            player.dead();
+            ag.db.deleteRole(id);
+        }
+    },
+
+
     //获得某玩家
     getRole:function(id){
         return this._roleMap[id];
