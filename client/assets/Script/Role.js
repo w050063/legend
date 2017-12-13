@@ -578,10 +578,10 @@ cc.Class({
                     ag.jsUtil.getEffect(this.node,"ani/effect3/"+(503000+this._data.direction*8),8,ag.gameConst.roleEffectZorder,0.1);
                 }
                 ag.buffManager.setCDForFireCrit(this,true);
-                cc.audioEngine.play(cc.url.raw("resources/voice/liehuo.mp3"),false,1);
+                if(this._agAni)cc.audioEngine.play(cc.url.raw("resources/voice/liehuo.mp3"),false,1);
             }else{
                 ag.jsUtil.getEffect(this.node,"ani/effect0/"+(500000+this._data.direction*6),6,ag.gameConst.roleEffectZorder,0.1);
-                cc.audioEngine.play(cc.url.raw(Math.random()>0.5?"resources/voice/cisha0.mp3":"resources/voice/cisha1.mp3"),false,1);
+                if(this._agAni)cc.audioEngine.play(cc.url.raw(Math.random()>0.5?"resources/voice/cisha0.mp3":"resources/voice/cisha1.mp3"),false,1);
             }
         }else if(this._data.type=="m1"){
             var pos = locked.getTruePosition();
@@ -598,7 +598,7 @@ cc.Class({
                     node.setPosition(pos);
                 }.bind(this));
             }
-            cc.audioEngine.play(cc.url.raw("resources/voice/mietianhuo.mp3"),false,1);
+            if(this._agAni)cc.audioEngine.play(cc.url.raw("resources/voice/mietianhuo.mp3"),false,1);
         }else if(this._data.type=="m2"){
             var pos1 = cc.pAdd(this.node.getPosition(),cc.p(0,60));
             var pos2 = cc.pAdd(locked.node.getPosition(),cc.p(0,60));
@@ -617,7 +617,7 @@ cc.Class({
             }.bind(this));
 
             ag.buffManager.setPoison(locked,this);//道士启用毒
-            cc.audioEngine.play(cc.url.raw("resources/voice/huofu.mp3"),false,1);
+            if(this._agAni)cc.audioEngine.play(cc.url.raw("resources/voice/huofu.mp3"),false,1);
         }else if(this._data.type=="m5" || this._data.type=="m18"){
             var pos1 = cc.pAdd(this.node.getPosition(),cc.p(0,60));
             var pos2 = cc.pAdd(locked.node.getPosition(),cc.p(0,35));
@@ -641,7 +641,7 @@ cc.Class({
             }
         }
         if(locked.getIsPlayer()){
-            cc.audioEngine.play(cc.url.raw(locked._data.sex==1?"resources/voice/behit1.mp3":"resources/voice/behit0.mp3"),false,1);
+            if(this._agAni)cc.audioEngine.play(cc.url.raw(locked._data.sex==1?"resources/voice/behit1.mp3":"resources/voice/behit0.mp3"),false,1);
         }
     },
 
