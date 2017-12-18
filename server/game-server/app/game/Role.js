@@ -237,14 +237,30 @@ module.exports = ag.class.extend({
     },
 
 
+    //掉血
+    changeHPByHurt:function(attacker,hurt,bCisha){
+        if(bCisha){
+            this._data.hp -= hurt;
+        }else{
+            var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
+            this._data.hp -=  Math.round(hurt/correct);
+        }
+        ag.jsUtil.sendDataAll("sHP",{id:this._data.id,hp:this._data.hp},this._data.mapId);
+
+        if(ag.gameLayer.isEnemyForAttack(attacker,this)) {
+            if (attacker._tiger && attacker._tiger != this && attacker._tiger._state != ag.gameConst.stateDead && !attacker._tiger._ai._locked)attacker._tiger._ai._locked = this;//如果有老虎，操作老虎攻击敌人。
+            if (this._tiger && this._tiger._state != ag.gameConst.stateDead && !this._tiger._ai._locked)this._tiger._ai._locked = attacker;//敌人有老虎，敌人老虎攻击自己。
+        }
+    },
+
+
     //攻击
     attack:function(locked){
         if(this._state==ag.gameConst.stateDead)return;
         var data = locked._data;
         var x = data.x, y = data.y;
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
-        if(this._tiger && this._tiger!=locked && this._tiger._state!=ag.gameConst.stateDead && !this._tiger._ai._locked)this._tiger._ai._locked = locked;//如果有老虎，操作老虎攻击敌人。
-        if(locked._tiger && locked._tiger._state!=ag.gameConst.stateDead && !locked._tiger._ai._locked)locked._tiger._ai._locked = this;//敌人有老虎，敌人老虎攻击自己。
+
 
 
         //伤害计算
@@ -260,11 +276,10 @@ module.exports = ag.class.extend({
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
-                        var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            tempRole._data.hp -= Math.round(this._hurt/correct*5);
+                            tempRole.changeHPByHurt(this,this._hurt*5);
                         }else{
-                            tempRole._data.hp -=  Math.round(this._hurt/correct);
+                            tempRole.changeHPByHurt(this,this._hurt);
                         }
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
@@ -277,10 +292,9 @@ module.exports = ag.class.extend({
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
-                            tempRole._data.hp -=  Math.round(this._hurt/correct*3);
+                            tempRole.changeHPByHurt(this,this._hurt*5);
                         }else{
-                            tempRole._data.hp -= this._hurt;
+                            tempRole.changeHPByHurt(this,this._hurt,true);
                         }
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
@@ -294,8 +308,7 @@ module.exports = ag.class.extend({
                         for(var k=0;k<array.length;++k){
                             var tempRole = array[k];
                             if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
-                                var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
-                                tempRole._data.hp -=  Math.round(this._hurt/correct);
+                                tempRole.changeHPByHurt(this,this._hurt);
                                 sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                             }
                         }
@@ -318,8 +331,7 @@ module.exports = ag.class.extend({
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
-                        var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
-                        tempRole._data.hp -=  Math.round(this._hurt/correct);
+                        tempRole.changeHPByHurt(this,this._hurt);
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }
@@ -333,8 +345,7 @@ module.exports = ag.class.extend({
             for (var i = 0; i < array.length; ++i) {
                 var tempRole = array[i];
                 if (ag.gameLayer.isEnemyForAttack(this,tempRole)) {
-                    var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
-                    tempRole._data.hp -= Math.round(this._hurt/correct);
+                    tempRole.changeHPByHurt(this,this._hurt);
                     sendArray.push({id: tempRole._data.id, hp: tempRole._data.hp});
                 }
             }
@@ -344,8 +355,7 @@ module.exports = ag.class.extend({
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
-                        var correct = tempRole._defense>=0 ? tempRole._defense/10+1 : -1/(tempRole._defense/10-1);
-                        tempRole._data.hp -=  Math.round(this._hurt/correct);
+                        tempRole.changeHPByHurt(this,this._hurt);
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }
@@ -372,7 +382,6 @@ module.exports = ag.class.extend({
 
         //删除本地死亡怪物数据,更新AI锁定
         for(var i=0;i<sendArray.length;++i){
-            ag.jsUtil.sendDataAll("sHP",sendArray[i],this._data.mapId);
             var beAttacker = ag.gameLayer._roleMap[sendArray[i].id];
             if(sendArray[i].hp<=0){
                 beAttacker.dead(this);

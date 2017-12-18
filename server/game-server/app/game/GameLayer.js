@@ -58,25 +58,31 @@ module.exports = {
     //所有离线角色，土城归一
     theCountryIsAtPeace:function(){
         var array = [];
+        var safe = ag.gameConst._terrainMap['t1'].safe;
         for(var key in this._roleMap){
             var role = this._roleMap[key];
             if(role.getIsPlayer() && ag.jsUtil.getIsOnline(role._data.id)==false){
-                if(role._state == ag.gameConst.stateDead){
-                    role.relife();
-                }
-                if(role._data.level<35){
+                if(role._data.level<44){
                     this.deleteRole(role._data.id);
                 }else{
-                    role.changeMap('t1');
-                    var x,y;
-                    for(var i=0;i<10;++i){
-                        x = 7+Math.floor(Math.random()*(26-7+1));
-                        y = 27+Math.floor(Math.random()*(46-27+1));
-                        if(!this._roleXYMap['t1'+','+x+','+y])break;
+                    var lx = role.getLocation().x,ly = role.getLocation().y;
+                    var xyStr = role.getMapXYString();
+                    if((!(role._data.mapId=='t1' && lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy))
+                        || (this._roleXYMap[xyStr] && this._roleXYMap[xyStr].length>=2)){
+                        if(role._state == ag.gameConst.stateDead){
+                            role.relife();
+                        }
+                        role.changeMap('t1');
+                        var x,y;
+                        for(var i=0;i<10;++i){
+                            x = 7+Math.floor(Math.random()*(26-7+1));
+                            y = 27+Math.floor(Math.random()*(46-27+1));
+                            if(!this._roleXYMap['t1'+','+x+','+y])break;
+                        }
+                        role.setLocation(ag.jsUtil.p(x,y));
+                        array.push(role);
                     }
-                    role.setLocation(ag.jsUtil.p(x,y));
                 }
-                array.push(role);
             }
         }
         ag.db.setRoles(array);//角色保存
@@ -255,8 +261,11 @@ module.exports = {
     //碰撞检测
     isCollision:function(mapId,x,y){
         var obj = ag.gameConst._terrainMap[mapId];
-        if(x<0 || x>=obj.mapX || y<0 || y>=obj.mapY)return true;
-        return obj.collision[y*obj.mapX+x]=='1';
+        if(obj){
+            if(x<0 || x>=obj.mapX || y<0 || y>=obj.mapY)return true;
+            return obj.collision[y*obj.mapX+x]=='1';
+        }
+        return true;
     },
 
 
