@@ -162,10 +162,11 @@ module.exports = ag.class.extend({
     },
 
 
-    insertRole:function(id,map_id,x,y,type,camp,sex,direction,level,exp,callback){
+    insertRole:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,callback){
+        return;
         if(id && map_id){
-            var sql = 'INSERT INTO t_roles(id,map_id,x,y,type,camp,sex,direction,level,exp) VALUES("'
-                + id + '","' + map_id+'",' + x+',' + y+',"' + type+'",' + camp+',' + sex+',' + direction+',' + level+',' + exp + ')';
+            var sql = 'INSERT INTO t_roles(id,map_id,x,y,type,camp,sex,direction,level,exp,gold) VALUES("'
+                + id + '","' + map_id+'",' + x+',' + y+',"' + type+'",' + camp+',' + sex+',' + direction+',' + level+',' + exp+',' + gold + ')';
             this.query(sql, function(err, rows) {
                 if (err) {
                     if(err.code == 'ER_DUP_ENTRY'){
@@ -184,6 +185,7 @@ module.exports = ag.class.extend({
 
 
     setRoles:function(array,callback){
+        return;
         var allSql = '';
         for(var i=0;i<array.length;++i){
             var role = array[i];
@@ -197,6 +199,7 @@ module.exports = ag.class.extend({
                 + ', direction = ' + data.direction
                 + ', level = ' + data.level
                 + ', exp = ' + role._exp
+                + ', gold = ' + data.gold
                 + ' WHERE id = "' + data.id + '";';
             allSql = allSql+sql;
             this.query(allSql, function(err, rows) {

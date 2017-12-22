@@ -124,6 +124,7 @@ module.exports = {
 		if(!player){
 			player = new Role();
             player._data = {};
+            player._data.gold = 0,
             player._data.id = id;
             player._data.type = type;
             if(map_id){

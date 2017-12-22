@@ -69,3 +69,8 @@ CREATE TABLE `t_chats` (
   `chat_time` varchar(16) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- alter table
+-- ----------------------------
+alter table t_roles add column gold int(8) NOT NULL DEFAULT 0;

@@ -72,7 +72,8 @@
     "required int32 level": 8,
     "required int32 hp": 9,
     "optional int32 sex": 10,
-    "optional string name": 11
+    "optional string name": 11,
+    "optional int32 gold": 12
   },
   "message sRelife": {
     "required string id": 1,
@@ -105,6 +106,7 @@
     "repeated sChatYou sChatYouArray": 18,
     "repeated string sSystemNotifyArray": 19,
     "repeated sRelife sRelifeArray": 20,
-    "repeated sCamp sCampArray": 21
+    "repeated sCamp sCampArray": 21,
+    "repeated int32 sAddGoldArray": 22
   }
 }

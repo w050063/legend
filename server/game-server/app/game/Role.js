@@ -163,12 +163,16 @@ module.exports = ag.class.extend({
         for(var key in ag.gameLayer._roleMap){
             var data = ag.gameLayer._roleMap[key]._data;
             if(data.mapId==this._data.mapId && data.id!=this._data.id){
+                //var temp = JSON.parse(JSON.stringify(data));
+                //delete temp.gold;
                 ag.jsUtil.sendData("sRole",data,this._data.id);
             }
         }
 
         //通知其他人。
-        ag.jsUtil.sendDataExcept("sRole",this._data,this._data.id);
+        //var temp = JSON.parse(JSON.stringify(this._data));
+        //delete temp.gold;
+        ag.jsUtil.sendDataExcept("sRole",data,this._data.id);
         if(this._tiger)ag.jsUtil.sendDataExcept("sRole",this._tiger._data,this._data.id);
 
         //发送装备情况
@@ -406,6 +410,12 @@ module.exports = ag.class.extend({
         }else{
             ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp},this._data.mapId);
         }
+    },
+
+
+    addGold:function(count){
+        this._data.gold += count;
+        ag.jsUtil.sendData("sAddGold",this._data.gold,this._data.id);
     },
 
 
