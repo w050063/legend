@@ -126,6 +126,7 @@ cc.Class({
         this._equipArray.push(0);
         this._equipArray.push(cc.find('Canvas/nodeBag/labelLevel').getComponent(cc.Label));
         this._equipArray.push(cc.find('Canvas/nodeBag/labelExp').getComponent(cc.Label));
+        this._labelGold = cc.find('Canvas/nodeBag/labelGold').getComponent(cc.Label);
 
         //聊天相关
         //var nodeChat = cc.find('Canvas/nodeChat');
@@ -164,6 +165,7 @@ cc.Class({
         this._roleMap[ag.userInfo._data.id] = this._player;
         this._player.init(ag.userInfo._data);
         this.defaultRoleAni(this._player);
+        this._labelGold.string = '元宝:'+this._player._data.gold;
 
         this.changeMap();
         //请求本地图所有角色

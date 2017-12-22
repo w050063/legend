@@ -145,6 +145,8 @@ module.exports={
                 if(player){
                     player.addExp(obj.value.level,obj.value.exp,obj.value.source);
                 }
+            }else if(obj.key=='sAddGoldArray'){
+                ag.gameLayer._player.addGold(obj.value);
             }else if(obj.key=='sDropArray'){
                 ag.gameLayer.dropItem(obj.value);
             }else if(obj.key=='sItemGroundDeleteArray'){

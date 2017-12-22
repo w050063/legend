@@ -194,6 +194,12 @@ cc.Class({
     },
 
 
+    addGold:function(count){
+        this._data.gold = count;
+        ag.gameLayer._labelGold.string = '元宝:'+this._data.gold;
+    },
+
+
     //获得策划数据
     getMst : function(){
         return ag.gameConst._roleMst[this._data.type];
