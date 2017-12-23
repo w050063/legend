@@ -21,7 +21,7 @@ module.exports={
         self._sessionId=id;
         if(self._step != 0)pomelo.disconnect();
         self._step = 0;
-        pomelo.init({host: "192.168.99.174",port: 3014,log: true}, function() {
+        pomelo.init({host: "192.168.2.110",port: 3014,log: true}, function() {
             pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
 				pomelo.disconnect(function () {
 					self._step = 1;
