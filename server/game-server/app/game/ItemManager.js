@@ -47,7 +47,7 @@ module.exports = ag.class.extend({
     },
 
 
-    drop:function (str,mapId,location) {
+    drop:function (rid,str,mapId,location) {
         var array = str.split(',');
         for(var i=0;i<array.length;++i){
             if(i%2==0){
@@ -57,6 +57,7 @@ module.exports = ag.class.extend({
                     pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
                     var item = new Item(array[i],mapId,pos);
                     item._duration = ag.gameConst.itemDuration;
+                    item._their = rid;
                     this._itemMap.add(item);
                     ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
                 }
@@ -65,7 +66,7 @@ module.exports = ag.class.extend({
     },
 
 
-    dropByLevel:function (level,rate,mapId,location) {
+    dropByLevel:function (rid,level,rate,mapId,location) {
         var map = ag.gameConst._itemMst;
         for(var key in map){
             if(map[key].level==level){
@@ -75,6 +76,7 @@ module.exports = ag.class.extend({
                     pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
                     var item = new Item(key,mapId,pos);
                     item._duration = ag.gameConst.itemDuration;
+                    item._their = rid;
                     this._itemMap.add(item);
                     ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
                 }

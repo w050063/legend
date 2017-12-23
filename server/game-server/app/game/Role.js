@@ -227,13 +227,18 @@ module.exports = ag.class.extend({
             if(array.length>left){
                 ag.jsUtil.sendData("sSystemNotify","背包已满!",this._data.id);
             }
-            if(left>0){
+            if(left>0 && array.length>0){
                 var count = Math.min(array.length,left);
                 for(var i=count-1;i>=0;--i){
                     var id = array[i]._data.id;
-                    ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
-                    ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
-                    ag.itemManager.addBagItem(id,this._data.id);
+                    console.log(array[i]);
+                    if(array[i]._their==this._data.id){
+                        ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
+                        ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
+                        ag.itemManager.addBagItem(id,this._data.id);
+                    }else{
+                        ag.jsUtil.sendData("sSystemNotify","一定时间内无法捡取该装备!",this._data.id);
+                    }
                 }
             }
         }
@@ -427,12 +432,12 @@ module.exports = ag.class.extend({
         if(this.getIsMonster()){
             var str = ag.gameConst._roleMst[this._data.type].drop;
             if(str){
-                ag.itemManager.drop(str,this._data.mapId,this.getLocation());
+                ag.itemManager.drop(attacker._data.id,str,this._data.mapId,this.getLocation());
             }
             var array = ag.gameConst._roleMst[this._data.type].dropLevels;
             if(array){
                 for(var i=0;i<array.length;i=i+2){
-                    ag.itemManager.dropByLevel(array[i],array[i+1],this._data.mapId,this.getLocation());
+                    ag.itemManager.dropByLevel(attacker._data.id,array[i],array[i+1],this._data.mapId,this.getLocation());
                 }
             }
         }
