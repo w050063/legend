@@ -399,7 +399,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 37,
-      "height": 18
+      "height": 36
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -429,11 +429,11 @@
     "_actualFontSize": 14,
     "_fontSize": 14,
     "_lineHeight": 18,
-    "_enableWrapText": true,
+    "_enableWrapText": false,
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_N$string": "Label",
+    "_N$string": "Label\nddd",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",

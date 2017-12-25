@@ -1167,6 +1167,18 @@ cc.Class({
         this._nodeNpcContent.active = false;
     },
 
+    getIsGuildmember:function(){
+        for(var key in ag.userInfo._guildMap){
+            var array = ag.userInfo._guildMap[key].member;
+            for(var i=0;i<array.length;++i){
+                if(array[i]==this._player._data.id){
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
     showNodeNpcContent:function(data){
         this._nodeNpcContent.active = true;
         this._nodeNpcContent.stopAllActions();
@@ -1174,19 +1186,53 @@ cc.Class({
             this.buttonEventNpcClose();
         }.bind(this))));
         this._nodeNpcContent.getChildByName('labelTitle').getComponent(cc.Label).string = data.title;
+        var content = data.content;
+        if(data.content.length>0){
+            if(data.content[0]=='t4000'){
+                if(this.getIsGuildmember()){
+                    content = ['t4006'];
+                }else if(ag.userInfo._guildInvite){
+                    content = ['t4000','t4001'];
+                }else{
+                    content = ['t4002','t4003','t4004','t4005'];
+                }
+            }
+        }
         var self = this;
         for(var i=0;i<6;++i){
             (function(i){
                 var label = self._nodeNpcContent.getChildByName('label'+i).getComponent(cc.Label);
-                if(i<data.content.length){
-                    var transferMst = ag.gameConst._transferMst[data.content[i]];
+                if(i<content.length){
+                    var transferMst = ag.gameConst._transferMst[content[i]];
                     label.node.active = true;
                     label.string = transferMst.name;
                     label.node.off(cc.Node.EventType.TOUCH_END);
                     label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
                         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
                         var npcStr = transferMst.name;
-                        if(npcStr=='比奇城市'){
+                        if(transferMst.id=='t4002') {
+                            cc.find('Canvas/nodeCreateGuild').active = true;
+                        }else if(transferMst.id=='t4003'){
+                            if(ag.userInfo._guildMap[self._player._data.id]){
+                                ag.jsUtil.alert(ag.gameLayer.node,'删除行会!',function () {
+                                    ag.agSocket.send("guildDelete",{});
+                                },function () {});
+                            }else{
+                                ag.jsUtil.showText(self.node,'您还没有行会！');
+                            }
+                        }else if(transferMst.id=='t4004'){
+                            cc.find('Canvas/nodeGuildInvite').active = true;
+                        }else if(transferMst.id=='t4005'){
+                            cc.find('Canvas/nodeGuildKick').active = true;
+                        }else if(transferMst.id=='t4000'){
+                            ag.agSocket.send("guildOK",{});
+                        }else if(transferMst.id=='t4001'){
+                            ag.agSocket.send("guildCancel",{});
+                        }else if(transferMst.id=='t4006'){
+                            ag.jsUtil.alert(ag.gameLayer.node,'退出行会!',function () {
+                                ag.agSocket.send("guildExit",{});
+                            },function () {});
+                        }else if(npcStr=='比奇城市'){
                             ag.jsUtil.showText(self.node,"比奇城限制52级以上！");
                         }else if(npcStr=='四级以下回收' || npcStr=='五级回收' || npcStr=='六级回收' || npcStr=='七级回收' || npcStr=='八级回收' || npcStr=='九级回收'){
                             var curLevels = transferMst.levels;

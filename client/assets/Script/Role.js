@@ -68,6 +68,48 @@ cc.Class({
     },
 
 
+    resetName:function(){
+        if(this._propNode && this._propNode._labelName){
+            var name = this._data.name+'('+ag.gameConst._roleMst[this._data.type].name+')\n';
+            if(ag.userInfo._guildMap[this._data.id]){
+                name = name + '[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(掌门人)';
+            }else{
+                for(var key in ag.userInfo._guildMap){
+                    var index = ag.userInfo._guildMap[key].member.indexOf(this._data.id);
+                    if(index!=-1){
+                        name = name + '[' + ag.userInfo._guildMap[key].name + ']';
+                        break;
+                    }
+                }
+            }
+            if(this._propNode._labelName.string!=name){
+                ag.jsUtil.putLabelFromName(this._propNode._labelName.string,this._propNode._labelName);
+                this._propNode._labelName = ag.jsUtil.getLabelFromName(name);
+                this._propNode.addChild(this._propNode._labelName.node);
+                this.resetNameColor();
+            }
+        }
+    },
+
+
+    //获取当前行会id
+    getGuildId : function(){
+        if(this.getIsPlayer()){
+            if(ag.userInfo._guildMap[this._data.id]){
+                return this._data.id;
+            }else{
+                for(var key in ag.userInfo._guildMap){
+                    if(ag.userInfo._guildMap[key].member.indexOf(this._data.id)!=-1){
+                        return key;
+                    }
+                }
+            }
+            return ag.gameConst.campPlayerNone;
+        }
+        return this._data.camp;
+    },
+
+
     addEquip:function(id){
         var data = ag.userInfo._itemMap[id]._data;
         var mst = ag.gameConst._itemMst[data.mid];
@@ -243,16 +285,20 @@ cc.Class({
         if(this._propNode && this._propNode._labelName){
             var color = cc.color(255,255,255);
             var colorOut = cc.color(0,0,0);
-            if(this._data.camp==ag.gameConst.campPlayerQinglong){
-                color = cc.color(0,255,255);
-            }else if(this._data.camp==ag.gameConst.campPlayerBaihu){
-                color = cc.color(255,255,255);
-                colorOut = cc.color(128,128,0);
-            }else if(this._data.camp==ag.gameConst.campPlayerZhuque){
-                color = cc.color(242,101,34);
-            }else if(this._data.camp==ag.gameConst.campPlayerXuanwu){
-                color = cc.color(0,0,0);
-                colorOut = cc.color(64,0,0);
+            if(this._data.camp==ag.gameConst.campNpc
+                || this._data.camp==ag.gameConst.campMonster
+            || this._data.camp==ag.gameConst.campPlayerNone){
+
+            }else {
+                var camp = this.getGuildId();
+                if(camp!=ag.gameConst.campPlayerNone){
+                    var playerCamp = ag.gameLayer._player.getGuildId();
+                    if(playerCamp==camp){
+                        color = cc.color(30,144,255);
+                    }else{
+                        color = cc.color(242,101,34);
+                    }
+                }
             }
 
             var node = this._propNode._labelName.node;
@@ -282,16 +328,15 @@ cc.Class({
                     ag.gameLayer._nameMap.node.addChild(this._propNode);
                 }
                 //name
-                if(this._data.camp==ag.gameConst.campNpc || this.getIsPlayer()){
-                    var name = '';
-                    if(this._data.camp==ag.gameConst.campNpc){
-                        name = this._data.name;
-                    }else{
-                        name = this._data.name+'('+ag.gameConst._roleMst[this._data.type].name+')';
-                    }
+                if(this._data.camp==ag.gameConst.campNpc){
+                    var name = this._data.name;
                     this._propNode._labelName = ag.jsUtil.getLabelFromName(name);
                     this._propNode.addChild(this._propNode._labelName.node);
                     this.resetNameColor();
+                }else if(this.getIsPlayer()){
+                    this._propNode._labelName = ag.jsUtil.getLabelFromName('');
+                    this._propNode.addChild(this._propNode._labelName.node);
+                    this.resetName();
                 }
 
                 //hp and bar

@@ -17,4 +17,10 @@ cc.Class({
         if (this.node._callback)this.node._callback();
         this.node.destroy();
     },
+
+
+    buttonCancel: function() {
+        if (this.node._callbackCancel)this.node._callbackCancel();
+        this.node.destroy();
+    },
 });

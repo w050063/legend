@@ -172,6 +172,33 @@ module.exports={
                 if(player) {
                     player.relife(obj.value);
                 }
+            }else if(obj.key=='sGuildCreateArray'){
+                if(obj.value.result==0){
+                    var tempArray = [];
+                    if(obj.value.member!='' && obj.value.member){
+                        tempArray = obj.value.member.split(',');
+                    }
+                    ag.userInfo._guildMap[obj.value.id] = {id:obj.value.id,name:obj.value.name,member:tempArray};
+                    for(var key in ag.gameLayer._roleMap){
+                        var tempRole = ag.gameLayer._roleMap[key];
+                        if(tempRole.getIsPlayer()){
+                            tempRole.resetName();
+                            tempRole.resetNameColor();
+                        }
+                    }
+                }
+            }else if(obj.key=='sGuildDeleteArray'){
+                delete ag.userInfo._guildMap[obj.value];
+                ag.userInfo._guildInvite = null;
+                for(var key in ag.gameLayer._roleMap){
+                    var tempRole = ag.gameLayer._roleMap[key];
+                    if(tempRole.getIsPlayer()){
+                        tempRole.resetName();
+                        tempRole.resetNameColor();
+                    }
+                }
+            }else if(obj.key=='sGuildInviteArray'){
+                ag.userInfo._guildInvite = obj.value;
             }else if(obj.key=='sCampArray'){
                 var player =  ag.gameLayer.getRole(obj.value.id);
                 if(player) {

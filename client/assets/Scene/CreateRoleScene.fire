@@ -45,7 +45,7 @@
     "_globalZOrder": 0,
     "_opacityModifyRGB": false,
     "groupIndex": 0,
-    "autoReleaseAssets": null
+    "autoReleaseAssets": {}
   },
   {
     "__type__": "cc.Node",
@@ -2647,7 +2647,7 @@
     "_N$returnType": 2,
     "_N$inputFlag": 5,
     "_N$inputMode": 6,
-    "_N$fontSize": 40,
+    "_N$fontSize": 36,
     "_N$lineHeight": 40,
     "_N$fontColor": {
       "__type__": "cc.Color",
@@ -2657,7 +2657,7 @@
       "a": 255
     },
     "_N$placeholder": "名字",
-    "_N$placeholderFontSize": 40,
+    "_N$placeholderFontSize": 36,
     "_N$placeholderFontColor": {
       "__type__": "cc.Color",
       "r": 127,

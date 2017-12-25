@@ -29,6 +29,8 @@ module.exports={
 	_itemMap : {},
     backGroundPos :cc.p(-100,-330),
     operatePuton:'right',
+    _guildMap : {},
+    _guildInvite:null,
 
 	init:function () {
 

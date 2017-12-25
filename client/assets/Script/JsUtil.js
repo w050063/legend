@@ -54,6 +54,7 @@ module.exports={
     },
 
     putLabelFromName:function(name,label){
+        label.node.removeFromParent();
         var array = this._heroNameMap[name];
         if(!array)array = [];
         array.push(label);
@@ -75,6 +76,18 @@ module.exports={
         var label = node.getChildByName("labelContent").getComponent(cc.Label);
         label.string = content;
         node._callback = callback;
+    },
+
+
+    alertOKCancel:function (father,content,callback,callbackCancel) {
+        //加载
+        var node = cc.instantiate(ag.gameLayer._nodeAlertClone);
+        node.parent = father;
+        node.setLocalZOrder(101);
+        var label = node.getChildByName("labelContent").getComponent(cc.Label);
+        label.string = content;
+        node._callback = callback;
+        node._callbackCancel = callbackCancel;
     },
 
 
