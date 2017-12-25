@@ -181,4 +181,141 @@ var Handler = cc.Class.extend({
         }
         next();
     },
+
+
+    //创建行会
+    guildCreate:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player){
+            ag.guild.addGuild(msg.name,player._data.id);
+        }
+        next();
+    },
+
+
+    //删除行会
+    guildDelete:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player){
+            ag.guild.guildDelete(player._data.id);
+            player._data.camp = ag.gameConst.campPlayerNone;
+        }
+        next();
+    },
+
+
+    //邀请成员
+    guildInvite:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player){
+            var rid = '-1';
+            for(var key in ag.gameLayer._roleMap){
+                if(ag.gameLayer._roleMap[key].getIsPlayer()) {
+                    if (ag.gameLayer._roleMap[key]._data.name == msg.name) {
+                        rid = ag.gameLayer._roleMap[key]._data.id;
+                        break;
+                    }
+                }
+            }
+            if(rid!='-1'){
+                ag.guild.guildInvite(player._data.id,rid);
+            }else{
+                ag.jsUtil.sendData("sSystemNotify","邀请人不存在！",player._data.id);
+            }
+        }
+        next();
+    },
+
+
+    //同意邀请
+    guildOK:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player){
+            var id = ag.guild._inviteMap[session.uid];
+            if(id){
+                delete ag.guild._inviteMap[session.uid];
+                var obj = ag.guild._dataMap[id];
+                obj.member.push(session.uid);
+                ag.jsUtil.sendData("sSystemNotify","您已经加入["+obj.name+"]！",session.uid);
+                ag.jsUtil.sendData("sSystemNotify","玩家"+player._data.name+"加入行会["+obj.name+"]！",id);
+                var str = obj.member.length==0?'':obj.member.join(',');
+                ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:id,name:obj.name,member:str});
+                player._data.camp = obj.identify;
+                ag.db.guildSaveMember(id,obj.member);
+            }
+        }
+        next();
+    },
+
+
+    //不同意邀请
+    guildCancel:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player){
+            var id = ag.guild._inviteMap[session.uid];
+            if(id){
+                delete ag.guild._inviteMap[session.uid];
+                ag.jsUtil.sendData("sSystemNotify","取消成功！",session.uid);
+                ag.jsUtil.sendData("sSystemNotify","玩家"+player._data.name+"拒绝加入行会邀请！",id);
+            }
+        }
+        next();
+    },
+
+
+    //踢出成员
+    guildKick:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player){
+            var rid = '-1';
+            for(var key in ag.gameLayer._roleMap){
+                if(ag.gameLayer._roleMap[key].getIsPlayer()) {
+                    if (ag.gameLayer._roleMap[key]._data.name == msg.name) {
+                        rid = ag.gameLayer._roleMap[key]._data.id;
+                        break;
+                    }
+                }
+            }
+            if(rid!='-1'){
+                var obj = ag.guild._dataMap[session.uid];
+                var index = obj.member.indexOf(rid);
+                if(index!=-1){
+                    obj.member.splice(index,1);
+                    var str = obj.member.length==0?'':obj.member.join(',');
+                    ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:obj.id,name:obj.name,member:str});
+                    ag.jsUtil.sendData("sSystemNotify","踢出成功！",session.uid);
+                    ag.jsUtil.sendData("sSystemNotify","您被踢出行会！",rid);
+                    ag.gameLayer.getRole(rid)._data.camp = ag.gameConst.campPlayerNone;
+                    ag.db.guildSaveMember(session.uid,obj.member);
+                }else{
+                    ag.jsUtil.sendData("sSystemNotify","被踢人不在本行会！",session.uid);
+                }
+            }else{
+                ag.jsUtil.sendData("sSystemNotify","被踢人不存在！",session.uid);
+            }
+        }
+        next();
+    },
+
+
+    //成员退出
+    guildExit:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player) {
+            for (var key in ag.guild._dataMap) {
+                var obj = ag.guild._dataMap[key];
+                var index = obj.member.indexOf(session.uid);
+                if (index != -1) {
+                    obj.member.splice(index, 1);
+                    var str = obj.member.length == 0 ? '' : obj.member.join(',');
+                    ag.jsUtil.sendDataAll("sGuildCreate", {result: 0, id: obj.id, name: obj.name, member: str});
+                    ag.jsUtil.sendData("sSystemNotify", "退出行会成功！", session.uid);
+                    player._data.camp = ag.gameConst.campPlayerNone;
+                    ag.db.guildSaveMember(key,obj.member);
+                    break;
+                }
+            }
+        }
+        next();
+    },
 });

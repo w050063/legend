@@ -85,6 +85,12 @@
     "required string id": 1,
     "required int32 camp": 2
   },
+  "message sGuildCreate": {
+    "optional string id": 1,
+    "optional string name": 2,
+    "optional string member": 3,
+    "required int32 result": 4
+  },
   "onData" : {
     "repeated sMove sMoveArray": 1,
     "repeated sAttack sAttackArray": 2,
@@ -107,6 +113,9 @@
     "repeated string sSystemNotifyArray": 19,
     "repeated sRelife sRelifeArray": 20,
     "repeated sCamp sCampArray": 21,
-    "repeated int32 sAddGoldArray": 22
+    "repeated int32 sAddGoldArray": 22,
+    "repeated sGuildCreate sGuildCreateArray": 23,
+    "repeated string sGuildDeleteArray": 24,
+    "repeated string sGuildInviteArray": 25
   }
 }

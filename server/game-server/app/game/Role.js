@@ -170,9 +170,9 @@ module.exports = ag.class.extend({
         }
 
         //通知其他人。
-        //var temp = JSON.parse(JSON.stringify(this._data));
-        //delete temp.gold;
-        ag.jsUtil.sendDataExcept("sRole",data,this._data.id);
+        var temp = JSON.parse(JSON.stringify(this._data));
+        delete temp.gold;
+        ag.jsUtil.sendDataExcept("sRole",temp,this._data.id);
         if(this._tiger)ag.jsUtil.sendDataExcept("sRole",this._tiger._data,this._data.id);
 
         //发送装备情况
@@ -183,6 +183,14 @@ module.exports = ag.class.extend({
             if(itemData.mapId==this._data.mapId || (role && role._data.mapId==this._data.mapId)){
                 ag.jsUtil.sendDataAll("sItem",itemData,this._data.mapId);
             }
+        }
+
+
+        //行会数据
+        for(var key in ag.guild._dataMap){
+            var temp = ag.guild._dataMap[key];
+            var str = temp.member.length==0?'':temp.member.join(',');
+            ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:temp.id,name:temp.name,member:str});//ag add for test./行会成员
         }
     },
 
@@ -231,7 +239,6 @@ module.exports = ag.class.extend({
                 var count = Math.min(array.length,left);
                 for(var i=count-1;i>=0;--i){
                     var id = array[i]._data.id;
-                    console.log(array[i]);
                     if(array[i]._their==this._data.id){
                         ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
                         ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);

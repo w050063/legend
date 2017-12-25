@@ -45,6 +45,17 @@ module.exports = ag.class.extend({
                 }
             }
         });
+        this.getGuilds(function(rows){
+            for(var i=0;i<rows.length;++i){
+                var name = crypto.fromBase64(rows[i].name);
+                var member = [];
+                if(rows[i].member && rows[i].member!=''){
+                    member = crypto.fromBase64(rows[i].member);
+                    member.split(',');
+                }
+                ag.guild._dataMap[rows[i].id] = {id:rows[i].id,name:name,member:member};
+            }
+        });
     },
 
 
@@ -163,7 +174,6 @@ module.exports = ag.class.extend({
 
 
     insertRole:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,callback){
-        return;
         if(id && map_id){
             var sql = 'INSERT INTO t_roles(id,map_id,x,y,type,camp,sex,direction,level,exp,gold) VALUES("'
                 + id + '","' + map_id+'",' + x+',' + y+',"' + type+'",' + camp+',' + sex+',' + direction+',' + level+',' + exp+',' + gold + ')';
@@ -185,7 +195,6 @@ module.exports = ag.class.extend({
 
 
     setRoles:function(array,callback){
-        return;
         var allSql = '';
         for(var i=0;i<array.length;++i){
             var role = array[i];
@@ -335,5 +344,90 @@ module.exports = ag.class.extend({
                 }
             });
         }
+    },
+
+
+    //获得当前行会数据
+    getGuilds:function(callback){
+        var sql = 'SELECT * FROM t_guilds';
+        this.query(sql, function(err, rows) {
+            if (err) {
+                if(callback)callback([]);
+                throw err;
+            }
+
+            if(rows.length == 0){
+                if(callback)callback([]);
+                return;
+            }
+            if(callback)callback(rows);
+        });
+    },
+
+    //创建行会
+    guildCreate:function(id,name,callback){
+        if(name && id){
+            name = crypto.toBase64(name);
+            var sql = 'INSERT INTO t_guilds(id,name,member) VALUES("'
+                + id + '","' + name + '","")';
+            this.query(sql, function(err, rows) {
+                if (err) {
+                    if(err.code == 'ER_DUP_ENTRY'){
+                        if(callback)callback(false);
+                        return;
+                    }
+                    if(callback)callback(false);
+                    throw err;
+                }
+                else{
+                    if(callback)callback(true);
+                }
+            });
+        }
+    },
+
+
+    //保存行会成员
+    guildSaveMember:function(id,member,callback){
+        console.log(id,member);
+        if(id){
+            var str = member.length==0?'':member.join(',');
+            var sql = 'UPDATE t_guilds SET member = "' + str
+                + '" WHERE id = "' + id + '";';
+            console.log(sql);
+
+            this.query(sql, function(err, rows) {
+                if (err) {
+                    if(err.code == 'ER_DUP_ENTRY'){
+                        if(callback)callback(false);
+                        return;
+                    }
+                    if(callback)callback(false);
+                    throw err;
+                }
+                else{
+                    if(callback)callback(true);
+                }
+            });
+        }
+    },
+
+
+    //删除行会
+    guildDelete:function(id,callback){
+        var sql = 'DELETE FROM t_guilds WHERE id = "' + id + '";';
+        this.query(sql, function(err, rows) {
+            if (err) {
+                if(err.code == 'ER_DUP_ENTRY'){
+                    if(callback)callback(false);
+                    return;
+                }
+                if(callback)callback(false);
+                throw err;
+            }
+            else{
+                if(callback)callback(true);
+            }
+        });
     },
 });

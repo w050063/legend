@@ -1,28 +1,28 @@
 {
   "development":{
     "conn":[
-      {"id":"conn-server-1", "host":"192.168.99.174", "port":4050, "clientPort": 3050, "frontend": true},
-      {"id":"conn-server-2", "host":"192.168.99.174", "port":4051, "clientPort": 3051, "frontend": true},
-      {"id":"conn-server-3", "host":"192.168.99.174", "port":4052, "clientPort": 3052, "frontend": true}
+      {"id":"conn-server-1", "host":"192.168.2.110", "port":4050, "clientPort": 3050, "frontend": true},
+      {"id":"conn-server-2", "host":"192.168.2.110", "port":4051, "clientPort": 3051, "frontend": true},
+      {"id":"conn-server-3", "host":"192.168.2.110", "port":4052, "clientPort": 3052, "frontend": true}
     ],
     "work":[
-      {"id":"work-server-1", "host":"192.168.99.174", "port":6055}
+      {"id":"work-server-1", "host":"192.168.2.110", "port":6055}
     ],
     "gate":[
-      {"id": "gate-server-1", "host": "192.168.99.174", "clientPort": 3014, "frontend": true}
+      {"id": "gate-server-1", "host": "192.168.2.110", "clientPort": 3014, "frontend": true}
     ]
   },
   "production":{
     "conn":[
-      {"id":"conn-server-1", "host":"192.168.99.174", "port":4050, "clientPort": 3050, "frontend": true},
-      {"id":"conn-server-2", "host":"192.168.99.174", "port":4051, "clientPort": 3051, "frontend": true},
-      {"id":"conn-server-3", "host":"192.168.99.174", "port":4052, "clientPort": 3052, "frontend": true}
+      {"id":"conn-server-1", "host":"192.168.2.110", "port":4050, "clientPort": 3050, "frontend": true},
+      {"id":"conn-server-2", "host":"192.168.2.110", "port":4051, "clientPort": 3051, "frontend": true},
+      {"id":"conn-server-3", "host":"192.168.2.110", "port":4052, "clientPort": 3052, "frontend": true}
     ],
     "work":[
-      {"id":"work-server-1", "host":"192.168.99.174", "port":6055}
+      {"id":"work-server-1", "host":"192.168.2.110", "port":6055}
     ],
     "gate":[
-      {"id": "gate-server-1", "host": "192.168.99.174", "clientPort": 3014, "frontend": true}
+      {"id": "gate-server-1", "host": "192.168.2.110", "clientPort": 3014, "frontend": true}
     ]
   }
 }

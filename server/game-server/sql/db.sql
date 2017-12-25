@@ -74,3 +74,15 @@ CREATE TABLE `t_chats` (
 -- alter table
 -- ----------------------------
 alter table t_roles add column gold int(8) NOT NULL DEFAULT 0;
+
+
+-- ----------------------------
+-- Table structure for `t_guild`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_guilds`;
+CREATE TABLE `t_guilds` (
+  `id` varchar(16) NOT NULL,
+  `name` varchar(36) NOT NULL,
+  `member` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
