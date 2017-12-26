@@ -42,10 +42,11 @@
   "message sItem": {
     "required string id": 1,
     "required string mid": 2,
-    "optional int32 x": 3,
-    "optional int32 y": 4,
-    "optional string owner": 5,
-    "optional int32 puton": 6
+    "optional string mapId": 3,
+    "optional int32 x": 4,
+    "optional int32 y": 5,
+    "optional string owner": 6,
+    "optional int32 puton": 7
   },
   "message sBagItemToEquip": {
     "required string id": 1,

@@ -38,12 +38,26 @@ module.exports = ag.class.extend({
         return this._roleMap;
     },
 
-    getByXY:function (location) {
-        var array = this._roleXYMap[''+location.x+','+location.y];
+    setMapXYById:function(id,mapId,x,y){
+        var obj = this._roleMap[id];
+        var xyStr = this.getMapXYString(obj);
+        obj._data.mapId = mapId;
+        obj._data.x = x;
+        obj._data.y = y;
+        this._roleXYMap[xyStr].splice(this._roleXYMap[xyStr].indexOf(obj),1);
+        if(this._roleXYMap[xyStr].length==0)delete this._roleXYMap[xyStr];
+
+        xyStr = this.getMapXYString(obj);
+        if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
+        this._roleXYMap[xyStr].push(obj);
+    },
+
+    getByXY:function (mapId,location) {
+        var array = this._roleXYMap[''+mapId+','+location.x+','+location.y];
         return array?array:[];
     },
 
     getMapXYString:function(obj){
-        return ''+obj._data.x+','+obj._data.y;
+        return ''+obj._data.mapId+','+obj._data.x+','+obj._data.y;
     },
 });

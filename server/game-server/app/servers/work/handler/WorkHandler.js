@@ -17,6 +17,26 @@ var Handler = cc.Class.extend({
     },
 
 
+    //加元宝
+    addGold:function(msg, session, next){
+        var role = null;
+        for(var key in ag.gameLayer._roleMap){
+            if(ag.gameLayer._roleMap[key].getIsPlayer()) {
+                if (ag.gameLayer._roleMap[key]._data.name == msg.name) {
+                    role = ag.gameLayer._roleMap[key];
+                    break;
+                }
+            }
+        }
+        if(role){
+            role.addGold(msg.gold);
+        }
+        next(null, {
+            code: role?0:1,
+        });
+    },
+
+
     theCountryIsAtPeace:function(msg, session, next){
         ag.gameLayer.theCountryIsAtPeace();
         next();
@@ -187,7 +207,13 @@ var Handler = cc.Class.extend({
     guildCreate:function (msg, session, next) {
         var player =  ag.gameLayer.getRole(session.uid);
         if(player){
-            ag.guild.addGuild(msg.name,player._data.id);
+            if(player._data.gold>=500){
+                player._data.gold-=500;
+                player.addGold(-500);
+                ag.guild.addGuild(msg.name,player._data.id);
+            }else{
+                ag.jsUtil.sendData("sSystemNotify","元宝不足500!",player._data.id);
+            }
         }
         next();
     },
@@ -314,6 +340,38 @@ var Handler = cc.Class.extend({
                     ag.db.guildSaveMember(key,obj.member);
                     break;
                 }
+            }
+        }
+        next();
+    },
+
+
+    //寻宝一次
+    treasure:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player) {
+            if(player._data.gold>=200){
+                player._data.gold-=200;
+                player.addGold(-200);
+                ag.itemManager.treasure(player);
+            }else{
+                ag.jsUtil.sendData("sSystemNotify","元宝不足200!",player._data.id);
+            }
+        }
+        next();
+    },
+
+
+    //寻宝一次
+    treasure5:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        if(player) {
+            if(player._data.gold>=1000){
+                player._data.gold-=1000;
+                player.addGold(-1000);
+                ag.itemManager.treasure5(player);
+            }else{
+                ag.jsUtil.sendData("sSystemNotify","元宝不足1000!",player._data.id);
             }
         }
         next();

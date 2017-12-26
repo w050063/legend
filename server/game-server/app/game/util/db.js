@@ -50,10 +50,20 @@ module.exports = ag.class.extend({
                 var name = crypto.fromBase64(rows[i].name);
                 var member = [];
                 if(rows[i].member && rows[i].member!=''){
-                    member = crypto.fromBase64(rows[i].member);
-                    member.split(',');
+                    member = rows[i].member.split(',');
                 }
-                ag.guild._dataMap[rows[i].id] = {id:rows[i].id,name:name,member:member};
+                var obj = {id:rows[i].id,name:name,member:member,identify:++ag.guild._baseIdentify};
+                ag.guild._dataMap[rows[i].id] = obj;
+                var temp = ag.gameLayer.getRole(obj.id);
+                if(temp){
+                    temp._data.camp = obj.identify;
+                }
+                for(var j=0;j<member.length;++j){
+                    var temp = ag.gameLayer.getRole(member[j]);
+                    if(temp){
+                        temp._data.camp = obj.identify;
+                    }
+                }
             }
         });
     },
@@ -389,7 +399,7 @@ module.exports = ag.class.extend({
 
     //保存行会成员
     guildSaveMember:function(id,member,callback){
-        console.log(id,member);
+        console.log('h2',id,member);
         if(id){
             var str = member.length==0?'':member.join(',');
             var sql = 'UPDATE t_guilds SET member = "' + str

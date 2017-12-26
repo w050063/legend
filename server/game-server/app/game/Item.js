@@ -7,6 +7,7 @@
 var baseItemId = 0;
 module.exports = ag.class.extend({
     ctor:function (mid,mapId,location,id) {
+        console.log('bbbb');
         this._data = {};
         if(id){
             this._data.id = id;

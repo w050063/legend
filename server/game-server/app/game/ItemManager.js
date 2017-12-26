@@ -66,6 +66,24 @@ module.exports = ag.class.extend({
     },
 
 
+    dropEquipOneByArray:function (role,array,mapId,location) {
+        if(array.length>0){
+            var index = Math.floor(Math.random()*array.length);
+            var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+            pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+            var item =this._itemMap.get(array[index]);
+            this._itemMap.setMapXYById(item._data.id,mapId,pos.x,pos.y);
+            item._duration = ag.gameConst.itemDuration;
+            delete item._data.owner;
+            delete item._data.puton;
+            delete item._their;
+            console.log('tt',item);
+            role.refreshItemProp();
+            ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
+        }
+    },
+
+
     dropByLevel:function (rid,level,rate,mapId,location) {
         var map = ag.gameConst._itemMst;
         for(var key in map){
@@ -155,7 +173,7 @@ module.exports = ag.class.extend({
                 }
             }
             role.addExp(sum,'recycle');
-            role.addGold(sumGold);
+            //role.addGold(sumGold);//回收不加元宝
         }
     },
 
@@ -224,7 +242,58 @@ module.exports = ag.class.extend({
 
 
     //根据位置得到掉落
-    getDropByLocation:function (location) {
-        return this._itemMap.getByXY(location);
-    }
+    getDropByLocation:function (mapId,location) {
+        return this._itemMap.getByXY(mapId,location);
+    },
+
+
+    //寻宝一次
+    treasure:function (role) {
+        var rand = Math.random();
+        if(rand<0.4){
+            role.addExp(100);
+            ag.jsUtil.sendData("sSystemNotify","在龙族宝藏寻到10点经验",role._data.id);
+        }else if(rand<0.5){
+            ag.jsUtil.sendData("sSystemNotify","在龙族宝藏寻到10点官职",role._data.id);
+        }else{
+            var array = [];
+            var map = ag.gameConst._itemMst;
+            if(rand<0.95){
+                for(var key in map){
+                    if(map[key].level==1 || map[key].level==2 || map[key].level==3 || map[key].level==4 || map[key].level==5)array.push(key);
+                }
+            }else if(rand<0.98){
+                for(var key in map){
+                    if(map[key].level==6)array.push(key);
+                }
+            }else if(rand<0.998){
+                for(var key in map){
+                    if(map[key].level==7)array.push(key);
+                }
+            }else if(rand<0.9995){
+                for(var key in map){
+                    if(map[key].level==8)array.push(key);
+                }
+            }else{
+                for(var key in map){
+                    if(map[key].level==9)array.push(key);
+                }
+            }
+            var index = Math.floor(Math.random()*array.length);
+            var item = new Item(array[index]);
+            item._duration = 0;
+            item._data.owner = role._data.id;
+            this._itemMap.add(item);
+            ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
+            ag.jsUtil.sendDataAll("sSystemNotify", role._data.name+"在龙族宝藏寻到"+ag.gameConst._itemMst[item._data.mid].name+"！");
+        }
+    },
+
+
+    //寻宝一次
+    treasure5:function (role) {
+        for(var i=0;i<5;++i){
+            this.treasure(role);
+        }
+    },
 });
