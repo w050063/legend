@@ -32,4 +32,20 @@ cc.Class({
     theCountryIsAtPeace: function() {
         ag.agSocket.send("theCountryIsAtPeace",'');
     },
+
+
+    buttonEventAddGold: function() {
+        var name = cc.find("Canvas/editBoxGoldName").getComponent(cc.EditBox).string;
+        var count = parseInt(cc.find("Canvas/editBoxGoldCount").getComponent(cc.EditBox).string);
+        if(typeof count=='number' && count>=0 && count<=1000000){
+            //ag.agSocket.send("addGold",{name:name,gold:count});
+            ag.jsUtil.request(this.node,'addGold',{name:name,gold:count},function (data) {
+                if(data.code==0){
+                    ag.jsUtil.showText(this.node,''+count+'元宝增加成功');
+                }else{
+                    ag.jsUtil.showText(this.node,''+'玩家不存在');
+                }
+            }.bind((this)));
+        }
+    },
 });

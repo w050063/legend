@@ -413,6 +413,17 @@ cc.Class({
     //地上增加一个道具,并且存到本地实例中
     dropItem:function (data) {
         if(data.mapId==this._player._data.mapId){
+            //如果是装备，则处理掉落
+            var obj = ag.userInfo._itemMap[data.id];
+            if(obj && obj._data.owner && typeof obj._data.puton=='number') {
+                var role = this.getRole(obj._data.owner);
+                var puton = obj._data.puton;
+                delete obj._data.owner;
+                delete obj._data.puton;
+                this.itemEquipToGround(obj._data.id,puton,role);
+            }
+
+
             var node = new cc.Node();
             var item = node.addComponent(Item);
             this._map.node.addChild(node,1);
@@ -484,7 +495,7 @@ cc.Class({
         if(obj && role){
             delete obj._data.puton;
             var success = role.delEquip(id);
-            if(success){
+            if(success && role==this._player){
                 var data = obj._data;
                 var mst = ag.gameConst._itemMst[data.mid];
                 var puton = ag.gameConst.putonTypes.indexOf(mst.type);
@@ -613,8 +624,10 @@ cc.Class({
     isEnemyCamp:function(role1,role2){
         if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead
             && role1._data.camp!=ag.gameConst.campNpc && role2._data.camp!=ag.gameConst.campNpc){
-            if(role1._data.camp!=role2._data.camp)return true;
-            if(role2._data.camp==ag.gameConst.campPlayerNone)return true;
+            var camp1 = role1.getGuildId();
+            var camp2 = role2.getGuildId();
+            if(camp1!=camp2)return true;
+            if(camp2==ag.gameConst.campPlayerNone)return true;
         }
         return false;
     },
@@ -711,6 +724,50 @@ cc.Class({
         var mst = ag.gameConst._itemMst[data.mid];
         var success = this._player.delEquip(id);
         if(success){
+            //var puton = ag.gameConst.putonTypes.indexOf(mst.type);
+            cc.log('puton:'+puton);
+            if(typeof puton=='number'){
+                var father = cc.find('Canvas/nodeBag/equip');
+                var node = father.getChildByName('equip'+puton);
+                if(node){
+                    cc.log('del ok');
+                    node.removeFromParent();
+                    node.destroy();
+                }
+            }
+
+            //衣服
+            if(mst.type==2){
+                if(father.clothe){
+                    father.clothe.getComponent(AGAni).putCache();
+                    this.defaultRoleAni(this._player);
+                }
+            }
+            //武器
+            if(mst.type==0){
+                if(father.weapon){
+                    father.weapon.getComponent(AGAni).putCache();
+                    father.weapon = undefined;
+                }
+            }
+            //翅膀
+            if(mst.type==6){
+                if(father.wing){
+                    father.wing.getComponent(AGAni).putCache();
+                    father.wing = undefined;
+                }
+            }
+            this.resetPlayerProp(this._player);
+        }
+    },
+
+
+    //掉落下一件道具
+    itemEquipToGround:function(id,puton,role){
+        var data = ag.userInfo._itemMap[id]._data;
+        var mst = ag.gameConst._itemMst[data.mid];
+        var success = this._player.delEquip(id);
+        if(success && role==this._player){
             //var puton = ag.gameConst.putonTypes.indexOf(mst.type);
             cc.log('puton:'+puton);
             if(typeof puton=='number'){
@@ -1127,7 +1184,7 @@ cc.Class({
         var node = cc.instantiate(cc.find('Canvas/clone/labelSystemNotifyClone'));
         cc.find('Canvas/nodeChatContent').addChild(node);
         node.getComponent(cc.Label).string = content;
-        node.runAction(cc.sequence(cc.delayTime(3),cc.fadeOut(1),cc.callFunc((callback.bind(this)))));
+        node.runAction(cc.sequence(cc.delayTime(6),cc.fadeOut(1),cc.callFunc((callback.bind(this)))));
         this._systemNotifyArray.push(node);
         if(this._systemNotifyArray.length>=6){
             callback.call(this);
@@ -1210,8 +1267,30 @@ cc.Class({
                     label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
                         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
                         var npcStr = transferMst.name;
-                        if(transferMst.id=='t4002') {
-                            cc.find('Canvas/nodeCreateGuild').active = true;
+                        if(transferMst.id=='t5000'){
+                            var index = self._bagArray.indexOf(-1);
+                            if(index!=-1 && self._player._data.gold>=200){
+                                ag.agSocket.send("treasure",{});
+                            }else{
+                                ag.jsUtil.showText(self.node,'背包已满,或者元宝不足200个！');
+                            }
+                        }else if(transferMst.id=='t5001'){
+                            var findBagItemCount = 0;
+                            for(var i=0;i<self._bagArray.length;++i){
+                                if(self._bagArray[i]==-1)++findBagItemCount;
+                            }
+                            if(findBagItemCount>=5 && self._player._data.gold>=1000){
+                                ag.agSocket.send("treasure5",{});
+                            }else{
+                                ag.jsUtil.showText(self.node,'背包已满,或者元宝不足1000个！');
+                            }
+                        }else if(transferMst.id=='t4002') {
+                            var index = self._bagArray.indexOf(-1);
+                            if(index!=-1 && self._player._data.gold>=500){
+                                cc.find('Canvas/nodeCreateGuild').active = true;
+                            }else{
+                                ag.jsUtil.showText(self.node,'元宝不足500个！');
+                            }
                         }else if(transferMst.id=='t4003'){
                             if(ag.userInfo._guildMap[self._player._data.id]){
                                 ag.jsUtil.alert(ag.gameLayer.node,'删除行会!',function () {

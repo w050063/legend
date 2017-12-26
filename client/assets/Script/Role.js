@@ -286,8 +286,7 @@ cc.Class({
             var color = cc.color(255,255,255);
             var colorOut = cc.color(0,0,0);
             if(this._data.camp==ag.gameConst.campNpc
-                || this._data.camp==ag.gameConst.campMonster
-            || this._data.camp==ag.gameConst.campPlayerNone){
+                || this._data.camp==ag.gameConst.campMonster){
 
             }else {
                 var camp = this.getGuildId();
@@ -491,6 +490,7 @@ cc.Class({
                 if(id)name = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid].model;
                 this._agAni = this.getAgAni(this._agAni,name+array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,0.4);
                 //武器
+                if(this._weaponAni){this._weaponAni.getComponent(AGAni).putCache();this._weaponAni = undefined;}
                 var id = this._equipArray[ag.gameConst.itemEquipWeapon];
                 if(id){
                     var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
@@ -500,6 +500,7 @@ cc.Class({
                     this._weaponAni = null;
                 }
                 //翅膀
+                if(this._wingAni){this._wingAni.getComponent(AGAni).putCache();this._wingAni = undefined;}
                 var id = this._equipArray[ag.gameConst.itemEquipWing];
                 if(id){
                     var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
@@ -575,6 +576,7 @@ cc.Class({
                 if(id)name = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid].model;
                 this._agAni = this.getAgAni(this._agAni,name+array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,moveSpeed/count);
                 //武器
+                if(this._weaponAni){this._weaponAni.getComponent(AGAni).putCache();this._weaponAni = undefined;}
                 var id = this._equipArray[ag.gameConst.itemEquipWeapon];
                 if(id){
                     var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
@@ -584,6 +586,7 @@ cc.Class({
                     this._weaponAni = null;
                 }
                 //翅膀
+                if(this._wingAni){this._wingAni.getComponent(AGAni).putCache();this._wingAni = undefined;}
                 var id = this._equipArray[ag.gameConst.itemEquipWing];
                 if(id){
                     var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
@@ -1017,10 +1020,12 @@ cc.Class({
         var w = ag.gameConst.tileWidth/ 2,h = ag.gameConst.tileHeight*2;
         for(var key in map){
             var role = map[key];
-            var p = role.node.getPosition();
-            if(point.x>p.x-w && point.x<p.x+w && point.y>p.y && point.y< p.y+h){
-                if(role._data.camp==ag.gameConst.campNpc)return role;
-                if((!locked || p.y<locked.node.getPositionY()) && ag.gameLayer.isEnemyCamp(this,role))locked = map[key];
+            if(role._state != ag.gameConst.stateDead){
+                var p = role.node.getPosition();
+                if(point.x>p.x-w && point.x<p.x+w && point.y>p.y && point.y< p.y+h){
+                    if(role._data.camp==ag.gameConst.campNpc)return role;
+                    if((!locked || p.y<locked.node.getPositionY()))locked = map[key];
+                }
             }
         }
         return locked;
