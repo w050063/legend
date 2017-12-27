@@ -140,7 +140,7 @@ module.exports = {
             }
             player._data.name = name;
             player._data.sex = sex;
-            player._data.camp = camp?camp:ag.gameConst.campPlayerNone;
+            player._data.camp = ag.gameConst.campPlayerNone;
             player._data.direction = direction!=undefined?direction:4;//默认朝下
             player._data.level = level?level:0;
             player.resetAllProp(exp);
