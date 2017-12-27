@@ -16,6 +16,31 @@ cc.Class({
     },
 
 
+
+    setOfficeByRole:function(role){
+        if(!role)role = this._obj;
+        var back = this.node.getChildByName('back');
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.find('Canvas/nodeBag/equip/office').getComponent(cc.Sprite).spriteFrame.clone();
+
+
+        var office = role.getOfficeIndex();
+        var str = '当前称号:'+ag.gameConst.officeName[office]
+            +'\n攻击:'+ag.gameConst.officeHurt[office]
+            +'\n防御:'+ag.gameConst.officeDefense[office]
+            +'\n当前进度:'+role._data.office;
+
+
+
+        back.getChildByName('labelContent').getComponent(cc.Label).string = str;
+        var buttonNode = back.getChildByName('buttonDispose');
+        buttonNode.x = 0;
+        var label = buttonNode.getChildByName('label').getComponent(cc.Label);
+        label.string = '确定';
+        back.getChildByName('buttonDispose1').active = false;
+        ag.jsUtil.secondInterfaceAnimation(back);
+    },
+
+
     setItemId:function(id){
         var obj = ag.userInfo._itemMap[id];
         var mst = ag.gameConst._itemMst[obj._data.mid];

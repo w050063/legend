@@ -888,7 +888,7 @@ cc.Class({
         father.wing=undefined;
         var array = father.children;
         for(var i=array.length-1;i>=0;--i){
-            if(array[i].name!='labelTitle' && array[i].name!='labelProp'){
+            if(array[i].name!='labelTitle' && array[i].name!='labelProp' && array[i].name!='office'){
                 array[i].destroy();
                 array[i].removeFromParent();
             }
@@ -900,6 +900,9 @@ cc.Class({
                 this.itemBagToEquip(data.id);
             }
         }
+
+        //将官职数据保存到iteminfo界面
+        cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode')._obj = role;
     },
 
 
@@ -942,6 +945,11 @@ cc.Class({
                 if(itemMst.defense)defense+=itemMst.defense;
             }
         }
+        //加上官职属性
+        var office = role.getOfficeIndex();
+        hurt+=ag.gameConst.officeHurt[office];
+        defense+=ag.gameConst.officeDefense[office];
+
         father.labelTitle.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
         father.labelProp.string = '攻击:'+hurt+' 防御:'+defense;
     },
@@ -1367,5 +1375,21 @@ cc.Class({
                 }
             })(i);
         }
+    },
+
+
+    //绑定官职事件
+    buttonEventOffice:function(event){
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        cc.find('Canvas/nodeItemInfo').active = true;
+        cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setOfficeByRole(this._player);
+    },
+
+
+    //绑定其他官职事件
+    buttonEventOtherOffice:function(event){
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        cc.find('Canvas/nodeItemInfo').active = true;
+        cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setOfficeByRole();
     },
 });

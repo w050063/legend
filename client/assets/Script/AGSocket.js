@@ -145,7 +145,7 @@ module.exports={
                 if(player){
                     player.addExp(obj.value.level,obj.value.exp,obj.value.source);
                 }
-            }else if(obj.key=='sAddGoldArray'){
+            }else if(obj.key=='sSetGoldArray'){
                 ag.gameLayer._player.addGold(obj.value);
             }else if(obj.key=='sDropArray'){
                 ag.gameLayer.dropItem(obj.value);
@@ -213,6 +213,11 @@ module.exports={
                     }
                     player._data.camp = obj.value.camp;
                     player.resetNameColor();
+                }
+            }else if(obj.key=='sSetOfficeArray'){
+                var player =  ag.gameLayer.getRole(obj.value.id);
+                if(player && player.getIsPlayer()) {
+                    ag.gameLayer._player.setOffice(obj.value.office);
                 }
             }
         }

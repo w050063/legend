@@ -308,6 +308,26 @@ cc.Class({
     },
 
 
+    //设置官职
+    setOffice:function(count){
+        this._data.office = count;
+        if(this.getIsPlayer() && this._propNode) {
+            var index = this.getOfficeIndex();
+            if (index > 0) {
+                if(this._propNode._spriteOffice)this._propNode._spriteOffice.node.destroy();
+                this._propNode._spriteOffice = new cc.Node().addComponent(cc.Sprite);
+                this._propNode._spriteOffice.node.y = 100;
+                this._propNode.addChild(this._propNode._spriteOffice.node);
+                cc.loader.loadRes('office/' + index, cc.SpriteFrame, function (err, spriteFrame) {
+                    if (this._propNode && this._propNode._spriteOffice && cc.isValid(this._propNode._spriteOffice)) {
+                        this._propNode._spriteOffice.spriteFrame = spriteFrame;
+                    }
+                }.bind(this));
+            }
+        }
+    },
+
+
     resetNearFlag:function(x,y){
         this._nearFlag = !!(Math.abs(this._data.x-x)<8 && Math.abs(this._data.y-y)<8);
         if(this._nearFlag){
@@ -326,6 +346,11 @@ cc.Class({
                     this._propNode.setLocalZOrder(ag.gameConst.roleNameZorder);
                     ag.gameLayer._nameMap.node.addChild(this._propNode);
                 }
+
+                //官职
+                this.setOffice(this._data.office);
+
+
                 //name
                 if(this._data.camp==ag.gameConst.campNpc){
                     var name = this._data.name;
@@ -1059,6 +1084,18 @@ cc.Class({
 
     getIsTiger:function() {
         return this._data.camp != ag.gameConst.campMonster && this._data.camp != ag.gameConst.campNpc && this._data.type=='m19';
+    },
+
+
+    //获得当前的称号索引
+    getOfficeIndex:function(){
+        var office = 0;
+        for(var i=0;i<ag.gameConst.officeProgress.length;++i){
+            if(ag.gameConst.officeProgress[i]<=this._data.office){
+                office = i;
+            }
+        }
+        return office;
     },
 
 
