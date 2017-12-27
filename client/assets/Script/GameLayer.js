@@ -681,7 +681,7 @@ cc.Class({
             return;
         }
         var bag = cc.find('Canvas/nodeBag/bag');
-        var startPos = cc.p(-125,61);
+        var startPos = cc.p(-125,64);
         var disPos = cc.p(36,32);
         var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
         var node = new cc.Node();
