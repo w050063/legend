@@ -74,12 +74,30 @@ module.exports = ag.class.extend({
                     if(itemMst.defense)defense+=itemMst.defense;
                 }
             }
+
+            //加上官职属性
+            var office = this.getOfficeIndex();
+            hurt+=ag.gameConst.officeHurt[office];
+            defense+=ag.gameConst.officeDefense[office];
+
             this._hurt = hurt;
             this._defense = defense;
         }else{
             this._hurt = mst.hurt;
             this._defense = mst.defense;
         }
+    },
+
+
+    //获得当前的称号索引
+    getOfficeIndex:function(){
+        var office = 0;
+        for(var i=0;i<ag.gameConst.officeProgress.length;++i){
+            if(ag.gameConst.officeProgress[i]<=this._data.office){
+                office = i;
+            }
+        }
+        return office;
     },
 
 
@@ -434,24 +452,32 @@ module.exports = ag.class.extend({
 
     addGold:function(count){
         this._data.gold += count;
-        ag.jsUtil.sendData("sAddGold",this._data.gold,this._data.id);
+        ag.db.setRoles([this]);
+        ag.jsUtil.sendData("sSetGold",this._data.gold,this._data.id);
+    },
+
+
+    addOffice:function(count){
+        this._data.office += count;
+        ag.jsUtil.sendDataAll("sSetOffice",{id:this._data.id,office:this._data.office},this._data.mapId);
     },
 
 
     dead:function (attacker) {
         if(this._state==ag.gameConst.stateDead)return;
         this._state = ag.gameConst.stateDead;
+        var master = attacker._master?attacker._master:attacker;
         
         //掉落装备
         if(this.getIsMonster()){
             var str = ag.gameConst._roleMst[this._data.type].drop;
             if(str){
-                ag.itemManager.drop(attacker._data.id,str,this._data.mapId,this.getLocation());
+                ag.itemManager.drop(master._data.id,str,this._data.mapId,this.getLocation());
             }
             var array = ag.gameConst._roleMst[this._data.type].dropLevels;
             if(array){
                 for(var i=0;i<array.length;i=i+2){
-                    ag.itemManager.dropByLevel(attacker._data.id,array[i],array[i+1],this._data.mapId,this.getLocation());
+                    ag.itemManager.dropByLevel(master._data.id,array[i],array[i+1],this._data.mapId,this.getLocation());
                 }
             }
         }else if(this.getIsPlayer()){
@@ -470,7 +496,6 @@ module.exports = ag.class.extend({
 
         
         if(attacker && attacker._data.camp!=ag.gameConst.campMonster){
-            var master = attacker._master?attacker._master:attacker;
             master.addExp(this.getMst().expDead);
 
             if(this.getIsPlayer()){

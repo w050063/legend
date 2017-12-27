@@ -70,11 +70,6 @@ CREATE TABLE `t_chats` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
--- ----------------------------
--- alter table
--- ----------------------------
-alter table t_roles add column gold int(8) NOT NULL DEFAULT 0;
-
 
 -- ----------------------------
 -- Table structure for `t_guild`
@@ -86,3 +81,10 @@ CREATE TABLE `t_guilds` (
   `member` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
+-- alter table
+-- ----------------------------
+alter table t_roles add column gold int(8) NOT NULL DEFAULT 0;
+alter table t_roles add column office int(8) NOT NULL DEFAULT 0;

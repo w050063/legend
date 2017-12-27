@@ -157,22 +157,27 @@ module.exports = ag.class.extend({
     bagItemRecycle:function(array,rid){
         var expArray = [20,20,20,20,100,200,300,400,800];
         var goldArray = [2,2,2,2,3,5,10,15,30];
+        var officeArray = [0,0,0,0,1,3,8,20,100];
         var role = ag.gameLayer.getRole(rid);
         if(role){
             var sum = 0;
-            var sumGold = 0;
+            var sumOffice = 0;
+            //var sumGold = 0;
             for(var i=0;i<array.length;++i){
                 var id = array[i];
                 var obj = this._itemMap.get(id);
                 if(obj && obj._data.owner==rid){
                     ag.jsUtil.sendDataAll("sItemDisappear",obj._data.id,role._data.mapId);
-                    sum += expArray[ag.gameConst._itemMst[obj._data.mid].level-1];
-                    sumGold += goldArray[ag.gameConst._itemMst[obj._data.mid].level-1];
+                    var index = ag.gameConst._itemMst[obj._data.mid].level-1;
+                    sum += expArray[index];
+                    sumOffice += officeArray[index];
+                    //sumGold += goldArray[ag.gameConst._itemMst[obj._data.mid].level-1];
                     this._itemMap.del(id);
                     --this._bagLengthMap[rid];
                 }
             }
             role.addExp(sum,'recycle');
+            role.addOffice(sumOffice);
             //role.addGold(sumGold);//回收不加元宝
         }
     },
@@ -254,6 +259,7 @@ module.exports = ag.class.extend({
             role.addExp(100);
             ag.jsUtil.sendData("sSystemNotify","在龙族宝藏寻到10点经验",role._data.id);
         }else if(rand<0.5){
+            role.addOffice(10);
             ag.jsUtil.sendData("sSystemNotify","在龙族宝藏寻到10点官职",role._data.id);
         }else{
             var array = [];

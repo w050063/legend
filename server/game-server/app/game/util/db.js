@@ -27,7 +27,7 @@ module.exports = ag.class.extend({
             for(var i=0;i<rows.length;++i){
                 var data = rows[i];
                 if(data.camp==ag.gameConst.campNpc || data.camp==ag.gameConst.campMonster)data.camp=ag.gameConst.campPlayerNone;//防错处理
-                ag.gameLayer.addPlayer(data.id,data.map_id,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,data.exp);
+                ag.gameLayer.addPlayer(data.id,data.map_id,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,data.exp,data.gold,data.office);
             }
         });
         this.getItems(function(rows){
@@ -183,10 +183,10 @@ module.exports = ag.class.extend({
     },
 
 
-    insertRole:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,callback){
+    insertRole:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,callback){
         if(id && map_id){
-            var sql = 'INSERT INTO t_roles(id,map_id,x,y,type,camp,sex,direction,level,exp,gold) VALUES("'
-                + id + '","' + map_id+'",' + x+',' + y+',"' + type+'",' + camp+',' + sex+',' + direction+',' + level+',' + exp+',' + gold + ')';
+            var sql = 'INSERT INTO t_roles(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office) VALUES("'
+                + id + '","' + map_id+'",' + x+',' + y+',"' + type+'",' + camp+',' + sex+',' + direction+',' + level+',' + exp+',' + gold+',' + office + ')';
             this.query(sql, function(err, rows) {
                 if (err) {
                     if(err.code == 'ER_DUP_ENTRY'){
@@ -219,6 +219,7 @@ module.exports = ag.class.extend({
                 + ', level = ' + data.level
                 + ', exp = ' + role._exp
                 + ', gold = ' + data.gold
+                + ', office = ' + data.office
                 + ' WHERE id = "' + data.id + '";';
             allSql = allSql+sql;
             this.query(allSql, function(err, rows) {

@@ -62,7 +62,7 @@ module.exports = {
         for(var key in this._roleMap){
             var role = this._roleMap[key];
             if(role.getIsPlayer() && ag.jsUtil.getIsOnline(role._data.id)==false){
-                if(role._data.level<44){
+                if(role._data.level<48){
                     this.deleteRole(role._data.id);
                 }else{
                     var lx = role.getLocation().x,ly = role.getLocation().y;
@@ -118,13 +118,14 @@ module.exports = {
 	
 	
 	//增加一个玩家
-    addPlayer:function(id,map_id,x,y,type,camp,sex,direction,level,exp){
+    addPlayer:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office){
         var name = ag.userManager.getName(id);
 		var player = this._roleMap[id];
 		if(!player){
 			player = new Role();
             player._data = {};
-            player._data.gold = 0,
+            player._data.gold = gold?gold:0,
+                player._data.office = office?office:0,
             player._data.id = id;
             player._data.type = type;
             if(map_id){
@@ -386,6 +387,8 @@ module.exports = {
         return false;
     },
     isEnemyForAttack:function(role1,role2){
+        if(role1._master)role1 = role1._master;
+        if(role2._master)role2 = role2._master;
         if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
             if(role2.getIsPlayer()){
                 var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;

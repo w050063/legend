@@ -74,7 +74,8 @@
     "required int32 hp": 9,
     "optional int32 sex": 10,
     "optional string name": 11,
-    "optional int32 gold": 12
+    "optional int32 gold": 12,
+    "optional int32 office": 13
   },
   "message sRelife": {
     "required string id": 1,
@@ -85,6 +86,10 @@
   "message sCamp": {
     "required string id": 1,
     "required int32 camp": 2
+  },
+  "message sSetOffice": {
+    "required string id": 1,
+    "required int32 office": 2
   },
   "message sGuildCreate": {
     "optional string id": 1,
@@ -114,9 +119,10 @@
     "repeated string sSystemNotifyArray": 19,
     "repeated sRelife sRelifeArray": 20,
     "repeated sCamp sCampArray": 21,
-    "repeated int32 sAddGoldArray": 22,
+    "repeated int32 sSetGoldArray": 22,
     "repeated sGuildCreate sGuildCreateArray": 23,
     "repeated string sGuildDeleteArray": 24,
-    "repeated string sGuildInviteArray": 25
+    "repeated string sGuildInviteArray": 25,
+    "repeated sSetOffice sSetOfficeArray": 26
   }
 }

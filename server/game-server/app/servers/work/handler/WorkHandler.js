@@ -126,11 +126,11 @@ var Handler = cc.Class.extend({
     enter:function(msg, session, next) {
         var role = ag.gameLayer.getRole(session.uid);
         var exist = !!role;
-        ag.gameLayer.addPlayer(session.uid,undefined,undefined,undefined,msg.type,undefined,msg.sex,undefined,undefined,undefined);
+        ag.gameLayer.addPlayer(session.uid,undefined,undefined,undefined,msg.type,undefined,msg.sex);
         if(!exist){
             role = ag.gameLayer.getRole(session.uid);
             var data = role._data;
-            ag.db.insertRole(data.id,data.mapId,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,role._exp,data.gold);
+            ag.db.insertRole(data.id,data.mapId,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,role._exp,data.gold,data.office);
         }
         next();
     },
