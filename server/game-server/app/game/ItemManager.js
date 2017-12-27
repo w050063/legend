@@ -256,10 +256,10 @@ module.exports = ag.class.extend({
         var rand = Math.random();
         if(rand<0.4){
             role.addExp(100);
-            ag.jsUtil.sendData("sSystemNotify","在龙族宝藏寻到10点经验",role._data.id);
+            ag.jsUtil.sendData("sSystemNotify",role._data.name+"在龙族宝藏寻到10点经验",role._data.id);
         }else if(rand<0.5){
             role.addOffice(10);
-            ag.jsUtil.sendData("sSystemNotify","在龙族宝藏寻到10点官职",role._data.id);
+            ag.jsUtil.sendData("sSystemNotify",role._data.name+"在龙族宝藏寻到10点官职",role._data.id);
         }else{
             var array = [];
             var map = ag.gameConst._itemMst;
