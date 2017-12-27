@@ -207,9 +207,7 @@ module.exports = ag.class.extend({
         //行会数据
         for(var key in ag.guild._dataMap){
             var temp = ag.guild._dataMap[key];
-            console.log('h1',temp.member);
             var str = temp.member.length==0?'':temp.member.join(',');
-            console.log(str);
 
             ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:temp.id,name:temp.name,member:str});//ag add for test./行会成员
         }
@@ -250,20 +248,16 @@ module.exports = ag.class.extend({
 
 
         //捡装备,是玩家,地上有东西,背包没满
-        console.log('y1');
         if(this.getIsPlayer()){
-            console.log('y2');
             var array = ag.itemManager.getDropByLocation(this._data.mapId,this.getLocation());
             var left = ag.gameConst.bagLength-ag.itemManager.getBagLength(this._data.id);
             if(array.length>left && array.length>0){
                 ag.jsUtil.sendData("sSystemNotify","背包已满!",this._data.id);
             }
-            console.log('y3',left,array.length);
             if(left>0 && array.length>0){
                 var count = Math.min(array.length,left);
                 for(var i=count-1;i>=0;--i){
                     var id = array[i]._data.id;
-                    console.log('g1',array[i]._their,this._data.id);
                     if(!array[i]._their || array[i]._their==this._data.id){
                         ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
                         ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
@@ -466,7 +460,7 @@ module.exports = ag.class.extend({
     dead:function (attacker) {
         if(this._state==ag.gameConst.stateDead)return;
         this._state = ag.gameConst.stateDead;
-        var master = attacker._master?attacker._master:attacker;
+        var master = (attacker && attacker._master)?attacker._master:attacker;
         
         //掉落装备
         if(this.getIsMonster()){

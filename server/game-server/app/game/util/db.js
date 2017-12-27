@@ -400,12 +400,10 @@ module.exports = ag.class.extend({
 
     //保存行会成员
     guildSaveMember:function(id,member,callback){
-        console.log('h2',id,member);
         if(id){
             var str = member.length==0?'':member.join(',');
             var sql = 'UPDATE t_guilds SET member = "' + str
                 + '" WHERE id = "' + id + '";';
-            console.log(sql);
 
             this.query(sql, function(err, rows) {
                 if (err) {

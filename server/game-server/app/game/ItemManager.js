@@ -77,7 +77,6 @@ module.exports = ag.class.extend({
             delete item._data.owner;
             delete item._data.puton;
             delete item._their;
-            console.log('tt',item);
             role.refreshItemProp();
             ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
         }
