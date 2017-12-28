@@ -9,6 +9,7 @@ var Item = require("Item");
 var AGTileMap = require("AGTileMap");
 var AGListView = require("AgListView");
 var ItemInfoNode = require('ItemInfoNode');
+var Wharehouse = require('Wharehouse');
 var AGAniClothes = require("AGAniClothes");
 var AGAni = require("AGAni");
 var baseNpcId = 5000;
@@ -1275,7 +1276,10 @@ cc.Class({
                     label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
                         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
                         var npcStr = transferMst.name;
-                        if(transferMst.id=='t5000'){
+                        if(transferMst.id=='t6000'){
+                            cc.find('Canvas/nodeWharehouse').getComponent(Wharehouse).show();
+                            self.buttonEventNpcClose();
+                        }else if(transferMst.id=='t5000'){
                             var index = self._bagArray.indexOf(-1);
                             if(index!=-1 && self._player._data.gold>=200){
                                 ag.agSocket.send("treasure",{});

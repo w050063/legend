@@ -1045,7 +1045,7 @@ cc.Class({
         var w = ag.gameConst.tileWidth/ 2,h = ag.gameConst.tileHeight*2;
         for(var key in map){
             var role = map[key];
-            if(role._state != ag.gameConst.stateDead){
+            if(role!=ag.gameLayer._player && role._state != ag.gameConst.stateDead){
                 var p = role.node.getPosition();
                 if(point.x>p.x-w && point.x<p.x+w && point.y>p.y && point.y< p.y+h){
                     if(role._data.camp==ag.gameConst.campNpc)return role;
