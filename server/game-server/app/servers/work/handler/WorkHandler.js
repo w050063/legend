@@ -376,4 +376,32 @@ var Handler = cc.Class.extend({
         }
         next();
     },
+
+
+
+    //增加到仓库
+    itemBagToWharehouse:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        var item = ag.itemManager._itemMap.get(msg);
+        if(player && item && item._data.owner==session.uid) {
+            item._data.puton = ag.gameConst.putonWharehouse;
+            --player._bagLength;
+            ++player._wharehoseLength;
+        }
+        next();
+    },
+
+
+
+    //道具仓库到背包
+    itemWharehouseToBag:function (msg, session, next) {
+        var player =  ag.gameLayer.getRole(session.uid);
+        var item = ag.itemManager._itemMap.get(msg);
+        if(player && item && item._data.owner==session.uid) {
+            item._data.puton = ag.gameConst.putonBag;
+            ++player._bagLength;
+            --player._wharehoseLength;
+        }
+        next();
+    },
 });

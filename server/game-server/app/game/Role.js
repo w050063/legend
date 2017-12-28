@@ -9,6 +9,8 @@ module.exports = ag.class.extend({
     _mst:null,
     ctor:function () {
         this._busy = false;
+        this._bagLength = 0;
+        this._wharehoseLength = 0;
     },
 
 
@@ -68,7 +70,7 @@ module.exports = ag.class.extend({
             var map = ag.itemManager._itemMap.getMap();
             for (var key in map) {
                 var obj = map[key]._data;
-                if (obj.owner == this._data.id && typeof obj.puton=='number') {
+                if (obj.owner == this._data.id && obj.puton>=0) {
                     var itemMst = ag.gameConst._itemMst[obj.mid];
                     if(itemMst.hurt)hurt+=itemMst.hurt;
                     if(itemMst.defense)defense+=itemMst.defense;
@@ -250,7 +252,7 @@ module.exports = ag.class.extend({
         //捡装备,是玩家,地上有东西,背包没满
         if(this.getIsPlayer()){
             var array = ag.itemManager.getDropByLocation(this._data.mapId,this.getLocation());
-            var left = ag.gameConst.bagLength-ag.itemManager.getBagLength(this._data.id);
+            var left = ag.gameConst.bagLength-this._bagLength;
             if(array.length>left && array.length>0){
                 ag.jsUtil.sendData("sSystemNotify","背包已满!",this._data.id);
             }
@@ -259,9 +261,9 @@ module.exports = ag.class.extend({
                 for(var i=count-1;i>=0;--i){
                     var id = array[i]._data.id;
                     if(!array[i]._their || array[i]._their==this._data.id){
+                        ag.itemManager.addBagItem(id,this._data.id);
                         ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
                         ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
-                        ag.itemManager.addBagItem(id,this._data.id);
                     }else{
                         ag.jsUtil.sendData("sSystemNotify","一定时间内无法捡取该装备!",this._data.id);
                     }
@@ -480,7 +482,7 @@ module.exports = ag.class.extend({
                 var map = ag.itemManager._itemMap.getMap();
                 for(var key in map){
                     var itemData = map[key]._data;
-                    if(itemData.owner==this._data.id && typeof itemData.puton=='number'){
+                    if(itemData.owner==this._data.id && itemData.puton>=0){
                         array.push(itemData.id);
                     }
                 }

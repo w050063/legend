@@ -9,7 +9,6 @@ var AgXYMap = require("./AgXYMap");
 module.exports = ag.class.extend({
     ctor:function () {
         this._itemMap = new AgXYMap();
-        this._bagLengthMap = {};
         ag.actionManager.schedule(this,1,this.update1.bind(this));
     },
 
@@ -40,7 +39,9 @@ module.exports = ag.class.extend({
                 var item = new Item(array[i]);
                 item._duration = 0;
                 item._data.owner = id;
-                this.addItem(item);
+                item._data.puton = ag.gameConst.putonBag;
+                this._itemMap.add(item);
+                ++role._bagLength;
                 ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
             }
         }
@@ -57,6 +58,8 @@ module.exports = ag.class.extend({
                     pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
                     var item = new Item(array[i],mapId,pos);
                     item._duration = ag.gameConst.itemDuration;
+                    item._data.owner = '';
+                    item._data.puton = ag.gameConst.putonGround;
                     item._their = rid;
                     this._itemMap.add(item);
                     ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
@@ -74,8 +77,8 @@ module.exports = ag.class.extend({
             var item =this._itemMap.get(array[index]);
             this._itemMap.setMapXYById(item._data.id,mapId,pos.x,pos.y);
             item._duration = ag.gameConst.itemDuration;
-            delete item._data.owner;
-            delete item._data.puton;
+            item._data.owner = '';
+            item._data.puton = ag.gameConst.putonGround;
             delete item._their;
             role.refreshItemProp();
             ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
@@ -92,6 +95,8 @@ module.exports = ag.class.extend({
                     var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
                     pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
                     var item = new Item(key,mapId,pos);
+                    item._data.owner = '';
+                    item._data.puton = ag.gameConst.putonGround;
                     item._duration = ag.gameConst.itemDuration;
                     item._their = rid;
                     this._itemMap.add(item);
@@ -111,6 +116,8 @@ module.exports = ag.class.extend({
                 var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
                 pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
                 var item = new Item(tempArray[rand],mapId,pos);
+                item._data.owner = '';
+                item._data.puton = ag.gameConst.putonGround;
                 item._duration = ag.gameConst.itemDuration;
                 this._itemMap.add(item);
                 ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
@@ -120,13 +127,13 @@ module.exports = ag.class.extend({
 
 
     addBagItem:function (id,rid) {
+        var role = ag.gameLayer.getRole(rid);
         var obj = this._itemMap.get(id);
         if(obj){
-            this._itemMap.del(id);
+            this._itemMap.setMapXYById(id);
             obj._data.owner = rid;
-            obj._data.x = undefined;
-            obj._data.y = undefined;
-            this.addItem(obj);
+            obj._data.puton = ag.gameConst.putonBag;
+            ++role._bagLength;
         }
     },
 
@@ -135,18 +142,15 @@ module.exports = ag.class.extend({
         var obj = this._itemMap.get(id);
         var role = ag.gameLayer.getRole(rid);
         if(obj && role){
-            this._itemMap.del(id);
-            obj._data.owner = undefined;
             var location = role.getLocation();
             var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
             pos = ag.gameLayer.getStandLocation(role._data.mapId,pos.x,pos.y);
-            obj._data.mapId = role._data.mapId;
-            obj._data.x = pos.x;
-            obj._data.y = pos.y;
+            this._itemMap.setMapXYById(id,role._data.mapId,pos.x,pos.y);
+            obj._data.owner = '';
+            obj._data.puton = ag.gameConst.putonGround;
             obj._duration = ag.gameConst.itemDuration;
-            this._itemMap.add(obj);
-            if(!this._bagLengthMap[rid])this._bagLengthMap[rid] = 1;
-            --this._bagLengthMap[rid];
+
+            --role._bagLength;
             ag.jsUtil.sendDataAll("sDrop",obj._data,obj._data.mapId);
         }
     },
@@ -172,7 +176,7 @@ module.exports = ag.class.extend({
                     sumOffice += officeArray[index];
                     //sumGold += goldArray[ag.gameConst._itemMst[obj._data.mid].level-1];
                     this._itemMap.del(id);
-                    --this._bagLengthMap[rid];
+                    --role._bagLength;
                 }
             }
             role.addExp(sum,'recycle');
@@ -192,13 +196,13 @@ module.exports = ag.class.extend({
                 for (var key in map) {
                     var obj = map[key]._data;
                     if (obj.owner == rid && obj.puton==puton && mst.type == ag.gameConst._itemMst[obj.mid].type) {
-                        delete obj.puton;
-                        ++this._bagLengthMap[rid];
+                        obj.puton = ag.gameConst.putonBag;
+                        ++role._bagLength;
                         break;
                     }
                 }
                 item._data.puton = puton;
-                --this._bagLengthMap[rid];
+                --role._bagLength;
                 ag.jsUtil.sendDataExcept("sBagItemToEquip",{id:id,puton:puton,rid:rid},rid);
                 role.refreshItemProp();
             }
@@ -210,8 +214,8 @@ module.exports = ag.class.extend({
         var item = this._itemMap.get(id);
         var role = ag.gameLayer.getRole(rid);
         if(item && role){
-            delete item._data.puton;
-            ++this._bagLengthMap[rid];
+            item._data.puton = ag.gameConst.putonBag;
+            ++role._bagLength;
             role.refreshItemProp();
             ag.jsUtil.sendDataExcept("sEquipItemToBag",{id:id,rid:rid},rid);
         }
@@ -220,6 +224,7 @@ module.exports = ag.class.extend({
 
     //删除指定角色的道具
     delItemByRoleId:function(rid){
+        var role = ag.gameLayer.getRole(rid);
         var map = this._itemMap.getMap();
         for (var key in map) {
             var obj = map[key]._data;
@@ -227,21 +232,7 @@ module.exports = ag.class.extend({
                 this._itemMap.del(key);
             }
         }
-        delete this._bagLengthMap[rid];
-    },
-
-
-    getBagLength:function (id) {
-        return this._bagLengthMap[id] || 0;
-    },
-
-    addItem:function(item){
-        ag.itemManager._itemMap.add(item);
-        var rid = item._data.owner;
-        if(rid && typeof item._data.puton!='number'){
-            if(!this._bagLengthMap[rid])this._bagLengthMap[rid] = 0;
-            ++this._bagLengthMap[rid];
-        }
+        role._bagLength = 0;
     },
 
 
@@ -288,7 +279,9 @@ module.exports = ag.class.extend({
             var item = new Item(array[index]);
             item._duration = 0;
             item._data.owner = role._data.id;
+            item._data.puton = ag.gameConst.putonBag;
             this._itemMap.add(item);
+            ++role._bagLength;
             ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
             ag.jsUtil.sendDataAll("sSystemNotify", role._data.name+"在龙族宝藏寻到"+ag.gameConst._itemMst[item._data.mid].name+"！");
         }

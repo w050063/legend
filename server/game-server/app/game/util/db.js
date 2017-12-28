@@ -36,8 +36,8 @@ module.exports = ag.class.extend({
                 var item = new Item(data.mid,undefined,undefined,data.id);
                 item._duration = 0;
                 item._data.owner = data.owner;
-                if(data.puton!=-1)item._data.puton = data.puton;
-                ag.itemManager.addItem(item);
+                item._data.puton = data.puton;
+                ag.itemManager._itemMap.add(item);
                 var role = ag.gameLayer.getRole(data.owner);
                 if(role){
                     ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
@@ -291,11 +291,10 @@ module.exports = ag.class.extend({
                 var i1 = items[i];
                 if(map[i1.id]){
 					var i2 = map[i1.id]._data;
-                    var puton = (typeof i2.puton=='number')?i2.puton:-1;
-                    if(i1.mid!=i2.mid || i1.owner!=i2.owner || i1.puton!=puton){
+                    if(i1.mid!=i2.mid || i1.owner!=i2.owner || i1.puton!=i2.puton){
                         var sql = 'UPDATE t_items SET mid = "' + i2.mid
                             + '", owner = "' + i2.owner
-                            + '", puton = ' + puton
+                            + '", puton = ' + i2.puton
                             + ' WHERE id = "' + i1.id + '";';
                         allSql = allSql+sql;
                     }
@@ -308,9 +307,8 @@ module.exports = ag.class.extend({
 
             for(var key in idMaps){
                 var temp = map[key]._data;
-                var puton = (typeof temp.puton=='number')?temp.puton:-1;
                 var sql = 'INSERT INTO t_items(id,mid,owner,puton) VALUES("'
-                    + temp.id + '","' + temp.mid+'","' + temp.owner+'",' + puton + ');';
+                    + temp.id + '","' + temp.mid+'","' + temp.owner+'",' + temp.puton + ');';
                 allSql = allSql+sql;
             }
             if(allSql.length>0){
