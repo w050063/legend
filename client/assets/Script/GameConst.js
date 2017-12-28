@@ -34,6 +34,12 @@ module.exports= {
     officeDefense:[0,1,2,3,5,6,8,10,12,15,20],
 
 
+    //装备puton编号，>0表示身上
+    putonBag:-1,
+    putonWharehouse:-2,
+    putonGround:-3,
+
+
     roleNameZorder:14,
     roleEffectZorder:13,
     roleWeaponZorder:[8,12,12,12,8,8,8,8],//武器z轴

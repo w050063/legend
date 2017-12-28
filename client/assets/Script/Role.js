@@ -7,7 +7,6 @@
 var AGAniClothes = require("AGAniClothes");
 var AIController = require("AIController");
 var AGAni = require("AGAni");
-//var AGAniOffset = require("AGAniOffset");
 cc.Class({
     extends: cc.Component,
     properties: {},
@@ -21,7 +20,7 @@ cc.Class({
         for(var key in ag.userInfo._itemMap){
             var data = ag.userInfo._itemMap[key]._data;
             if(data.owner==this){
-                if(typeof data.puton=='number'){
+                if(data.puton>=0){
                     this.addEquip(data.id);
                     if(this==ag.gameLayer._player)ag.gameLayer.itemBagToEquip(data.id);
                 }else{
@@ -112,10 +111,7 @@ cc.Class({
 
     addEquip:function(id){
         var data = ag.userInfo._itemMap[id]._data;
-        var mst = ag.gameConst._itemMst[data.mid];
-        //var puton = ag.gameConst.putonTypes.indexOf(mst.type);
-        var puton = data.puton;
-            this._equipArray[puton] = id;
+        this._equipArray[data.puton] = id;
         if(this._state==ag.gameConst.stateIdle){
             this.idleAnimation();
         }
@@ -316,7 +312,7 @@ cc.Class({
             if (index > 0) {
                 if(this._propNode._spriteOffice)this._propNode._spriteOffice.node.destroy();
                 this._propNode._spriteOffice = new cc.Node().addComponent(cc.Sprite);
-                this._propNode._spriteOffice.node.y = 100;
+                this._propNode._spriteOffice.node.y = 107;
                 this._propNode.addChild(this._propNode._spriteOffice.node);
                 cc.loader.loadRes('office/' + index, cc.SpriteFrame, function (err, spriteFrame) {
                     if (this._propNode && this._propNode._spriteOffice && cc.isValid(this._propNode._spriteOffice)) {

@@ -41,6 +41,23 @@ cc.Class({
     },
 
 
+    setItemIdByWharehouse:function(id){
+        var obj = ag.userInfo._itemMap[id];
+        var mst = ag.gameConst._itemMst[obj._data.mid];
+        var back = this.node.getChildByName('back');
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
+        back.getChildByName('labelContent').getComponent(cc.Label).string = ag.gameLayer.getItemBagShow(mst);
+        var buttonNode = back.getChildByName('buttonDispose');
+        buttonNode.x = 0;
+        var label = buttonNode.getChildByName('label').getComponent(cc.Label);
+        label.string = obj._data.puton==ag.gameConst.putonBag?'存储':'取出';
+        var label1 = back.getChildByName('buttonDispose1').getChildByName('label').getComponent(cc.Label);
+        back.getChildByName('buttonDispose1').active = false;
+        this._obj = obj;
+        ag.jsUtil.secondInterfaceAnimation(back);
+    },
+
+
     setItemId:function(id){
         var obj = ag.userInfo._itemMap[id];
         var mst = ag.gameConst._itemMst[obj._data.mid];
@@ -50,7 +67,7 @@ cc.Class({
         var str = '确定';
         var bOther = false;
         if(obj._data.owner==ag.gameLayer._player._data.id){
-            if(typeof obj._data.puton=='number'){
+            if(obj._data.puton>=0){
                 str = '卸下';
             }else{
                 str = '丢弃';
@@ -101,7 +118,7 @@ cc.Class({
                 for(var key in ag.userInfo._itemMap){
                     var obj = ag.userInfo._itemMap[key]._data;
                     if(obj.owner==ag.gameLayer._player._data.id && obj.puton==index && mst.type==ag.gameConst._itemMst[obj.mid].type){
-                        delete obj.puton;
+                        obj.puton = ag.gameConst.putonBag;
                         tempId = obj.id;
                         break;
                     }
@@ -118,6 +135,20 @@ cc.Class({
                     if(i!=mst.exclusive.length-1)str = str+'，';
                 }
                 ag.jsUtil.showText(ag.gameLayer.node,str);
+            }
+        }else if(label.string=='存储'){
+            var index = ag.gameLayer._wharehouseArray.indexOf(-1);
+            if(index!=-1) {
+                this._obj._data.puton = ag.gameConst.putonWharehouse;
+                ag.agSocket.send("itemBagToWharehouse", this._obj._data.id);
+                ag.gameLayer.itemBagToWharehouse(this._obj._data.id);
+            }
+        }else if(label.string=='取出'){
+            var index = ag.gameLayer._bagArray.indexOf(-1);
+            if(index!=-1) {
+                this._obj._data.puton = ag.gameConst.putonBag;
+                ag.agSocket.send("itemWharehouseToBag", this._obj._data.id);
+                ag.gameLayer.itemWharehouseToBag(this._obj._data.id);
             }
         }
         this.node.active = false;

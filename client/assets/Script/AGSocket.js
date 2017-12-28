@@ -217,7 +217,7 @@ module.exports={
             }else if(obj.key=='sSetOfficeArray'){
                 var player =  ag.gameLayer.getRole(obj.value.id);
                 if(player && player.getIsPlayer()) {
-                    ag.gameLayer._player.setOffice(obj.value.office);
+                    player.setOffice(obj.value.office);
                 }
             }
         }

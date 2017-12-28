@@ -8,13 +8,13 @@ cc.Class({
     extends: cc.Component,
     properties: {},
     onLoad: function () {
-        var node = cc.find("Canvas/door");
-        node.setPosition(ag.userInfo.backGroundPos);
-        var dis0 = cc.pDistance(cc.p(280,230),cc.p(-100,-330));
-        var dis1 = cc.pDistance(cc.p(280,230),ag.userInfo.backGroundPos);
-        node.runAction(cc.sequence(cc.moveTo(20*dis1/dis0,cc.p(280,230)),cc.callFunc(function(){
-            node.runAction(cc.repeatForever(cc.sequence(cc.moveTo(20,cc.p(-100,-330)),cc.moveTo(20,cc.p(280,230)))));
-        })));
+        //var node = cc.find("Canvas/door");
+        //node.setPosition(ag.userInfo.backGroundPos);
+        //var dis0 = cc.pDistance(cc.p(280,230),cc.p(-100,-330));
+        //var dis1 = cc.pDistance(cc.p(280,230),ag.userInfo.backGroundPos);
+        //node.runAction(cc.sequence(cc.moveTo(20*dis1/dis0,cc.p(280,230)),cc.callFunc(function(){
+        //    node.runAction(cc.repeatForever(cc.sequence(cc.moveTo(20,cc.p(-100,-330)),cc.moveTo(20,cc.p(280,230)))));
+        //})));
         cc.audioEngine.stopAll();
         cc.audioEngine.play(cc.url.raw("resources/music/Dragon Rider.mp3"),true,1);
     },

@@ -35,6 +35,10 @@ cc.Class({
         for(var i=0;i<ag.gameConst.bagMaxCount;++i){
             this._bagArray.push(-1);
         }
+        this._wharehouseArray = [];
+        for(var i=0;i<ag.gameConst.bagMaxCount;++i){
+            this._wharehouseArray.push(-1);
+        }
 
         //自动攻击
         var temp = cc.sys.localStorage.getItem('setupAutoAttack');
@@ -397,14 +401,16 @@ cc.Class({
             if(data.owner){
                 var role = this._roleMap[data.owner];
                 if(role){
-                    if(typeof data.puton=='number'){
+                    if(data.puton>=0){
                         role.addEquip(data.id);
                         if(role==this._player)this.itemBagToEquip(data.id);
-                    }else{
+                    }else if(data.puton==ag.gameConst.putonBag){
                         if(role==this._player)this.itemEquipToBag(data.id);
+                    }else if(data.puton==ag.gameConst.putonWharehouse){
+                        if(role==this._player)this.itemToWharehouse(data.id);
                     }
                 }
-            }else{
+            }else if(data.puton==ag.gameConst.putonGround){
                 this.dropItem(data);
             }
         }
@@ -416,12 +422,8 @@ cc.Class({
         if(data.mapId==this._player._data.mapId){
             //如果是装备，则处理掉落
             var obj = ag.userInfo._itemMap[data.id];
-            if(obj && obj._data.owner && typeof obj._data.puton=='number') {
-                var role = this.getRole(obj._data.owner);
-                var puton = obj._data.puton;
-                delete obj._data.owner;
-                delete obj._data.puton;
-                this.itemEquipToGround(obj._data.id,puton,role);
+            if(obj && obj._data.owner && obj._data.puton>=0) {
+                this.itemEquipToGround(obj._data.id,obj._data.puton,this.getRole(obj._data.owner));
             }
 
 
@@ -494,7 +496,7 @@ cc.Class({
         var obj = ag.userInfo._itemMap[id];
         var role = ag.gameLayer.getRole(rid);
         if(obj && role){
-            delete obj._data.puton;
+            obj._data.puton = -1;
             var success = role.delEquip(id);
             if(success && role==this._player){
                 var data = obj._data;
@@ -697,7 +699,11 @@ cc.Class({
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
             cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
             cc.find('Canvas/nodeItemInfo').active = true;
-            cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
+            if(cc.find('Canvas/nodeWharehouse').active){
+                cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemIdByWharehouse(id);
+            }else{
+                cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
+            }
         }.bind(this));
     },
 
@@ -718,6 +724,87 @@ cc.Class({
     },
 
 
+    //背包道具到仓库
+    itemBagToWharehouse:function(id){
+        var index = -1;
+        for(var i=0;i<this._bagArray.length;++i){
+            if(this._bagArray[i].id==id){
+                index = i;
+                break;
+            }
+        }
+        var index2 = this._wharehouseArray.indexOf(-1);
+        if(index!=-1 && index2!=-1){
+            var sprite = this._bagArray[index];
+            this._bagArray[index] = -1;
+
+            sprite.node.removeFromParent(false);
+            var startPos = cc.p(-125,64);
+            var disPos = cc.p(36,32);
+            sprite.node.setPosition(startPos.x+disPos.x*(index2%8),startPos.y-disPos.y*Math.floor(index2/8));
+            cc.find('Canvas/nodeWharehouse/warehouse').addChild(sprite.node);
+            this._wharehouseArray[index2] = {id:id,node:sprite.node};
+        }
+    },
+
+
+    //道具仓库到背包
+    itemWharehouseToBag:function(id){
+        var index = -1;
+        for(var i=0;i<this._wharehouseArray.length;++i){
+            if(this._wharehouseArray[i].id==id){
+                index = i;
+                break;
+            }
+        }
+        var index2 = this._bagArray.indexOf(-1);
+        if(index!=-1 && index2!=-1){
+            var sprite = this._wharehouseArray[index];
+            this._wharehouseArray[index] = -1;
+
+            sprite.node.removeFromParent(false);
+            var startPos = cc.p(-125,64);
+            var disPos = cc.p(36,32);
+            sprite.node.setPosition(startPos.x+disPos.x*(index2%8),startPos.y-disPos.y*Math.floor(index2/8));
+            cc.find('Canvas/nodeWharehouse/bag').addChild(sprite.node);
+            this._bagArray[index2] = {id:id,node:sprite.node};
+        }
+    },
+
+
+    //增加到仓库
+    itemToWharehouse:function(id){
+        var index = this._wharehouseArray.indexOf(-1);
+        if(index!=-1){
+            var startPos = cc.p(-125,64);
+            var disPos = cc.p(36,32);
+            var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
+            var node = new cc.Node();
+            var sprite = node.addComponent(cc.Sprite);
+            sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
+            node.setPosition(startPos.x+disPos.x*(index%8),startPos.y-disPos.y*Math.floor(index/8));
+            sprite.sizeMode = cc.Sprite.SizeMode.RAW;
+            sprite.trim = false;
+            cc.find('Canvas/nodeWharehouse/warehouse').addChild(sprite.node);
+            this._wharehouseArray[index] = {id:id,node:node};
+
+
+            node.off(cc.Node.EventType.TOUCH_END);
+            node.on(cc.Node.EventType.TOUCH_END, function (event) {
+                cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+                cc.find('Canvas/nodeItemInfo').active = true;
+                if(cc.find('Canvas/nodeWharehouse').active){
+                    cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemIdByWharehouse(id);
+                }else{
+                    cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
+                }
+            }.bind(this));
+        }
+    },
+
+
+
+
     //卸下一件道具
     itemEquipToBag:function(id,puton){
         this.addItemToBag(id);
@@ -725,13 +812,10 @@ cc.Class({
         var mst = ag.gameConst._itemMst[data.mid];
         var success = this._player.delEquip(id);
         if(success){
-            //var puton = ag.gameConst.putonTypes.indexOf(mst.type);
-            cc.log('puton:'+puton);
-            if(typeof puton=='number'){
+            if(puton>=0){
                 var father = cc.find('Canvas/nodeBag/equip');
                 var node = father.getChildByName('equip'+puton);
                 if(node){
-                    cc.log('del ok');
                     node.removeFromParent();
                     node.destroy();
                 }
@@ -770,12 +854,10 @@ cc.Class({
         var success = this._player.delEquip(id);
         if(success && role==this._player){
             //var puton = ag.gameConst.putonTypes.indexOf(mst.type);
-            cc.log('puton:'+puton);
-            if(typeof puton=='number'){
+            if(puton>=0){
                 var father = cc.find('Canvas/nodeBag/equip');
                 var node = father.getChildByName('equip'+puton);
                 if(node){
-                    cc.log('del ok');
                     node.removeFromParent();
                     node.destroy();
                 }
@@ -812,7 +894,7 @@ cc.Class({
         var data = ag.userInfo._itemMap[id]._data;
         var mst = ag.gameConst._itemMst[data.mid];
         var puton = data.puton;
-        if(typeof puton!='number')return;
+        if(puton<0)return;
         //if(!puton)puton = ag.gameConst.putonTypes.indexOf(mst.type);
         var role = this._roleMap[ag.userInfo._itemMap[id]._data.owner];
         if(role==this._player)this.delItemFormBag(id);
@@ -897,7 +979,7 @@ cc.Class({
         this.defaultRoleAni(role);
         for(var key in ag.userInfo._itemMap){
             var data = ag.userInfo._itemMap[key]._data;
-            if(data.owner==playerId && typeof data.puton=='number'){
+            if(data.owner==playerId && data.puton>=0){
                 this.itemBagToEquip(data.id);
             }
         }
@@ -957,112 +1039,10 @@ cc.Class({
 
 
     refreshBag:function () {
-        return;
-        var array = [];
-        for(var key in ag.userInfo._itemMap){
-            var obj = ag.userInfo._itemMap[key];
-            if(obj._data.owner==this._player._data.id && !obj._data.puton){
-                array.push(obj);
-            }
-        }
-
-        var bag = cc.find('Canvas/nodeBag/bag');
-        bag.destroyAllChildren();
-        var startPos = cc.p(-100,100);
-        var disPos = cc.p(100,100);
-        for(var i=0;i<array.length;++i){
-            var mst = ag.gameConst._itemMst[array[i]._data.mid];
-            var node = new cc.Node();
-            var sprite = node.addComponent(cc.Sprite);
-            sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
-            bag.addChild(node);
-        }
-
-
-        this._scrollViewList.setCount(array.length);
-        this._scrollViewList.setCallback(function(item,index){
-            var data = ag.gameConst._itemMst[array[index]._data.mid];
-            item.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+data.id.substr(1));
-            item.getChildByName('spriteIcon').setScale(2);
-            item.getChildByName('labelName').getComponent(cc.Label).string = this.getItemBagShow(data);
-            item.off('touchstart');
-            item.on('touchstart', function (event) {
-            }.bind(this));
-
-            var button = item.getChildByName('buttonEquip');
-            button.off(cc.Node.EventType.TOUCH_END);
-            button.on(cc.Node.EventType.TOUCH_END, function (event) {
-                var id = array[index]._data.id;
-                var mst = ag.gameConst._itemMst[array[index]._data.mid];
-                if(mst.exclusive.indexOf(this._player.getTypeNum())!=-1){
-                    ag.agSocket.send("bagItemToEquip",id);
-                    for(var key in ag.userInfo._itemMap){
-                        var obj = ag.userInfo._itemMap[key]._data;
-                        if(obj.owner==this._player._data.id && obj.puton && mst.type==ag.gameConst._itemMst[obj.mid].type){
-                            delete obj.puton;
-                            break;
-                        }
-                    }
-                    ag.userInfo._itemMap[id]._data.puton = 1;
-                    this._player.addEquip(id);
-                    this.refreshBag();
-                    this.refreshEquip();
-                }else{
-                    ag.jsUtil.showText(this.node,'不能穿戴');
-                }
-            }.bind(this));
-
-            var button = item.getChildByName('buttonDrop');
-            button.off(cc.Node.EventType.TOUCH_END);
-            button.on(cc.Node.EventType.TOUCH_END, function (event) {
-                var id = array[index]._data.id;
-                ag.agSocket.send("bagItemToGround",id);
-                ag.userInfo._itemMap[id]._data.owner = undefined;
-                this.refreshBag();
-            }.bind(this));
-        }.bind(this));
-        this._scrollViewList.reload();
     },
 
 
     refreshEquip:function () {
-        return;
-        var array = [];
-        for(var key in ag.userInfo._itemMap){
-            var obj = ag.userInfo._itemMap[key];
-            if(obj._data.owner==this._player._data.id && obj._data.puton){
-                array.push(obj);
-            }
-        }
-
-
-        for(var i=0;i<5;++i){
-            this._equipArray[i].spriteFrame = undefined;
-        }
-
-        for(var i=0;i<array.length;++i){
-            var mst = ag.gameConst._itemMst[array[i]._data.mid];
-            this._equipArray[mst.type].spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
-            this._equipArray[mst.type].node.setScale(2);
-        }
-
-
-        //属性显示
-        var mst = this._player.getMst();
-        var lv = this._player._data.level;
-        var hurt = mst.hurt+Math.floor(mst.hurtAdd*lv);
-        var defense = mst.defense+Math.floor(mst.defenseAdd*lv);
-        for(var i=0;i<5;++i){
-            if(this._player._equipArray[i]){
-                var itemMst = ag.gameConst._itemMst[this._player._equipArray[i]];
-                if(itemMst.hurt)hurt+=itemMst.hurt;
-                if(itemMst.defense)defense+=itemMst.defense;
-            }
-        }
-        this._equipArray[5].string = '攻击:'+hurt;
-        this._equipArray[6].string = '防御:'+defense;
-        this._player._hurt = hurt;
-        this._player._defense = defense;
     },
 
 
@@ -1330,7 +1310,7 @@ cc.Class({
                             var array = [];
                             for(var key in ag.userInfo._itemMap){
                                 var obj = ag.userInfo._itemMap[key];
-                                if(obj._data.owner==self._player._data.id && typeof obj._data.puton!='number' && curLevels.indexOf(ag.gameConst._itemMst[obj._data.mid].level)!=-1){
+                                if(obj._data.owner==self._player._data.id && obj._data.puton==ag.gameConst.putonBag && curLevels.indexOf(ag.gameConst._itemMst[obj._data.mid].level)!=-1){
                                     var id = obj._data.id;
                                     array.push(id);
                                     ag.userInfo._itemMap[id]._data.owner = undefined;
