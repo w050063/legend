@@ -11,7 +11,9 @@ module.exports = function(app) {
 var WorkRemote = function(app) {
 	this.app = app;
 	this.channelService = app.get('channelService');
+    this._baseUid = 0;
 };
+
 
 /**
  * Add user into work channel.
@@ -83,6 +85,10 @@ WorkRemote.prototype.get = function() {
  *
  */
 WorkRemote.prototype.kick = function(uid, sid, cb) {
+    //解除绑定
+    ag.userManager.unbindUid(uid);
+
+
 	var channel = this.channelService.getChannel(ag.jsUtil.dataChannel, true);
 	// leave channel
 	if( !! channel) {

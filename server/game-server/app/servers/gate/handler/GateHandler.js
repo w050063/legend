@@ -13,8 +13,14 @@ module.exports = function(app) {
 var Handler = cc.Class.extend({
     ctor:function (app) {
         this.app = app;
+        this._baseUid = 0;
     },
 
+
+
+    getUniqueUid: function() {
+        return 'r'+(++this._baseUid);
+    },
 
     /**
      * Gate handler that dispatch user to connectors.
@@ -37,9 +43,10 @@ var Handler = cc.Class.extend({
         // select conn
         var res = connectors[Math.floor(Math.random()*connectors.length)];
         next(null, {
-            code: 200,
+            code: 0,
             host: res.host,
-            port: res.clientPort
+            port: res.clientPort,
+            uid:this.getUniqueUid()
         });
     },
 });

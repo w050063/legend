@@ -43,39 +43,54 @@ var Handler = cc.Class.extend({
     },
 
 
+
+    //注册
+    register:function(msg, session, next) {
+
+        if(ag.userManager.existAccount(msg.account)==false){
+            ag.userManager.add(msg.account,msg.password,msg.account);
+            //写进数据库
+            var timeCounter = ''+new Date().getTime();
+            ag.db.createAccount(msg.account,msg.password,msg.account,timeCounter,timeCounter);
+            next(null, {code: 0});
+        }else{
+            next(null, {code: 1});
+        }
+    },
+
+
     //进入游戏,0正确,1Id为空,2ID已经存在
-    ykLogin:function(msg, session, next) {
-        var data = null;
-        if(session.uid){
-            var exist = ag.userManager.getName(session.uid)!='';
-
-
-            data = ag.userManager.add(session.uid);
-            var player =  ag.gameLayer.getRole(session.uid);
+    login:function(msg, session, next) {
+        if(ag.userManager.isRightAccountAndPassword(msg.account,msg.password)){
+            //绑定账号和uid
+            ag.userManager.bindUid(session.uid,msg.account);
+            var data = ag.userManager.add(msg.account);
+            var player =  ag.gameLayer.getRole(msg.account);
             if(player){
                 data.type = player._data.type;
                 data.sex = player._data.sex;
             }
 
-
             //写进数据库
             var timeCounter = ''+new Date().getTime();
-            if(!exist){
-                ag.db.createAccount(session.uid,'111111',data.name,timeCounter,timeCounter);
-            }else{
-                ag.db.setAccountLastTime(session.uid,timeCounter);
-            }
+            ag.db.setAccountLastTime(msg.account,timeCounter);
+            next(null, {code: 0,data: data});
+        }else{
+            next(null, {code: 1});
         }
-        next(null, {
-            code: data?0:1,
-            data: data?data:0
-        });
+    },
+
+
+    //进入游戏,0正确,1Id为空,2ID已经存在
+    ykLogin:function(msg, session, next) {
+        next(null, {code:1});
     },
 
 
     //0正常,1id不存在,2名字重复
     changeName:function(msg, session, next) {
-        var code = ag.userManager.changeName(session.uid,msg);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var code = ag.userManager.changeName(id,msg);
         next(null, {
             code: code
         });
@@ -94,7 +109,8 @@ var Handler = cc.Class.extend({
     //删除角色,0正常，1不存在角色
     deleteRole:function(msg, session, next) {
         var code = 0;
-        ag.gameLayer.deleteRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        ag.gameLayer.deleteRole(id);
         ag.db.setItems();//道具保存
         next(null, {
             code: code
@@ -103,10 +119,11 @@ var Handler = cc.Class.extend({
 
 
     chatYou : function(msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
-            ag.db.insertChat(session.uid,msg,''+new Date().getTime());
-            ag.jsUtil.sendDataAll("sChatYou",{id:session.uid,name:player._data.name+'('+ag.gameConst._roleMst[player._data.type].name+')',content:msg});
+            ag.db.insertChat(id,msg,''+new Date().getTime());
+            ag.jsUtil.sendDataAll("sChatYou",{id:id,name:player._data.name+'('+ag.gameConst._roleMst[player._data.type].name+')',content:msg});
         }
         next();
     },
@@ -114,7 +131,8 @@ var Handler = cc.Class.extend({
 
     //更换新地图
     changeMap:function(msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
             player.changeMap(msg);
         }
@@ -124,11 +142,12 @@ var Handler = cc.Class.extend({
 
     //进入游戏
     enter:function(msg, session, next) {
-        var role = ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var role = ag.gameLayer.getRole(id);
         var exist = !!role;
-        ag.gameLayer.addPlayer(session.uid,undefined,undefined,undefined,msg.type,undefined,msg.sex);
+        ag.gameLayer.addPlayer(id,undefined,undefined,undefined,msg.type,undefined,msg.sex);
         if(!exist){
-            role = ag.gameLayer.getRole(session.uid);
+            role = ag.gameLayer.getRole(id);
             var data = role._data;
             ag.db.insertRole(data.id,data.mapId,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,role._exp,data.gold,data.office);
         }
@@ -138,7 +157,8 @@ var Handler = cc.Class.extend({
 
     //移动
     move:function(msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
             player.move({x:msg.x,y:msg.y});
         }
@@ -148,7 +168,8 @@ var Handler = cc.Class.extend({
 
     //攻击
     attack:function(msg, session, next) {
-        var attacker =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var attacker =  ag.gameLayer.getRole(id);
         var locked =  ag.gameLayer.getRole(msg.id);
         if(attacker && locked){
             attacker.attack(locked);
@@ -160,7 +181,8 @@ var Handler = cc.Class.extend({
 
     //复活请求
     relife:function(msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
             player.relife();
         }
@@ -169,33 +191,38 @@ var Handler = cc.Class.extend({
 
 
     bagItemToGround:function (msg, session, next) {
-        ag.itemManager.bagItemToGround(msg,session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        ag.itemManager.bagItemToGround(msg,id);
         next();
     },
 
 
 
     bagItemToEquip:function (msg, session, next) {
-        ag.itemManager.bagItemToEquip(msg.id,msg.puton,session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        ag.itemManager.bagItemToEquip(msg.id,msg.puton,id);
         next();
     },
 
 
     equipItemToBag:function (msg, session, next) {
-        ag.itemManager.equipItemToBag(msg,session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        ag.itemManager.equipItemToBag(msg,id);
         next();
     },
 
 
     bagItemRecycle:function (msg, session, next) {
-        ag.itemManager.bagItemRecycle(msg.split(','),session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        ag.itemManager.bagItemRecycle(msg.split(','),id);
         next();
     },
 
 
     //更换阵营
     camp:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
             player.changeCamp(msg);
         }
@@ -205,7 +232,8 @@ var Handler = cc.Class.extend({
 
     //创建行会
     guildCreate:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
             if(player._data.gold>=500){
                 player._data.gold-=500;
@@ -221,7 +249,8 @@ var Handler = cc.Class.extend({
 
     //删除行会
     guildDelete:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
             ag.guild.guildDelete(player._data.id);
             player._data.camp = ag.gameConst.campPlayerNone;
@@ -232,7 +261,8 @@ var Handler = cc.Class.extend({
 
     //邀请成员
     guildInvite:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
             var rid = '-1';
             for(var key in ag.gameLayer._roleMap){
@@ -255,14 +285,15 @@ var Handler = cc.Class.extend({
 
     //同意邀请
     guildOK:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
-            var id = ag.guild._inviteMap[session.uid];
+            var id = ag.guild._inviteMap[id];
             if(id){
-                delete ag.guild._inviteMap[session.uid];
+                delete ag.guild._inviteMap[id];
                 var obj = ag.guild._dataMap[id];
-                obj.member.push(session.uid);
-                ag.jsUtil.sendData("sSystemNotify","您已经加入["+obj.name+"]！",session.uid);
+                obj.member.push(id);
+                ag.jsUtil.sendData("sSystemNotify","您已经加入["+obj.name+"]！",id);
                 ag.jsUtil.sendData("sSystemNotify","玩家"+player._data.name+"加入行会["+obj.name+"]！",id);
                 var str = obj.member.length==0?'':obj.member.join(',');
                 ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:id,name:obj.name,member:str});
@@ -276,12 +307,13 @@ var Handler = cc.Class.extend({
 
     //不同意邀请
     guildCancel:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
-            var id = ag.guild._inviteMap[session.uid];
+            var id = ag.guild._inviteMap[id];
             if(id){
-                delete ag.guild._inviteMap[session.uid];
-                ag.jsUtil.sendData("sSystemNotify","取消成功！",session.uid);
+                delete ag.guild._inviteMap[id];
+                ag.jsUtil.sendData("sSystemNotify","取消成功！",id);
                 ag.jsUtil.sendData("sSystemNotify","玩家"+player._data.name+"拒绝加入行会邀请！",id);
             }
         }
@@ -291,7 +323,8 @@ var Handler = cc.Class.extend({
 
     //踢出成员
     guildKick:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player){
             var rid = '-1';
             for(var key in ag.gameLayer._roleMap){
@@ -303,21 +336,21 @@ var Handler = cc.Class.extend({
                 }
             }
             if(rid!='-1'){
-                var obj = ag.guild._dataMap[session.uid];
+                var obj = ag.guild._dataMap[id];
                 var index = obj.member.indexOf(rid);
                 if(index!=-1){
                     obj.member.splice(index,1);
                     var str = obj.member.length==0?'':obj.member.join(',');
                     ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:obj.id,name:obj.name,member:str});
-                    ag.jsUtil.sendData("sSystemNotify","踢出成功！",session.uid);
+                    ag.jsUtil.sendData("sSystemNotify","踢出成功！",id);
                     ag.jsUtil.sendData("sSystemNotify","您被踢出行会！",rid);
                     ag.gameLayer.getRole(rid)._data.camp = ag.gameConst.campPlayerNone;
-                    ag.db.guildSaveMember(session.uid,obj.member);
+                    ag.db.guildSaveMember(id,obj.member);
                 }else{
-                    ag.jsUtil.sendData("sSystemNotify","被踢人不在本行会！",session.uid);
+                    ag.jsUtil.sendData("sSystemNotify","被踢人不在本行会！",id);
                 }
             }else{
-                ag.jsUtil.sendData("sSystemNotify","被踢人不存在！",session.uid);
+                ag.jsUtil.sendData("sSystemNotify","被踢人不存在！",id);
             }
         }
         next();
@@ -326,16 +359,17 @@ var Handler = cc.Class.extend({
 
     //成员退出
     guildExit:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player) {
             for (var key in ag.guild._dataMap) {
                 var obj = ag.guild._dataMap[key];
-                var index = obj.member.indexOf(session.uid);
+                var index = obj.member.indexOf(id);
                 if (index != -1) {
                     obj.member.splice(index, 1);
                     var str = obj.member.length == 0 ? '' : obj.member.join(',');
                     ag.jsUtil.sendDataAll("sGuildCreate", {result: 0, id: obj.id, name: obj.name, member: str});
-                    ag.jsUtil.sendData("sSystemNotify", "退出行会成功！", session.uid);
+                    ag.jsUtil.sendData("sSystemNotify", "退出行会成功！", id);
                     player._data.camp = ag.gameConst.campPlayerNone;
                     ag.db.guildSaveMember(key,obj.member);
                     break;
@@ -348,7 +382,8 @@ var Handler = cc.Class.extend({
 
     //寻宝一次
     treasure:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player) {
             if(player._data.gold>=200){
                 player._data.gold-=200;
@@ -364,7 +399,8 @@ var Handler = cc.Class.extend({
 
     //寻宝一次
     treasure5:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         if(player) {
             if(player._data.gold>=1000){
                 player._data.gold-=1000;
@@ -381,9 +417,10 @@ var Handler = cc.Class.extend({
 
     //增加到仓库
     itemBagToWharehouse:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         var item = ag.itemManager._itemMap.get(msg);
-        if(player && item && item._data.owner==session.uid) {
+        if(player && item && item._data.owner==id) {
             item._data.puton = ag.gameConst.putonWharehouse;
             --player._bagLength;
             ++player._wharehoseLength;
@@ -395,9 +432,10 @@ var Handler = cc.Class.extend({
 
     //道具仓库到背包
     itemWharehouseToBag:function (msg, session, next) {
-        var player =  ag.gameLayer.getRole(session.uid);
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
         var item = ag.itemManager._itemMap.get(msg);
-        if(player && item && item._data.owner==session.uid) {
+        if(player && item && item._data.owner==id) {
             item._data.puton = ag.gameConst.putonBag;
             ++player._bagLength;
             --player._wharehoseLength;

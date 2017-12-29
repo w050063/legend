@@ -11,31 +11,11 @@ module.exports = {
 
     send : function(route,msg,uids){
         //发送信息
-        //var channelService = pomelo.app.get('channelService');
-        //var channel = channelService.getChannel(JsUtil.dataChannel, true);
-        //var param = {msg: "cvb",from: "",target: ""};
-        //
-        //
-        //channel.pushMessage('onChat', param);
-        //
-        //var sendArray = [];
-        //for(var key in this._roleMap){
-        //    var array = this._roleMap[key];
-        //    for(var i=0;i<array.length;++i){
-        //        var uid = array[i]._data.uid;
-        //        var userObj = channel.getMember(uid);
-        //        if(userObj)sendArray.push({uid: uid,sid: userObj['sid']});
-        //    }
-        //}
-        //channelService.pushMessageByUids('onChat', param, sendArray);
-
-
-        //发送信息
         var channelService = pomelo.app.get('channelService');
         var channel = channelService.getChannel(this.dataChannel, true);
         var infoArray = [];
         for(var i=0;i<uids.length;++i){
-            var uid = uids[i];
+            var uid = ag.userManager.getUidByAccount(uids[i]);
             var userObj = channel.getMember(uid);
             if(userObj)infoArray.push({uid: uid,sid: userObj['sid']});
         }
@@ -62,8 +42,9 @@ module.exports = {
             var channelService = pomelo.app.get('channelService');
             var channel = channelService.getChannel(this.dataChannel, true);
             for(var id in this._sendObj){
-                var userObj = channel.getMember(id);
-                if(userObj)channelService.pushMessageByUids('onData',this._sendObj[id],[{uid: id,sid: userObj['sid']}]);
+                var uid = ag.userManager.getUidByAccount(id);
+                var userObj = channel.getMember(uid);
+                if(userObj)channelService.pushMessageByUids('onData',this._sendObj[id],[{uid: uid,sid: userObj['sid']}]);
             }
             this._sendObj = {};
         }.bind(this),50);
@@ -77,7 +58,8 @@ module.exports = {
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
             if(role.getIsPlayer()){
-                if(channel.getMember(role._data.id)){
+                var uid = ag.userManager.getUidByAccount(role._data.id);
+                if(channel.getMember(uid)){
                     ++sum;
                 }
             }
@@ -90,7 +72,8 @@ module.exports = {
     getIsOnline:function(id){
         var channelService = pomelo.app.get('channelService');
         var channel = channelService.getChannel(this.dataChannel, true);
-        if(channel.getMember(id)){
+        var uid = ag.userManager.getUidByAccount(id);
+        if(channel.getMember(uid)){
             return true;
         }
         return false;

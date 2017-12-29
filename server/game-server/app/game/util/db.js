@@ -20,7 +20,7 @@ module.exports = ag.class.extend({
         this.getAccounts(function(rows){
             for(var i=0;i<rows.length;++i){
                 var name = crypto.fromBase64(rows[i].name);
-                ag.userManager.add(rows[i].id,name);
+                ag.userManager.add(rows[i].id,rows[i].password,name);
             }
         });
         this.getRoles(function(rows){

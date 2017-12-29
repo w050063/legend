@@ -20,7 +20,7 @@ var Handler = cc.Class.extend({
     //���ӽ���
     connect : function(msg, session, next) {
         var self = this;
-        var uid = msg.uid
+        var uid = msg.uid;
         var sessionService = self.app.get('sessionService');
 
         //duplicate log in
@@ -33,7 +33,7 @@ var Handler = cc.Class.extend({
         }
 
         session.bind(uid);
-        session.set('uid', msg.uid);
+        session.set('uid', uid);
         session.push('uid', function(err) {
             if(err) {
                 console.error('set uid for session service failed! error is : %j', err.stack);
