@@ -1,14 +1,14 @@
 {
   "ver": "1.0.0",
-  "uuid": "0e58f0e4-87c2-4064-99a5-cd3a296ff641",
+  "uuid": "c81de4f4-3c3f-4f95-a9f5-51d488fa5647",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
   "subMetas": {
-    "button": {
+    "editboxBack": {
       "ver": "1.0.3",
-      "uuid": "e8e6cf98-895b-4f12-acc1-73722818e1a2",
-      "rawTextureUuid": "0e58f0e4-87c2-4064-99a5-cd3a296ff641",
+      "uuid": "4a98738a-1d8d-4175-9066-d068ffd52d25",
+      "rawTextureUuid": "c81de4f4-3c3f-4f95-a9f5-51d488fa5647",
       "trimType": "auto",
       "trimThreshold": 1,
       "rotated": false,
@@ -16,10 +16,10 @@
       "offsetY": 0,
       "trimX": 0,
       "trimY": 0,
-      "width": 139,
-      "height": 59,
-      "rawWidth": 139,
-      "rawHeight": 59,
+      "width": 144,
+      "height": 21,
+      "rawWidth": 144,
+      "rawHeight": 21,
       "borderTop": 0,
       "borderBottom": 0,
       "borderLeft": 0,

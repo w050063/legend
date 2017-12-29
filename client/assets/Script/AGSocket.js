@@ -4,7 +4,6 @@
  */
 
 module.exports={
-    _sessionId:null,
     _dataArray:[],
     _step : 0,
 
@@ -13,27 +12,22 @@ module.exports={
     //setup socket.
     init: function(callback) {
         var self = this;
-        var id = cc.sys.localStorage.getItem('id');
-        if(!id){
-            id = 'r'+(new Date().getTime());
-            cc.sys.localStorage.setItem('id',id);
-        }
-        self._sessionId=id;
         if(self._step != 0)pomelo.disconnect();
         self._step = 0;
         pomelo.init({host: "192.168.2.110",port: 3014,log: true}, function() {
             pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
+                var uid = data.uid;
 				pomelo.disconnect(function () {
 					self._step = 1;
 					pomelo.init({
 						host : data.host,
 						port : data.port,
 						reconnect : true
-					}, function () {
-						pomelo.request("conn.ConnHandler.connect", {uid:self._sessionId}, function(data) {
+					}, function (data1) {
+						pomelo.request("conn.ConnHandler.connect", {uid:uid}, function(data2) {
 							self._step = 2;
 							cc.log("网关 successed!");
-							if(callback)callback(data);
+							if(callback)callback(data2);
 						});
 					})
 				});

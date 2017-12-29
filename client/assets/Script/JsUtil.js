@@ -103,11 +103,12 @@ module.exports={
         }
         pomelo.request("work.WorkHandler."+key, obj, function(data) {
             if(node)node.destroy();
-            if(data.code==0){
-                if(callback)callback(data);
-            }else{
-                ag.jsUtil.showText(father,'错误码:'+data.code);
-            }
+            //ag.jsUtil.showText(father,'错误码:'+data.code);
+            if(callback)callback(data);
+            //if(data.code==0){
+            //}else{
+            //    ag.jsUtil.showText(father,'错误码:'+data.code);
+            //}
         });
     },
 

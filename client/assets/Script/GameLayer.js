@@ -1304,7 +1304,7 @@ cc.Class({
                                 ag.agSocket.send("guildExit",{});
                             },function () {});
                         }else if(npcStr=='比奇城市'){
-                            ag.jsUtil.showText(self.node,"比奇城限制52级以上！");
+                            ag.jsUtil.showText(self.node,"比奇城限制55级以上！");
                         }else if(npcStr=='四级以下回收' || npcStr=='五级回收' || npcStr=='六级回收' || npcStr=='七级回收' || npcStr=='八级回收' || npcStr=='九级回收'){
                             var curLevels = transferMst.levels;
                             var array = [];

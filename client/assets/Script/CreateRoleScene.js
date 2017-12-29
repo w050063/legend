@@ -26,13 +26,12 @@ cc.Class({
         this._selectIndex = 0;
         //初始化按钮对象
         this._nodeRoleArray = [];
-        var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
-        var nameArray = ['ani/hum4/004','ani/hum5/005','ani/hum6/006','ani/hum7/007','ani/hum8/008','ani/hum9/009'];
+        //var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
+        //var nameArray = ['ani/hum4/004','ani/hum5/005','ani/hum6/006','ani/hum7/007','ani/hum8/008','ani/hum9/009'];
+        var pageView = cc.find('Canvas/pageViewRole').getComponent(cc.PageView);
         for(var i=0;i<6;++i){
             (function (i) {
-                var nodeRole = cc.find('Canvas/layoutRole/nodeRole'+i);
-                nodeRole._modelNode = ag.jsUtil.getNode(nodeRole,nameArray[i]+array[0],parseInt(array[1]),0,0.3);
-                nodeRole._modelNode.y = -50;
+                var nodeRole = pageView.content.getChildByName('page_'+Math.floor(i/2)).getChildByName('role'+i);
                 nodeRole.on('touchend', function () {
                     cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
                     this.setSelected(i);
@@ -40,8 +39,10 @@ cc.Class({
                 this._nodeRoleArray.push(nodeRole);
             }.call(this,i));
         }
+        var selectIndex = this.getRoleIndex(ag.userInfo._accountData.type,ag.userInfo._accountData.sex);
+        this.setSelected(selectIndex);
 
-        this.setSelected(this.getRoleIndex(ag.userInfo._accountData.type,ag.userInfo._accountData.sex));
+
         this._buttonDelete = cc.find('Canvas/buttonDelete').getComponent(cc.Button);
         this._buttonStart = cc.find('Canvas/buttonStart').getComponent(cc.Button);
         //this._buttonDelete.enableAutoGrayEffect = true;
@@ -61,6 +62,7 @@ cc.Class({
         if(!cc.sys.localStorage.getItem('firstChangeName')){
             cc.sys.localStorage.setItem('firstChangeName','1');
             ag.jsUtil.showText(this.node,'欢迎大侠，给您起个霸气的名字吧！');
+            cc.find('Canvas/spriteHeadInfo').active = true;
         }else{
             cc.find('Canvas/spriteHeadInfo').active = false;
         }
@@ -68,9 +70,6 @@ cc.Class({
 
 
         pomelo.on('sEnter',function(data) {
-            for(var i=0;i<6;++i){
-                this._nodeRoleArray[i]._modelNode.getComponent(AGAni).putCache();
-            }
             var msg = JSON.parse(data.msg);
             ag.userInfo._id = msg.id;
             ag.userInfo._name = msg.name;
@@ -85,6 +84,12 @@ cc.Class({
         this.schedule(ag.spriteCache.update001.bind(ag.spriteCache),0.01);
     },
 
+    start:function(){
+        var pageView = cc.find('Canvas/pageViewRole').getComponent(cc.PageView);
+        var selectIndex = this.getRoleIndex(ag.userInfo._accountData.type,ag.userInfo._accountData.sex);
+        pageView.setCurrentPageIndex(Math.floor(selectIndex/2));
+    },
+
 
     //选中哪一个
     setSelected:function (index) {
@@ -97,16 +102,11 @@ cc.Class({
         this._selectIndex = index;
         for(var i=0;i<6;++i){
             var nodeRole = this._nodeRoleArray[i];
-            nodeRole._modelNode.stopAllActions();
+            nodeRole.stopAllActions();
             if(index==i){
-                //nodeRole._modelNode.getComponent(cc.Sprite)._sgNode.setState(0);
-                nodeRole._modelNode.getComponent(AGAni).resume();
-                nodeRole._modelNode.setScale(2);
-                nodeRole._modelNode.runAction(cc.scaleTo(0.2,3));
+                nodeRole.runAction(cc.scaleTo(0.2,1.2));
             }else{
-                //nodeRole._modelNode.getComponent(cc.Sprite)._sgNode.setState(1);
-                nodeRole._modelNode.getComponent(AGAni).pause();
-                nodeRole._modelNode.setScale(2);
+                nodeRole.setScale(1);
             }
         }
     },
@@ -116,7 +116,7 @@ cc.Class({
     buttonDelete: function () {
         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         if(ag.userInfo._accountData.type!=undefined && ag.userInfo._accountData.sex!=undefined){
-            ag.jsUtil.request(this.node,'deleteRole',ag.agSocket._sessionId,function (data) {
+            ag.jsUtil.request(this.node,'deleteRole',ag.userInfo._accountData.id,function (data) {
                 ag.userInfo._accountData.type=undefined;
                 ag.userInfo._accountData.sex=undefined;
                 ag.jsUtil.showText(this.node,'删除成功！');
@@ -160,8 +160,8 @@ cc.Class({
 
     //更新个人资料数据
     firstUpdateInfo:function(){
-        cc.find('Canvas/spriteHeadInfo/labelId').getComponent(cc.Label).string = 'ID：'+ag.userInfo._accountData.id;
-        cc.find('Canvas/spriteHeadInfo/labelSessions').getComponent(cc.Label).string = '场次：'+ag.userInfo._accountData.sessions;
+        //cc.find('Canvas/spriteHeadInfo/labelId').getComponent(cc.Label).string = 'ID：'+ag.userInfo._accountData.id;
+        //cc.find('Canvas/spriteHeadInfo/labelSessions').getComponent(cc.Label).string = '场次：'+ag.userInfo._accountData.sessions;
         this.nextUpdateInfo();
     },
     nextUpdateInfo:function(){
@@ -190,5 +190,17 @@ cc.Class({
         cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
         ag.userInfo.backGroundPos = cc.find("Canvas/door").getPosition();
         cc.director.loadScene('LoginScene');
+    },
+
+    buttonEventLeft:function(){
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        var pageView = cc.find('Canvas/pageViewRole').getComponent(cc.PageView);
+        pageView.scrollToPage(Math.max(0,pageView.getCurrentPageIndex()-1),0.3);
+    },
+
+    buttonEventRight:function(){
+        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        var pageView = cc.find('Canvas/pageViewRole').getComponent(cc.PageView);
+        pageView.scrollToPage(Math.min(2,pageView.getCurrentPageIndex()+1),0.3);
     },
 });

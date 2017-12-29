@@ -13,7 +13,6 @@ module.exports={
     //相关数据
 	_accountData:null,
     _data:null,
-    _sessionId:-1,
 	_id:100000,
 	_level:1,
 	_name:"红军小战士",
