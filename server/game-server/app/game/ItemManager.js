@@ -119,6 +119,24 @@ module.exports = ag.class.extend({
                 item._data.owner = '';
                 item._data.puton = ag.gameConst.putonGround;
                 item._duration = ag.gameConst.itemDuration;
+                item._their = rid;
+                this._itemMap.add(item);
+                ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
+            }
+        }else if(level>=4){
+            var tempArray = ['i001101','i001102','i001103',
+                'i001301','i001302','i001303',
+                'i001401','i001402','i001403',
+                'i001501','i001502','i001503'];
+            for(var i=0;i<2;++i){
+                var rand = Math.floor(Math.random()*tempArray.length);
+                var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+                pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+                var item = new Item(tempArray[rand],mapId,pos);
+                item._data.owner = '';
+                item._data.puton = ag.gameConst.putonGround;
+                item._duration = ag.gameConst.itemDuration;
+                item._their = rid;
                 this._itemMap.add(item);
                 ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
             }
@@ -132,6 +150,7 @@ module.exports = ag.class.extend({
         if(obj){
             this._itemMap.setMapXYById(id);
             obj._data.owner = rid;
+            delete obj._their;
             obj._data.puton = ag.gameConst.putonBag;
             ++role._bagLength;
         }

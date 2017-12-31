@@ -122,8 +122,32 @@ var Handler = cc.Class.extend({
         var id = ag.userManager.getAccountByUid(session.uid);
         var player =  ag.gameLayer.getRole(id);
         if(player){
-            ag.db.insertChat(id,msg,''+new Date().getTime());
-            ag.jsUtil.sendDataAll("sChatYou",{id:id,name:player._data.name+'('+ag.gameConst._roleMst[player._data.type].name+')',content:msg});
+            var str = null;
+            if(msg.chatType==ag.gameConst.chatAll){
+                str = '(全体)'+msg.str;
+            }else if(msg.chatType==ag.gameConst.chatMap){
+                str = '(地图)'+msg.str;
+            }else if(msg.chatType==ag.gameConst.chatGuild){
+                str = '(行会)'+msg.str;
+            }
+            if(str){
+                ag.db.insertChat(id,str,''+new Date().getTime());
+                if(msg.chatType==ag.gameConst.chatAll){
+                    ag.jsUtil.sendDataAll("sChatYou",{id:id,name:player._data.name+'('+ag.gameConst._roleMst[player._data.type].name+')',content:str});
+                }else if(msg.chatType==ag.gameConst.chatMap){
+                    ag.jsUtil.sendDataAll("sChatYou",{id:id,name:player._data.name+'('+ag.gameConst._roleMst[player._data.type].name+')',content:str},player._data.mapId);
+                }else if(msg.chatType==ag.gameConst.chatGuild){
+                    for(var key in ag.gameLayer._roleMap){
+                        var temp = ag.gameLayer._roleMap[key];
+                        if(temp.getIsPlayer()){
+                            console.log(temp._data.camp,player._data.camp);
+                            if(temp._data.camp!=ag.gameConst.campPlayerNone && temp._data.camp==player._data.camp){
+                                ag.jsUtil.sendData("sChatYou",{id:id,name:player._data.name+'('+ag.gameConst._roleMst[player._data.type].name+')',content:str},temp._data.id);
+                            }
+                        }
+                    }
+                }
+            }
         }
         next();
     },
@@ -288,17 +312,21 @@ var Handler = cc.Class.extend({
         var id = ag.userManager.getAccountByUid(session.uid);
         var player =  ag.gameLayer.getRole(id);
         if(player){
-            var id = ag.guild._inviteMap[id];
-            if(id){
+            var laoda = ag.guild._inviteMap[id];
+            if(laoda){
                 delete ag.guild._inviteMap[id];
-                var obj = ag.guild._dataMap[id];
-                obj.member.push(id);
-                ag.jsUtil.sendData("sSystemNotify","您已经加入["+obj.name+"]！",id);
-                ag.jsUtil.sendData("sSystemNotify","玩家"+player._data.name+"加入行会["+obj.name+"]！",id);
-                var str = obj.member.length==0?'':obj.member.join(',');
-                ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:id,name:obj.name,member:str});
-                player._data.camp = obj.identify;
-                ag.db.guildSaveMember(id,obj.member);
+                var obj = ag.guild._dataMap[laoda];
+                if(obj && laoda!=id && obj.member.indexOf(id)==-1){
+                    obj.member.push(id);
+                    ag.jsUtil.sendData("sSystemNotify","您已经加入["+obj.name+"]！",id);
+                    ag.jsUtil.sendData("sSystemNotify","玩家"+player._data.name+"加入行会["+obj.name+"]！",laoda);
+                    var str = obj.member.length==0?'':obj.member.join(',');
+                    ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:laoda,name:obj.name,member:str});
+                    player._data.camp = obj.identify;
+                    ag.db.guildSaveMember(laoda,obj.member);
+                }else{
+                    ag.jsUtil.sendData("sSystemNotify","同意邀请发生了未知错误！",id);
+                }
             }
         }
         next();

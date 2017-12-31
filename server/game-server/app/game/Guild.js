@@ -51,9 +51,9 @@ module.exports = ag.class.extend({
         if(this._dataMap[id]){
             delete this._dataMap[id];
             ag.db.guildDelete(id);
+            ag.jsUtil.sendData("sSystemNotify","删除行会成功！",id);
+            ag.jsUtil.sendDataAll("sGuildDelete",id);
         }
-        ag.jsUtil.sendData("sSystemNotify","删除行会成功！",id);
-        ag.jsUtil.sendDataAll("sGuildDelete",id);
     },
 
 
