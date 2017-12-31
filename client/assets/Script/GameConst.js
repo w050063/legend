@@ -24,6 +24,12 @@ module.exports= {
     campPlayerArray:['青龙堂','白虎堂','朱雀堂','玄武堂'],
 
 
+    //聊天
+    chatAll:0,
+    chatMap:1,
+    chatGuild:2,
+
+
     //性别
     sexBoy:0,
     sexGirl:1,
@@ -302,6 +308,7 @@ module.exports= {
 
 
 
+
     _roleMst: {
         m0:{id:"m0",name:"战",hp:19,hpAdd:[15,28,31,34,35],defense:0,defenseAdd:0.2,hurt:3,hurtAdd:0.45,expDead:0,heal:5,healAdd:1,
             moveSpeed:0.4,attackSpeed:0.8,checkDistance:5,visibleDistance:8,attackDistance:0},
@@ -349,15 +356,15 @@ module.exports= {
         m21:{id:"m21",name:"幽冥大魔神",hp:8000,defense:10,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum52/052",drop:'',dropLevels:[6,3],lv:6},
         m22:{id:"m22",name:"天界魔王",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
-            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum53/053",drop:'i001901,100',dropLevels:[7,1],lv:7},
+            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum53/053",drop:'i001900,9,i001901,6,i001902,3',dropLevels:[7,1],lv:7},
         m23:{id:"m23",name:"鼠王",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
-            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum54/054",drop:'i001902,100',dropLevels:[7,1],lv:7},
+            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum54/054",drop:'i001900,9,i001901,6,i001902,3',dropLevels:[7,1],lv:7},
         m24:{id:"m24",name:"牛魔王",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
-            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum26/026",drop:'i001900,100',dropLevels:[7,1],lv:7},
+            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum26/026",drop:'i001900,9,i001901,6,i001902,3',dropLevels:[7,1],lv:7},
         m25:{id:"m25",name:"嗜血魔王",hp:8000,defense:10,hurt:200,expDead:800,heal:100,
-            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum55/055",drop:'i001010,10,i001011,10,i001012,10',dropLevels:[],lv:6},
+            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum55/055",drop:'i001010,5,i001011,5,i001012,5',dropLevels:[],lv:6},
         m26:{id:"m26",name:"幻灵魔王",hp:8000,defense:10,hurt:200,expDead:800,heal:100,
-            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum56/056",drop:'i001010,10,i001011,10,i001012,10',dropLevels:[],lv:6},
+            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum56/056",drop:'i001010,5,i001011,5,i001012,5',dropLevels:[],lv:6},
         m27:{id:"m27",name:"九天神龙",hp:20000,defense:100,hurt:400,expDead:2000,heal:300,
             moveSpeed:1,attackSpeed:2,checkDistance:5,visibleDistance:5,attackDistance:5,model:"ani/hum57/057",drop:'',dropLevels:[9,1],lv:9},
         m28:{id:"m28",name:"狂龙教主",hp:20000,defense:100,hurt:400,expDead:2000,heal:300,
@@ -377,7 +384,7 @@ module.exports= {
         m35:{id:"m35",name:"天宫之主",hp:10000,defense:50,hurt:300,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum65/065",drop:'',dropLevels:[8,1],lv:8},
         m36:{id:"m36",name:"神王",hp:15000,defense:20,hurt:300,expDead:1500,heal:200,
-            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum65/065",drop:'i002100,50',dropLevels:[8,1],lv:8},
+            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum65/065",drop:'i002100,9,i002101,6,i002101,3',dropLevels:[8,1],lv:8},
         m37:{id:"m37",name:"天宫侍卫",hp:2500,defense:10,hurt:100,expDead:200,heal:0,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum66/066",drop:'',dropLevels:[3,2],lv:3},
         m38:{id:"m38",name:"天宫蜴卫",hp:2500,defense:10,hurt:100,expDead:200,heal:0,
@@ -387,13 +394,13 @@ module.exports= {
         m40:{id:"m40",name:"天宫女王",hp:10000,defense:50,hurt:300,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum69/069",drop:'',dropLevels:[8,1],lv:8},
         m41:{id:"m41",name:"舞后",hp:15000,defense:50,hurt:300,expDead:1500,heal:200,
-            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum69/069",drop:'i002101,50',dropLevels:[8,1],lv:8},
+            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum69/069",drop:'i002100,9,i002101,6,i002101,3',dropLevels:[8,1],lv:8},
         m42:{id:"m42",name:"天宫大神官",hp:10000,defense:50,hurt:300,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum70/070",drop:'',dropLevels:[8,1],lv:8},
         m43:{id:"m43",name:"招魂王",hp:15000,defense:50,hurt:300,expDead:1500,heal:200,
-            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum70/070",drop:'i002102,50',dropLevels:[8,1],lv:8},
+            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum70/070",drop:'i002100,9,i002101,6,i002101,3',dropLevels:[8,1],lv:8},
         m44:{id:"m44",name:"驽马法老",hp:6000,defense:10,hurt:200,expDead:600,heal:100,
-            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum71/071",drop:'i001700,10,i001701,10,i001702,10,i001800,10,i001801,10,i001802,10,i001900,10,i001901,10,i001902,10,i002000,10,i002001,10,i002002,10',dropLevels:[],lv:9},
+            moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum71/071",drop:'i001700,9,i001701,6,i001702,3,i001800,9,i001801,6,i001802,3,i002000,9,i002001,6,i002002,3',dropLevels:[],lv:9},
         m45:{id:"m45",name:"爱情鸟",hp:9000,defense:10,hurt:100,expDead:900,heal:50,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum72/072",drop:'',dropLevels:[5,5],lv:5},
         m46:{id:"m46",name:"蚁王",hp:8000,defense:20,hurt:200,expDead:800,heal:100,

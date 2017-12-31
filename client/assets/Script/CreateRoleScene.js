@@ -33,7 +33,7 @@ cc.Class({
             (function (i) {
                 var nodeRole = pageView.content.getChildByName('page_'+Math.floor(i/2)).getChildByName('role'+i);
                 nodeRole.on('touchend', function () {
-                    cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+                    ag.musicManager.playEffect("resources/voice/button.mp3");
                     this.setSelected(i);
                 }.bind(this));
                 this._nodeRoleArray.push(nodeRole);
@@ -114,7 +114,7 @@ cc.Class({
 
     //开始游戏按钮
     buttonDelete: function () {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         if(ag.userInfo._accountData.type!=undefined && ag.userInfo._accountData.sex!=undefined){
             ag.jsUtil.request(this.node,'deleteRole',ag.userInfo._accountData.id,function (data) {
                 ag.userInfo._accountData.type=undefined;
@@ -128,7 +128,7 @@ cc.Class({
 
     //开始游戏按钮
     buttonStart: function () {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         var prefab = cc.loader.getRes('prefab/nodeRequest',cc.Prefab);
         var node = cc.instantiate(prefab);
         node.parent = this.node;
@@ -170,7 +170,7 @@ cc.Class({
 
     //回车发送信息
     editBoxConfirm: function (sender) {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         if(sender.string.length>=2){
             ag.jsUtil.request(this.node,'changeName',sender.string,function (data) {
                 ag.userInfo._accountData.name = sender.string;
@@ -182,24 +182,24 @@ cc.Class({
     },
 
     buttonClose:function(){
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find('Canvas/spriteHeadInfo').active = false;
     },
 
     back:function(){
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         ag.userInfo.backGroundPos = cc.find("Canvas/door").getPosition();
         cc.director.loadScene('LoginScene');
     },
 
     buttonEventLeft:function(){
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         var pageView = cc.find('Canvas/pageViewRole').getComponent(cc.PageView);
         pageView.scrollToPage(Math.max(0,pageView.getCurrentPageIndex()-1),0.3);
     },
 
     buttonEventRight:function(){
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         var pageView = cc.find('Canvas/pageViewRole').getComponent(cc.PageView);
         pageView.scrollToPage(Math.min(2,pageView.getCurrentPageIndex()+1),0.3);
     },

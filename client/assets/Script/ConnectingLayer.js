@@ -29,6 +29,9 @@ cc.Class({
             var AgSpriteCache = require("AgSpriteCache");
             ag.spriteCache = new AgSpriteCache();
             ag.spriteCache.init();
+            var MusicManager = require("MusicManager");
+            ag.musicManager = new MusicManager();
+            ag.musicManager.init();
 
 
             //注册前后台切换事件

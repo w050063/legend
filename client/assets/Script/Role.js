@@ -45,7 +45,7 @@ cc.Class({
         if(this._data.type=='m1'){
             var sprite = ag.spriteCache.get('ani/effect8/513000');
             var array = AGAniOffset[513000].split(',');
-            sprite.node.setPosition(array[0],array[1]);
+            sprite.node.setPosition(parseInt(array[0]),parseInt(array[1]));
             //sprite.node.opacity = 128;
             this.node.addChild(sprite.node,ag.gameConst.roleEffectZorder);
         }
@@ -210,7 +210,7 @@ cc.Class({
                 ag.gameLayer.refreshEquip();
                 ag.jsUtil.showText(ag.gameLayer.node, '升级！！！');
             }
-            cc.audioEngine.play(cc.url.raw("resources/voice/levelup.mp3"),false,1);
+            ag.musicManager.playEffect("resources/voice/levelup.mp3");
             var temp = this.getAgAni(null,"ani/effect8/512000",15,ag.gameConst.roleEffectZorder,0.1,function(sender){
                 this.putAgAni(sender);
             }.bind(this));
@@ -312,7 +312,7 @@ cc.Class({
             if (index > 0) {
                 if(this._propNode._spriteOffice)this._propNode._spriteOffice.node.destroy();
                 this._propNode._spriteOffice = new cc.Node().addComponent(cc.Sprite);
-                this._propNode._spriteOffice.node.y = 107;
+                this._propNode._spriteOffice.node.y = 103;
                 this._propNode.addChild(this._propNode._spriteOffice.node);
                 cc.loader.loadRes('office/' + index, cc.SpriteFrame, function (err, spriteFrame) {
                     if (this._propNode && this._propNode._spriteOffice && cc.isValid(this._propNode._spriteOffice)) {
@@ -721,12 +721,12 @@ cc.Class({
                     }.bind(this));
                 }
                 ag.buffManager.setCDForFireCrit(this,true);
-                if(this._agAni)cc.audioEngine.play(cc.url.raw("resources/voice/liehuo.mp3"),false,1);
+                if(this._agAni)ag.musicManager.playEffect("resources/voice/liehuo.mp3");
             }else{
                 this.getAgAni(null,"ani/effect0/"+(500000+this._data.direction*6),6,ag.gameConst.roleEffectZorder,0.1,function(sender){
                     this.putAgAni(sender);
                 }.bind(this));
-                if(this._agAni)cc.audioEngine.play(cc.url.raw(Math.random()>0.5?"resources/voice/cisha0.mp3":"resources/voice/cisha1.mp3"),false,1);
+                if(this._agAni)ag.musicManager.playEffect(Math.random()>0.5?"resources/voice/cisha0.mp3":"resources/voice/cisha1.mp3");
             }
         }else if(this._data.type=="m1"){
             var pos = locked.getTruePosition();
@@ -743,7 +743,7 @@ cc.Class({
                     node.setPosition(pos);
                 }.bind(this));
             }
-            if(this._agAni)cc.audioEngine.play(cc.url.raw("resources/voice/mietianhuo.mp3"),false,1);
+            if(this._agAni)ag.musicManager.playEffect("resources/voice/mietianhuo.mp3");
         }else if(this._data.type=="m2"){
             var pos1 = cc.pAdd(this.node.getPosition(),cc.p(0,60));
             var pos2 = cc.pAdd(locked.node.getPosition(),cc.p(0,60));
@@ -762,7 +762,7 @@ cc.Class({
             }.bind(this));
 
             ag.buffManager.setPoison(locked,this);//道士启用毒
-            if(this._agAni)cc.audioEngine.play(cc.url.raw("resources/voice/huofu.mp3"),false,1);
+            if(this._agAni)ag.musicManager.playEffect("resources/voice/huofu.mp3");
         }else if(this._data.type=="m5" || this._data.type=="m18"){
             var pos1 = cc.pAdd(this.node.getPosition(),cc.p(0,60));
             var pos2 = cc.pAdd(locked.node.getPosition(),cc.p(0,35));
@@ -786,7 +786,7 @@ cc.Class({
             }
         }
         if(locked.getIsPlayer()){
-            if(this._agAni)cc.audioEngine.play(cc.url.raw(locked._data.sex==1?"resources/voice/behit1.mp3":"resources/voice/behit0.mp3"),false,1);
+            if(this._agAni)ag.musicManager.playEffect(locked._data.sex==1?"resources/voice/behit1.mp3":"resources/voice/behit0.mp3");
         }
     },
 
@@ -943,7 +943,7 @@ cc.Class({
             this.putCache();
             delete ag.gameLayer._roleMap[this._data.id];
         }else{
-            if(bVoice)cc.audioEngine.play(cc.url.raw(this._data.sex==1?"resources/voice/dead1.mp3":"resources/voice/dead0.mp3"),false,1);
+            if(bVoice)ag.musicManager.playEffect(this._data.sex==1?"resources/voice/dead1.mp3":"resources/voice/dead0.mp3");
             if(this._propNode)this._propNode.active = false;
             if(this._minMapNode)this._minMapNode.active = false;
             this.node.active = false;

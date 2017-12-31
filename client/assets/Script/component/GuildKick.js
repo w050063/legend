@@ -16,7 +16,7 @@ cc.Class({
 
     //确认按钮
     buttonOKEvent:function(event){
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         if(this._editBox.string.length>=2 && this._editBox.string.length<=8){
             ag.agSocket.send("guildKick",{name:this._editBox.string});
             this.node.active = false;
@@ -28,7 +28,7 @@ cc.Class({
 
     //关闭按钮
     buttonCloseEvent:function(event){
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         this.node.active = false;
     },
 });

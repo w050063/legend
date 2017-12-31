@@ -8,13 +8,12 @@ module.exports={
     _step : 0,
 
 
-	
     //setup socket.
     init: function(callback) {
         var self = this;
         if(self._step != 0)pomelo.disconnect();
         self._step = 0;
-        pomelo.init({host: "192.168.2.110",port: 3014,log: true}, function() {
+        pomelo.init({host: "192.168.99.174",port: 3014,log: true}, function() {
             pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
                 var uid = data.uid;
 				pomelo.disconnect(function () {

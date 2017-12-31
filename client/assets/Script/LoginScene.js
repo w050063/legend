@@ -20,7 +20,7 @@ cc.Class({
         editBoxAccount.string = cc.sys.localStorage.getItem('account') || '';
         editBoxPassword.string = cc.sys.localStorage.getItem('password') || '';
         cc.audioEngine.stopAll();
-        cc.audioEngine.play(cc.url.raw("resources/music/Dragon Rider.mp3"),true,1);
+        ag.musicManager.playMusic("resources/music/Dragon Rider.mp3");
     },
 
 
@@ -76,12 +76,12 @@ cc.Class({
 
     //注册
     buttonEventRegister: function() {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find("Canvas/nodeRegister").active = true;
     },
 
     buttonEventRegisterOK: function() {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         var editBoxAccount = cc.find("Canvas/nodeRegister/editBoxAccount").getComponent(cc.EditBox);
         var editBoxPassword = cc.find("Canvas/nodeRegister/editBoxPassword").getComponent(cc.EditBox);
         var editBoxPasswordAgain = cc.find("Canvas/nodeRegister/editBoxPasswordAgain").getComponent(cc.EditBox);
@@ -112,19 +112,19 @@ cc.Class({
     },
 
     buttonEventRegisterClose: function() {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find("Canvas/nodeRegister").active = false;
     },
 
 
     //登陆
     buttonEventLogin: function() {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find("Canvas/nodeLogin").active = true;
     },
 
     buttonEventLoginOK: function() {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         var editBoxAccount = cc.find("Canvas/nodeLogin/editBoxAccount").getComponent(cc.EditBox);
         var editBoxPassword = cc.find("Canvas/nodeLogin/editBoxPassword").getComponent(cc.EditBox);
         if(editBoxAccount.string.length<4){
@@ -148,7 +148,7 @@ cc.Class({
     },
 
     buttonEventLoginClose: function() {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find("Canvas/nodeLogin").active = false;
     },
 });

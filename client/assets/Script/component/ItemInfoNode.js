@@ -87,7 +87,7 @@ cc.Class({
 
 
     buttonDisposeEvent:function(event){
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         var buttonNode = event.target;
         var label = buttonNode.getChildByName('label').getComponent(cc.Label);
         if(label.string=='确定'){

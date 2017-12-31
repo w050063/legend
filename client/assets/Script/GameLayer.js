@@ -27,6 +27,7 @@ cc.Class({
     // use this for initialization
     onLoad: function () {
         ag.gameLayer = this;
+        this._chatType = ag.gameConst.chatAll;
         this._roleMap = {};
         this._player = null;
         this._lastMapPosition = cc.p(0,0);
@@ -107,26 +108,6 @@ cc.Class({
         for(var i=0;i<5;++i){
             this._equipArray.push(0);
         }
-        //var self = this;
-        //for(var i=0;i<5;++i){
-        //    (function(i){
-        //        self._equipArray.push(cc.find('Canvas/nodeBag/sprite'+i+'/sprite').getComponent(cc.Sprite));
-        //        cc.find('Canvas/nodeBag/sprite'+i).on(cc.Node.EventType.TOUCH_END, function (event) {
-        //            cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
-        //            for(var key in ag.userInfo._itemMap){
-        //                var obj = ag.userInfo._itemMap[key];
-        //                var mst = ag.gameConst._itemMst[obj._data.mid];
-        //                if(obj._data.owner==self._player._data.id && obj._data.puton && mst.type==i){
-        //                    delete obj._data.puton;
-        //                    self._player.delEquip(i);
-        //                    self.refreshBag();
-        //                    self.refreshEquip();
-        //                    ag.agSocket.send("equipItemToBag",obj._data.id);
-        //                }
-        //            }
-        //        });
-        //    })(i);
-        //}
         this._equipArray.push(0);
         this._equipArray.push(0);
         this._equipArray.push(cc.find('Canvas/nodeBag/labelLevel').getComponent(cc.Label));
@@ -134,13 +115,6 @@ cc.Class({
         this._labelGold = cc.find('Canvas/nodeBag/labelGold').getComponent(cc.Label);
 
         //聊天相关
-        //var nodeChat = cc.find('Canvas/nodeChat');
-        //nodeChat.active = false;
-        //nodeChat.on(cc.Node.EventType.TOUCH_END, function (event) {
-        //    cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
-        //    nodeChat.active = false;
-        //    cc.find('Canvas/nodeChat/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
-        //}.bind(this));
         this._chatContentArray = [];
         this._chatLabelArray = [];
         for(var i=0;i<5;++i){
@@ -255,7 +229,7 @@ cc.Class({
         if(this._backMusicName!=map.music){
             this._backMusicName = map.music;
             cc.audioEngine.stopAll();
-            cc.audioEngine.play(cc.url.raw("resources/music/"+map.music),true,1);
+            ag.musicManager.playMusic("resources/music/"+map.music);
         }
 
 
@@ -362,7 +336,7 @@ cc.Class({
         ag.agSocket._dataArray = [];
         ag.userInfo._itemMap = {};
         cc.audioEngine.stopAll();
-        cc.audioEngine.play(cc.url.raw("resources/music/Dragon Rider.mp3"),true,1);
+        ag.musicManager.playMusic("resources/music/Dragon Rider.mp3");
         ag.spriteCache.release();
         cc.director.loadScene('CreateRoleScene');
         ag.gameLayer = null;
@@ -475,6 +449,7 @@ cc.Class({
             obj._data.owner = this._player._data.id;
             obj.comp.node.destroy();
             obj.comp = undefined;
+            obj._data.puton = ag.gameConst.putonBag;
             this.addItemToBag(id);
             this.systemNotify(ag.gameConst._itemMst[obj._data.mid].name+'被发现！');
         }
@@ -496,7 +471,7 @@ cc.Class({
         var obj = ag.userInfo._itemMap[id];
         var role = ag.gameLayer.getRole(rid);
         if(obj && role){
-            obj._data.puton = -1;
+            obj._data.puton = ag.gameConst.putonBag;
             var success = role.delEquip(id);
             if(success && role==this._player){
                 var data = obj._data;
@@ -655,17 +630,17 @@ cc.Class({
 
 
     buttonBagEvent:function (sender) {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         this._nodeBag.active = true;
     },
 
 
     buttonBagClose:function (sender) {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         this._nodeBag.active = false;
     },
     buttonSettingClose:function (sender) {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find('Canvas/nodeHelp').active = false;
     },
 
@@ -697,7 +672,7 @@ cc.Class({
         this._bagArray[index] = {id:id,node:node};
         node.off(cc.Node.EventType.TOUCH_END);
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
-            cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+            ag.musicManager.playEffect("resources/voice/button.mp3");
             cc.find('Canvas/nodeItemInfo').active = true;
             if(cc.find('Canvas/nodeWharehouse').active){
                 cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemIdByWharehouse(id);
@@ -791,7 +766,7 @@ cc.Class({
 
             node.off(cc.Node.EventType.TOUCH_END);
             node.on(cc.Node.EventType.TOUCH_END, function (event) {
-                cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+                ag.musicManager.playEffect("resources/voice/button.mp3");
                 cc.find('Canvas/nodeItemInfo').active = true;
                 if(cc.find('Canvas/nodeWharehouse').active){
                     cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemIdByWharehouse(id);
@@ -914,7 +889,7 @@ cc.Class({
             sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
             node.off(cc.Node.EventType.TOUCH_END);
             node.on(cc.Node.EventType.TOUCH_END, function (event) {
-                cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+                ag.musicManager.playEffect("resources/voice/button.mp3");
                 var nodeItemInfo = cc.find('Canvas/nodeItemInfo');
                 nodeItemInfo.active = true;
                 nodeItemInfo.getComponent('ItemInfoNode').setItemId(id);
@@ -1085,7 +1060,7 @@ cc.Class({
     buttonShowChatNode:function(){
         var node = cc.find('Canvas/nodeChatContent/spriteBack');
         node.active = !node.active;
-        if(!(cc.sys.isMobile && cc.sys.isBrowser)){
+        if(cc.sys.isMobile==false && cc.sys.isBrowser){
             var editbox = cc.find('Canvas/nodeChatContent/spriteBack/editBoxName').getComponent(cc.EditBox);
             editbox.stayOnTop = true;
             editbox.setFocus();
@@ -1094,18 +1069,20 @@ cc.Class({
 
     //聊天按钮
     buttonShowHelp:function(){
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find('Canvas/nodeHelp').active = true;
     },
 
 
     //回车发送信息
     editBoxConfirm: function (sender) {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         //cc.find('Canvas/nodeChat').active = false;
-        cc.find('Canvas/nodeChatContent/spriteBack/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
+        if(cc.sys.isMobile==false && cc.sys.isBrowser){
+            cc.find('Canvas/nodeChatContent/spriteBack/editBoxName').getComponent(cc.EditBox).stayOnTop = false;
+        }
         if(sender.string.length>0){
-            ag.agSocket.send("chatYou",sender.string);
+            ag.agSocket.send("chatYou",{chatType:this._chatType,str:sender.string});
             sender.string = '';
         }
         this._bEditBoxKey = true;
@@ -1113,7 +1090,7 @@ cc.Class({
 
     chat:function(id,name,content){
         var role = this.getRole(id);
-        if(role){
+        if(role && role._propNode){
             var node = new cc.Node();
             var tips = node.addComponent(cc.Label);
             node.x = 0;
@@ -1121,7 +1098,8 @@ cc.Class({
             tips.fontSize = 12;
             node.color = cc.color(255,255,255);
             tips.string = content;
-            role.node.addChild(node,30);
+            //role.node.addChild(node,30);
+            role._propNode.addChild(node,30);
             node.runAction(cc.sequence(cc.delayTime(5), cc.fadeOut(0.2),cc.callFunc(function(){
                 node.destroy();
             })));
@@ -1184,14 +1162,21 @@ cc.Class({
 
 
     toggleAutoAttack: function (event) {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         this._setupAutoAttack = event.isChecked;
         cc.sys.localStorage.setItem('setupAutoAttack',''+event.isChecked);
     },
     toggleEventSetupRock: function (event) {
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find('Canvas/nodeRock').active = event.isChecked;
         cc.sys.localStorage.setItem('setupRock',''+event.isChecked);
+    },
+
+    toggleMusic: function (event) {
+        ag.musicManager.setupMusic(event.isChecked);
+    },
+    toggleSoundEffect: function (event) {
+        ag.musicManager.setupSoundEffect(event.isChecked);
     },
 
 
@@ -1254,7 +1239,7 @@ cc.Class({
                     label.string = transferMst.name;
                     label.node.off(cc.Node.EventType.TOUCH_END);
                     label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
-                        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+                        ag.musicManager.playEffect("resources/voice/button.mp3");
                         var npcStr = transferMst.name;
                         if(transferMst.id=='t6000'){
                             cc.find('Canvas/nodeWharehouse').getComponent(Wharehouse).show();
@@ -1364,7 +1349,7 @@ cc.Class({
 
     //绑定官职事件
     buttonEventOffice:function(event){
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find('Canvas/nodeItemInfo').active = true;
         cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setOfficeByRole(this._player);
     },
@@ -1372,8 +1357,36 @@ cc.Class({
 
     //绑定其他官职事件
     buttonEventOtherOffice:function(event){
-        cc.audioEngine.play(cc.url.raw("resources/voice/button.mp3"),false,1);
+        ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find('Canvas/nodeItemInfo').active = true;
         cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setOfficeByRole();
+    },
+
+
+
+
+    //聊天对象
+    buttonEventChatSelect:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        var node = cc.find('Canvas/nodeChatContent/spriteBack/nodeButtonsChatSelect');
+        node.active = !node.active;
+    },
+    buttonEventChatAll:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.find('Canvas/nodeChatContent/spriteBack/nodeButtonsChatSelect').active = false;
+        cc.find('Canvas/nodeChatContent/spriteBack/buttonChatSelect/Label').getComponent(cc.Label).string = '全体  ▲';
+        this._chatType = ag.gameConst.chatAll;
+    },
+    buttonEventChatMap:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.find('Canvas/nodeChatContent/spriteBack/nodeButtonsChatSelect').active = false;
+        cc.find('Canvas/nodeChatContent/spriteBack/buttonChatSelect/Label').getComponent(cc.Label).string = '地图  ▲';
+        this._chatType = ag.gameConst.chatMap;
+    },
+    buttonEventChatGuild:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.find('Canvas/nodeChatContent/spriteBack/nodeButtonsChatSelect').active = false;
+        cc.find('Canvas/nodeChatContent/spriteBack/buttonChatSelect/Label').getComponent(cc.Label).string = '行会  ▲';
+        this._chatType = ag.gameConst.chatGuild;
     },
 });
