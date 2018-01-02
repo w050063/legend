@@ -126,6 +126,7 @@
     "repeated string sGuildDeleteArray": 24,
     "repeated string sGuildInviteArray": 25,
     "repeated sSetOffice sSetOfficeArray": 26,
-    "repeated string sGuildWinIdArray": 27
+    "repeated string sGuildWinIdArray": 27,
+    "repeated string sAlertArray": 28
   }
 }

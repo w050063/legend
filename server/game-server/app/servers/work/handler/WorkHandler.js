@@ -16,8 +16,18 @@ var Handler = cc.Class.extend({
         this.app = app;
     },
 
+
     //开始沙巴克
-    //加元宝
+    systemNotify:function(msg, session, next){
+        if(typeof msg=='string'){
+            ag.jsUtil.sendDataAll("sSystemNotify",msg);
+            next(null, {code: 0});
+            return;
+        }
+        next(null, {code: 1});
+    },
+
+    //开始沙巴克
     shabake:function(msg, session, next){
         var array = msg.duration.split('.');
         var startTime = new Date(parseInt(array[0]),parseInt(array[1])-1,parseInt(array[2]),parseInt(array[3]),parseInt(array[4]),parseInt(array[5])).getTime();
@@ -188,6 +198,21 @@ var Handler = cc.Class.extend({
             role = ag.gameLayer.getRole(id);
             var data = role._data;
             ag.db.insertRole(data.id,data.mapId,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,role._exp,data.gold,data.office);
+        }
+
+        //记录玩家进入游戏时间
+        role._startGameTime = ag.gameLayer._gameTime;
+        next();
+    },
+
+
+    verifyTime:function(msg, session, next) {
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var role = ag.gameLayer.getRole(id);
+        if(role && typeof msg=='number'){
+            if(ag.gameLayer._gameTime-role._startGameTime+20<msg){
+                ag.jsUtil.sendData("sAlert","请勿使用作弊软件！",role._data.id);
+            }
         }
         next();
     },
