@@ -16,7 +16,7 @@ module.exports = {
             for(var i=0;i<count;++i){
                 var x = i%map.mapX;
                 var y = Math.floor(i/map.mapX);
-                map.collision.push(array[(y*map.mapX+x)*3+4]);
+                map.collision.push(array[y*map.mapX+x+2]);
             }
         }
     },
@@ -112,11 +112,12 @@ module.exports = {
             res: 'map/3',
             resPad: '001',
             music:'Victory.mp3',
-            npc:[{name:"传送员",x:25,y:33,title:"区域传送:",content:['t17','t0','t2','t5','t11']},
+            npc:[{name:"传送员",x:25,y:33,title:"区域传送:",content:['t17','t0','t2','t5','t11','t18']},
                 {name:"装备回收",x:6,y:32,title:"装备回收:",content:['t1000','t1001','t1002','t1003','t1004','t1005']},
                 {name:"比奇国王",x:27,y:43,title:"是否加入行会:",content:['t4000','t4001','t4002','t4003','t4004','t4005','t4006']},
                 {name:"比奇城市大使",x:18,y:47,title:"比奇路途遥远，确认要去:",content:['t3000']},
                 {name:"龙族宝藏",x:12,y:25,title:"200元宝一次:",content:['t5000','t5001']},
+                {name:"皇宫",x:46,y:36,title:"危险区域:",content:['t19','t20','t21']},
                 {name:"仓库管理",x:24,y:25,title:"有什么宝贝尽管存到我这里吧:",content:['t6000']},
                 {name:"苍月使者",x:18,y:25,title:"区域传送:",content:['t9','t10','t8']}],
             mapX: 60,
@@ -175,7 +176,7 @@ module.exports = {
             mapX: 32,
             mapY: 38,
             refresh: [["m36", -1, -1, 600, 1],["m41", -1, -1, 180, 1],["m43", -1, -1, 600, 1],["m27", 22, 25, 600, 1]
-                ,["m28", 22, 25, 600, 1],["m29", 22, 25, 600, 1]
+                ,["m28", -1, -1, 600, 1],["m29", -1, -1, 600, 1]
                 ,["m37", -1, -1, 7200, 3],["m38", -1, -1, 7200, 3],["m39", -1, -1, 7200, 3]]
         },
         t6:{
@@ -278,6 +279,35 @@ module.exports = {
             mapY: 100,
             refresh: [["m4", -1, -1, 300, 15],["m5", -1, -1, 300, 15],["m6", -1, -1, 600, 5],["m7", -1, -1, 600, 5]]
         },
+        t15:{
+            id : "t15",
+            name: "火龙洞窟",
+            level:35,
+            res: 'map/d2083',
+            resPad: '010',
+            music:'Victory.mp3',
+            npc:[{name:"传送员",x:8,y:12,title:"传送:",content:['t1']}
+                ,{name:"传送员",x:28,y:26,title:"传送:",content:['t1']}
+                ,{name:"传送员",x:34,y:57,title:"传送:",content:['t1']}
+                ,{name:"传送员",x:57,y:34,title:"传送:",content:['t1']}],
+            mapX: 64,
+            mapY: 72,
+            refresh: [["m36", -1, -1, 600, 1],["m41", -1, -1, 180, 1],["m43", -1, -1, 600, 1],["m27", 49, 49, 600, 1]
+                ,["m28", -1, -1, 600, 1],["m29", -1, -1, 600, 1]
+                ,["m37", -1, -1, 7200, 3],["m38", -1, -1, 7200, 3],["m39", -1, -1, 7200, 3]]
+        },
+        t16:{
+            id : "t16",
+            name: "皇宫",
+            level:35,
+            res: 'map/0150',
+            resPad: '011',
+            music:'Victory.mp3',
+            npc:[{name:"国王",x:8,y:15,title:"传送:",content:['t1']}],
+            mapX: 23,
+            mapY: 27,
+            refresh: []
+        },
     },
 
 
@@ -300,6 +330,10 @@ module.exports = {
         t15:{id:'t15',name:'天宫三层',mapId:'t11',x:78,y:19},
         t16:{id:'t16',name:'训练基地',mapId:'t12',x:26,y:21},
         t17:{id:'t17',name:'石墓七层',mapId:'t14',x:26,y:25},
+        t18:{id:'t18',name:'火龙洞窟',mapId:'t15',x:10,y:8},
+        t19:{id:'t19',name:'皇宫一号点',mapId:'t16',x:10,y:3},
+        t20:{id:'t20',name:'皇宫二号点',mapId:'t16',x:16,y:7},
+        t21:{id:'t21',name:'皇宫三号点',mapId:'t16',x:19,y:12},
         t1000:{id:'t1000',name:'四级以下回收',levels:[1,2,3,4]},
         t1001:{id:'t1001',name:'五级回收',levels:[5]},
         t1002:{id:'t1002',name:'六级回收',levels:[6]},

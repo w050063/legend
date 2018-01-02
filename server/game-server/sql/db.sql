@@ -84,6 +84,17 @@ CREATE TABLE `t_guilds` (
 
 
 -- ----------------------------
+-- Table structure for `t_custom`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_custom`;
+CREATE TABLE `t_custom` (
+  `id` varchar(16) NOT NULL,
+  `data` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO t_custom(id,data) VALUES("0","{}");
+
+-- ----------------------------
 -- alter table
 -- ----------------------------
 alter table t_roles add column gold int(8) NOT NULL DEFAULT 0;

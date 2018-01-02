@@ -16,6 +16,20 @@ var Handler = cc.Class.extend({
         this.app = app;
     },
 
+    //开始沙巴克
+    //加元宝
+    shabake:function(msg, session, next){
+        var array = msg.duration.split('.');
+        var startTime = new Date(parseInt(array[0]),parseInt(array[1])-1,parseInt(array[2]),parseInt(array[3]),parseInt(array[4]),parseInt(array[5])).getTime();
+        var nowTime = new Date().getTime();
+        console.log(msg);
+        console.log(startTime);
+        console.log(nowTime);
+
+        ag.shabake.start(startTime-nowTime,parseFloat(msg.duration2)*60*60*1000);
+        next(null, {code: 0});
+    },
+
 
     //加元宝
     addGold:function(msg, session, next){

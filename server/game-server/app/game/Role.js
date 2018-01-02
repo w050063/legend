@@ -146,6 +146,7 @@ module.exports = ag.class.extend({
     changeMap:function(transferId){
         var transferMst = ag.gameConst._transferMst[transferId];
         if(transferMst){
+            var lastMapId = this._data.mapId;
             var mapId = transferMst.mapId;
             ag.jsUtil.sendDataExcept("sDeleteRole",this._data.id,this._data.id);
             if(this._tiger)ag.jsUtil.sendDataExcept("sDeleteRole",this._tiger._data.id,this._data.id);
@@ -175,6 +176,11 @@ module.exports = ag.class.extend({
             var map = ag.gameConst._terrainMap[mapId];
             if(!map.safe){
                 ag.jsUtil.sendDataAll("sSystemNotify",'玩家【'+this._data.name+'】冲向'+map.name+'寻宝去啦！');
+            }
+
+            //判断是否退出皇宫
+            if(this.getIsPlayer() && (this._data.mapId=='t16' || lastMapId=='t16')){
+                ag.shabake.reset();
             }
         }
         ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp},this._data.mapId);
@@ -529,6 +535,11 @@ module.exports = ag.class.extend({
             ag.actionManager.runAction(this,10,function(){
                 this._ai._relifeCD = false;
             }.bind(this));
+        }
+
+        //判断是否退出皇宫
+        if(this.getIsPlayer() && this._data.mapId=='t16'){
+            ag.shabake.reset();
         }
     },
 

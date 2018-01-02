@@ -83,4 +83,17 @@ module.exports = ag.class.extend({
             ag.jsUtil.sendData("sSystemNotify",role._data.name+"邀请您加入行会["+this._dataMap[id].name+"]！",rid);
         }
     },
+
+
+    getGuildId:function(rid){
+        if(this._dataMap[rid]){
+            return rid;
+        }
+        for(var key in this._dataMap){
+            if(this._dataMap[key].member.indexOf(rid)!=-1){
+                return key;
+            }
+        }
+        return null;
+    },
 });

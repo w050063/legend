@@ -437,4 +437,21 @@ module.exports = ag.class.extend({
             }
         });
     },
+
+
+    //获得当前行会数据
+    getCustomData:function(callback){
+        var sql = 'SELECT * FROM t_custom';
+        this.query(sql, function(err, rows) {
+            var data = rows[0].data.replace(/%/g,'"');
+            if(callback)callback(JSON.parse(data));
+        });
+    },
+
+    //创建行会
+    setCustomData:function(data){
+        var sql = 'UPDATE t_custom SET data = "' + JSON.stringify(data).replace(/"/g,'%')
+            + '" WHERE id = "0";';
+        this.query(sql, function(err, rows) {});
+    },
 });

@@ -181,6 +181,7 @@ module.exports = {
         //确认进入游戏成功。
         player.relife();
         ag.jsUtil.send("sEnter",JSON.stringify(player._data),[id]);
+        ag.jsUtil.sendData("sGuildWinId",ag.shabake._guildWinId,id);
         //player.changeMap();
         ag.jsUtil.sendDataAll("sSystemNotify","玩家【"+player._data.name+"】上线！");
     },
