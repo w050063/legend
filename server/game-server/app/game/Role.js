@@ -206,8 +206,17 @@ module.exports = ag.class.extend({
         for(var key in map){
             var itemData = map[key]._data;
             var role = ag.gameLayer.getRole(itemData.owner);
-            if(itemData.mapId==this._data.mapId || (role && role._data.mapId==this._data.mapId)){
-                ag.jsUtil.sendDataAll("sItem",itemData,this._data.mapId);
+            if(role==this){
+                ag.jsUtil.sendData("sItem",itemData,this._data.id);
+            }else if(itemData.mapId==this._data.mapId && itemData.puton==ag.gameConst.putonGround){
+                ag.jsUtil.sendData("sItem",itemData,this._data.id);
+            }else if(role && role._data.mapId==this._data.mapId && itemData.puton>=0){
+                ag.jsUtil.sendData("sItem",itemData,this._data.id);
+            }
+
+            //发给别人装备
+            if(role==this && itemData.puton>=0){
+                ag.jsUtil.sendDataExcept("sItem",itemData,this._data.id);
             }
         }
 

@@ -222,7 +222,7 @@ module.exports = ag.class.extend({
                 }
                 item._data.puton = puton;
                 --role._bagLength;
-                ag.jsUtil.sendDataExcept("sBagItemToEquip",{id:id,puton:puton,rid:rid},rid);
+                ag.jsUtil.sendDataExcept("sBagItemToEquip",item._data,rid);
                 role.refreshItemProp();
             }
         }

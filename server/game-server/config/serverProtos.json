@@ -32,15 +32,6 @@
     "required int32 exp": 3,
     "optional string source": 4
   },
-  "message sDrop": {
-    "required string id": 1,
-    "required string mid": 2,
-    "optional string mapId": 3,
-    "optional int32 x": 4,
-    "optional int32 y": 5,
-    "required string owner": 6,
-    "required int32 puton": 7
-  },
   "message sItem": {
     "required string id": 1,
     "required string mid": 2,
@@ -49,11 +40,6 @@
     "optional int32 y": 5,
     "required string owner": 6,
     "required int32 puton": 7
-  },
-  "message sBagItemToEquip": {
-    "required string id": 1,
-    "required string rid": 2,
-    "required int32 puton": 3
   },
   "message sEquipItemToBag": {
     "required string id": 1,
@@ -107,7 +93,7 @@
     "repeated sMoveForce sMoveForceArray": 5,
     "repeated string sBuffManagerArray": 6,
     "repeated string sBFireCritArray": 7,
-    "repeated sDrop sDropArray": 8,
+    "repeated sItem sDropArray": 8,
     "repeated sAddExp sAddExpArray": 9,
     "repeated sFireWall sFireWallArray": 10,
     "repeated string sItemGroundDeleteArray": 11,
@@ -115,7 +101,7 @@
     "repeated sItem sItemArray": 13,
     "repeated string sItemDisappearArray": 14,
     "repeated string sDeleteRoleArray": 15,
-    "repeated sBagItemToEquip sBagItemToEquipArray": 16,
+    "repeated sItem sBagItemToEquipArray": 16,
     "repeated sEquipItemToBag sEquipItemToBagArray": 17,
     "repeated sChatYou sChatYouArray": 18,
     "repeated string sSystemNotifyArray": 19,
