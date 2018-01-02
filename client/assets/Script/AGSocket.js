@@ -221,6 +221,8 @@ module.exports={
                         tempRole.resetNameColor();
                     }
                 }
+            }else if(obj.key=='sAlertArray'){
+                ag.jsUtil.alert(ag.gameLayer.node,obj.value,function () {});
             }
         }
         this._dataArray = [];

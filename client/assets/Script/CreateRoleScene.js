@@ -143,6 +143,7 @@ cc.Class({
         else if(this._selectIndex==3){type='m1';sex=ag.gameConst.sexGirl;}
         else if(this._selectIndex==4){type='m2';sex=ag.gameConst.sexBoy;}
         else if(this._selectIndex==5){type='m2';sex=ag.gameConst.sexGirl;}
+        ag.userInfo._startGameTime = new Date().getTime();
         ag.agSocket.send("enter",{type:type,sex:sex});
     },
 

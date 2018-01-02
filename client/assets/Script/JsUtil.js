@@ -81,7 +81,7 @@ module.exports={
 
     alertOKCancel:function (father,content,callback,callbackCancel) {
         //加载
-        var node = cc.instantiate(ag.gameLayer._nodeAlertClone);
+        var node = cc.instantiate(ag.gameLayer._nodeAlertOKOrCancelClone);
         node.parent = father;
         node.setLocalZOrder(101);
         var label = node.getChildByName("labelContent").getComponent(cc.Label);

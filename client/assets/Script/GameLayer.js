@@ -71,6 +71,7 @@ cc.Class({
         this._nodeRoleHPLabel = this._nodeRolePropClone.getChildByName('labelHP');
         this._nodeRoleHPBar = this._nodeRolePropClone.getChildByName('progressBarHP');
         this._nodeAlertClone = cc.find('Canvas/clone/nodeAlertClone');
+        this._nodeAlertOKOrCancelClone = cc.find('Canvas/clone/nodeAlertOKOrCancelClone');
 
 
         //键盘事件注入
@@ -182,14 +183,10 @@ cc.Class({
 
 
 
-        //启动定时器,每秒执行一次
-        //this.schedule(function(){
-        //    var str = '';
-        //    for(var key in ag.jsUtil._addTimeMap){
-        //        str = str+key+':'+ag.jsUtil._addTimeMap[key]+';';
-        //    }
-        //    cc.log(str);
-        //},1);
+        //启动定时器,每10秒执行一次
+        this.schedule(function(){
+            ag.agSocket.send("verifyTime",Math.floor((new Date().getTime()-ag.userInfo._startGameTime)/1000));
+        },10);
         this.schedule(ag.spriteCache.update001.bind(ag.spriteCache),0.01);
     },
 
