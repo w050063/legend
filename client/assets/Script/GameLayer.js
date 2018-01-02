@@ -349,23 +349,21 @@ cc.Class({
 
     //初始化道具
     initItem:function(data){
-        if(!ag.userInfo._itemMap[data.id]){
-            ag.userInfo._itemMap[data.id]={_data:data};
-            if(data.owner){
-                var role = this._roleMap[data.owner];
-                if(role){
-                    if(data.puton>=0){
-                        role.addEquip(data.id);
-                        if(role==this._player)this.itemBagToEquip(data.id);
-                    }else if(data.puton==ag.gameConst.putonBag){
-                        if(role==this._player)this.itemEquipToBag(data.id);
-                    }else if(data.puton==ag.gameConst.putonWharehouse){
-                        if(role==this._player)this.itemToWharehouse(data.id);
-                    }
+        ag.userInfo._itemMap[data.id]={_data:data};
+        if(data.owner){
+            var role = this._roleMap[data.owner];
+            if(role){
+                if(data.puton>=0){
+                    role.addEquip(data.id);
+                    if(role==this._player)this.itemBagToEquip(data.id);
+                }else if(data.puton==ag.gameConst.putonBag){
+                    if(role==this._player)this.itemEquipToBag(data.id);
+                }else if(data.puton==ag.gameConst.putonWharehouse){
+                    if(role==this._player)this.itemToWharehouse(data.id);
                 }
-            }else if(data.puton==ag.gameConst.putonGround){
-                this.dropItem(data);
             }
+        }else if(data.puton==ag.gameConst.putonGround){
+            this.dropItem(data);
         }
     },
 
@@ -424,17 +422,6 @@ cc.Class({
             obj._data.puton = ag.gameConst.putonBag;
             this.addItemToBag(id);
             this.systemNotify(ag.gameConst._itemMst[obj._data.mid].name+'被发现！');
-        }
-    },
-
-
-    bagItemToEquip:function(id,rid,puton){
-        var obj = ag.userInfo._itemMap[id];
-        var role = ag.gameLayer.getRole(rid);
-        if(obj && role){
-            obj._data.owner = rid;
-            obj._data.puton = puton;
-            role.addEquip(obj._data.id);
         }
     },
 
@@ -932,7 +919,7 @@ cc.Class({
         }
 
         //将官职数据保存到iteminfo界面
-        cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode')._obj = role;
+        cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode')._role = role;
     },
 
 

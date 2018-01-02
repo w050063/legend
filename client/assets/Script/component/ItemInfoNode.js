@@ -18,7 +18,7 @@ cc.Class({
 
 
     setOfficeByRole:function(role){
-        if(!role)role = this._obj;
+        if(!role)role = this._role;
         var back = this.node.getChildByName('back');
         back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.find('Canvas/nodeBag/equip/office').getComponent(cc.Sprite).spriteFrame.clone();
 
