@@ -3,7 +3,7 @@
  * 选人界面
  */
 
-var AGAniClothes = require("AGAniClothes");
+
 var AGAni = require("AGAni");
 cc.Class({
     extends: cc.Component,
@@ -26,8 +26,6 @@ cc.Class({
         this._selectIndex = 0;
         //初始化按钮对象
         this._nodeRoleArray = [];
-        //var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
-        //var nameArray = ['ani/hum4/004','ani/hum5/005','ani/hum6/006','ani/hum7/007','ani/hum8/008','ani/hum9/009'];
         var pageView = cc.find('Canvas/pageViewRole').getComponent(cc.PageView);
         for(var i=0;i<6;++i){
             (function (i) {

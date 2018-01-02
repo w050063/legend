@@ -7,10 +7,8 @@
 var Role = require("Role");
 var Item = require("Item");
 var AGTileMap = require("AGTileMap");
-var AGListView = require("AgListView");
 var ItemInfoNode = require('ItemInfoNode');
 var Wharehouse = require('Wharehouse');
-var AGAniClothes = require("AGAniClothes");
 var AGAni = require("AGAni");
 var baseNpcId = 5000;
 cc.Class({
@@ -126,9 +124,7 @@ cc.Class({
 
         this._nodeBag = cc.find("Canvas/nodeBag");
         this._nodeBag.active = false;
-        //this._scrollViewList = cc.find("Canvas/nodeBag/scrollViewList").getComponent(AGListView);
-        //this._scrollViewList.setSpace(2);
-        //this.refreshBag();
+
 
 
         //测试新地图
@@ -274,22 +270,8 @@ cc.Class({
             if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)str = '安全区';
         }
         this._labelLocation.string = map.name+'\n'+str+' '+this._player._data.x+','+this._player._data.y;
-        //return;
-        //var map = ag.gameConst._terrainMap[this._player._data.mapId];
-        //this._labelLocation.string = map.name+' '+this._player._data.x+','+this._player._data.y;
-        //var spriteFrame = this._spriteTopRight.spriteFrame;
         if(this._spriteMinMap.spriteFrame){
-            //spriteFrame = spriteFrame.clone();
-            //var nodeSize = this._spriteTopRight.node.getContentSize();
             var size = this._spriteMinMap.spriteFrame.getOriginalSize();
-            //
-            //var left = Math.max((this._player.getLocation().x+0.5)/map.mapX*size.width-nodeSize.width/2,0);
-            //left = Math.floor(Math.min(left,size.width-nodeSize.width));
-            //var top = Math.max(size.height-(this._player.getLocation().y+0.5)/map.mapY*size.height-nodeSize.height/2,0);
-            //top = Math.floor(Math.min(top,size.height-nodeSize.height));
-            //spriteFrame.setRect(cc.rect(left,top,nodeSize.width,nodeSize.height));
-            //this._spriteTopRight.spriteFrame = spriteFrame;
-
             //设置小地图上人的坐标
             var truePos = this._player.getTruePosition();
             this._nodeMinMapPlayer.setPosition(((this._player._data.x+0.5)/map.mapX-0.5)*size.width,((this._player._data.y+0.5)/map.mapY-0.5)*size.height);
@@ -418,7 +400,6 @@ cc.Class({
             }
             if(obj._data.owner==this._player._data.id){
                 delete obj._data.owner;
-                this.refreshBag();
             }
         }
     },
@@ -427,12 +408,6 @@ cc.Class({
     deleteRoleByServer:function (id) {
         var player =  ag.gameLayer.getRole(id);
         if(player){
-            for(var key in ag.userInfo._itemMap){
-                var obj = ag.userInfo._itemMap[key];
-                if(obj._data.owner==id){
-                    delete ag.userInfo._itemMap[key];
-                }
-            }
             player._data.camp=ag.gameConst.campMonster;
             player._state = ag.gameConst.stateIdle;
             player.dead();
@@ -896,7 +871,7 @@ cc.Class({
             //衣服
             var aniPos = cc.p(-2,-50);
             var scale = 1.5;
-            var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
+            var array = ag.userInfo.agAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
             if(mst.type==2){
                 if(father.clothe)father.clothe.getComponent(AGAni).putCache();
                 var name = (role._data.sex==0?'ani/hum0/000':'ani/hum1/001');
@@ -974,7 +949,7 @@ cc.Class({
 
         var aniPos = cc.p(-2,-50);
         var scale = 1.5;
-        var array = AGAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
+        var array = ag.userInfo.agAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
         if(father.clothe)father.clothe.getComponent(AGAni).putCache();
         var name = (role._data.sex==0?'ani/hum0/000':'ani/hum1/001');
         var node = ag.jsUtil.getNode(father,name+array[0],parseInt(array[1]),1,0.3);
@@ -1007,14 +982,6 @@ cc.Class({
 
         father.labelTitle.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
         father.labelProp.string = '攻击:'+hurt+' 防御:'+defense;
-    },
-
-
-    refreshBag:function () {
-    },
-
-
-    refreshEquip:function () {
     },
 
 

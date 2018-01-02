@@ -205,7 +205,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 100,
+      "width": 180,
       "height": 30
     },
     "_rotationX": 0,
@@ -214,7 +214,7 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": -148,
+      "x": -106,
       "y": 84
     },
     "_skewX": 0,
@@ -240,7 +240,7 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_N$string": "乱世提示：",
+    "_N$string": "邹平网通传奇提示：",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
@@ -563,12 +563,8 @@
     },
     "duration": 0.1,
     "zoomScale": 1.2,
-    "pressedSprite": {
-      "__uuid__": "a4a17fd3-65c8-4734-a6d7-c8247f2798f4"
-    },
-    "hoverSprite": {
-      "__uuid__": "a4a17fd3-65c8-4734-a6d7-c8247f2798f4"
-    },
+    "pressedSprite": null,
+    "hoverSprite": null,
     "clickEvents": [
       {
         "__id__": 18
@@ -593,9 +589,7 @@
     "_N$normalSprite": {
       "__uuid__": "e8e6cf98-895b-4f12-acc1-73722818e1a2"
     },
-    "_N$disabledSprite": {
-      "__uuid__": "a4a17fd3-65c8-4734-a6d7-c8247f2798f4"
-    },
+    "_N$disabledSprite": null,
     "_N$target": {
       "__id__": 11
     }
@@ -839,12 +833,8 @@
     },
     "duration": 0.1,
     "zoomScale": 1.2,
-    "pressedSprite": {
-      "__uuid__": "a4a17fd3-65c8-4734-a6d7-c8247f2798f4"
-    },
-    "hoverSprite": {
-      "__uuid__": "a4a17fd3-65c8-4734-a6d7-c8247f2798f4"
-    },
+    "pressedSprite": null,
+    "hoverSprite": null,
     "clickEvents": [
       {
         "__id__": 27
@@ -869,9 +859,7 @@
     "_N$normalSprite": {
       "__uuid__": "e8e6cf98-895b-4f12-acc1-73722818e1a2"
     },
-    "_N$disabledSprite": {
-      "__uuid__": "a4a17fd3-65c8-4734-a6d7-c8247f2798f4"
-    },
+    "_N$disabledSprite": null,
     "_N$target": {
       "__id__": 20
     }
