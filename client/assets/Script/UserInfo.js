@@ -30,6 +30,7 @@ module.exports={
     operatePuton:'right',
     _guildMap : {},
     _guildInvite:null,
+    _guildWinId:'',//沙巴克占领者
 
 	init:function () {
 

@@ -212,6 +212,15 @@ module.exports={
                 if(player && player.getIsPlayer()) {
                     player.setOffice(obj.value.office);
                 }
+            }else if(obj.key=='sGuildWinIdArray'){
+                ag.userInfo._guildWinId = obj.value;
+                for(var key in ag.gameLayer._roleMap){
+                    var tempRole = ag.gameLayer._roleMap[key];
+                    if(tempRole.getIsPlayer()){
+                        tempRole.resetName();
+                        tempRole.resetNameColor();
+                    }
+                }
             }
         }
         this._dataArray = [];

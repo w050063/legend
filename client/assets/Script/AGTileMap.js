@@ -80,6 +80,6 @@ cc.Class({
     isCollision:function(location){
         if(location.x<0 || location.x>=this._width || location.y<0 || location.y>=this._height)return true;
         if(!this._dataArray || this._dataArray.length==0)return true;
-        return this._dataArray[(location.y*this._width+location.x)*3+4]=='1';
+        return this._dataArray[location.y*this._width+location.x+2]=='1';
     },
 });

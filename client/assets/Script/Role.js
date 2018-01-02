@@ -71,12 +71,20 @@ cc.Class({
         if(this._propNode && this._propNode._labelName){
             var name = this._data.name+'('+ag.gameConst._roleMst[this._data.type].name+')\n';
             if(ag.userInfo._guildMap[this._data.id]){
-                name = name + '[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(掌门人)';
+                if(ag.userInfo._guildWinId==this._data.id){
+                    name = name + '[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(沙城主)';
+                }else{
+                    name = name + '[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(掌门人)';
+                }
             }else{
                 for(var key in ag.userInfo._guildMap){
                     var index = ag.userInfo._guildMap[key].member.indexOf(this._data.id);
                     if(index!=-1){
-                        name = name + '[' + ag.userInfo._guildMap[key].name + ']';
+                        if(ag.userInfo._guildWinId==key){
+                            name = name + '[' + ag.userInfo._guildMap[key].name + ']' + '(沙巴克)';
+                        }else{
+                            name = name + '[' + ag.userInfo._guildMap[key].name + ']';
+                        }
                         break;
                     }
                 }

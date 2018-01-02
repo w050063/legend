@@ -151,4 +151,15 @@ cc.Class({
         ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find("Canvas/nodeLogin").active = false;
     },
+
+
+    buttonEventShabake: function() {
+        var editBoxShaDuration = cc.find("Canvas/editBoxShaDuration").getComponent(cc.EditBox);
+        var editBoxShaDuration2 = cc.find("Canvas/editBoxShaDuration2").getComponent(cc.EditBox);
+        ag.jsUtil.request(this.node,'shabake',{duration:editBoxShaDuration.string,duration2:editBoxShaDuration2.string},function (data) {
+            if(data.code==0){
+                ag.jsUtil.showText(this.node,'已定时启动沙巴克');
+            }
+        }.bind((this)));
+    },
 });

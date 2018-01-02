@@ -398,8 +398,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 37,
-      "height": 36
+      "width": 17.240000000000002,
+      "height": 18
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -410,7 +410,7 @@
       "x": 0,
       "y": 32
     },
-    "_skewX": -0.1,
+    "_skewX": 0,
     "_skewY": 0,
     "_localZOrder": 0,
     "_globalZOrder": 0,
@@ -433,7 +433,7 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_N$string": "Label\nddd",
+    "_N$string": "ffff",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
