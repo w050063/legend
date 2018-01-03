@@ -14,6 +14,7 @@ var Handler = cc.Class.extend({
     ctor:function (app) {
         this.app = app;
         this._baseUid = 0;
+        this._version = '0.0.1';
     },
 
 
@@ -39,6 +40,22 @@ var Handler = cc.Class.extend({
             });
             return;
         }
+
+        if(typeof msg.version=='string'){
+            var array1 = this._version.split('.');
+            var array2 = msg.version.split('.');
+            if(parseInt(array1[0])>parseInt(array2[0])){
+                next(null, {code:1,text:'请下载新版本!'});
+                return;
+            }else if(parseInt(array1[0])==parseInt(array2[0]) && parseInt(array1[1])>parseInt(array2[1])){
+                next(null, {code:1,text:'请下载新版本!'});
+                return;
+            }else if(parseInt(array1[1])==parseInt(array2[1]) && parseInt(array1[2])>parseInt(array2[2])){
+                next(null, {code:1,text:'请下载新版本!'});
+                return;
+            }
+        }
+
 
         // select conn
         var res = connectors[Math.floor(Math.random()*connectors.length)];
