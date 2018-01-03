@@ -349,21 +349,28 @@ cc.Class({
 
     //初始化道具
     initItem:function(data){
-        ag.userInfo._itemMap[data.id]={_data:data};
-        if(data.owner){
-            var role = this._roleMap[data.owner];
-            if(role){
-                if(data.puton>=0){
-                    role.addEquip(data.id);
-                    if(role==this._player)this.itemBagToEquip(data.id);
-                }else if(data.puton==ag.gameConst.putonBag){
-                    if(role==this._player)this.itemEquipToBag(data.id);
-                }else if(data.puton==ag.gameConst.putonWharehouse){
-                    if(role==this._player)this.itemToWharehouse(data.id);
-                }
+        if(ag.userInfo._itemMap[data.id]){
+            if(data.owner && data.owner!=this._player._data.id && data.puton>=0){
+                var role = this.getRole(data.owner);
+                if(role)role.addEquip(data.id);
             }
-        }else if(data.puton==ag.gameConst.putonGround){
-            this.dropItem(data);
+        }else{
+            ag.userInfo._itemMap[data.id]={_data:data};
+            if(data.owner){
+                var role = this._roleMap[data.owner];
+                if(role){
+                    if(data.puton>=0){
+                        role.addEquip(data.id);
+                        if(role==this._player)this.itemBagToEquip(data.id);
+                    }else if(data.puton==ag.gameConst.putonBag){
+                        if(role==this._player)this.itemEquipToBag(data.id);
+                    }else if(data.puton==ag.gameConst.putonWharehouse){
+                        if(role==this._player)this.itemToWharehouse(data.id);
+                    }
+                }
+            }else if(data.puton==ag.gameConst.putonGround){
+                this.dropItem(data);
+            }
         }
     },
 
