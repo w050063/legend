@@ -14,22 +14,27 @@ module.exports={
         if(self._step != 0)pomelo.disconnect();
         self._step = 0;
         pomelo.init({host: "192.168.99.174",port: 3014,log: true}, function() {
-            pomelo.request('gate.GateHandler.queryEntry', {}, function(data) {
-                var uid = data.uid;
-				pomelo.disconnect(function () {
-					self._step = 1;
-					pomelo.init({
-						host : data.host,
-						port : data.port,
-						reconnect : true
-					}, function (data1) {
-						pomelo.request("conn.ConnHandler.connect", {uid:uid}, function(data2) {
-							self._step = 2;
-							cc.log("网关 successed!");
-							if(callback)callback(data2);
-						});
-					})
-				});
+            pomelo.request('gate.GateHandler.queryEntry', {version:ag.userInfo._version}, function(data) {
+                if(data.code==0){
+                    var uid = data.uid;
+                    pomelo.disconnect(function () {
+                        self._step = 1;
+                        pomelo.init({
+                            host : data.host,
+                            port : data.port,
+                            reconnect : true
+                        }, function (data1) {
+                            pomelo.request("conn.ConnHandler.connect", {uid:uid}, function(data2) {
+                                self._step = 2;
+                                cc.log("网关 successed!");
+                                if(callback)callback(data2);
+                            });
+                        })
+                    });
+                }else{
+                    ag.userInfo._needGameEnd = data.text;
+                    pomelo.disconnect(function () {});
+                }
             });
         });
 

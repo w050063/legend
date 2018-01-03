@@ -67,16 +67,23 @@ cc.Class({
         var self = this;
         var times = 0,sec = 5;
         var scheduleFunc = function (dt) {
-            ++sec;
-            if(sec==6){
-                sec = 0;
-                ++times;
-                ag.agSocket.init(function(){
-                    self.unschedule(scheduleFunc);
-                    self.loadPrefab();
+            if(ag.userInfo._needGameEnd){//版本过低，终止进入游戏
+                self.unschedule(scheduleFunc);
+                ag.jsUtil.alert(self.node,ag.userInfo._needGameEnd,function () {
+                    cc.game.end();
                 });
+            }else{
+                ++sec;
+                if(sec==6){
+                    sec = 0;
+                    ++times;
+                    ag.agSocket.init(function(){
+                        self.unschedule(scheduleFunc);
+                        self.loadPrefab();
+                    });
+                }
+                self._nodeLoading.setPercent('第'+times+'次'+sec+'秒');
             }
-            self._nodeLoading.setPercent('第'+times+'次'+sec+'秒');
         };
         this.schedule(scheduleFunc,1);
     },

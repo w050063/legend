@@ -32,6 +32,8 @@ module.exports={
     _guildInvite:null,
     _guildWinId:'',//沙巴克占领者
     _startGameTime :0,
+    _version:'0.0.1',
+    _needGameEnd:'',
 
 	init:function () {
         //角色动画：衣服，性别，动作，朝向

@@ -70,12 +70,14 @@ module.exports={
 
     alert:function (father,content,callback) {
         //加载
-        var node = cc.instantiate(ag.gameLayer._nodeAlertClone);
-        node.parent = father;
-        node.setLocalZOrder(101);
-        var label = node.getChildByName("labelContent").getComponent(cc.Label);
-        label.string = content;
-        node._callback = callback;
+        cc.loader.loadRes('prefab/nodeAlert',cc.Prefab,function(err, prefab){
+            var node = cc.instantiate(prefab);
+            node.parent = father;
+            node.setLocalZOrder(101);
+            var label = node.getChildByName("labelContent").getComponent(cc.Label);
+            label.string = content;
+            node._callback = callback;
+        });
     },
 
 
