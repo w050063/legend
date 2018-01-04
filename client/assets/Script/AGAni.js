@@ -3,7 +3,7 @@
  * 动画
  */
 
-//var AGAniOffset = require("AGAniOffset");
+
 cc.Class({
     extends: cc.Component,
     properties: {},
@@ -33,7 +33,7 @@ cc.Class({
         }
         this.modifyFrame();
     },
-
+	
 
     pause:function(){
         this._running = false;
@@ -62,26 +62,22 @@ cc.Class({
 
 
     modifyFrame:function(){
-        ag.jsUtil.startTime();
-        var sprite = this._spriteFrameArray[this._curIndex];
         for(var i=0;i<this._spriteFrameArray.length;++i){
             var node = this._spriteFrameArray[i].node;
             var b = (this._curIndex==i);
             if(node.active!=b)node.active = b;
         }
-        ag.jsUtil.addTime('ddd2');
-
-
+		
+		
         if(this._controllArray){
-            for(var i=this._controllArray.length-1;i>=0;--i){
-                if(this._controllArray[i]){
-                    if(this._controllArray[i]._bBeControll){
-                        this._controllArray[i]._curIndex = this._curIndex;
-                        this._controllArray[i].modifyFrame();
-                    }else{
-                        this._controllArray.splice(i,1);
-                    }
-                }
+            for(var i = this._controllArray.length-1;i>=0;--i){
+				var comp = this._controllArray[i];
+				if(comp._bBeControll){
+					comp._curIndex = this._curIndex;
+					comp.modifyFrame();
+				}else{
+					this._controllArray.splice(i,1);
+				}
             }
         }
     },
@@ -103,7 +99,7 @@ cc.Class({
     },
 
 
-    // called every frame
+    //called every frame
     update: function (dt) {
         if(this._bBeControll)return;
         if(this._running){
