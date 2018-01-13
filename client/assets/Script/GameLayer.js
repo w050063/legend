@@ -40,25 +40,20 @@ cc.Class({
         }
 
         //自动攻击
-        var temp = cc.sys.localStorage.getItem('setupAutoAttack');
-        if(!temp){
-            cc.sys.localStorage.setItem('setupAutoAttack','true');
-            this._setupAutoAttack = true;
-        }else if(temp=='true'){
-            this._setupAutoAttack = true;
-        }else{
-            this._setupAutoAttack = false;
-            cc.find('Canvas/nodeHelp/toggleAutoAttack').getComponent(cc.Toggle).isChecked = false;
-        }
+        var temp = !(cc.sys.localStorage.getItem('setupAutoAttack')=='false');
+        this._setupAutoAttack = temp;
+        cc.sys.localStorage.setItem('setupAutoAttack',''+temp);
+        cc.find('Canvas/nodeHelp/toggleAutoAttack').getComponent(cc.Toggle).isChecked = temp;
 
         //启用摇杆
-        var temp = cc.sys.localStorage.getItem('setupRock');
-        if(!temp){
-            cc.sys.localStorage.setItem('setupRock','true');
-        }else if(temp=='false'){
-            cc.find('Canvas/nodeHelp/toggleSetupRock').getComponent(cc.Toggle).isChecked = false;
-            cc.find('Canvas/nodeRock').active = false;
-        }
+        temp = cc.sys.localStorage.getItem('setupRock')=='true';
+        cc.sys.localStorage.setItem('setupRock',''+temp);
+        cc.find('Canvas/nodeHelp/toggleSetupRock').getComponent(cc.Toggle).isChecked = temp;
+        cc.find('Canvas/nodeRock').active = temp;
+
+        //背景音乐
+        cc.find('Canvas/nodeHelp/toggleSetupMusic').getComponent(cc.Toggle).isChecked = ag.musicManager._musicSetup;
+        cc.find('Canvas/nodeHelp/toggleSetupEffect').getComponent(cc.Toggle).isChecked = ag.musicManager._soundEffectSetup;
 
 
         this._flyBloodArray = [];//飘血数组
@@ -350,7 +345,8 @@ cc.Class({
     //初始化道具
     initItem:function(data){
         if(ag.userInfo._itemMap[data.id]){
-            if(data.owner && data.owner!=this._player._data.id && data.puton>=0){
+            ag.userInfo._itemMap[data.id]={_data:data};
+            if(data.owner && data.puton>=0){
                 var role = this.getRole(data.owner);
                 if(role)role.addEquip(data.id);
             }
@@ -1023,6 +1019,13 @@ cc.Class({
             editbox.stayOnTop = true;
             editbox.setFocus();
         }
+
+
+        //保持在最下面
+        var scrollview = cc.find('Canvas/nodeChatContent/spriteBack/scrollView').getComponent(cc.ScrollView);
+        var itemNode = scrollview.content.getChildByName('item');
+        scrollview.content.height = Math.max(itemNode.height,200);
+        scrollview.scrollToBottom();
     },
 
     //聊天按钮
@@ -1090,10 +1093,8 @@ cc.Class({
             if(i!=this._chatStringHistoryArray.length-1)str = str + '\n';
         }
         itemNode.getComponent(cc.Label).string = str;
-        //itemNode.y = Math.max(0,itemNode.height-400);
         contentNode.height = Math.max(itemNode.height,200);
         scrollview.scrollToBottom();
-
     },
 
 

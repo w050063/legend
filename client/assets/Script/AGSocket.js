@@ -55,8 +55,14 @@ module.exports={
                 }
             }
         });
-	},
 
+        pomelo.removeAllListeners('sOtherLogin');
+        pomelo.on('sOtherLogin',function(data) {
+            ag.jsUtil.alert(cc.director.getScene().getChildByName('Canvas'),data.msg,function () {
+                pomelo.disconnect();
+            });
+        }.bind(this));
+	},
 
     //发送数据封装
     send: function(key,obj) {

@@ -57,7 +57,7 @@ cc.Class({
             this.delFireWall(mapXYString);
         }
         var tag = ++this._baseTag;
-        ag.gameLayer.tagAction(cc.sequence(cc.delayTime(10),cc.callFunc(function(){
+        ag.gameLayer.tagAction(cc.sequence(cc.delayTime(20),cc.callFunc(function(){
             this.delFireWall(mapXYString);
         }.bind(this))),tag);
 

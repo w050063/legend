@@ -754,7 +754,7 @@ cc.Class({
 
     //飘雪动画
     flyAnimation:function(){
-        if(!this._flyBloodFlag){
+        if(!this._flyBloodFlag && this._propNode){
             var hpStr = null;
             for(var i=0;i<ag.gameLayer._flyBloodArray.length;++i){
                 if(this._data.id==ag.gameLayer._flyBloodArray[i].id){
@@ -770,8 +770,7 @@ cc.Class({
                 node.x = 0;
                 node.y = 71;
                 tips.string = ':'+hpStr.substr(1);
-                //node.color = (hpStr[0]=='+')?cc.color(0,255,0,255):cc.color(255,0,0,255);
-                this.node.addChild(node,30);
+                this._propNode.addChild(node,30);
                 node.runAction(cc.sequence(cc.moveBy(0.4, cc.p(0,30)), cc.fadeOut(0.2),cc.callFunc(function(){
                     node.destroy();
                 })));
