@@ -291,8 +291,10 @@ module.exports = ag.class.extend({
 
     //掉血
     changeHPByHurt:function(attacker,hurt,bCisha){
-        if(bCisha){
-            this._data.hp -= hurt;
+        if(this._data.type=='m1'){
+            this._data.hp -= Math.round(hurt*0.2);
+        }else if(bCisha){
+            this._data.hp -= Math.round(hurt);
         }else{
             var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
             this._data.hp -=  Math.round(hurt/correct);
@@ -329,7 +331,7 @@ module.exports = ag.class.extend({
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            tempRole.changeHPByHurt(this,this._hurt*5);
+                            tempRole.changeHPByHurt(this,this._hurt*3);
                         }else{
                             tempRole.changeHPByHurt(this,this._hurt);
                         }
@@ -344,7 +346,7 @@ module.exports = ag.class.extend({
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            tempRole.changeHPByHurt(this,this._hurt*5);
+                            tempRole.changeHPByHurt(this,this._hurt*3);
                         }else{
                             tempRole.changeHPByHurt(this,this._hurt,true);
                         }
@@ -378,20 +380,20 @@ module.exports = ag.class.extend({
                 }
             }
         }else if(this._data.type=='m2'){
+            //启动毒
+            ag.buffManager.setPoison(locked,this);
+
+
             var array = ag.gameLayer._roleXYMap[''+data.mapId+','+x+','+y];
             if(array){
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
-                        tempRole.changeHPByHurt(this,this._hurt);
+                        tempRole.changeHPByHurt(this,this._hurt*1.5);
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }
             }
-
-
-            //启动毒
-            ag.buffManager.setPoison(locked,this);
         }else if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27") {
             var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(),this.getMst().attackDistance);
             for (var i = 0; i < array.length; ++i) {

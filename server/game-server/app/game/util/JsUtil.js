@@ -9,6 +9,22 @@ module.exports = {
     dataChannel:"dataChannel",
 
 
+    sendByUids : function(route,msg,uids){
+        //发送信息
+        var channelService = pomelo.app.get('channelService');
+        var channel = channelService.getChannel(this.dataChannel, true);
+        var infoArray = [];
+        for(var i=0;i<uids.length;++i){
+            var uid = uids[i];
+            var userObj = channel.getMember(uid);
+            if(userObj)infoArray.push({uid: uid,sid: userObj['sid']});
+        }
+        var param = {msg: msg,from: "",target: ""};
+        channelService.pushMessageByUids(route,param,infoArray);
+    },
+
+
+
     send : function(route,msg,uids){
         //发送信息
         var channelService = pomelo.app.get('channelService');

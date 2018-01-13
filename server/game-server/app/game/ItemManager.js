@@ -49,6 +49,7 @@ module.exports = ag.class.extend({
 
 
     drop:function (rid,str,mapId,location) {
+        var map = ag.gameConst._itemMst;
         var array = str.split(',');
         for(var i=0;i<array.length;++i){
             if(i%2==0){
@@ -63,6 +64,9 @@ module.exports = ag.class.extend({
                     item._their = rid;
                     this._itemMap.add(item);
                     ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
+                    if(map[item._data.mid].level>=7){
+                        ag.jsUtil.sendDataAll("sSystemNotify",'装备【'+map[item._data.mid].name+'】掉落在地图【'+ag.gameConst._terrainMap[mapId].name+'】');
+                    }
                 }
             }
         }
@@ -71,6 +75,7 @@ module.exports = ag.class.extend({
 
     dropEquipOneByArray:function (role,array,mapId,location) {
         if(array.length>0){
+            var map = ag.gameConst._itemMst;
             var index = Math.floor(Math.random()*array.length);
             var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
             pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
@@ -82,6 +87,9 @@ module.exports = ag.class.extend({
             delete item._their;
             role.refreshItemProp();
             ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
+            if(map[item._data.mid].level>=7){
+                ag.jsUtil.sendDataAll("sSystemNotify",'装备【'+map[item._data.mid].name+'】掉落在地图【'+ag.gameConst._terrainMap[mapId].name+'】');
+            }
         }
     },
 
@@ -101,6 +109,9 @@ module.exports = ag.class.extend({
                     item._their = rid;
                     this._itemMap.add(item);
                     ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
+                    if(map[item._data.mid].level>=7){
+                        ag.jsUtil.sendDataAll("sSystemNotify",'装备【'+map[item._data.mid].name+'】掉落在地图【'+ag.gameConst._terrainMap[mapId].name+'】');
+                    }
                 }
             }
         }

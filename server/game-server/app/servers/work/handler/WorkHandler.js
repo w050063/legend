@@ -86,6 +86,14 @@ var Handler = cc.Class.extend({
     //进入游戏,0正确,1Id为空,2ID已经存在
     login:function(msg, session, next) {
         if(ag.userManager.isRightAccountAndPassword(msg.account,msg.password)){
+            var oldUid = ag.userManager.getUidByAccount(msg.account);
+            console.log('dddd',msg.account,oldUid);
+            if(oldUid){
+                //解除绑定
+                ag.userManager.unbindUid(oldUid);
+                ag.jsUtil.sendByUids('sOtherLogin','此账号已在其他地方登陆，您被迫下线！',[oldUid]);
+            }
+
             //绑定账号和uid
             ag.userManager.bindUid(session.uid,msg.account);
             var data = ag.userManager.add(msg.account);
