@@ -62,7 +62,7 @@ module.exports = {
         for(var key in this._roleMap){
             var role = this._roleMap[key];
             if(role.getIsPlayer() && ag.jsUtil.getIsOnline(role._data.id)==false){
-                if(role._data.level<48){
+                if(role._data.level<43){
                     this.deleteRole(role._data.id);
                 }else{
                     var lx = role.getLocation().x,ly = role.getLocation().y;
