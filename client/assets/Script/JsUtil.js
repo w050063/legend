@@ -83,13 +83,15 @@ module.exports={
 
     alertOKCancel:function (father,content,callback,callbackCancel) {
         //加载
-        var node = cc.instantiate(ag.gameLayer._nodeAlertOKOrCancelClone);
-        node.parent = father;
-        node.setLocalZOrder(101);
-        var label = node.getChildByName("labelContent").getComponent(cc.Label);
-        label.string = content;
-        node._callback = callback;
-        node._callbackCancel = callbackCancel;
+        cc.loader.loadRes('prefab/nodeAlertOKOrCancel',cc.Prefab,function(err, prefab){
+            var node = cc.instantiate(prefab);
+            node.parent = father;
+            node.setLocalZOrder(101);
+            var label = node.getChildByName("labelContent").getComponent(cc.Label);
+            label.string = content;
+            node._callback = callback;
+            node._callbackCancel = callbackCancel;
+        });
     },
 
 

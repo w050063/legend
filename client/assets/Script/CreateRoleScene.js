@@ -114,10 +114,14 @@ cc.Class({
     buttonDelete: function () {
         ag.musicManager.playEffect("resources/voice/button.mp3");
         if(ag.userInfo._accountData.type!=undefined && ag.userInfo._accountData.sex!=undefined){
-            ag.jsUtil.request(this.node,'deleteRole',ag.userInfo._accountData.id,function (data) {
-                ag.userInfo._accountData.type=undefined;
-                ag.userInfo._accountData.sex=undefined;
-                ag.jsUtil.showText(this.node,'删除成功！');
+            ag.jsUtil.alertOKCancel(this.node,'确认要删除此角色及其装备？',function(){
+                ag.jsUtil.request(this.node,'deleteRole',ag.userInfo._accountData.id,function (data) {
+                    ag.userInfo._accountData.type=undefined;
+                    ag.userInfo._accountData.sex=undefined;
+                    ag.jsUtil.showText(this.node,'删除成功！');
+                }.bind(this));
+            }.bind(this),function(){
+
             }.bind(this));
         }else{
             ag.jsUtil.showText(this.node,'您还没有角色');

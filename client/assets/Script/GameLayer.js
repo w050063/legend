@@ -141,6 +141,9 @@ cc.Class({
         this.changeMap();
         //请求本地图所有角色
         ag.agSocket.send("changeMap",undefined);
+
+        //重置攻击模式
+        cc.find('Canvas/buttonAttackMode/Label').getComponent(cc.Label).string = ag.gameConst.attackModeTextArray[this._player._data.attackMode];
 		
 		
         this.node.on(cc.Node.EventType.TOUCH_START, function (event) {
@@ -284,14 +287,14 @@ cc.Class({
                     this._stableMinMapNpcBoss.push(node);
                 }
                 for(var i=0;i<map.refresh.length;++i){
-                    if(map.refresh[i][1]!=-1 && map.refresh[i][2]!=-1){
+                    if(map.refresh[i].length==4){
                         var node = new cc.Node();
                         var label = node.addComponent(cc.Label);
                         label.fontSize = 20;
                         label.string = ag.gameConst._roleMst[map.refresh[i][0]].name;
                         this._nodeMinMapBack.addChild(node);
                         node.color = cc.color(255,0,0);
-                        node.setPosition(((map.refresh[i][1]+0.5)/map.mapX-0.5)*size.width,((map.refresh[i][2]+0.5)/map.mapY-0.5)*size.height);
+                        node.setPosition(((map.refresh[i][2]+0.5)/map.mapX-0.5)*size.width,((map.refresh[i][3]+0.5)/map.mapY-0.5)*size.height);
                         this._stableMinMapNpcBoss.push(node);
                     }
                 }
@@ -1347,5 +1350,20 @@ cc.Class({
         cc.find('Canvas/nodeChatContent/spriteBack/nodeButtonsChatSelect').active = false;
         cc.find('Canvas/nodeChatContent/spriteBack/buttonChatSelect/Label').getComponent(cc.Label).string = '行会  ▲';
         this._chatType = ag.gameConst.chatGuild;
+    },
+
+    //攻击模式
+    buttonEventAttackMode:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        var node = event.target;
+        if(this._player._data.attackMode==ag.gameConst.attackModeAll){
+            this._player._data.attackMode=ag.gameConst.attackModePeace;
+        }else if(this._player._data.attackMode==ag.gameConst.attackModePeace){
+            this._player._data.attackMode=ag.gameConst.attackModeGuild;
+        }else if(this._player._data.attackMode==ag.gameConst.attackModeGuild){
+            this._player._data.attackMode=ag.gameConst.attackModeAll;
+        }
+        cc.find('Canvas/buttonAttackMode/Label').getComponent(cc.Label).string = ag.gameConst.attackModeTextArray[this._player._data.attackMode];
+        ag.agSocket.send("setAttackMode",{no:this._player._data.attackMode});
     },
 });
