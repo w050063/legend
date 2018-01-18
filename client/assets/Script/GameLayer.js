@@ -31,11 +31,13 @@ cc.Class({
         this._lastMapPosition = cc.p(0,0);
         this._stableMinMapNpcBoss = [];
         this._bagArray = [];
-        for(var i=0;i<ag.gameConst.bagMaxCount;++i){
+        var i=0;
+
+        for(i=0;i<ag.gameConst.bagMaxCount;++i){
             this._bagArray.push(-1);
         }
         this._wharehouseArray = [];
-        for(var i=0;i<ag.gameConst.bagMaxCount;++i){
+        for(i=0;i<ag.gameConst.bagMaxCount;++i){
             this._wharehouseArray.push(-1);
         }
 
@@ -99,7 +101,7 @@ cc.Class({
 
 
         this._equipArray = [];
-        for(var i=0;i<5;++i){
+        for(i=0;i<5;++i){
             this._equipArray.push(0);
         }
         this._equipArray.push(0);
@@ -111,7 +113,7 @@ cc.Class({
         //聊天相关
         this._chatContentArray = [];
         this._chatLabelArray = [];
-        for(var i=0;i<5;++i){
+        for(i=0;i<5;++i){
             this._chatLabelArray.push(cc.find('Canvas/nodeChatContent/label'+i));
             this._chatLabelArray[i].opacity = 0;
         }
@@ -187,9 +189,10 @@ cc.Class({
 
     //换地图
     changeMap:function(transferId){
+        var i=0;
         this._player._ai._locked = null;
         //清空所有内容
-        for(var i=0;i<this._stableMinMapNpcBoss.length;++i){
+        for(i=0;i<this._stableMinMapNpcBoss.length;++i){
             this._stableMinMapNpcBoss[i].destroy();
         }
         this._stableMinMapNpcBoss = [];
@@ -201,7 +204,7 @@ cc.Class({
                 delete this._roleMap[key];
             }
         }
-        for(var i=this._map.node.childrenCount-1;i>=0;--i){
+        for(i=this._map.node.childrenCount-1;i>=0;--i){
             var node = this._map.node.children[i];
             if(node!=this._player.node){
                 node.destroy();
@@ -230,7 +233,7 @@ cc.Class({
 
 
         //增加npc
-        for(var i=0;i<map.npc.length;++i){
+        for(i=0;i<map.npc.length;++i){
             var npc = new cc.Node().addComponent(Role);
             this._map.node.addChild(npc.node);
             var data = JSON.parse(JSON.stringify(map.npc[i]));
@@ -260,6 +263,7 @@ cc.Class({
 
 
     resetMinMapPos:function(){
+        var i=0;
         var map = ag.gameConst._terrainMap[this._player._data.mapId];
         var str = '危险区';
         var safe = map.safe;
@@ -276,7 +280,7 @@ cc.Class({
 
             //设置boss和npc坐标
             if(this._stableMinMapNpcBoss.length==0){
-                for(var i=0;i<map.npc.length;++i){
+                for(i=0;i<map.npc.length;++i){
                     var node = new cc.Node();
                     var label = node.addComponent(cc.Label);
                     label.fontSize = 20;
@@ -286,7 +290,7 @@ cc.Class({
                     node.setPosition(((map.npc[i].x+0.5)/map.mapX-0.5)*size.width,((map.npc[i].y+0.5)/map.mapY-0.5)*size.height);
                     this._stableMinMapNpcBoss.push(node);
                 }
-                for(var i=0;i<map.refresh.length;++i){
+                for(i=0;i<map.refresh.length;++i){
                     if(map.refresh[i].length==4){
                         var node = new cc.Node();
                         var label = node.addComponent(cc.Label);
@@ -489,13 +493,13 @@ cc.Class({
         }
         var pointArray=ag.gameConst.directionArray;//可走方向
         var index = direction;
-
+        var i=0;
 
         if(role.getIsMonster()){//怪物
             var percent = [10000,1000,100,10,1];//权重比例
             var weight=[];
             var max = 0;
-            for(var i=0;i<8;++i){
+            for(i=0;i<8;++i){
                 if(this.isCollision(role._data.mapId,role._data.x+pointArray[i].x,role._data.y+pointArray[i].y) ||
                     this._roleXYMap[this.getMapXYRole(role._data.mapId,role._data.x+pointArray[i].x,role._data.y+pointArray[i].y)]){
                     weight.push(0);
@@ -510,13 +514,13 @@ cc.Class({
             //遍历权重，计算返回哪一个方向
             var curWeight = 0;
             var randNum=Math.random()*max;
-            for(var i=0;i<8;++i){
+            for(i=0;i<8;++i){
                 curWeight += weight[i];
                 if(randNum<curWeight)return i;
             }
         }else{//英雄
             var randNum=Math.random()<0.5 ? -1:1;
-            for(var i=0;i<8;++i){
+            for(i=0;i<8;++i){
                 if(this.isCollision(role._data.mapId,role._data.x+pointArray[index].x,role._data.y+pointArray[index].y)){
                     index+=(i+1)*randNum;
                     randNum=-randNum;
@@ -1053,6 +1057,7 @@ cc.Class({
     },
 
     chat:function(id,name,content){
+        var i=0;
         var role = this.getRole(id);
         if(role && role._propNode){
             var node = new cc.Node();
@@ -1070,7 +1075,7 @@ cc.Class({
         }
         var lb = this._chatLabelArray[0];
         var y = this._chatLabelArray[0].y;
-        for(var i=0;i<4;++i){
+        for(i=0;i<4;++i){
             this._chatLabelArray[i] = this._chatLabelArray[i+1];
             var tempY = this._chatLabelArray[i].y;
             this._chatLabelArray[i].y = y;
@@ -1091,7 +1096,7 @@ cc.Class({
         this._chatStringHistoryArray.push(""+name+' : '+content);
         if(this._chatStringHistoryArray.length>=50)this._chatStringHistoryArray.splice(0,1);
         var str = '';
-        for(var i=0;i<this._chatStringHistoryArray.length;++i){
+        for(i=0;i<this._chatStringHistoryArray.length;++i){
             str = str + this._chatStringHistoryArray[i];
             if(i!=this._chatStringHistoryArray.length-1)str = str + '\n';
         }
@@ -1215,8 +1220,8 @@ cc.Class({
                             }
                         }else if(transferMst.id=='t5001'){
                             var findBagItemCount = 0;
-                            for(var i=0;i<self._bagArray.length;++i){
-                                if(self._bagArray[i]==-1)++findBagItemCount;
+                            for(var j=0;j<self._bagArray.length;++j){
+                                if(self._bagArray[j]==-1)++findBagItemCount;
                             }
                             if(findBagItemCount>=5 && self._player._data.gold>=1000){
                                 ag.agSocket.send("treasure5",{});

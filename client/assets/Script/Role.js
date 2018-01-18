@@ -737,7 +737,7 @@ cc.Class({
             })));
         }else if(this._data.type=='m8' || this._data.type=="m9" || this._data.type=="m27") {
             var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(), this.getMst().attackDistance);
-            for (var i = 0; i < array.length; ++i) {
+            for(var i = 0; i < array.length; ++i) {
                 if(ag.gameLayer.isEnemyCamp(this,array[i])){
                     var pos = array[i].getTruePosition();
                     var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect8/510000",6,ag.gameConst.roleEffectZorder,0.15);
@@ -756,7 +756,8 @@ cc.Class({
     flyAnimation:function(){
         if(!this._flyBloodFlag && this._propNode){
             var hpStr = null;
-            for(var i=0;i<ag.gameLayer._flyBloodArray.length;++i){
+            var i=0;
+            for(i=0;i<ag.gameLayer._flyBloodArray.length;++i){
                 if(this._data.id==ag.gameLayer._flyBloodArray[i].id){
                     hpStr = ag.gameLayer._flyBloodArray[i].hp;
                     ag.gameLayer._flyBloodArray.splice(i,1);
@@ -782,7 +783,7 @@ cc.Class({
                         role._flyBloodFlag = false;
                         role.flyAnimation();
                     }else{
-                        for(var i=ag.gameLayer._flyBloodArray.length-1;i>=0;--i){
+                        for(i=ag.gameLayer._flyBloodArray.length-1;i>=0;--i){
                             if(id==ag.gameLayer._flyBloodArray[i].id){
                                 ag.gameLayer._flyBloodArray.splice(i,1);
                             }

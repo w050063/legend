@@ -62,7 +62,8 @@ cc.Class({
 
 
     modifyFrame:function(){
-        for(var i=0;i<this._spriteFrameArray.length;++i){
+        var i=0;
+        for(i=0;i<this._spriteFrameArray.length;++i){
             var node = this._spriteFrameArray[i].node;
             var b = (this._curIndex==i);
             if(node.active!=b)node.active = b;
@@ -70,7 +71,7 @@ cc.Class({
 		
 		
         if(this._controllArray){
-            for(var i = this._controllArray.length-1;i>=0;--i){
+            for(i = this._controllArray.length-1;i>=0;--i){
 				var comp = this._controllArray[i];
 				if(comp._bBeControll){
 					comp._curIndex = this._curIndex;
@@ -83,12 +84,13 @@ cc.Class({
     },
 
     putCache:function(){
+        var i=0;
         if(this._color.r!=255 || this._color.g!=255 || this._color.b!=255){
-            for(var i=0;i<this._spriteFrameArray.length;++i){
+            for(i=0;i<this._spriteFrameArray.length;++i){
                 this._spriteFrameArray[i].node.color = cc.color(255,255,255);
             }
         }
-        for(var i=this._spriteFrameArray.length-1;i>=0;--i){
+        for(i=this._spriteFrameArray.length-1;i>=0;--i){
             ag.spriteCache.put(this._spriteFrameArray[i]);
         }
         this._spriteFrameArray = [];

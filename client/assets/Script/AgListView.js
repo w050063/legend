@@ -39,8 +39,9 @@ cc.Class({
     },
 
     reload:function(){
+        var i=0;
         this.init();
-        for(var i=0;i<this.items.length;++i){
+        for(i=0;i<this.items.length;++i){
             this.items[i].destroy();
         }
         this.items = [];
@@ -49,7 +50,7 @@ cc.Class({
         var realCount = 2;
         while ((realCount-1)*(this.itemTemplate.height + this.spacing)<this.node.height)++realCount;
         if(realCount>this.totalCount)realCount = this.totalCount;
-        for (var i = 0; i < realCount; ++i) { // spawn items, we only need to do this once
+        for(i = 0; i < realCount; ++i) { // spawn items, we only need to do this once
             var item = cc.instantiate(this.itemTemplate);
             this.content.addChild(item);
             item.active = true;
