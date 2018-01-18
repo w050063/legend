@@ -142,7 +142,7 @@ module.exports = ag.class.extend({
                 'i001304','i001305','i001306','i001307','i001308','i001309',
                 'i001404','i001405','i001406','i001407','i001408','i001409',
                 'i001504','i001505','i001506','i001507','i001508','i001509'];
-            for(var i=0;i<2;++i){
+            for(var j=0;j<2;++j){
                 var rand = Math.floor(Math.random()*tempArray.length);
                 var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
                 pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
@@ -159,18 +159,16 @@ module.exports = ag.class.extend({
                 'i001301','i001302','i001303',
                 'i001401','i001402','i001403',
                 'i001501','i001502','i001503'];
-            for(var i=0;i<2;++i){
-                var rand = Math.floor(Math.random()*tempArray.length);
-                var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-                pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
-                var item = new Item(tempArray[rand],mapId,pos);
-                item._data.owner = '';
-                item._data.puton = ag.gameConst.putonGround;
-                item._duration = ag.gameConst.itemDuration;
-                item._their = rid;
-                this._itemMap.add(item);
-                ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
-            }
+            var rand = Math.floor(Math.random()*tempArray.length);
+            var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+            pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+            var item = new Item(tempArray[rand],mapId,pos);
+            item._data.owner = '';
+            item._data.puton = ag.gameConst.putonGround;
+            item._duration = ag.gameConst.itemDuration;
+            item._their = rid;
+            this._itemMap.add(item);
+            ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
         }
     },
 
