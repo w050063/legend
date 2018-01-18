@@ -291,8 +291,12 @@ module.exports = ag.class.extend({
 
     //掉血
     changeHPByHurt:function(attacker,hurt,bCisha){
-        if(this._data.type=='m1'){
-            this._data.hp -= Math.round(hurt*0.2);
+        if(this.getIsMonster() && this.getMst().lv==9){
+            var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
+            this._data.hp -= Math.round(hurt*0.5/correct);
+        }else if(this._data.type=='m1'){
+            var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
+            this._data.hp -= Math.round(hurt*0.2/correct);
         }else if(bCisha){
             this._data.hp -= Math.round(hurt);
         }else{
@@ -467,6 +471,7 @@ module.exports = ag.class.extend({
         this._data.gold += count;
         ag.db.setRoles([this]);
         ag.jsUtil.sendData("sSetGold",this._data.gold,this._data.id);
+        console.log('okkkkk!'+count);
     },
 
 
@@ -482,28 +487,28 @@ module.exports = ag.class.extend({
         var master = (attacker && attacker._master)?attacker._master:attacker;
         
         //掉落装备
-        if(this.getIsMonster()){
-            var str = ag.gameConst._roleMst[this._data.type].drop;
-            if(str){
-                ag.itemManager.drop(master._data.id,str,this._data.mapId,this.getLocation());
-            }
-            var array = ag.gameConst._roleMst[this._data.type].dropLevels;
-            if(array){
-                for(var i=0;i<array.length;i=i+2){
-                    ag.itemManager.dropByLevel(master._data.id,array[i],array[i+1],this._data.mapId,this.getLocation());
+        if(master){
+            if(this.getIsMonster()){
+                var str = ag.gameConst._roleMst[this._data.type].drop;
+                if(str){
+                    ag.itemManager.drop(master._data.id,str,this._data.mapId,this.getLocation());
                 }
-            }
-        }else if(this.getIsPlayer()){
-            if(Math.random()<0.3333){
-                var array = [];
-                var map = ag.itemManager._itemMap.getMap();
-                for(var key in map){
-                    var itemData = map[key]._data;
-                    if(itemData.owner==this._data.id && itemData.puton>=0){
-                        array.push(itemData.id);
+                ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation());
+                if(this._data.type=='m48'){//玉皇大帝双倍爆率
+                    ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation());
+                }
+            }else if(this.getIsPlayer()){
+                if(Math.random()<0.3333){
+                    var array = [];
+                    var map = ag.itemManager._itemMap.getMap();
+                    for(var key in map){
+                        var itemData = map[key]._data;
+                        if(itemData.owner==this._data.id && itemData.puton>=0){
+                            array.push(itemData.id);
+                        }
                     }
+                    ag.itemManager.dropEquipOneByArray(this,array,this._data.mapId,this.getLocation());
                 }
-                ag.itemManager.dropEquipOneByArray(this,array,this._data.mapId,this.getLocation());
             }
         }
 

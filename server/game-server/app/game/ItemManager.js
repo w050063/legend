@@ -32,7 +32,7 @@ module.exports = ag.class.extend({
     //为初始化准备道具
     presentWith:function(id){
         var role = ag.gameLayer.getRole(id);
-        if(role){
+        if(role && role._bagLength==0){
             //var array = ['i000','i001','i014','i019','i026','i033','i038','i045','i048','i055','i059','i063','i066'];
             var array = ['i001000','i001200','i001201'];
             for(var i=0;i<array.length;++i){
@@ -44,6 +44,21 @@ module.exports = ag.class.extend({
                 ++role._bagLength;
                 ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
             }
+        }
+    },
+
+
+    itemBuy:function(rid,iid){
+        var role = ag.gameLayer.getRole(rid);
+        if(role && role._bagLength<ag.gameConst.bagLength && ag.gameConst._itemMst[iid]){
+            var item = new Item(iid);
+            item._duration = 0;
+            item._data.owner = rid;
+            item._data.puton = ag.gameConst.putonBag;
+            this._itemMap.add(item);
+            ++role._bagLength;
+            ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
+            console.log('okkkkk!');
         }
     },
 
@@ -64,7 +79,7 @@ module.exports = ag.class.extend({
                     item._their = rid;
                     this._itemMap.add(item);
                     ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
-                    if(map[item._data.mid].level>=7){
+                    if(map[item._data.mid].level>=6){
                         ag.jsUtil.sendDataAll("sSystemNotify",'装备【'+map[item._data.mid].name+'】掉落在地图【'+ag.gameConst._terrainMap[mapId].name+'】');
                     }
                 }
@@ -87,37 +102,42 @@ module.exports = ag.class.extend({
             delete item._their;
             role.refreshItemProp();
             ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
-            if(map[item._data.mid].level>=7){
+            if(map[item._data.mid].level>=6){
                 ag.jsUtil.sendDataAll("sSystemNotify",'装备【'+map[item._data.mid].name+'】掉落在地图【'+ag.gameConst._terrainMap[mapId].name+'】');
             }
         }
     },
 
 
-    dropByLevel:function (rid,level,rate,mapId,location) {
+    dropByLevel:function (rid,lv,mapId,location) {
         var map = ag.gameConst._itemMst;
-        for(var key in map){
-            if(map[key].level==level){
-                var rand = Math.random()*100;
-                if(rand<rate){
-                    var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-                    pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
-                    var item = new Item(key,mapId,pos);
-                    item._data.owner = '';
-                    item._data.puton = ag.gameConst.putonGround;
-                    item._duration = ag.gameConst.itemDuration;
-                    item._their = rid;
-                    this._itemMap.add(item);
-                    ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
-                    if(map[item._data.mid].level>=7){
-                        ag.jsUtil.sendDataAll("sSystemNotify",'装备【'+map[item._data.mid].name+'】掉落在地图【'+ag.gameConst._terrainMap[mapId].name+'】');
-                    }
+        var array = ag.gameConst.itemLevelDropArray[lv-1];
+        var rand = Math.random()*100;
+        var cur = 0;
+        for(var i=0;i<array.length;i=i+2){
+            cur += array[i+1];
+            if(rand<cur){
+                var array2 = ag.gameConst.itemLevelIdArray[array[i]-1];
+                var itemId = array2[Math.floor(Math.random()*array2.length)];
+                var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+                pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+                var item = new Item(itemId,mapId,pos);
+                item._data.owner = '';
+                item._data.puton = ag.gameConst.putonGround;
+                item._duration = ag.gameConst.itemDuration;
+                item._their = rid;
+                this._itemMap.add(item);
+                ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
+                if(map[item._data.mid].level>=6){
+                    ag.jsUtil.sendDataAll("sSystemNotify",'装备【'+map[item._data.mid].name+'】掉落在地图【'+ag.gameConst._terrainMap[mapId].name+'】');
                 }
+                break;
             }
         }
 
+
         //6级以上boss必爆圣战铜域系列装备2个
-        if(level>=6){
+        if(lv>=6){
             var tempArray = ['i001101','i001102','i001103','i001104','i001105','i001106',
                 'i001304','i001305','i001306','i001307','i001308','i001309',
                 'i001404','i001405','i001406','i001407','i001408','i001409',
@@ -134,7 +154,7 @@ module.exports = ag.class.extend({
                 this._itemMap.add(item);
                 ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
             }
-        }else if(level>=4){
+        }else if(lv>=4){
             var tempArray = ['i001101','i001102','i001103',
                 'i001301','i001302','i001303',
                 'i001401','i001402','i001403',
@@ -189,13 +209,13 @@ module.exports = ag.class.extend({
     //背包装备回收
     bagItemRecycle:function(array,rid){
         var expArray = [20,20,20,20,100,200,300,400,800];
-        var goldArray = [2,2,2,2,3,5,10,15,30];
+        var goldArray = [0,0,0,0,1,2,4,8,16];
         var officeArray = [0,0,0,0,1,3,8,20,100];
         var role = ag.gameLayer.getRole(rid);
         if(role){
             var sum = 0;
             var sumOffice = 0;
-            //var sumGold = 0;
+            var sumGold = 0;
             for(var i=0;i<array.length;++i){
                 var id = array[i];
                 var obj = this._itemMap.get(id);
@@ -204,14 +224,14 @@ module.exports = ag.class.extend({
                     var index = ag.gameConst._itemMst[obj._data.mid].level-1;
                     sum += expArray[index];
                     sumOffice += officeArray[index];
-                    //sumGold += goldArray[ag.gameConst._itemMst[obj._data.mid].level-1];
+                    sumGold += goldArray[ag.gameConst._itemMst[obj._data.mid].level-1];
                     this._itemMap.del(id);
                     --role._bagLength;
                 }
             }
-            role.addExp(sum,'recycle');
-            role.addOffice(sumOffice);
-            //role.addGold(sumGold);//回收不加元宝
+            if(sum>0)role.addExp(sum,'recycle');
+            if(sumOffice>0)role.addOffice(sumOffice);
+            if(sumGold>0)role.addGold(sumGold);
         }
     },
 

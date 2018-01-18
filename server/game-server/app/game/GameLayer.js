@@ -56,13 +56,13 @@ module.exports = {
 
 
     //所有离线角色，土城归一
-    theCountryIsAtPeace:function(){
+    theCountryIsAtPeace:function(level){
         var array = [];
         var safe = ag.gameConst._terrainMap['t1'].safe;
         for(var key in this._roleMap){
             var role = this._roleMap[key];
             if(role.getIsPlayer() && ag.jsUtil.getIsOnline(role._data.id)==false){
-                if(role._data.level<43){
+                if(role._data.level<level){
                     this.deleteRole(role._data.id);
                 }else{
                     var lx = role.getLocation().x,ly = role.getLocation().y;
@@ -124,8 +124,9 @@ module.exports = {
 		if(!player){
 			player = new Role();
             player._data = {};
-            player._data.gold = gold?gold:0,
-                player._data.office = office?office:0,
+            player._data.attackMode = ag.gameConst.attackModeAll;
+            player._data.gold = gold?gold:0;
+            player._data.office = office?office:0;
             player._data.id = id;
             player._data.type = type;
             if(map_id){
@@ -193,24 +194,24 @@ module.exports = {
             var map = ag.gameConst._terrainMap[key];
             var array = map.refresh;
             for(var i=0;i<array.length;++i){
-                if(this._gameTime%array[i][3]==0){//时间正好是倍数，可以刷新了
+                if(this._gameTime%ag.gameConst.refreshArray[ag.gameConst._roleMst[array[i][0]].lv-1]==0){//时间正好是倍数，可以刷新了
                     var count = this.getCountWithType(key,array[i][0]);
-                    var maxCount = array[i][4];
+                    var maxCount = array[i][1];
                     for(var j=count;j<maxCount;++j){
                         var player = new Role();
                         player._data = {};
                         player._data.id = 'm'+(++this._baseMonsterId);
                         player._data.type = array[i][0];
                         var x= 0,y=0;
-                        if(array[i][1]==-1 && array[i][2]==-1){
+                        if(array[i].length==2){
                             while(true){
                                 x = Math.floor(Math.random()*map.mapX);
                                 y = Math.floor(Math.random()*map.mapY);
                                 if(this.isCollision(key,x,y)==false)break;
                             };
                         }else{
-                            x = array[i][1];
-                            y = array[i][2];
+                            x = array[i][2];
+                            y = array[i][3];
                         }
                         var position = ag.jsUtil.p(x,y);//this.getStandLocation(key,x,y);
                         player._data.x = position.x;
@@ -391,15 +392,32 @@ module.exports = {
         if(role1._master)role1 = role1._master;
         if(role2._master)role2 = role2._master;
         if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
-            if(role2.getIsPlayer()){
-                var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
-                if(safe){
-                    var lx = role2.getLocation().x,ly = role2.getLocation().y;
-                    if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+            if(role1._data.attackMode==ag.gameConst.attackModeAll){
+                if(role2.getIsPlayer()){
+                    var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
+                    if(safe){
+                        var lx = role2.getLocation().x,ly = role2.getLocation().y;
+                        if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+                    }
                 }
+                return true;
+            }else if(role1._data.attackMode==ag.gameConst.attackModePeace){
+                if(role2.getIsMonster()){
+                    return true;
+                }
+            }else if(role1._data.attackMode==ag.gameConst.attackModeGuild){
+                if(role2.getIsPlayer()){
+                    var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
+                    if(safe){
+                        var lx = role2.getLocation().x,ly = role2.getLocation().y;
+                        if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+                    }
+                }
+                if(role1._data.camp!=role2._data.camp)return true;
+                if(role2._data.camp==ag.gameConst.campPlayerNone)return true;
+            }else{
+                return true;
             }
-            if(role1._data.camp!=role2._data.camp)return true;
-            if(role2._data.camp==ag.gameConst.campPlayerNone)return true;
         }
         return false;
     },

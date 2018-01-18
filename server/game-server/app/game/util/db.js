@@ -66,6 +66,11 @@ module.exports = ag.class.extend({
                 }
             }
         });
+
+
+        ag.actionManager.runAction(this,3,function(){
+            ag.gameLayer.theCountryIsAtPeace(35);
+        }.bind(this));
     },
 
 

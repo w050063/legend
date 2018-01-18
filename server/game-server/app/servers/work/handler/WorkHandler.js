@@ -43,15 +43,7 @@ var Handler = cc.Class.extend({
 
     //加元宝
     addGold:function(msg, session, next){
-        var role = null;
-        for(var key in ag.gameLayer._roleMap){
-            if(ag.gameLayer._roleMap[key].getIsPlayer()) {
-                if (ag.gameLayer._roleMap[key]._data.name == msg.name) {
-                    role = ag.gameLayer._roleMap[key];
-                    break;
-                }
-            }
-        }
+        var role = ag.gameLayer.getRole(msg.rid);
         if(role){
             role.addGold(msg.gold);
         }
@@ -60,9 +52,19 @@ var Handler = cc.Class.extend({
         });
     },
 
+    //买装备
+    itemBuy:function(msg, session, next){
+        var role = ag.gameLayer.getRole(msg.rid);
+        if(role){
+            ag.itemManager.itemBuy(msg.rid,msg.iid);
+        }
+        next(null, {
+            code: role?0:1,
+        });
+    },
 
     theCountryIsAtPeace:function(msg, session, next){
-        ag.gameLayer.theCountryIsAtPeace();
+        ag.gameLayer.theCountryIsAtPeace(47);
         next();
     },
 
@@ -87,7 +89,6 @@ var Handler = cc.Class.extend({
     login:function(msg, session, next) {
         if(ag.userManager.isRightAccountAndPassword(msg.account,msg.password)){
             var oldUid = ag.userManager.getUidByAccount(msg.account);
-            console.log('dddd',msg.account,oldUid);
             if(oldUid){
                 //解除绑定
                 ag.userManager.unbindUid(oldUid);
@@ -514,6 +515,18 @@ var Handler = cc.Class.extend({
             item._data.puton = ag.gameConst.putonBag;
             ++player._bagLength;
             --player._wharehoseLength;
+        }
+        next();
+    },
+
+
+
+    //更改攻击模式
+    setAttackMode:function (msg, session, next) {
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var player =  ag.gameLayer.getRole(id);
+        if(player && typeof msg.no=='number' && msg.no>=ag.gameConst.attackModeAll && msg.no<=ag.gameConst.attackModeGuild) {
+            player._data.attackMode = msg.no;
         }
         next();
     },

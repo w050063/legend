@@ -63,7 +63,8 @@
     "optional int32 sex": 10,
     "optional string name": 11,
     "optional int32 gold": 12,
-    "optional int32 office": 13
+    "optional int32 office": 13,
+    "optional int32 attackMode": 14
   },
   "message sRelife": {
     "required string id": 1,
