@@ -318,7 +318,7 @@ module.exports = ag.class.extend({
         var data = locked._data;
         var x = data.x, y = data.y;
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
-
+        var i=0;
 
 
         //伤害计算
@@ -359,7 +359,7 @@ module.exports = ag.class.extend({
                 }
             }
         }else if(this._data.type=='m1'){
-            for(var i=y-1;i<=y+1;++i){
+            for(i=y-1;i<=y+1;++i){
                 for(var j=x-1;j<=x+1;++j){
                     var array = ag.gameLayer._roleXYMap[''+data.mapId+','+j+','+i];
                     if(array){
@@ -377,7 +377,7 @@ module.exports = ag.class.extend({
 
             //启动火墙
             var tempArray = ag.gameConst.searchEnemypath;
-            for(var i=0;i<9;++i){
+            for(i=0;i<9;++i){
                 var x = locked._data.x+tempArray[i][0],y = locked._data.y+tempArray[i][1];
                 if(ag.gameLayer.isCollision(this._data.mapId,x,y)==false){
                     ag.buffManager.setFireWall(this.getMapXYString(this._data.mapId,x,y),this);
@@ -400,7 +400,7 @@ module.exports = ag.class.extend({
             }
         }else if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27") {
             var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(),this.getMst().attackDistance);
-            for (var i = 0; i < array.length; ++i) {
+            for(i = 0; i < array.length; ++i) {
                 var tempRole = array[i];
                 if (ag.gameLayer.isEnemyForAttack(this,tempRole)) {
                     tempRole.changeHPByHurt(this,this._hurt);
@@ -439,7 +439,7 @@ module.exports = ag.class.extend({
 
 
         //删除本地死亡怪物数据,更新AI锁定
-        for(var i=0;i<sendArray.length;++i){
+        for(i=0;i<sendArray.length;++i){
             var beAttacker = ag.gameLayer._roleMap[sendArray[i].id];
             if(sendArray[i].hp<=0){
                 beAttacker.dead(this);

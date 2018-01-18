@@ -122,7 +122,7 @@ module.exports = ag.class.extend({
                 var array = key.split(',');
                 array = ag.gameLayer.getRoleFromCenterXY(array[0], ag.jsUtil.p(parseInt(array[1]), parseInt(array[2])), 0);
                 if (array) {
-                    for (var i = 0; i < array.length; ++i) {
+                    for(var i = 0; i < array.length; ++i) {
                         var tempRole = array[i];
                         if (ag.gameLayer.isEnemyForAttack(attacker, tempRole)) {
                             tempRole.changeHPByHurt(attacker, attacker._hurt * 0.5);

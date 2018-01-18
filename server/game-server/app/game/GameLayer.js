@@ -293,11 +293,12 @@ module.exports = {
         var index = direction;
 
 
+        var i = 0;
         if(role.getIsMonster()){//怪物
             var percent = [10000,100,10,1,1];//权重比例
             var weight=[];
             var max = 0;
-            for(var i=0;i<8;++i){
+            for(i=0;i<8;++i){
                 if(this.isCollision(role._data.mapId,role._data.x+pointArray[i].x,role._data.y+pointArray[i].y)
                     || this.getHavelivedRole(this.getMapXYRole(role._data.mapId,role._data.x+pointArray[i].x,role._data.y+pointArray[i].y))){
                     weight.push(0);
@@ -312,13 +313,13 @@ module.exports = {
             //遍历权重，计算返回哪一个方向
             var curWeight = 0;
             var randNum=Math.random()*max;
-            for(var i=0;i<8;++i){
+            for(i=0;i<8;++i){
                 curWeight += weight[i];
                 if(randNum<curWeight)return i;
             }
         }else{//英雄
             var randNum=Math.random()<0.5 ? -1:1;
-            for(var i=0;i<8;++i){
+            for(i=0;i<8;++i){
                 if(this.isCollision(role._data.mapId,role._data.x+pointArray[index].x,role._data.y+pointArray[index].y)){
                     index+=(i+1)*randNum;
                     randNum=-randNum;

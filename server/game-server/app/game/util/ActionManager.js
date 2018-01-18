@@ -12,26 +12,27 @@ module.exports = {
         setInterval(function () {
             var curTime = new Date().getTime()/1000;
             var elapse = curTime-this._nowTime;
+            var i=0;
 
 
             //防止错误，先遍历所有函数存起来，然后在统一执行，最后重新检索删除。
             var callbacks = [];
-            for(var i=0;i<this._actionArray.length;++i){
+            for(i=0;i<this._actionArray.length;++i){
                 if(this._actionArray[i].endTime<=this._nowTime){
                     callbacks.push(this._actionArray[i].callback);
                 }
             }
 
-            for(var i=0;i<callbacks.length;++i)callbacks[i](elapse);
+            for(i=0;i<callbacks.length;++i)callbacks[i](elapse);
 
-            for(var i=this._actionArray.length-1;i>=0;--i){
+            for(i=this._actionArray.length-1;i>=0;--i){
                 if(this._actionArray[i].endTime<=this._nowTime){
                     this._actionArray.splice(i,1);
                 }
             }
 
 
-            for(var i=0;i<this._scheduleArray.length;++i){
+            for(i=0;i<this._scheduleArray.length;++i){
                 this._scheduleArray[i].time += elapse;
                 if(this._scheduleArray[i].time>=this._scheduleArray[i].interval){
                     this._scheduleArray[i].time-=this._scheduleArray[i].interval;
