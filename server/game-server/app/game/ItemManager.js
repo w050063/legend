@@ -23,6 +23,8 @@ module.exports = ag.class.extend({
                 if(obj._duration<=0){
                     ag.jsUtil.sendDataAll("sItemDisappear",obj._data.id,obj._data.mapId);
                     this._itemMap.del(key);
+                }else if(obj._duration==ag.gameConst.itemPickUpLeft){
+                    delete obj._their;
                 }
             }
         }
@@ -63,7 +65,7 @@ module.exports = ag.class.extend({
     },
 
 
-    drop:function (rid,str,mapId,location) {
+    drop:function (rid,str,mapId,location,name) {
         var map = ag.gameConst._itemMst;
         var array = str.split(',');
         for(var i=0;i<array.length;++i){
@@ -80,7 +82,7 @@ module.exports = ag.class.extend({
                     this._itemMap.add(item);
                     ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
                     if(map[item._data.mid].level>=6){
-                        ag.jsUtil.sendDataAll("sSystemNotify",'装备【'+map[item._data.mid].name+'】掉落在地图【'+ag.gameConst._terrainMap[mapId].name+'】');
+                        ag.jsUtil.sendDataAll("sSystemNotify",'【'+map[item._data.mid].name+'】从'+name+'身上掉落在【'+ag.gameConst._terrainMap[mapId].name+'】');
                     }
                 }
             }
@@ -88,7 +90,7 @@ module.exports = ag.class.extend({
     },
 
 
-    dropEquipOneByArray:function (role,array,mapId,location) {
+    dropEquipOneByArray:function (role,array,mapId,location,name) {
         if(array.length>0){
             var map = ag.gameConst._itemMst;
             var index = Math.floor(Math.random()*array.length);
@@ -103,13 +105,13 @@ module.exports = ag.class.extend({
             role.refreshItemProp();
             ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
             if(map[item._data.mid].level>=6){
-                ag.jsUtil.sendDataAll("sSystemNotify",'装备【'+map[item._data.mid].name+'】掉落在地图【'+ag.gameConst._terrainMap[mapId].name+'】');
+                ag.jsUtil.sendDataAll("sSystemNotify",'【'+map[item._data.mid].name+'】从'+name+'身上掉落在【'+ag.gameConst._terrainMap[mapId].name+'】');
             }
         }
     },
 
 
-    dropByLevel:function (rid,lv,mapId,location) {
+    dropByLevel:function (rid,lv,mapId,location,name) {
         var map = ag.gameConst._itemMst;
         var array = ag.gameConst.itemLevelDropArray[lv-1];
         var rand = Math.random()*100;
@@ -129,8 +131,7 @@ module.exports = ag.class.extend({
                 this._itemMap.add(item);
                 ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
                 if(map[item._data.mid].level>=6){
-                    ag.jsUtil.sendDataAll("sSystemNotify",'装备【'+map[item._data.mid].name+'】掉落在地图【'+ag.gameConst._terrainMap[mapId].name+'】');
-                }
+                    ag.jsUtil.sendDataAll("sSystemNotify",'【'+map[item._data.mid].name+'】从'+name+'身上掉落在【'+ag.gameConst._terrainMap[mapId].name+'】');            }
                 break;
             }
         }
@@ -142,18 +143,16 @@ module.exports = ag.class.extend({
                 'i001304','i001305','i001306','i001307','i001308','i001309',
                 'i001404','i001405','i001406','i001407','i001408','i001409',
                 'i001504','i001505','i001506','i001507','i001508','i001509'];
-            for(var j=0;j<2;++j){
-                var rand = Math.floor(Math.random()*tempArray.length);
-                var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-                pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
-                var item = new Item(tempArray[rand],mapId,pos);
-                item._data.owner = '';
-                item._data.puton = ag.gameConst.putonGround;
-                item._duration = ag.gameConst.itemDuration;
-                item._their = rid;
-                this._itemMap.add(item);
-                ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
-            }
+            var rand = Math.floor(Math.random()*tempArray.length);
+            var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+            pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+            var item = new Item(tempArray[rand],mapId,pos);
+            item._data.owner = '';
+            item._data.puton = ag.gameConst.putonGround;
+            item._duration = ag.gameConst.itemDuration;
+            item._their = rid;
+            this._itemMap.add(item);
+            ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
         }else if(lv>=4){
             var tempArray = ['i001101','i001102','i001103',
                 'i001301','i001302','i001303',

@@ -86,6 +86,7 @@ module.exports = {
     born: {x:30,y:8},
 
     itemDuration:60,
+    itemPickUpLeft:30,
 
     //八个方向顺序
     directionStringArray:['0,1','1,1','1,0','1,-1','0,-1','-1,-1','-1,0','-1,1'],

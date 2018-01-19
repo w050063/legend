@@ -417,7 +417,7 @@ module.exports = {
                 if(role1._data.camp!=role2._data.camp)return true;
                 if(role2._data.camp==ag.gameConst.campPlayerNone)return true;
             }else{
-                return true;
+                if(role1._data.camp!=role2._data.camp)return true;
             }
         }
         return false;

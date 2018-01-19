@@ -280,7 +280,7 @@ module.exports = ag.class.extend({
                         ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
                         ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
                     }else{
-                        ag.jsUtil.sendData("sSystemNotify","一定时间内无法捡取该装备!",this._data.id);
+                        ag.jsUtil.sendData("sSystemNotify",''+(array[i]._duration-ag.gameConst.itemPickUpLeft)+"秒时间内无法捡取该装备!",this._data.id);
                     }
                 }
             }
@@ -488,14 +488,16 @@ module.exports = ag.class.extend({
         
         //掉落装备
         if(master){
+            var name = this._data.name;
+            if(!name)name = this.getMst().name;
             if(this.getIsMonster()){
                 var str = ag.gameConst._roleMst[this._data.type].drop;
                 if(str){
-                    ag.itemManager.drop(master._data.id,str,this._data.mapId,this.getLocation());
+                    ag.itemManager.drop(master._data.id,str,this._data.mapId,this.getLocation(),name);
                 }
-                ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation());
+                ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
                 if(this._data.type=='m48'){//玉皇大帝双倍爆率
-                    ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation());
+                    ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
                 }
             }else if(this.getIsPlayer()){
                 if(Math.random()<0.3333){
@@ -507,7 +509,7 @@ module.exports = ag.class.extend({
                             array.push(itemData.id);
                         }
                     }
-                    ag.itemManager.dropEquipOneByArray(this,array,this._data.mapId,this.getLocation());
+                    ag.itemManager.dropEquipOneByArray(this,array,this._data.mapId,this.getLocation(),name);
                 }
             }
         }
