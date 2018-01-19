@@ -24,7 +24,7 @@ module.exports = ag.class.extend({
     add:function (id,password,name) {
         if(!this._infoMap[id]){
             name = name?name:'r'+this._nLength;
-            this._infoMap[id] = {id:id,name:name,password:password,sessions:0,score:0};
+            this._infoMap[id] = {id:id,name:name,password:password,sessions:0,score:0,online:false};
             ++this._nLength;
         }
         return this._infoMap[id];
@@ -52,6 +52,14 @@ module.exports = ag.class.extend({
         return "";
     },
 
+    getOnline:function(id){
+        if(id && this._infoMap[id])return this._infoMap[id].online;
+        return false;
+    },
+
+    setOnline:function(id,online){
+        if(id && this._infoMap[id])this._infoMap[id].online = online;
+    },
 
     //账号密码是否正确
     isRightAccountAndPassword:function(account,password){

@@ -200,6 +200,7 @@ var Handler = cc.Class.extend({
     //进入游戏
     enter:function(msg, session, next) {
         var id = ag.userManager.getAccountByUid(session.uid);
+        ag.userManager.setOnline(id,true);
         var role = ag.gameLayer.getRole(id);
         var exist = !!role;
         ag.gameLayer.addPlayer(id,undefined,undefined,undefined,msg.type,undefined,msg.sex);
@@ -527,6 +528,7 @@ var Handler = cc.Class.extend({
         var player =  ag.gameLayer.getRole(id);
         if(player && typeof msg.no=='number' && msg.no>=ag.gameConst.attackModeAll && msg.no<=ag.gameConst.attackModeGuild) {
             player._data.attackMode = msg.no;
+            ag.jsUtil.sendData("sSystemNotify","已经改为"+ag.gameConst.attackModeTextArray[msg.no]+"模式！",id);
         }
         next();
     },

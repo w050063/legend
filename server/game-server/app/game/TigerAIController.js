@@ -36,6 +36,7 @@ module.exports = ag.class.extend({
 
     // called every frame
     update: function () {
+        if(ag.userManager.getOnline(this._role._master._data.id)==false)return;
         //执行玩家操作
         if(this._role._busy==false && this._role._state != ag.gameConst.stateDead){
             //有锁定目标
@@ -68,6 +69,7 @@ module.exports = ag.class.extend({
 
     // called every frame
     update1s: function () {
+        if(ag.userManager.getOnline(this._role._master._data.id)==false)return;
         //执行玩家操作
         if(this._role._state != ag.gameConst.stateDead){
             var l1 = this._role.getLocation(), l2 = this._role._master.getLocation();

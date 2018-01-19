@@ -142,6 +142,15 @@ module.exports = ag.class.extend({
     },
 
 
+    //下线
+    offline:function(){
+        if(this.getIsPlayer()){
+            ag.jsUtil.sendDataExcept("sDeleteRole",this._data.id,this._data.id);
+            if(this._tiger)ag.jsUtil.sendDataExcept("sDeleteRole",this._tiger._data.id,this._data.id);
+        }
+    },
+
+
     //更换地图
     changeMap:function(transferId){
         var transferMst = ag.gameConst._transferMst[transferId];
@@ -187,19 +196,46 @@ module.exports = ag.class.extend({
 
         //返回当前地图非自己的角色。
         for(var key in ag.gameLayer._roleMap){
-            var data = ag.gameLayer._roleMap[key]._data;
-            if(data.mapId==this._data.mapId && data.id!=this._data.id){
-                //var temp = JSON.parse(JSON.stringify(data));
-                //delete temp.gold;
-                ag.jsUtil.sendData("sRole",data,this._data.id);
+            var role = ag.gameLayer._roleMap[key];
+            if(role._data.mapId==this._data.mapId){
+                if(role.getIsPlayer()){
+                    if(ag.userManager.getOnline(role._data.id)){
+                        if(role._data.id!=this._data.id){
+                            var temp = JSON.parse(JSON.stringify(role._data));
+                            delete temp.gold;
+                            delete temp.attackMode;
+                            ag.jsUtil.sendData("sRole",temp,this._data.id);
+                        }
+
+                        if(role._tiger){
+                            role = role._tiger;
+                            temp = JSON.parse(JSON.stringify(role._data));
+                            delete temp.gold;
+                            delete temp.attackMode;
+                            ag.jsUtil.sendData("sRole",temp,this._data.id);
+                        }
+                    }
+                }else if(role.getIsMonster()){
+                    var temp = JSON.parse(JSON.stringify(role._data));
+                    delete temp.gold;
+                    delete temp.attackMode;
+                    ag.jsUtil.sendData("sRole",temp,this._data.id);
+                }
             }
         }
 
         //通知其他人。
         var temp = JSON.parse(JSON.stringify(this._data));
         delete temp.gold;
+        delete temp.attackMode;
         ag.jsUtil.sendDataExcept("sRole",temp,this._data.id);
-        if(this._tiger)ag.jsUtil.sendDataExcept("sRole",this._tiger._data,this._data.id);
+        if(this._tiger){
+            role = this._tiger;
+            temp = JSON.parse(JSON.stringify(role._data));
+            delete temp.gold;
+            delete temp.attackMode;
+            ag.jsUtil.sendDataExcept("sRole",temp,this._data.id);
+        }
 
         //发送装备情况
         var map = ag.itemManager._itemMap.getMap();
@@ -291,17 +327,25 @@ module.exports = ag.class.extend({
 
     //掉血
     changeHPByHurt:function(attacker,hurt,bCisha){
-        if(this.getIsMonster() && this.getMst().lv==9){
-            var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
-            this._data.hp -= Math.round(hurt*0.5/correct);
-        }else if(this._data.type=='m1'){
-            var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
-            this._data.hp -= Math.round(hurt*0.2/correct);
-        }else if(bCisha){
-            this._data.hp -= Math.round(hurt);
+        if(bCisha){
+            if(this.getIsMonster() && this.getMst().lv==9){
+                this._data.hp -=  Math.round(hurt*0.75);
+            }else if(this._data.type=='m1'){
+                this._data.hp -=  Math.round(hurt*0.5);
+            }else{
+                this._data.hp -=  Math.round(hurt);
+            }
         }else{
-            var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
-            this._data.hp -=  Math.round(hurt/correct);
+            if(this.getIsMonster() && this.getMst().lv==9){
+                var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
+                this._data.hp -= Math.round(hurt*0.5/correct);
+            }else if(this._data.type=='m1'){
+                var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
+                this._data.hp -= Math.round(hurt*0.5/correct);
+            }else{
+                var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
+                this._data.hp -=  Math.round(hurt/correct);
+            }
         }
         ag.jsUtil.sendDataAll("sHP",{id:this._data.id,hp:this._data.hp},this._data.mapId);
 

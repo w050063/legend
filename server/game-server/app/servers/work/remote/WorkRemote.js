@@ -88,8 +88,13 @@ WorkRemote.prototype.get = function() {
  */
 WorkRemote.prototype.kick = function(uid, sid, cb) {
     //解除绑定
+    var id = ag.userManager.getAccountByUid(uid);
     ag.userManager.unbindUid(uid);
-
+    ag.userManager.setOnline(id,false);
+    var role = ag.gameLayer.getRole(id);
+    if(role){
+        role.offline();
+    }
 
 	var channel = this.channelService.getChannel(ag.jsUtil.dataChannel, true);
 	// leave channel

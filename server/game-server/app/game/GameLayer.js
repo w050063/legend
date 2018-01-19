@@ -226,7 +226,10 @@ module.exports = {
                         if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
                         this._roleXYMap[xyStr].push(player);
                         player.setAIController(new AIController(player));
-                        ag.jsUtil.sendDataAll("sRole",player._data,player._data.mapId);
+                        var temp = JSON.parse(JSON.stringify(player._data));
+                        delete temp.gold;
+                        delete temp.attackMode;
+                        ag.jsUtil.sendDataAll("sRole",temp,player._data.mapId);
                     }
                 }
             }
@@ -384,40 +387,45 @@ module.exports = {
 
     //是否攻击
     isEnemyForCheck:function(role1,role2){
-        if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
-            if(role1._data.camp!=role2._data.camp)return true;
+        if(role2._master)role2 = role2._master;
+        if(role2.getIsMonster() || (role2.getIsPlayer() && ag.userManager.getOnline(role2._data.id))){
+            if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
+                if(role1._data.camp!=role2._data.camp)return true;
+            }
         }
         return false;
     },
     isEnemyForAttack:function(role1,role2){
         if(role1._master)role1 = role1._master;
         if(role2._master)role2 = role2._master;
-        if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
-            if(role1._data.attackMode==ag.gameConst.attackModeAll){
-                if(role2.getIsPlayer()){
-                    var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
-                    if(safe){
-                        var lx = role2.getLocation().x,ly = role2.getLocation().y;
-                        if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+        if(role2.getIsMonster() || (role2.getIsPlayer() && ag.userManager.getOnline(role2._data.id))){
+            if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
+                if(role1._data.attackMode==ag.gameConst.attackModeAll){
+                    if(role2.getIsPlayer()){
+                        var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
+                        if(safe){
+                            var lx = role2.getLocation().x,ly = role2.getLocation().y;
+                            if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+                        }
                     }
-                }
-                return true;
-            }else if(role1._data.attackMode==ag.gameConst.attackModePeace){
-                if(role2.getIsMonster()){
                     return true;
-                }
-            }else if(role1._data.attackMode==ag.gameConst.attackModeGuild){
-                if(role2.getIsPlayer()){
-                    var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
-                    if(safe){
-                        var lx = role2.getLocation().x,ly = role2.getLocation().y;
-                        if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+                }else if(role1._data.attackMode==ag.gameConst.attackModePeace){
+                    if(role2.getIsMonster()){
+                        return true;
                     }
+                }else if(role1._data.attackMode==ag.gameConst.attackModeGuild){
+                    if(role2.getIsPlayer()){
+                        var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
+                        if(safe){
+                            var lx = role2.getLocation().x,ly = role2.getLocation().y;
+                            if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+                        }
+                    }
+                    if(role1._data.camp!=role2._data.camp)return true;
+                    if(role2._data.camp==ag.gameConst.campPlayerNone)return true;
+                }else{
+                    if(role1._data.camp!=role2._data.camp)return true;
                 }
-                if(role1._data.camp!=role2._data.camp)return true;
-                if(role2._data.camp==ag.gameConst.campPlayerNone)return true;
-            }else{
-                if(role1._data.camp!=role2._data.camp)return true;
             }
         }
         return false;

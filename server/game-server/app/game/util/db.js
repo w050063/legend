@@ -9,6 +9,8 @@ var crypto = require('./crypto');
 var Item = require('../Item');
 module.exports = ag.class.extend({
     ctor:function () {
+        this._chatCount = 0;
+
         this._pool = mysql.createPool({
             host: '127.0.0.1',
             user: 'root',
@@ -341,6 +343,12 @@ module.exports = ag.class.extend({
     //生成聊天
     insertChat:function(aid,chat,chat_time,callback){
         if(aid && chat && chat_time){
+            ++this._chatCount;
+            if(this._chatCount>99){
+                this._chatCount = 0;
+                var sql = 'DELETE FROM t_chats';
+                this.query(sql, function(err, rows) {});
+            }
             chat = crypto.toBase64(chat);
             var sql = 'INSERT INTO t_chats(aid,chat,chat_time) VALUES("'
                 + aid + '","' + chat+'","' + chat_time + '")';
