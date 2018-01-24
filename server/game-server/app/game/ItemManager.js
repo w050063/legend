@@ -8,6 +8,7 @@ var Item = require("./Item");
 var AgXYMap = require("./AgXYMap");
 module.exports = ag.class.extend({
     ctor:function () {
+        this._treasureStringArray = [];
         this._itemMap = new AgXYMap();
         ag.actionManager.schedule(this,1,this.update1.bind(this));
     },
@@ -294,10 +295,14 @@ module.exports = ag.class.extend({
         var rand = Math.random();
         if(rand<0.4){
             role.addExp(100);
-            ag.jsUtil.sendData("sSystemNotify",role._data.name+"在龙族宝藏寻到10点经验",role._data.id);
+            ag.jsUtil.sendData("sSystemNotify",role._data.name+"在龙族宝藏寻到100点经验",role._data.id);
         }else if(rand<0.5){
             role.addOffice(10);
-            ag.jsUtil.sendData("sSystemNotify",role._data.name+"在龙族宝藏寻到10点官职",role._data.id);
+            var str = role._data.name+"在龙族宝藏寻到10点官职";
+            ag.jsUtil.sendData("sSystemNotify",str,role._data.id);
+            if(this._treasureStringArray.length>=20)this._treasureStringArray.splice(0,1);
+            this._treasureStringArray.push(str);
+            this.sendTreasureString(role._data.id);
         }else{
             var array = [];
             var map = ag.gameConst._itemMst;
@@ -323,6 +328,7 @@ module.exports = ag.class.extend({
                 }
             }
             var index = Math.floor(Math.random()*array.length);
+            var mst = ag.gameConst._itemMst[array[index]];
             var item = new Item(array[index]);
             item._duration = 0;
             item._data.owner = role._data.id;
@@ -330,8 +336,26 @@ module.exports = ag.class.extend({
             this._itemMap.add(item);
             ++role._bagLength;
             ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
-            ag.jsUtil.sendDataAll("sSystemNotify", role._data.name+"在龙族宝藏寻到"+ag.gameConst._itemMst[item._data.mid].name+"！");
+            var str = role._data.name+"在龙族宝藏寻到"+mst.name+"！";
+            ag.jsUtil.sendDataAll("sSystemNotify", str);
+            if(mst.level>=6){
+                if(this._treasureStringArray.length>=20)this._treasureStringArray.splice(0,1);
+                this._treasureStringArray.push(str);
+                this.sendTreasureString(role._data.id);
+            }
         }
+    },
+
+
+    sendTreasureString:function(id){
+        var str = '';
+        for(var i=0;i<this._treasureStringArray.length;++i){
+            str = str+this._treasureStringArray[i];
+            if(i!=this._treasureStringArray.length-1){
+                str = str+'\n';
+            }
+        }
+        ag.jsUtil.sendData("treasureString",str,id);
     },
 
 

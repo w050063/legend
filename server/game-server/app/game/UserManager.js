@@ -68,6 +68,14 @@ module.exports = ag.class.extend({
     },
 
 
+    alterPassWord:function(account,password){
+        if(account && this._infoMap[account]){
+            this._infoMap[account].password = password;
+            ag.db.alterPassWord(account,password);//写进数据库
+        }
+    },
+
+
     //设置uid
     bindUid:function(uid,account){
         this._uidBindMap[uid] = account;

@@ -14,7 +14,7 @@ var Handler = cc.Class.extend({
     ctor:function (app) {
         this.app = app;
         this._baseUid = 0;
-        this._version = '0.0.1';
+        this._version = '0.0.2';
     },
 
 
@@ -45,13 +45,13 @@ var Handler = cc.Class.extend({
             var array1 = this._version.split('.');
             var array2 = msg.version.split('.');
             if(parseInt(array1[0])>parseInt(array2[0])){
-                next(null, {code:1,text:'请下载新版本!'});
+                next(null, {code:1,text:'稍后提供安卓版!'});
                 return;
             }else if(parseInt(array1[0])==parseInt(array2[0]) && parseInt(array1[1])>parseInt(array2[1])){
-                next(null, {code:1,text:'请下载新版本!'});
+                next(null, {code:1,text:'稍后提供安卓版!'});
                 return;
             }else if(parseInt(array1[1])==parseInt(array2[1]) && parseInt(array1[2])>parseInt(array2[2])){
-                next(null, {code:1,text:'请下载新版本!'});
+                next(null, {code:1,text:'稍后提供安卓版!'});
                 return;
             }
         }

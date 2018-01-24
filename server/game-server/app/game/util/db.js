@@ -11,6 +11,7 @@ module.exports = ag.class.extend({
     ctor:function () {
         this._chatCount = 0;
 
+
         this._pool = mysql.createPool({
             host: '127.0.0.1',
             user: 'root',
@@ -29,21 +30,23 @@ module.exports = ag.class.extend({
             for(var i=0;i<rows.length;++i){
                 var data = rows[i];
                 if(data.camp==ag.gameConst.campNpc || data.camp==ag.gameConst.campMonster)data.camp=ag.gameConst.campPlayerNone;//防错处理
-                ag.gameLayer.addPlayer(data.id,data.map_id,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,data.exp,data.gold,data.office);
+                ag.gameLayer.addPlayer(data.id,data.map_id,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,data.exp,data.gold,data.office,data.wing,data.come,data.practice);
             }
         });
         this.getItems(function(rows){
             for(var i=0;i<rows.length;++i){
                 var data = rows[i];
-                var item = new Item(data.mid,undefined,undefined,data.id);
-                item._duration = 0;
-                item._data.owner = data.owner;
-                item._data.puton = data.puton;
-                ag.itemManager._itemMap.add(item);
-                var role = ag.gameLayer.getRole(data.owner);
-                if(role){
-                    ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
-                    role.refreshItemProp();
+                if(ag.gameConst._itemMst[data.mid]){
+                    var item = new Item(data.mid,undefined,undefined,data.id);
+                    item._duration = 0;
+                    item._data.owner = data.owner;
+                    item._data.puton = data.puton;
+                    ag.itemManager._itemMap.add(item);
+                    var role = ag.gameLayer.getRole(data.owner);
+                    if(role){
+                        ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
+                        role.refreshItemProp();
+                    }
                 }
             }
         });
@@ -68,6 +71,29 @@ module.exports = ag.class.extend({
                 }
             }
         });
+
+
+        //读取拍卖行数据
+        this.getAuctionShop(function(rows){
+            for(var i=0;i<rows.length;++i){
+                var obj = {id:rows[i].id,price:rows[i].price,create_time:rows[i].create_time};
+                ag.auctionShop._dataMap[obj.id] = obj;
+            }
+        });
+
+
+        //自定义数据
+        this.getCustomData(function(data){
+            this._customData = data;
+            if(!this._customData.guildWinId)this._customData.guildWinId = '0';
+            if(ag.shabake)ag.shabake._guildWinId = this._customData.guildWinId;
+            if(!ag.db._customData.comeDate){
+                var date = new Date();
+                ag.db._customData.comeDate = ''+date .getFullYear()+'.'+date .getMonth()+'.'+date .getDate();
+            }
+            if(!ag.db._customData.come)ag.db._customData.come = {};
+            if(!ag.db._customData.wing)ag.db._customData.wing = {};
+        }.bind(this));
 
 
         ag.actionManager.runAction(this,3,function(){
@@ -172,6 +198,26 @@ module.exports = ag.class.extend({
     },
 
 
+    alterPassWord:function(id,password,callback){
+        if(id && password){
+            var sql = 'UPDATE t_accounts SET password = "' + password + '" WHERE id = "' + id + '"';
+            this.query(sql, function(err, rows) {
+                if (err) {
+                    if(err.code == 'ER_DUP_ENTRY'){
+                        if(callback)callback(false);
+                        return;
+                    }
+                    if(callback)callback(false);
+                    throw err;
+                }
+                else{
+                    if(callback)callback(true);
+                }
+            });
+        }
+    },
+
+
     //获取所有角色信息
     getRoles:function(callback){
         var sql = 'SELECT * FROM t_roles';
@@ -190,10 +236,11 @@ module.exports = ag.class.extend({
     },
 
 
-    insertRole:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,callback){
+    insertRole:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,wing,come,practice,callback){
         if(id && map_id){
-            var sql = 'INSERT INTO t_roles(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office) VALUES("'
-                + id + '","' + map_id+'",' + x+',' + y+',"' + type+'",' + camp+',' + sex+',' + direction+',' + level+',' + exp+',' + gold+',' + office + ')';
+            var sql = 'INSERT INTO t_roles(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,wing,come,practice) VALUES("'
+                + id + '","' + map_id+'",' + x+',' + y+',"' + type+'",' + camp+',' + sex+',' + direction
+                +',' + level+',' + exp+',' + gold+',' + office +',' + wing +',' + come+',' + practice + ')';
             this.query(sql, function(err, rows) {
                 if (err) {
                     if(err.code == 'ER_DUP_ENTRY'){
@@ -227,6 +274,9 @@ module.exports = ag.class.extend({
                 + ', exp = ' + role._exp
                 + ', gold = ' + data.gold
                 + ', office = ' + data.office
+                + ', wing = ' + data.wing
+                + ', come = ' + data.come
+                + ', practice = ' + data.practice
                 + ' WHERE id = "' + data.id + '";';
             allSql = allSql+sql;
             this.query(allSql, function(err, rows) {
@@ -338,6 +388,79 @@ module.exports = ag.class.extend({
             }
         }.bind(this));
     },
+
+
+    //获取所有道具
+    getAuctionShop:function(callback){
+        var sql = 'SELECT * FROM t_auctionShop';
+        this.query(sql, function(err, rows) {
+            if (err) {
+                if(callback)callback([]);
+                throw err;
+            }
+
+            if(rows.length == 0){
+                if(callback)callback([]);
+                return;
+            }
+            if(callback)callback(rows);
+        });
+    },
+
+
+    //更新所有道具
+    setAuctionShop:function(callback){
+        this.getItems(function(items){
+            var allSql = '';
+            var i= 0,j=0;
+
+
+            var idMaps = ag.auctionShop._dataMap;
+            for(i=0;i<items.length;++i){
+                var i1 = items[i];
+                if(idMaps[i1.id]){
+                    var i2 = map[i1.id]._data;
+                    if(i1.mid!=i2.mid || i1.owner!=i2.owner || i1.puton!=i2.puton){
+                        var sql = 'UPDATE t_items SET mid = "' + i2.mid
+                            + '", owner = "' + i2.owner
+                            + '", puton = ' + i2.puton
+                            + ' WHERE id = "' + i1.id + '";';
+                        allSql = allSql+sql;
+                    }
+                    delete idMaps[i1.id];
+                }else{
+                    var sql = 'DELETE FROM t_items WHERE id = "'+i1.id+'";';
+                    allSql = allSql+sql;
+                }
+            }
+
+            for(var key in idMaps){
+                var temp = map[key]._data;
+                var sql = 'INSERT INTO t_items(id,mid,owner,puton) VALUES("'
+                    + temp.id + '","' + temp.mid+'","' + temp.owner+'",' + temp.puton + ');';
+                allSql = allSql+sql;
+            }
+            if(allSql.length>0){
+                this.query(allSql, function(err, rows) {
+                    if (err) {
+                        if(err.code == 'ER_DUP_ENTRY'){
+                            if(callback)callback(false);
+                            return;
+                        }
+                        if(callback)callback(false);
+                        throw err;
+                    }
+                    else{
+                        if(callback)callback(true);
+                    }
+                });
+            }
+            else{
+                if(callback)callback(true);
+            }
+        }.bind(this));
+    },
+
 
 
     //生成聊天

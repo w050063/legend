@@ -38,18 +38,25 @@ module.exports = ag.class.extend({
         var mst = this.getMst();
         if(this.getIsPlayer()){
             var lv = this._data.level;
-            if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51));
-            if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47));
-            if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43));
-            if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35));
-            return Math.floor(mst.hp+mst.hpAdd[0]*lv);
+
+            var hpex = 0;//加上转生血量
+            var come = this._data.come;
+            if(come>0){
+                hpex+=ag.gameConst.comeHP[come];
+            }
+
+            if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51))+hpex;
+            if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47))+hpex;
+            if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43))+hpex;
+            if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35))+hpex;
+            return Math.floor(mst.hp+mst.hpAdd[0]*lv)+hpex;
         }
         return mst.hp;
     },
 
-    getTotalExpFromDataBase:function(){
+    getTotalExpFromDataBase:function(paramLevel){
         if(this.getIsPlayer()){
-            var lv = this._data.level;
+            var lv = paramLevel==undefined?this._data.level:paramLevel;
             var array = ag.gameConst.expDatabase;
             if(lv>50)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*4+array[5]*(lv-50));
             if(lv>46)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*(lv-46));
@@ -82,6 +89,20 @@ module.exports = ag.class.extend({
             hurt+=ag.gameConst.officeHurt[office];
             defense+=ag.gameConst.officeDefense[office];
 
+
+            //加上翅膀属性
+            var wing = this.getWingIndex();
+            hurt+=ag.gameConst.wingHurt[wing];
+            defense+=ag.gameConst.wingDefense[wing];
+
+
+            //加上转生属性
+            var come = this._data.come;
+            if(come>0){
+                hurt+=ag.gameConst.comeHurt[come];
+                defense+=ag.gameConst.comeDefense[come];
+            }
+
             this._hurt = hurt;
             this._defense = defense;
         }else{
@@ -102,6 +123,16 @@ module.exports = ag.class.extend({
         return office;
     },
 
+    //获得当前的翅膀索引
+    getWingIndex:function(){
+        var wingIndex = 0;
+        for(var i=0;i<ag.gameConst.wingProgress.length;++i){
+            if(ag.gameConst.wingProgress[i]<=this._data.wing){
+                wingIndex = i;
+            }
+        }
+        return wingIndex;
+    },
 
     getTypeNum:function(){
         if(this._data.type=='m0')return this._data.sex==ag.gameConst.sexBoy?0:1;
@@ -204,6 +235,7 @@ module.exports = ag.class.extend({
                             var temp = JSON.parse(JSON.stringify(role._data));
                             delete temp.gold;
                             delete temp.attackMode;
+                            delete temp.practice;
                             ag.jsUtil.sendData("sRole",temp,this._data.id);
                         }
 
@@ -212,6 +244,7 @@ module.exports = ag.class.extend({
                             temp = JSON.parse(JSON.stringify(role._data));
                             delete temp.gold;
                             delete temp.attackMode;
+                            delete temp.practice;
                             ag.jsUtil.sendData("sRole",temp,this._data.id);
                         }
                     }
@@ -219,6 +252,7 @@ module.exports = ag.class.extend({
                     var temp = JSON.parse(JSON.stringify(role._data));
                     delete temp.gold;
                     delete temp.attackMode;
+                    delete temp.practice;
                     ag.jsUtil.sendData("sRole",temp,this._data.id);
                 }
             }
@@ -234,6 +268,7 @@ module.exports = ag.class.extend({
             temp = JSON.parse(JSON.stringify(role._data));
             delete temp.gold;
             delete temp.attackMode;
+            delete temp.practice;
             ag.jsUtil.sendDataExcept("sRole",temp,this._data.id);
         }
 
@@ -515,13 +550,18 @@ module.exports = ag.class.extend({
         this._data.gold += count;
         ag.db.setRoles([this]);
         ag.jsUtil.sendData("sSetGold",this._data.gold,this._data.id);
-        console.log('okkkkk!'+count);
     },
 
 
     addOffice:function(count){
         this._data.office += count;
         ag.jsUtil.sendDataAll("sSetOffice",{id:this._data.id,office:this._data.office},this._data.mapId);
+    },
+
+
+    addWing:function(count){
+        this._data.wing += count;
+        ag.jsUtil.sendDataAll("sSetWing",{id:this._data.id,wing:this._data.wing},this._data.mapId);
     },
 
 

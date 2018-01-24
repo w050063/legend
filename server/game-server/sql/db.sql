@@ -94,8 +94,24 @@ CREATE TABLE `t_custom` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 INSERT INTO t_custom(id,data) VALUES("0","{}");
 
+
+-- ----------------------------
+-- Table structure for `t_auctionShop`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_auctionShop`;
+CREATE TABLE `t_auctionShop` (
+  `id` varchar(16) NOT NULL,
+  `price` int(8) NOT NULL,
+  `create_time` varchar(16) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 -- ----------------------------
 -- alter table
 -- ----------------------------
 alter table t_roles add column gold int(8) NOT NULL DEFAULT 0;
 alter table t_roles add column office int(8) NOT NULL DEFAULT 0;
+alter table t_roles add column come int(8) NOT NULL DEFAULT 0;
+alter table t_roles add column practice int(8) NOT NULL DEFAULT 0;
+alter table t_roles add column wing int(8) NOT NULL DEFAULT 0;

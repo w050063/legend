@@ -27,21 +27,25 @@ module.exports = {
             this.refresh();
         }.bind(this));
 
-        //每隔30秒发送一次在线人数
-        ag.actionManager.schedule(this,30,function (dt) {
+        //每隔60秒发送一次在线人数
+        ag.actionManager.schedule(this,60,function (dt) {
             var rand = Math.random();
-            if(rand<0.33){
-                ag.jsUtil.sendDataAll("sSystemNotify","当前在线人数："+(ag.jsUtil.getClientCount()*3+Math.floor(Math.random()*6)));
-            }else if(rand<0.66){
+            if(rand<0.5){
                 ag.jsUtil.sendDataAll("sSystemNotify","提示：战士刺杀第二格无视防御！");
             }else{
                 ag.jsUtil.sendDataAll("sSystemNotify","提示：安全区外可随意杀人！");
             }
-        }.bind(this));
+
+            //更新新的一天的数据
+            var date = new Date();
+            var now = ''+date .getFullYear()+'.'+date .getMonth()+'.'+date .getDate();
+            if(ag.db._customData.comeDate!=now){
+                ag.db._customData.comeDate = now;
+                ag.db._customData.come = {};
+                ag.db._customData.wing = {};
+            }
 
 
-        //定时保存到数据库
-        ag.actionManager.schedule(this,120,function (dt) {
             var array = [];
             for(var key in this._roleMap){
                 var role = this._roleMap[key];
@@ -51,6 +55,7 @@ module.exports = {
             }
             ag.db.setRoles(array);//角色保存
             ag.db.setItems();//道具保存
+            ag.db.setCustomData(ag.db._customData);//自定义数据保存
         }.bind(this));
 	},
 
@@ -118,7 +123,7 @@ module.exports = {
 	
 	
 	//增加一个玩家
-    addPlayer:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office){
+    addPlayer:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,wing,come,practice){
         var name = ag.userManager.getName(id);
 		var player = this._roleMap[id];
 		if(!player){
@@ -127,6 +132,9 @@ module.exports = {
             player._data.attackMode = ag.gameConst.attackModeAll;
             player._data.gold = gold?gold:0;
             player._data.office = office?office:0;
+            player._data.come = come?come:0;
+            player._data.practice = practice?practice:0;
+            player._data.wing = wing?wing:0;
             player._data.id = id;
             player._data.type = type;
             if(map_id){
@@ -145,6 +153,7 @@ module.exports = {
             player._data.direction = direction!=undefined?direction:4;//默认朝下
             player._data.level = level?level:0;
             player.resetAllProp(exp);
+
 			this._roleMap[id] = player;
             var xyStr = player.getMapXYString();
             if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
@@ -229,6 +238,7 @@ module.exports = {
                         var temp = JSON.parse(JSON.stringify(player._data));
                         delete temp.gold;
                         delete temp.attackMode;
+                        delete temp.practice;
                         ag.jsUtil.sendDataAll("sRole",temp,player._data.mapId);
                     }
                 }

@@ -34,6 +34,8 @@ WorkRemote.prototype.add = function(uid, sid, cb) {
         ag.jsUtil.init();
         ag.gameConst = require('../../../game/util/GameConst');
         ag.gameConst.init();
+        var AuctionShop = require("../../../game/AuctionShop.js");
+        ag.auctionShop = new AuctionShop();
         ag.gameLayer = require("../../../game/GameLayer");
         ag.gameLayer.init();
         var BuffManager = require("../../../game/BuffManager");

@@ -61,7 +61,7 @@ var Handler = cc.Class.extend({
             return;
         }
         app.rpc.work.WorkRemote.kick(session, session.get("uid"), app.get('serverId'), function(){
-            console.log("====== kick callback over! ======");
+            //console.log("====== kick callback over! ======");
         });
     },
 });

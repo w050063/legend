@@ -8,9 +8,9 @@ module.exports = ag.class.extend({
     ctor:function () {
         this._bRunning = 0;
         this._guildWinId = '';
-        ag.db.getCustomData(function(data){
-            this._guildWinId = data.guildWinId;
-        }.bind(this));
+        if(ag.db && ag.db._customData){
+            this._guildWinId = ag.db._customData.guildWinId?ag.db._customData.guildWinId:'0';
+        }
     },
 
 
@@ -29,6 +29,7 @@ module.exports = ag.class.extend({
                     this._bRunning = 0;
                     ag.db.getCustomData(function(data2){
                         data2.guildWinId = this._guildWinId;
+                        ag.db._customData.guildWinId = this._guildWinId;
                         ag.db.setCustomData(data2);
                     }.bind(this));
                     ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
@@ -44,7 +45,7 @@ module.exports = ag.class.extend({
             if(!this._guildWinId){//不存在则增加
                 for(var key in ag.gameLayer._roleMap){
                     var role = ag.gameLayer._roleMap[key];
-                    if(role.getIsPlayer() && role._state!=ag.gameConst.stateDead && role._data.mapId=='t16' && ag.guild.getGuildId(key)){
+                    if(role.getIsPlayer() && ag.userManager.getOnline(role._data.id) && role._state!=ag.gameConst.stateDead && role._data.mapId=='t16' && ag.guild.getGuildId(key)){
                         this._guildWinId = ag.guild.getGuildId(key);
                         ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
                         ag.jsUtil.sendDataAll("sGuildWinId",this._guildWinId);
@@ -55,7 +56,7 @@ module.exports = ag.class.extend({
                 var bFind = false;
                 for(var key in ag.gameLayer._roleMap){
                     var role = ag.gameLayer._roleMap[key];
-                    if(role.getIsPlayer() && role._state!=ag.gameConst.stateDead && role._data.mapId=='t16' && ag.guild.getGuildId(key)==this._guildWinId){
+                    if(role.getIsPlayer() && ag.userManager.getOnline(role._data.id) && role._state!=ag.gameConst.stateDead && role._data.mapId=='t16' && ag.guild.getGuildId(key)==this._guildWinId){
                         bFind = true;
                         break;
                     }

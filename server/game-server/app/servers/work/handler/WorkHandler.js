@@ -84,10 +84,20 @@ var Handler = cc.Class.extend({
         }
     },
 
+    //修改密码
+    alterPassWord:function(msg, session, next) {
+        if(msg.account && msg.password && msg.passwordNew && ag.userManager.isRightAccountAndPassword(msg.account,msg.password)){
+            ag.userManager.alterPassWord(msg.account,msg.passwordNew);
+            next(null, {code: 0});
+        }else{
+            next(null, {code: 1});
+        }
+    },
+
 
     //进入游戏,0正确,1Id为空,2ID已经存在
     login:function(msg, session, next) {
-        if(ag.userManager.isRightAccountAndPassword(msg.account,msg.password)){
+        if(msg.account && msg.password && ag.userManager.isRightAccountAndPassword(msg.account,msg.password)){
             var oldUid = ag.userManager.getUidByAccount(msg.account);
             if(oldUid){
                 //解除绑定
@@ -207,7 +217,7 @@ var Handler = cc.Class.extend({
         if(!exist){
             role = ag.gameLayer.getRole(id);
             var data = role._data;
-            ag.db.insertRole(data.id,data.mapId,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,role._exp,data.gold,data.office);
+            ag.db.insertRole(data.id,data.mapId,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,role._exp,data.gold,data.office,data.wing,data.come,data.practice);
         }
 
         //记录玩家进入游戏时间
@@ -463,7 +473,6 @@ var Handler = cc.Class.extend({
         var player =  ag.gameLayer.getRole(id);
         if(player) {
             if(player._data.gold>=200){
-                player._data.gold-=200;
                 player.addGold(-200);
                 ag.itemManager.treasure(player);
             }else{
@@ -474,13 +483,12 @@ var Handler = cc.Class.extend({
     },
 
 
-    //寻宝一次
+    //寻宝5次
     treasure5:function (msg, session, next) {
         var id = ag.userManager.getAccountByUid(session.uid);
         var player =  ag.gameLayer.getRole(id);
         if(player) {
             if(player._data.gold>=1000){
-                player._data.gold-=1000;
                 player.addGold(-1000);
                 ag.itemManager.treasure5(player);
             }else{
@@ -529,6 +537,137 @@ var Handler = cc.Class.extend({
         if(player && typeof msg.no=='number' && msg.no>=ag.gameConst.attackModeAll && msg.no<=ag.gameConst.attackModeGuild) {
             player._data.attackMode = msg.no;
             ag.jsUtil.sendData("sSystemNotify","已经改为"+ag.gameConst.attackModeTextArray[msg.no]+"模式！",id);
+        }
+        next();
+    },
+
+
+
+
+    //增加修为,0正常1等级不到50,2经验换取超过3次，3,到达上线，4未知错误
+    come:function(msg, session, next) {
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var role =  ag.gameLayer.getRole(id);
+        if(role){
+            if(msg=='exp'){
+                if(!ag.db._customData.come[id])ag.db._customData.come[id] = 0;
+                if(role._data.level<51){
+                    next(null, {code: 1});
+                    return;
+                }
+                if(ag.db._customData.come[id]>=3){
+                    next(null, {code: 2});
+                    return;
+                }
+                if(role._data.come>=ag.gameConst.comeArray.length){
+                    next(null, {code: 3});
+                    return;
+                }
+                ++ag.db._customData.come[id];
+                role._data.practice += 10;
+                if(role._data.practice>=ag.gameConst.comeArray[role._data.come]){
+                    role._data.practice -= ag.gameConst.comeArray[role._data.come];
+                    ++role._data.come;
+                }
+                role._exp -= 40000;
+                if(role._exp<0){
+                    role._data.level -= 1;
+                    role._exp += role.getTotalExpFromDataBase(role._data.level);
+                }
+                role.resetAllProp(role._exp);
+                next(null, {code: 0});
+                ag.jsUtil.sendDataAll("sCome",{id:role._data.id,come:role._data.come,practice:role._data.practice,level:role._data.level,exp:role._exp},role._data.mapId);
+                return;
+            }
+        }
+        next(null, {code: 4});
+    },
+
+
+    //增加修为,0正常,1换取超过1次，2,到达上线，3未知错误
+    daily:function(msg, session, next) {
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var role =  ag.gameLayer.getRole(id);
+        if(role){
+            var price = ag.gameConst.dailyPriceArray[msg.index];
+            if(!ag.db._customData.wing[id])ag.db._customData.wing[id] = 0;
+            if(ag.db._customData.wing[id]>=1){
+                ag.jsUtil.sendData("sSystemNotify","每天只能领取一次！",id);
+            }else if(role.getWingIndex()>=ag.gameConst.wingProgress.length){
+                ag.jsUtil.sendData("sSystemNotify","已经到达上线！",id);
+            }else if(role._data.gold>=price){
+                role.addGold(-price);
+                if(msg.index==ag.gameConst.dailyWing){
+                    ++ag.db._customData.wing[id];
+                    role._data.wing += 10;
+                    ag.jsUtil.sendDataAll("sSetWing",{id:role._data.id,wing:role._data.wing},role._data.mapId);
+                }else if(msg.index==ag.gameConst.dailyWingWithGold){
+                    ++ag.db._customData.wing[id];
+                    role._data.wing += 20;
+                    ag.jsUtil.sendDataAll("sSetWing",{id:role._data.id,wing:role._data.wing},role._data.mapId);
+                }
+                role.resetAllProp(role._exp);
+                ag.jsUtil.sendData("sSystemNotify","领取成功！",id);
+            }else{
+                ag.jsUtil.sendData("sSystemNotify","您的元宝不足1000！",id);
+            }
+        }
+        next();
+    },
+
+
+
+    //请求寻宝记录
+    requestTreasureString:function(msg, session, next) {
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var role =  ag.gameLayer.getRole(id);
+        if(role){
+            ag.itemManager.sendTreasureString(id);
+        }
+        next();
+    },
+
+
+    //商店记录
+    shopBuy:function(msg, session, next) {
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var role =  ag.gameLayer.getRole(id);
+        if(role && msg.index>=0 && msg.index<=2){
+            var price = ag.gameConst.shopPriceArray[msg.index];
+            if(role._data.gold>=price){
+                role.addGold(-price);
+
+                if(msg.index==ag.gameConst.shopOffice){
+                    role.addOffice(10);
+                }else if(msg.index==ag.gameConst.shopCome){
+                    role._data.practice += 10;
+                    if(role._data.practice>=ag.gameConst.comeArray[role._data.come]){
+                        role._data.practice -= ag.gameConst.comeArray[role._data.come];
+                        ++role._data.come;
+                    }
+                    ag.jsUtil.sendDataAll("sCome",{id:role._data.id,come:role._data.come,practice:role._data.practice,level:role._data.level,exp:role._exp},role._data.mapId);
+                }else if(msg.index==ag.gameConst.shopWing){
+                    role._data.wing += 10;
+                    ag.jsUtil.sendDataAll("sSetWing",{id:role._data.id,wing:role._data.wing},role._data.mapId);
+                }
+                role.resetAllProp(role._exp);
+                ag.jsUtil.sendData("sSystemNotify","购买成功！",id);
+            }else{
+                ag.jsUtil.sendData("sSystemNotify","您的元宝不足1000！",id);
+            }
+        }
+        next();
+    },
+
+
+
+
+    //请求拍卖行
+    requestauctionShop:function(msg, session, next) {
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var role =  ag.gameLayer.getRole(id);
+        if(role){
+            ag.auctionShop.sendData(id);
         }
         next();
     },

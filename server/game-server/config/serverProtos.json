@@ -64,7 +64,10 @@
     "optional string name": 11,
     "optional int32 gold": 12,
     "optional int32 office": 13,
-    "optional int32 attackMode": 14
+    "optional int32 attackMode": 14,
+    "optional int32 come": 15,
+    "optional int32 practice": 16,
+    "optional int32 wing": 17
   },
   "message sRelife": {
     "required string id": 1,
@@ -85,6 +88,17 @@
     "optional string name": 2,
     "optional string member": 3,
     "required int32 result": 4
+  },
+  "message sCome": {
+    "optional string id": 1,
+    "optional int32 come": 2,
+    "optional int32 practice": 3,
+    "required int32 level": 4,
+    "required int32 exp": 5
+  },
+  "message sSetWing": {
+    "optional string id": 1,
+    "optional int32 wing": 2
   },
   "onData" : {
     "repeated sMove sMoveArray": 1,
@@ -114,6 +128,10 @@
     "repeated string sGuildInviteArray": 25,
     "repeated sSetOffice sSetOfficeArray": 26,
     "repeated string sGuildWinIdArray": 27,
-    "repeated string sAlertArray": 28
+    "repeated string sAlertArray": 28,
+    "repeated sCome sComeArray": 29,
+    "repeated sSetWing sSetWingArray": 30,
+    "repeated string treasureStringArray": 31,
+    "repeated string sAuctionShopArray": 32
   }
 }
