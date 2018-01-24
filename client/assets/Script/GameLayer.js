@@ -9,6 +9,7 @@ var Item = require("Item");
 var AGTileMap = require("AGTileMap");
 var ItemInfoNode = require('ItemInfoNode');
 var Wharehouse = require('Wharehouse');
+var AuctionShop = require('AuctionShop');
 var AGAni = require("AGAni");
 var baseNpcId = 5000;
 cc.Class({
@@ -25,12 +26,13 @@ cc.Class({
     // use this for initialization
     onLoad: function () {
         ag.gameLayer = this;
-        this._chatType = ag.gameConst.chatAll;
+        this._chatType = ag.gameConst.chatMap;
         this._roleMap = {};
         this._player = null;
         this._lastMapPosition = cc.p(0,0);
         this._stableMinMapNpcBoss = [];
         this._bagArray = [];
+        this._auctionShop = cc.find('Canvas/nodeAuctionShop').getComponent(AuctionShop);
         var i=0;
 
         for(i=0;i<ag.gameConst.bagMaxCount;++i){
@@ -109,6 +111,8 @@ cc.Class({
         this._equipArray.push(cc.find('Canvas/nodeBag/labelLevel').getComponent(cc.Label));
         this._equipArray.push(cc.find('Canvas/nodeBag/labelExp').getComponent(cc.Label));
         this._labelGold = cc.find('Canvas/nodeBag/labelGold').getComponent(cc.Label);
+        cc.find('Canvas/nodeBag/labelCome').getComponent(cc.Label).string = '转生:'+ag.userInfo._data.come;
+        cc.find('Canvas/nodeBag/labelPractice').getComponent(cc.Label).string = '修为:'+ag.userInfo._data.practice;
 
         //聊天相关
         this._chatContentArray = [];
@@ -138,7 +142,8 @@ cc.Class({
         this._roleMap[ag.userInfo._data.id] = this._player;
         this._player.init(ag.userInfo._data);
         this.defaultRoleAni(this._player);
-        this._labelGold.string = '元宝:'+this._player._data.gold;
+        //this._labelGold.string = '元宝:'+this._player._data.gold;
+        this._player.addGold(this._player._data.gold);
 
         this.changeMap();
         //请求本地图所有角色
@@ -873,7 +878,7 @@ cc.Class({
                 if(father.clothe)father.clothe.getComponent(AGAni).putCache();
                 var name = (role._data.sex==0?'ani/hum0/000':'ani/hum1/001');
                 name = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid].model;
-                var node = ag.jsUtil.getNode(father,name+array[0],parseInt(array[1]),1,0.3);
+                var node = ag.jsUtil.getNode(father,name+array[0],parseInt(array[1]),2,0.3);
                 node.setPosition(aniPos);
                 node.scale = scale;
                 father.clothe = node;
@@ -884,21 +889,24 @@ cc.Class({
             if(mst.type==0){
                 if(father.weapon)father.weapon.getComponent(AGAni).putCache();
                 var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
-                var node1 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),0,0.3);
+                var node1 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),1,0.3);
                 if(father.clothe)father.clothe.getComponent(AGAni).addControl(node1.getComponent(AGAni));
                 node1.setPosition(aniPos);
                 node1.scale = scale;
                 father.weapon = node1;
             }
+
             //翅膀
-            if(mst.type==6){
-                if(father.wing)father.wing.getComponent(AGAni).putCache();
-                var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
-                var node2 = ag.jsUtil.getNode(father,mst.model+array[0],parseInt(array[1]),2,0.3);
-                if(father.clothe)father.clothe.getComponent(AGAni).addControl(node2.getComponent(AGAni));
-                node2.setPosition(aniPos);
-                node2.scale = scale;
-                father.wing = node2;
+            var wing = ag.gameConst.wingModel[role.getWingIndex()];
+            if(!wing && father.wing){
+                father.wing.getComponent(AGAni).putCache();
+                father.wing = undefined;
+            }
+            if((wing && father.wing && father.wing.getComponent(AGAni)._name != (wing+'000')) || (wing && !father.wing)){
+                father.wing = ag.jsUtil.getNode(father,wing+array[0],parseInt(array[1]),0,0.3);
+                if(father.clothe)father.clothe.getComponent(AGAni).addControl(father.wing.getComponent(AGAni));
+                father.wing.setPosition(aniPos);
+                father.wing.scale = scale;
             }
             this.resetPlayerProp(role);
         }
@@ -915,7 +923,7 @@ cc.Class({
         father.wing=undefined;
         var array = father.children;
         for(var i=array.length-1;i>=0;--i){
-            if(array[i].name!='labelTitle' && array[i].name!='labelProp' && array[i].name!='office'){
+            if(array[i].name!='labelTitle' && array[i].name!='labelProp' && array[i].name!='office' && array[i].name!='wing'){
                 array[i].destroy();
                 array[i].removeFromParent();
             }
@@ -977,8 +985,24 @@ cc.Class({
         hurt+=ag.gameConst.officeHurt[office];
         defense+=ag.gameConst.officeDefense[office];
 
-        father.labelTitle.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
-        father.labelProp.string = '攻击:'+hurt+' 防御:'+defense;
+
+        //加上翅膀属性
+        var wing = role.getWingIndex();
+        hurt+=ag.gameConst.wingHurt[wing];
+        defense+=ag.gameConst.wingDefense[wing];
+
+
+        //加上转生属性
+        var come = this._player._data.come;
+        if(come>0){
+            hurt+=ag.gameConst.comeHurt[come];
+            defense+=ag.gameConst.comeDefense[come];
+        }
+
+        if(role==this._player || father.active){
+            father.labelTitle.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
+            father.labelProp.string = '攻击:'+hurt+' 防御:'+defense;
+        }
     },
 
 
@@ -1018,8 +1042,12 @@ cc.Class({
 
 
     //聊天按钮
-    buttonShowChatNode:function(){
+    buttonShowChatNode:function(event){
         var node = cc.find('Canvas/nodeChatContent/spriteBack');
+        this.node.runAction(cc.sequence(cc.delayTime(0.1),cc.callFunc(function(){
+            var target = cc.find('Canvas/buttonChat');
+            target.scaleX = -target.scaleX;
+        })));
         node.active = !node.active;
         if(cc.sys.isMobile==false && cc.sys.isBrowser){
             var editbox = cc.find('Canvas/nodeChatContent/spriteBack/editBoxName').getComponent(cc.EditBox);
@@ -1208,26 +1236,41 @@ cc.Class({
                     label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
                         ag.musicManager.playEffect("resources/voice/button.mp3");
                         var npcStr = transferMst.name;
-                        if(transferMst.id=='t6000'){
+                        if(transferMst.id=='t8000'){
+                            self._auctionShop.show();
+                        }else if(transferMst.id=='t7000'){
+                            if(self._player._data.gold>=ag.gameConst.dailyPriceArray[ag.gameConst.dailyWing]){
+                                ag.agSocket.send("daily",{index:ag.gameConst.dailyWing});
+                            }else{
+                                ag.jsUtil.showText(self.node,'元宝不足'+ag.gameConst.dailyPriceArray[ag.gameConst.dailyWing]+'个！');
+                            }
+                        }else if(transferMst.id=='t7001'){
+                            if(self._player._data.gold>=ag.gameConst.dailyPriceArray[ag.gameConst.dailyWingWithGold]){
+                                ag.agSocket.send("daily",{index:ag.gameConst.dailyWingWithGold});
+                            }else{
+                                ag.jsUtil.showText(self.node,'元宝不足'+ag.gameConst.dailyPriceArray[ag.gameConst.dailyWingWithGold]+'个！');
+                            }
+                        }else if(transferMst.id=='t6000'){
                             cc.find('Canvas/nodeWharehouse').getComponent(Wharehouse).show();
                             self.buttonEventNpcClose();
                         }else if(transferMst.id=='t5000'){
-                            var index = self._bagArray.indexOf(-1);
-                            if(index!=-1 && self._player._data.gold>=200){
-                                ag.agSocket.send("treasure",{});
-                            }else{
-                                ag.jsUtil.showText(self.node,'背包已满,或者元宝不足200个！');
+                            cc.find('Canvas/nodeTreasure').active = true;
+                            var tempArray = ['001021','001020','001019','001016','001017','001018'
+                                ,'001216','001217','001218','001219','001220','001221'
+                                ,'001317','001318','001319','001320','001321','001322'
+                                ,'001417','001418','001419','001420','001421','001422'
+                                ,'001517','001518','001519','001520','001521','001522'
+                                ,'001702','001802','002002'
+                                ,'icon3','icon4','icon5','icon6','icon7','icon8','icon9','icon10'
+                                ,'icon11','icon12','icon13','icon14'];
+
+                            var tempNode = cc.find('Canvas/nodeTreasure/spriteBack');
+                            for(var j=3;j<15;++j){
+                                var random = Math.floor(Math.random()*tempArray.length);
+                                tempNode.getChildByName('sprite'+j).getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(tempArray[random]);
                             }
-                        }else if(transferMst.id=='t5001'){
-                            var findBagItemCount = 0;
-                            for(var j=0;j<self._bagArray.length;++j){
-                                if(self._bagArray[j]==-1)++findBagItemCount;
-                            }
-                            if(findBagItemCount>=5 && self._player._data.gold>=1000){
-                                ag.agSocket.send("treasure5",{});
-                            }else{
-                                ag.jsUtil.showText(self.node,'背包已满,或者元宝不足1000个！');
-                            }
+                            ag.agSocket.send("requestTreasureString",{});
+                            self.buttonEventNpcClose();
                         }else if(transferMst.id=='t4002') {
                             var index = self._bagArray.indexOf(-1);
                             if(index!=-1 && self._player._data.gold>=500){
@@ -1255,8 +1298,6 @@ cc.Class({
                             ag.jsUtil.alert(ag.gameLayer.node,'退出行会!',function () {
                                 ag.agSocket.send("guildExit",{});
                             },function () {});
-                        }else if(npcStr=='比奇城市'){
-                            ag.jsUtil.showText(self.node,"比奇城限制55级以上！");
                         }else if(npcStr=='四级以下回收' || npcStr=='五级回收' || npcStr=='六级回收' || npcStr=='七级回收' || npcStr=='八级回收' || npcStr=='九级回收'){
                             var curLevels = transferMst.levels;
                             var array = [];
@@ -1298,9 +1339,37 @@ cc.Class({
                             var maxLevel = ag.gameConst._terrainMap[transferMst.mapId].maxLevel;
                             if(!maxLevel)maxLevel = 65535;
                             if(self._player._data.level>=level && self._player._data.level<=maxLevel){
-                                self.changeMap(transferMst.id);
-                                //请求本地图所有角色
-                                ag.agSocket.send("changeMap",transferMst.id);
+                                if(transferMst.mapId=='t20'){
+                                    if(ag.userInfo._guildMap[self._player._data.id]){
+                                        if(ag.userInfo._guildWinId==self._player._data.id){
+                                            self.changeMap(transferMst.id);
+                                            ag.agSocket.send("changeMap",transferMst.id);
+                                        }else{
+                                            ag.jsUtil.showText(self.node,'此为沙巴克专属地图!!!');
+                                        }
+                                    }else{
+                                        var bFind = false;
+                                        for(var key in ag.userInfo._guildMap){
+                                            var index = ag.userInfo._guildMap[key].member.indexOf(self._player._data.id);
+                                            if(index!=-1){
+                                                bFind = true;
+                                                if(ag.userInfo._guildWinId==key){
+                                                    self.changeMap(transferMst.id);
+                                                    ag.agSocket.send("changeMap",transferMst.id);
+                                                }else{
+                                                    ag.jsUtil.showText(self.node,'此为沙巴克专属地图!!!');
+                                                }
+                                                break;
+                                            }
+                                        }
+                                        if(bFind==false){
+                                            ag.jsUtil.showText(self.node,'此为沙巴克专属地图!!!');
+                                        }
+                                    }
+                                }else{
+                                    self.changeMap(transferMst.id);
+                                    ag.agSocket.send("changeMap",transferMst.id);
+                                }
                             }else{
                                 ag.jsUtil.showText(self.node,'此地图要求等级'+level+'!!!');
                             }
@@ -1331,6 +1400,21 @@ cc.Class({
 
 
 
+    //绑定翅膀事件
+    buttonEventWing:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.find('Canvas/nodeItemInfo').active = true;
+        cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setWingByRole(this._player);
+    },
+
+
+    //绑定其他翅膀事件
+    buttonEventOtherWing:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.find('Canvas/nodeItemInfo').active = true;
+        cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setWingByRole();
+    },
+
 
     //聊天对象
     buttonEventChatSelect:function(event){
@@ -1341,13 +1425,13 @@ cc.Class({
     buttonEventChatAll:function(event){
         ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find('Canvas/nodeChatContent/spriteBack/nodeButtonsChatSelect').active = false;
-        cc.find('Canvas/nodeChatContent/spriteBack/buttonChatSelect/Label').getComponent(cc.Label).string = '全体  ▲';
+        cc.find('Canvas/nodeChatContent/spriteBack/buttonChatSelect/Label').getComponent(cc.Label).string = '世界  ▲';
         this._chatType = ag.gameConst.chatAll;
     },
     buttonEventChatMap:function(event){
         ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find('Canvas/nodeChatContent/spriteBack/nodeButtonsChatSelect').active = false;
-        cc.find('Canvas/nodeChatContent/spriteBack/buttonChatSelect/Label').getComponent(cc.Label).string = '地图  ▲';
+        cc.find('Canvas/nodeChatContent/spriteBack/buttonChatSelect/Label').getComponent(cc.Label).string = '当前  ▲';
         this._chatType = ag.gameConst.chatMap;
     },
     buttonEventChatGuild:function(event){
@@ -1370,5 +1454,109 @@ cc.Class({
         }
         cc.find('Canvas/buttonAttackMode/Label').getComponent(cc.Label).string = ag.gameConst.attackModeTextArray[this._player._data.attackMode];
         ag.agSocket.send("setAttackMode",{no:this._player._data.attackMode});
+    },
+
+
+    //转生事件
+    buttonEventCome:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        if(this._player._data.level>=51){
+            ag.jsUtil.alertOKCancel(this.node,'确认要使用4万经验换取10点修为？',function(){
+                ag.jsUtil.request(this.node,'come','exp',function (data) {
+                    if(data.code==0){
+                        this.systemNotify('转生成功！');
+                    }else if(data.code==1){
+                        this.systemNotify('转生需要51级以上！');
+                    }else if(data.code==2){
+                        this.systemNotify('每天顶多转生三次！');
+                    }else if(data.code==3){
+                        this.systemNotify('您转生已经到达顶级！');
+                    }else if(data.code==4){
+                        this.systemNotify('未知错误！');
+                    }
+                }.bind(this));
+            }.bind(this),function(){
+            }.bind(this));
+        }else{
+            ag.jsUtil.showText(this.node,'转生需要51级以上！');
+        }
+    },
+
+    //treasure一次
+    buttonEventTreasureClose:function(){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.find('Canvas/nodeTreasure').active = false;
+    },
+
+    //treasure一次
+    buttonEventTreasureOne:function(){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        var index = this._bagArray.indexOf(-1);
+        if(index!=-1 && this._player._data.gold>=200){
+            ag.agSocket.send("treasure",{});
+        }else{
+            ag.jsUtil.showText(this.node,'背包已满,或者元宝不足200个！');
+        }
+    },
+
+    //treasure5次
+    buttonEventTreasureFive:function(){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        var findBagItemCount = 0;
+        for(var j=0;j<this._bagArray.length;++j){
+            if(this._bagArray[j]==-1)++findBagItemCount;
+        }
+        if(findBagItemCount>=5 && this._player._data.gold>=1000){
+            ag.agSocket.send("treasure5",{});
+        }else{
+            ag.jsUtil.showText(this.node,'背包已满,或者元宝不足1000个！');
+        }
+    },
+
+
+    //回城事件
+    buttonEventGotoCity:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        var transferMst = ag.gameConst._transferMst['t1'];
+        if(this._player._data.mapId=='t18'
+            || this._player._data.mapId=='t19'
+            || this._player._data.mapId=='t20'
+            || this._player._data.mapId=='t21'
+            || this._player._data.mapId=='t22'){
+            transferMst = ag.gameConst._transferMst['t23'];
+        }else if(this._player._data.mapId=='t12'
+            || this._player._data.mapId=='t0'){
+            transferMst = ag.gameConst._transferMst['t0'];
+        }
+
+        var level = ag.gameConst._terrainMap[transferMst.mapId].level;
+        var maxLevel = ag.gameConst._terrainMap[transferMst.mapId].maxLevel;
+        if(!maxLevel)maxLevel = 65535;
+        if(this._player._data.level>=level && this._player._data.level<=maxLevel){
+            this.changeMap(transferMst.id);
+            //请求本地图所有角色
+            ag.agSocket.send("changeMap",transferMst.id);
+            this._nodeBag.active = false;
+        }else{
+            ag.jsUtil.showText(this.node,'此地图要求等级'+level+'!!!');
+        }
+    },
+
+
+    //抽奖记录
+    showTreasureString:function(str){
+        //保存到聊天记录里面
+        var scrollview = cc.find('Canvas/nodeTreasure/spriteBack/scrollView').getComponent(cc.ScrollView);
+        var contentNode = scrollview.content;
+        var itemNode = contentNode.getChildByName('item');
+        itemNode.getComponent(cc.Label).string = str;
+        contentNode.height = Math.max(itemNode.height,270);
+        scrollview.scrollToBottom();
+    },
+
+    //商城事件
+    buttonEventShop:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.find('Canvas/nodeShop').active = true;
     },
 });

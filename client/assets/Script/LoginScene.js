@@ -8,40 +8,12 @@ cc.Class({
     extends: cc.Component,
     properties: {},
     onLoad: function () {
-        //var node = cc.find("Canvas/door");
-        //node.setPosition(ag.userInfo.backGroundPos);
-        //var dis0 = cc.pDistance(cc.p(280,230),cc.p(-100,-330));
-        //var dis1 = cc.pDistance(cc.p(280,230),ag.userInfo.backGroundPos);
-        //node.runAction(cc.sequence(cc.moveTo(20*dis1/dis0,cc.p(280,230)),cc.callFunc(function(){
-        //    node.runAction(cc.repeatForever(cc.sequence(cc.moveTo(20,cc.p(-100,-330)),cc.moveTo(20,cc.p(280,230)))));
-        //})));
         var editBoxAccount = cc.find("Canvas/nodeLogin/editBoxAccount").getComponent(cc.EditBox);
         var editBoxPassword = cc.find("Canvas/nodeLogin/editBoxPassword").getComponent(cc.EditBox);
         editBoxAccount.string = cc.sys.localStorage.getItem('account') || '';
         editBoxPassword.string = cc.sys.localStorage.getItem('password') || '';
         cc.audioEngine.stopAll();
         ag.musicManager.playMusic("resources/music/Dragon Rider.mp3");
-    },
-
-
-    theCountryIsAtPeace: function() {
-        ag.agSocket.send("theCountryIsAtPeace",'');
-    },
-
-
-    buttonEventAddGold: function() {
-        var name = cc.find("Canvas/editBoxGoldName").getComponent(cc.EditBox).string;
-        var count = parseInt(cc.find("Canvas/editBoxGoldCount").getComponent(cc.EditBox).string);
-        if(typeof count=='number' && count>=0 && count<=1000000){
-            //ag.agSocket.send("addGold",{name:name,gold:count});
-            ag.jsUtil.request(this.node,'addGold',{name:name,gold:count},function (data) {
-                if(data.code==0){
-                    ag.jsUtil.showText(this.node,''+count+'元宝增加成功');
-                }else{
-                    ag.jsUtil.showText(this.node,''+'玩家不存在');
-                }
-            }.bind((this)));
-        }
     },
 
 
@@ -153,13 +125,56 @@ cc.Class({
     },
 
 
-    buttonEventShabake: function() {
-        var editBoxShaDuration = cc.find("Canvas/editBoxShaDuration").getComponent(cc.EditBox);
-        var editBoxShaDuration2 = cc.find("Canvas/editBoxShaDuration2").getComponent(cc.EditBox);
-        ag.jsUtil.request(this.node,'shabake',{duration:editBoxShaDuration.string,duration2:editBoxShaDuration2.string},function (data) {
-            if(data.code==0){
-                ag.jsUtil.showText(this.node,'已定时启动沙巴克');
-            }
-        }.bind((this)));
+    //修改密码
+    buttonEventAlterPassword: function() {
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.find("Canvas/nodeAlterPassWord").active = true;
+    },
+
+    buttonEventAlterPasswordClose: function() {
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.find("Canvas/nodeAlterPassWord").active = false;
+    },
+
+
+    buttonEventAlterPasswordOK: function() {
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        var editBoxAccount = cc.find("Canvas/nodeAlterPassWord/editBoxAccount").getComponent(cc.EditBox);
+        var editBoxPassword = cc.find("Canvas/nodeAlterPassWord/editBoxPassword").getComponent(cc.EditBox);
+        var editBoxPasswordNew = cc.find("Canvas/nodeAlterPassWord/editBoxPasswordNew").getComponent(cc.EditBox);
+        var editBoxPasswordAgain = cc.find("Canvas/nodeAlterPassWord/editBoxPasswordAgain").getComponent(cc.EditBox);
+        if(editBoxAccount.string.length<4){
+            ag.jsUtil.showText(this.node,'账号长度最少4位');
+        }else if(editBoxPassword.string.length<4){
+            ag.jsUtil.showText(this.node,'原密码长度最少4位');
+        }else if(editBoxPasswordNew.string.length<4){
+            ag.jsUtil.showText(this.node,'新密码长度最少4位');
+        }else if(editBoxPasswordAgain.string.length<4){
+            ag.jsUtil.showText(this.node,'重复密码长度最少4位');
+        }else if(editBoxPasswordNew.string!=editBoxPasswordAgain.string){
+            ag.jsUtil.showText(this.node,'新密码和重复密码不一致');
+        }else{
+            ag.jsUtil.request(this.node,'alterPassWord',{account:editBoxAccount.string,password:editBoxPassword.string,passwordNew:editBoxPasswordNew.string},function (data) {
+                if(data.code==0){
+                    cc.find("Canvas/nodeAlterPassWord").active = false;
+                    ag.jsUtil.showText(this.node,'修改成功');
+                    cc.sys.localStorage.setItem('account',editBoxAccount.string);
+                    cc.sys.localStorage.setItem('password',editBoxPasswordNew.string);
+                    cc.find("Canvas/nodeLogin/editBoxAccount").getComponent(cc.EditBox).string = cc.sys.localStorage.getItem('account') || '';
+                    cc.find("Canvas/nodeLogin/editBoxPassword").getComponent(cc.EditBox).string = cc.sys.localStorage.getItem('password') || '';
+                }else{
+                    editBoxPassword.string = '';
+                    editBoxPassword.string = '';
+                    editBoxPasswordNew.string = '';
+                    ag.jsUtil.showText(this.node,'账号或者密码错误!');
+                }
+            }.bind(this));
+        }
+    },
+
+
+    buttonEventHomePage: function() {
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        ag.jsUtil.showText(this.node,'官网正在维护中...');
     },
 });

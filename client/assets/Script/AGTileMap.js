@@ -24,7 +24,7 @@ cc.Class({
             var array = data.split(',');
             this._dataArray = array;
             if(ag.gameLayer && ag.gameLayer._player){
-                ag.gameLayer._player.setLocation(ag.gameLayer._player.getLocation());
+                ag.gameLayer._player.setLocation(ag.gameLayer._player.getLocation(),true);
             }
         }.bind(this));
     },

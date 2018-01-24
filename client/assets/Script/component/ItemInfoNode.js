@@ -40,6 +40,28 @@ cc.Class({
         ag.jsUtil.secondInterfaceAnimation(back);
     },
 
+    setWingByRole:function(role){
+        if(!role)role = this._role;
+        var back = this.node.getChildByName('back');
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame('001600');
+
+        var wing = role.getWingIndex();
+        var str = '神羽' + wing + '阶'
+            +'\n攻击:'+ag.gameConst.wingHurt[wing]
+            +'\n防御:'+ag.gameConst.wingDefense[wing]
+            +'\n当前进度:'+role._data.wing;
+
+
+
+        back.getChildByName('labelContent').getComponent(cc.Label).string = str;
+        var buttonNode = back.getChildByName('buttonDispose');
+        buttonNode.x = 0;
+        var label = buttonNode.getChildByName('label').getComponent(cc.Label);
+        label.string = '确定';
+        back.getChildByName('buttonDispose1').active = false;
+        ag.jsUtil.secondInterfaceAnimation(back);
+    },
+
 
     setItemIdByWharehouse:function(id){
         var obj = ag.userInfo._itemMap[id];

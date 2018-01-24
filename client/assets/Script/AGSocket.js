@@ -13,7 +13,7 @@ module.exports={
         var self = this;
         if(self._step != 0)pomelo.disconnect();
         self._step = 0;
-        pomelo.init({host: "192.168.99.174",port: 3014,log: true}, function() {
+        pomelo.init({host: "192.168.2.109",port: 3014,log: true}, function() {
             pomelo.request('gate.GateHandler.queryEntry', {version:ag.userInfo._version}, function(data) {
                 if(data.code==0){
                     var uid = data.uid;
@@ -223,6 +223,11 @@ module.exports={
                 if(player && player.getIsPlayer()) {
                     player.setOffice(obj.value.office);
                 }
+            }else if(obj.key=='sSetWingArray'){
+                var player =  ag.gameLayer.getRole(obj.value.id);
+                if(player && player.getIsPlayer()) {
+                    player.setWing(obj.value.wing);
+                }
             }else if(obj.key=='sGuildWinIdArray'){
                 ag.userInfo._guildWinId = obj.value;
                 for(var key in ag.gameLayer._roleMap){
@@ -234,6 +239,30 @@ module.exports={
                 }
             }else if(obj.key=='sAlertArray'){
                 ag.jsUtil.alert(ag.gameLayer.node,obj.value,function () {});
+            }else if(obj.key=='sComeArray'){
+                var player =  ag.gameLayer.getRole(obj.value.id);
+                if(player && player.getIsPlayer()) {
+                    player._data.come = obj.value.come;
+                    player._data.practice = obj.value.practice;
+                    if(player==ag.gameLayer._player){
+                        cc.find('Canvas/nodeBag/labelCome').getComponent(cc.Label).string = '转生:'+obj.value.come;
+                        cc.find('Canvas/nodeBag/labelPractice').getComponent(cc.Label).string = '修为:'+obj.value.practice+'/'+ag.gameConst.comeArray[obj.value.come];
+                    }
+                    player._data.level = obj.value.level;
+                    player.resetAllProp();
+                    ag.gameLayer.resetPlayerProp(player);
+                    player.addExp(obj.value.level,obj.value.exp);
+                    player._data.hp = 1;//确保可以进入改血量
+                    player.changeHP(player._totalHP);
+                }
+            }else if(obj.key=='treasureStringArray'){
+                if(ag.gameLayer) {
+                    ag.gameLayer.showTreasureString(obj.value);
+                }
+            }else if(obj.key=='sAuctionShopArray'){
+                if(ag.gameLayer){
+                    ag.gameLayer._auctionShop.refresh(JSON.parse(obj.value));
+                }
             }
         }
         this._dataArray = [];

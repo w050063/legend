@@ -35,7 +35,7 @@ cc.Class({
         this._agAni = null;
         this._labelName = null;
         this._aniColor = cc.color(255,255,255);
-        this.setLocation(cc.p(this._data.x,this._data.y));
+        this.setLocation(this.getLocation(),true);
         this.idle();
         this.changeHP(this._data.hp);
 
@@ -182,11 +182,18 @@ cc.Class({
         var mst = this.getMst();
         if(this.getIsPlayer()){
             var lv = this._data.level;
-            if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51));
-            if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47));
-            if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43));
-            if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35));
-            return Math.floor(mst.hp+mst.hpAdd[0]*lv);
+
+            var hpex = 0;//加上转生血量
+            var come = this._data.come;
+            if(come>0){
+                hpex+=ag.gameConst.comeHP[come];
+            }
+
+            if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51))+hpex;
+            if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47))+hpex;
+            if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43))+hpex;
+            if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35))+hpex;
+            return Math.floor(mst.hp+mst.hpAdd[0]*lv)+hpex;
         }
         return mst.hp;
     },
@@ -210,19 +217,24 @@ cc.Class({
         var bShowLevelUp = false;
         var last = this._data.level;
         this._data.level = level;
-        if(last < this._data.level){
+
+        if(last != this._data.level){
             this.resetAllProp();
             this._data.hp = 1;//确保可以进入改血量
-            if(this==ag.gameLayer._player) {
-                ag.jsUtil.showText(ag.gameLayer.node, '升级！！！');
+
+            if(last < this._data.level){
+                if(this==ag.gameLayer._player) {
+                    ag.jsUtil.showText(ag.gameLayer.node, '升级！！！');
+                }
+                ag.musicManager.playEffect("resources/voice/levelup.mp3");
+                var temp = this.getAgAni(null,"ani/effect8/512000",15,ag.gameConst.roleEffectZorder,0.1,function(sender){
+                    this.putAgAni(sender);
+                }.bind(this));
+                temp.node.setScale(0.5);
+                bShowLevelUp = true;
             }
-            ag.musicManager.playEffect("resources/voice/levelup.mp3");
-            var temp = this.getAgAni(null,"ani/effect8/512000",15,ag.gameConst.roleEffectZorder,0.1,function(sender){
-                this.putAgAni(sender);
-            }.bind(this));
-            temp.node.setScale(0.5);
-            bShowLevelUp = true;
             this.changeHP(this._totalHP);
+            ag.gameLayer.resetPlayerProp(this);
         }
         if(this==ag.gameLayer._player){
             ag.gameLayer._equipArray[7].string = '等级:'+this._data.level;
@@ -241,6 +253,7 @@ cc.Class({
     addGold:function(count){
         this._data.gold = count;
         ag.gameLayer._labelGold.string = '元宝:'+this._data.gold;
+        cc.find('Canvas/nodeShop/spriteBack/labelGold').getComponent(cc.Label).string = '元宝数量：\n'+this._data.gold;
     },
 
 
@@ -260,24 +273,27 @@ cc.Class({
 
 
     //设置逻辑位置
-    setLocation:function(location){
+    setLocation:function(location,refresh){
+        var bExec = (this._data.x != location.x || this._data.y != location.y || refresh);
         this._data.x = location.x;
         this._data.y = location.y;
-        var mapData = ag.gameConst._terrainMap[this._data.mapId];
-        this.node.setPosition(this.getTruePosition());
+        if(bExec){
+            var mapData = ag.gameConst._terrainMap[this._data.mapId];
+            this.node.setPosition(this.getTruePosition());
 
 
-        //优化显示和隐藏,上下左右各多两个地块,超过1.9就认为要更新了
-        if(this._state!=ag.gameConst.stateDead){
-            var x = ag.gameLayer._player._data.x,y = ag.gameLayer._player._data.y;
-            if(ag.gameLayer._player == this){
-                ag.gameLayer._map.setCenter(location);
-                ag.gameLayer.resetMinMapPos();
-                for(var key in  ag.gameLayer._roleMap){
-                    ag.gameLayer._roleMap[key].resetNearFlag(x,y);
+            //优化显示和隐藏,上下左右各多两个地块,超过1.9就认为要更新了
+            if(this._state!=ag.gameConst.stateDead){
+                var x = ag.gameLayer._player._data.x,y = ag.gameLayer._player._data.y;
+                if(ag.gameLayer._player == this){
+                    ag.gameLayer._map.setCenter(location);
+                    ag.gameLayer.resetMinMapPos();
+                    for(var key in  ag.gameLayer._roleMap){
+                        ag.gameLayer._roleMap[key].resetNearFlag(x,y);
+                    }
+                }else{
+                    this.resetNearFlag(x,y);
                 }
-            }else{
-                this.resetNearFlag(x,y);
             }
         }
     },
@@ -328,6 +344,32 @@ cc.Class({
             }
         }
     },
+
+
+    //设置官职
+    setWing:function(count){
+        this._data.wing = count;
+        if(this.getIsPlayer() && this._propNode) {
+            this.idleAnimation();
+            if(this==ag.gameLayer._player){
+                //翅膀
+                var father = cc.find('Canvas/nodeBag/equip');
+                var aniPos = cc.p(-2,-50);
+                var scale = 1.5;
+                var array = ag.userInfo.agAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
+                if(father.wing)father.wing.getComponent(AGAni).putCache();
+                var wing = ag.gameConst.wingModel[this.getWingIndex()];
+                if(wing){
+                    var node2 = ag.jsUtil.getNode(father,wing+array[0],parseInt(array[1]),0,0.3);
+                    if(father.clothe)father.clothe.getComponent(AGAni).addControl(node2.getComponent(AGAni));
+                    node2.setPosition(aniPos);
+                    node2.scale = scale;
+                    father.wing = node2;
+                }
+            }
+        }
+    },
+
 
 
     resetNearFlag:function(x,y){
@@ -483,10 +525,9 @@ cc.Class({
                 }
                 //翅膀
                 if(this._wingAni){this._wingAni.getComponent(AGAni).putCache();this._wingAni = undefined;}
-                var id = this._equipArray[ag.gameConst.itemEquipWing];
-                if(id){
-                    var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
-                    this._wingAni = this.getAgAni(this._wingAni,mst.model+array[0],parseInt(array[1]),ag.gameConst.roleWingZorder,0.4);
+                var wing = ag.gameConst.wingModel[this.getWingIndex()];
+                if(wing){
+                    this._wingAni = this.getAgAni(this._wingAni,wing+array[0],parseInt(array[1]),ag.gameConst.roleWingZorder[this._data.direction],0.4);
                     this._agAni.addControl(this._wingAni);
                 }else{
                     this._wingAni = null;
@@ -501,6 +542,7 @@ cc.Class({
     idle:function(){
         if(this._state != ag.gameConst.stateIdle && this._state != ag.gameConst.stateDead){
             this.node.stopAllActions();
+            this.setLocation(this.getLocation());
             if(this.getIsPlayer() && this._state == ag.gameConst.stateAttack){
                 if(this._agAni)this._agAni.pause();
                 if(this._weaponAni)this._weaponAni.pause();
@@ -569,10 +611,9 @@ cc.Class({
                 }
                 //翅膀
                 if(this._wingAni){this._wingAni.getComponent(AGAni).putCache();this._wingAni = undefined;}
-                var id = this._equipArray[ag.gameConst.itemEquipWing];
-                if(id){
-                    var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
-                    this._wingAni = this.getAgAni(this._wingAni,mst.model+array[0],count,ag.gameConst.roleWingZorder,moveSpeed/count);
+                var wing = ag.gameConst.wingModel[this.getWingIndex()];
+                if(wing){
+                    this._wingAni = this.getAgAni(this._wingAni,wing+array[0],count,ag.gameConst.roleWingZorder[this._data.direction],moveSpeed/count);
                     this._agAni.addControl(this._wingAni);
                 }else{
                     this._wingAni = null;
@@ -608,6 +649,7 @@ cc.Class({
         //攻击动画
         if(this._nearFlag){
             this.node.stopAllActions();
+            this.setLocation(this.getLocation());
             if(this.getIsMonster() || this.getIsTiger()){
                 var str = 'nudeboy0'+ag.gameConst.stateAttack+this._data.direction;
                 if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27")str = 'nudeboy0'+ag.gameConst.stateIdle+0;
@@ -639,10 +681,9 @@ cc.Class({
                 }
                 //翅膀
                 if(this._wingAni){this._wingAni.getComponent(AGAni).putCache();this._wingAni = undefined;}
-                var id = this._equipArray[ag.gameConst.itemEquipWing];
-                if(id){
-                    var mst = ag.gameConst._itemMst[ag.userInfo._itemMap[id]._data.mid];
-                    this._wingAni = this.getAgAni(this._wingAni,mst.model+array[0],parseInt(array[1]),ag.gameConst.roleWingZorder,0.1);
+                var wing = ag.gameConst.wingModel[this.getWingIndex()];
+                if(wing){
+                    this._wingAni = this.getAgAni(this._wingAni,wing+array[0],parseInt(array[1]),ag.gameConst.roleWingZorder[this._data.direction],0.1);
                     this._agAni.addControl(this._wingAni);
                 }else{
                     this._wingAni = null;
@@ -1045,6 +1086,17 @@ cc.Class({
         return office;
     },
 
+    //获得当前的称号索引
+    getWingIndex:function(){
+        var wing = 0;
+        for(var i=ag.gameConst.wingProgress.length-1;i>=0;--i){
+            if(this._data.wing>=ag.gameConst.wingProgress[i]){
+                wing = i;
+                break;
+            }
+        }
+        return wing;
+    },
 
     // called every frame
     update: function (dt) {
