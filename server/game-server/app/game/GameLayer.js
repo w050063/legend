@@ -56,6 +56,7 @@ module.exports = {
             ag.db.setRoles(array);//角色保存
             ag.db.setItems();//道具保存
             ag.db.setCustomData(ag.db._customData);//自定义数据保存
+            ag.db.setAuctionShop();//拍卖行
         }.bind(this));
 	},
 

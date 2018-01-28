@@ -81,6 +81,9 @@ module.exports = ag.class.extend({
             }
         });
 
+        //拍卖数据矫正
+        ag.auctionShop.correct();
+
 
         //自定义数据
         this.getCustomData(function(data){
@@ -390,7 +393,7 @@ module.exports = ag.class.extend({
     },
 
 
-    //获取所有道具
+    //获取拍卖行道具
     getAuctionShop:function(callback){
         var sql = 'SELECT * FROM t_auctionShop';
         this.query(sql, function(err, rows) {
@@ -408,37 +411,41 @@ module.exports = ag.class.extend({
     },
 
 
-    //更新所有道具
+    //更新拍卖行
     setAuctionShop:function(callback){
-        this.getItems(function(items){
+        this.getAuctionShop(function(items){
             var allSql = '';
             var i= 0,j=0;
+            var dataMap = ag.auctionShop._dataMap;
+            var itemMap = {};
+            for(i=0;i<items.length;++i){
+                itemMap[items[i].id] = 1;
+            }
 
 
-            var idMaps = ag.auctionShop._dataMap;
             for(i=0;i<items.length;++i){
                 var i1 = items[i];
-                if(idMaps[i1.id]){
-                    var i2 = map[i1.id]._data;
-                    if(i1.mid!=i2.mid || i1.owner!=i2.owner || i1.puton!=i2.puton){
-                        var sql = 'UPDATE t_items SET mid = "' + i2.mid
-                            + '", owner = "' + i2.owner
-                            + '", puton = ' + i2.puton
+                var i2 = dataMap[i1.id];
+                if(i2){
+                    if(i1.price!=i2.price){
+                        var sql = 'UPDATE t_auctionShop SET create_time = "' + i2.create_time
+                            + '", price = ' + i2.price
                             + ' WHERE id = "' + i1.id + '";';
                         allSql = allSql+sql;
                     }
-                    delete idMaps[i1.id];
                 }else{
-                    var sql = 'DELETE FROM t_items WHERE id = "'+i1.id+'";';
+                    var sql = 'DELETE FROM t_auctionShop WHERE id = "'+i1.id+'";';
                     allSql = allSql+sql;
                 }
             }
 
-            for(var key in idMaps){
-                var temp = map[key]._data;
-                var sql = 'INSERT INTO t_items(id,mid,owner,puton) VALUES("'
-                    + temp.id + '","' + temp.mid+'","' + temp.owner+'",' + temp.puton + ');';
-                allSql = allSql+sql;
+            for(var key in dataMap){
+                if(!itemMap[key]){
+                    var temp = dataMap[key];
+                    var sql = 'INSERT INTO t_auctionShop(id,create_time,price) VALUES("'
+                        + temp.id + '","' + temp.create_time+'",' + temp.price + ');';
+                    allSql = allSql+sql;
+                }
             }
             if(allSql.length>0){
                 this.query(allSql, function(err, rows) {

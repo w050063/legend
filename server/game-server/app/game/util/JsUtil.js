@@ -84,6 +84,7 @@ module.exports = {
     },
 
 
+
     //获取一个id是否在线
     getIsOnline:function(id){
         var channelService = pomelo.app.get('channelService');

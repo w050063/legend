@@ -93,6 +93,7 @@ module.exports = {
     putonBag:-1,
     putonWharehouse:-2,
     putonGround:-3,
+    putonAuctionShop:-4,
 
 
 
@@ -126,17 +127,19 @@ module.exports = {
 
 
     //aliquot time,怪物刷新时间
-    refreshArray:[30,60,60,120,300,600,1800,3600,7200],
+    refreshArray:[30,60,60,120,1200,3600,3600,7200,7200],
 
-    itemLevelDropArray:[[1,20],[1,10,2,50],[3,100],[4,100],[5,100],[4,32.7,5,30,6,30,7,6.4,8,0.8,9,0.1],[5,38.2,6,30,7,30,8,1.6,9,0.2]
-        ,[6,61.6,7,30,8,8,9,0.4],[7,90,8,8,9,2]],
-    itemLevelIdArray:[[],[],[],[],[],[],[],[],[]],
+    itemLevelDropArray:[[1,20],[1,10,2,100],[3,100],[4,100],[5,50],[4,32.7,5,30,6,15,7,6.4,8,0.5,9,0.01],[5,38.2,6,30,7,30,8,1.6,9,0.1]
+        ,[6,61.6,7,15,8,8,9,0.4],[7,90,8,8,9,2,10,0.2]],
+    itemLevelIdArray:[[],[],[],[],[],[],[],[],[],[]],
 
     //转生
     comeArray:[10,20,40,80,150,250,400,625,900,1300,1800,2500,99999],
-    comeHurt:[1,3,5,7,9,11,13,15,17,19,21,23,25],
-    comeDefense:[1,3,5,7,9,11,13,15,17,19,21,23,25],
-    comeHP:[10,30,50,70,90,110,130,150,170,190,210,230,250],
+    comeHurt:[3,6,10,15,22,29,41,55,70,88,108,140,180],
+    comeDefense:[2,5,9,14,20,27,35,44,54,65,72,85,100],
+    comeHPWarrior:[30,80,180,250,350,460,570,690,810,1000,1300,1800,2400],
+    comeHPWizard:[10,27,60,85,118,153,190,230,270,333,433,600,800],
+    comeHPTaoist:[15,40,90,125,175,230,285,345,405,500,650,900,1200],
 
     //地图详细信息,refresh怪物相关刷新，坐标-1表示全地图随机刷--hero,count,x,y
     _terrainMap: {
@@ -164,10 +167,11 @@ module.exports = {
                 {name:"装备回收",x:6,y:32,title:"装备回收:",content:['t1000','t1001','t1002','t1003','t1004','t1005']},
                 {name:"比奇国王",x:27,y:43,title:"是否加入行会:",content:['t4000','t4001','t4002','t4003','t4004','t4005','t4006']},
                 {name:"比奇城市大使",x:18,y:47,title:"比奇路途遥远，确认要去:",content:['t23']},
+                {name:"拍卖行",x:16,y:47,title:"不用的东西让我帮你卖:",content:['t8000']},
                 {name:"龙族宝藏",x:12,y:25,title:"200元宝一次:",content:['t5000']},
                 {name:"皇宫",x:46,y:36,title:"危险区域:",content:['t19','t20','t21']},
                 {name:"仓库管理",x:24,y:25,title:"有什么宝贝尽管存到我这里吧:",content:['t6000']},
-                {name:"每日奖励",x:26,y:25,title:"每日奖励:",content:['t7000','t7001']},
+                {name:"每日奖励",x:26,y:25,title:"每日奖励:",content:['t7000','t7001','t7100']},
                 {name:"王者幻境",x:10,y:25,title:"虚幻的世界，分不清真真假假:",content:['t22']},
                 {name:"苍月使者",x:18,y:25,title:"区域传送:",content:['t9','t10','t8']}],
             mapX: 60,
@@ -185,7 +189,7 @@ module.exports = {
             npc:[{name:"传送员",x:7,y:40,title:"传送:",content:['t1']},{name:"传送员",x:41,y:12,title:"传送:",content:['t4','t1']}],
             mapX: 50,
             mapY: 50,
-            refresh: [["m4",5],["m5",5],["m6",5],["m7",5],["m45",3],["m21",3],["m30",3],["m31",3]]
+            refresh: [["m4",2],["m5",2],["m6",2],["m7",2],["m45",2],["m21",2],["m30",2],["m31",2]]
         },
         t3:{
             id : "t3",
@@ -234,7 +238,7 @@ module.exports = {
             npc:[{name:"传送员",x:87,y:32,title:"传送:",content:['t1']},{name:"传送员",x:18,y:18,title:"传送:",content:['t1']},{name:"传送员",x:50,y:75,title:"传送:",content:['t1']}],
             mapX: 100,
             mapY: 100,
-            refresh: [["m4",20],["m5",20],["m6",10],["m7",10],["m23",2],["m48",1]]
+            refresh: [["m4",20],["m5",20],["m6",10],["m7",10],["m23",2]]
         },
         t7:{
             id : "t7",
@@ -246,7 +250,7 @@ module.exports = {
             npc:[{name:"传送员",x:14,y:86,title:"传送:",content:['t1']},{name:"传送员",x:15,y:12,title:"传送:",content:['t1']},{name:"传送员",x:52,y:48,title:"传送:",content:['t1']},{name:"传送员",x:89,y:84,title:"传送:",content:['t1']},{name:"传送员",x:89,y:10,title:"传送:",content:['t1']}],
             mapX: 100,
             mapY: 100,
-            refresh: [["m4",20],["m5",20],["m6",10],["m7",10],["m24",2],["m48",1]]
+            refresh: [["m4",20],["m5",20],["m6",10],["m7",10],["m24",2]]
         },
         t8:{
             id : "t8",
@@ -258,7 +262,7 @@ module.exports = {
             npc:[{name:"传送员",x:106,y:52,title:"传送:",content:['t1']},{name:"传送员",x:19,y:33,title:"传送:",content:['t1']}],
             mapX: 130,
             mapY: 60,
-            refresh: [["m4",20],["m5",20],["m6",10],["m7",10],["m22",2],["m48",1]]
+            refresh: [["m4",20],["m5",20],["m6",10],["m7",10],["m22",2]]
         },
         t9:{
             id : "t9",
@@ -270,7 +274,7 @@ module.exports = {
             npc:[{name:"传送员",x:79,y:21,title:"传送:",content:['t1']},{name:"传送员",x:24,y:74,title:"传送:",content:['t13','t1']}],
             mapX: 100,
             mapY: 100,
-            refresh: [["m37",15],["m38",15],["m39",15],["m42",1],["m43",1],["m48",1]]
+            refresh: [["m37",15],["m38",15],["m39",15],["m42",1],["m43",1]]
         },
         t10:{
             id : "t10",
@@ -282,7 +286,7 @@ module.exports = {
             npc:[{name:"传送员",x:79,y:21,title:"传送:",content:['t12','t1']},{name:"传送员",x:24,y:74,title:"传送:",content:['t15','t1']}],
             mapX: 100,
             mapY: 100,
-            refresh: [["m37",15],["m38",15],["m39",15],["m40",1],["m41",1],["m48",1]]
+            refresh: [["m37",15],["m38",15],["m39",15],["m40",1],["m41",1]]
         },
         t11:{
             id : "t11",
@@ -317,7 +321,7 @@ module.exports = {
             resPad: '012',
             music:'Heart Of Courage.mp3',
             npc:[{name:"比奇接待员",x:33,y:48,title:"安全区域传送:",content:['t1']}
-                ,{name:"危险区域",x:33,y:28,title:"危险区域传送:",content:['t25','t26','t27']}],
+                ,{name:"危险区域",x:35,y:46,title:"危险区域传送:",content:['t25','t26','t27']}],
             mapX: 70,
             mapY: 84,
             safe:{x:0,y:0,xx:69,yy:83},
@@ -348,7 +352,7 @@ module.exports = {
                 ,{name:"传送员",x:57,y:34,title:"传送:",content:['t1']}],
             mapX: 64,
             mapY: 72,
-            refresh: [["m36",4],["m41",4],["m43",4],["m27",1,48,49],["m28",1],["m29",1],["m37",6],["m38",6],["m39",6]]
+            refresh: [["m36",1],["m41",1],["m43",1],["m27",1,48,49],["m28",1],["m29",1],["m37",6],["m38",6],["m39",6]]
         },
         t16:{
             id : "t16",
@@ -372,8 +376,8 @@ module.exports = {
             npc:[{name:"传送员",x:14,y:86,title:"传送:",content:['t1']},{name:"传送员",x:15,y:12,title:"传送:",content:['t1']},{name:"传送员",x:52,y:48,title:"传送:",content:['t1']},{name:"传送员",x:89,y:84,title:"传送:",content:['t1']},{name:"传送员",x:89,y:10,title:"传送:",content:['t1']}],
             mapX: 100,
             mapY: 100,
-            refresh: [["m10",10],["m11",10],["m12",10],["m13",10],["m14",10],["m15",10],["m16",10],["m17",10],["m18",10]
-                ,["m48",1],["m27",1,48,51],["m28",1],["m29",1],["m8",10],["m9",1]]
+            refresh: [["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
+                ,["m27",1,48,51],["m28",1],["m29",1],["m8",10],["m9",1]]
         },
         t19:{
             id : "t19",
@@ -385,8 +389,8 @@ module.exports = {
             npc:[],
             mapX: 200,
             mapY: 200,
-            refresh: [["m10",5],["m11",5],["m12",5],["m13",5],["m14",5],["m15",5],["m16",5],["m17",5],["m18",5],["m36",5],["m41",5],["m43",5]
-                ,["m48",1],["m27",1],["m28",1],["m29",1],["m8",5],["m9",1]]
+            refresh: [["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
+                ,["m27",1],["m28",1],["m29",1],["m8",10],["m9",1]]
         },
         t20:{
             id : "t20",
@@ -398,8 +402,8 @@ module.exports = {
             npc:[],
             mapX: 100,
             mapY: 100,
-            refresh: [["m10",10],["m11",10],["m12",10],["m13",10],["m14",10],["m15",10],["m16",10],["m17",10],["m18",10]
-                ,["m48",1],["m27",1],["m28",1],["m29",1],["m8",10]]
+            refresh: [["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
+                ,["m27",1],["m28",1],["m29",1],["m8",10],["m9",1]]
         },
         t21:{
             id : "t21",
@@ -411,8 +415,8 @@ module.exports = {
             npc:[],
             mapX: 100,
             mapY: 100,
-            refresh: [["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2],["m36",1],["m41",1],["m43",1]
-                ,["m48",1],["m27",1],["m28",1],["m29",1],["m8",2],["m9",1]]
+            refresh: [["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
+                ,["m27",1],["m28",1],["m29",1],["m8",10],["m9",1]]
         },
     },
 
@@ -468,6 +472,7 @@ module.exports = {
         t6000:{id:'t6000',name:'仓库管理'},
         t7000:{id:'t7000',name:'10点神羽'},
         t7001:{id:'t7001',name:'100元宝翻倍'},
+        t7100:{id:'t7100',name:'分享奖励'},
         t8000:{id:'t8000',name:'拍卖行'},
     },
 
@@ -492,63 +497,63 @@ module.exports = {
         m8:{id:"m8",name:"千年树妖",hp:10000,defense:50,hurt:100,expDead:1000,heal:0,
             moveSpeed:2,attackSpeed:2,checkDistance:5,visibleDistance:5,attackDistance:5,model:"ani/hum22/022",drop:'',lv:7},
         m9:{id:"m9",name:"万年树妖",hp:30000,defense:100,hurt:400,expDead:2000,heal:500,
-            moveSpeed:1.5,attackSpeed:1.5,checkDistance:5,visibleDistance:5,attackDistance:5,model:"ani/hum22/022",drop:'',lv:9},
-        m10:{id:"m10",name:"暗之双头血魔",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+            moveSpeed:1.5,attackSpeed:1.5,checkDistance:5,visibleDistance:5,attackDistance:5,model:"ani/hum22/022",drop:'',lv:8},
+        m10:{id:"m10",name:"暗之双头血魔",hp:10000,defense:70,hurt:240,expDead:1000,heal:100,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum23/023",drop:'',lv:7},
-        m11:{id:"m11",name:"暗之骷髅精灵",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m11:{id:"m11",name:"暗之骷髅精灵",hp:10000,defense:70,hurt:240,expDead:1000,heal:100,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum24/024",drop:'',lv:7},
-        m12:{id:"m12",name:"暗之黄泉教主",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m12:{id:"m12",name:"暗之黄泉教主",hp:10000,defense:70,hurt:240,expDead:1000,heal:100,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum25/025",drop:'',lv:7},
-        m13:{id:"m13",name:"暗之虹膜教主",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m13:{id:"m13",name:"暗之虹膜教主",hp:10000,defense:70,hurt:240,expDead:1000,heal:100,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum26/026",drop:'',lv:7},
-        m14:{id:"m14",name:"暗之双头金刚",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m14:{id:"m14",name:"暗之双头金刚",hp:10000,defense:70,hurt:240,expDead:1000,heal:100,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum27/027",drop:'',lv:7},
-        m15:{id:"m15",name:"暗之沃玛教主",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m15:{id:"m15",name:"暗之沃玛教主",hp:10000,defense:70,hurt:240,expDead:1000,heal:100,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum28/028",drop:'',lv:7},
-        m16:{id:"m16",name:"刀卫",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m16:{id:"m16",name:"刀卫",hp:10000,defense:70,hurt:240,expDead:1000,heal:100,
             moveSpeed:1.5,attackSpeed:2,checkDistance:5,visibleDistance:9,attackDistance:1.5,model:"ani/hum29/029",drop:'',lv:7},
-        m17:{id:"m17",name:"虎卫",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m17:{id:"m17",name:"虎卫",hp:10000,defense:70,hurt:240,expDead:1000,heal:100,
             moveSpeed:2,attackSpeed:1.5,checkDistance:5,visibleDistance:9,attackDistance:1.5,model:"ani/hum30/030",drop:'',lv:7},
-        m18:{id:"m18",name:"鹰卫",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m18:{id:"m18",name:"鹰卫",hp:10000,defense:70,hurt:240,expDead:1000,heal:100,
             moveSpeed:2,attackSpeed:2,checkDistance:5,visibleDistance:9,attackDistance:4,model:"ani/hum31/031",drop:'',lv:7},
         m19:{id:"m19",name:"白虎",hp:2400,hpAdd:0,defense:30,defenseAdd:0,hurt:100,hurtAdd:0,expDead:0,heal:100,healAdd:0,
             moveSpeed:1,attackSpeed:0.7,checkDistance:4,visibleDistance:6,attackDistance:1.5,model:"ani/hum32/032",lv:1},
         m20:{id:"m20",name:"鸡",hp:1,defense:0,hurt:1,expDead:10,heal:0,
             moveSpeed:2,attackSpeed:2,checkDistance:5,visibleDistance:9,attackDistance:1.5,model:"ani/hum72/072",drop:'',lv:1},
-        m21:{id:"m21",name:"幽冥大魔神",hp:8000,defense:10,hurt:200,expDead:800,heal:100,
+        m21:{id:"m21",name:"幽冥大魔神",hp:8000,defense:30,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum52/052",drop:'',lv:6},
-        m22:{id:"m22",name:"天界魔王",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m22:{id:"m22",name:"天界魔王",hp:10000,defense:50,hurt:300,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum53/053"
             ,drop:'i001700,7,i001701,4,i001702,1,i001800,7,i001801,4,i001802,1,i001900,7,i001901,4,i001902,1,i002000,7,i002001,4,i002002,1,i002100,7,i002101,4,i002102,1',lv:7},
-        m23:{id:"m23",name:"鼠王",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m23:{id:"m23",name:"鼠王",hp:10000,defense:50,hurt:300,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum54/054"
             ,drop:'i001700,7,i001701,4,i001702,1,i001800,7,i001801,4,i001802,1,i001900,7,i001901,4,i001902,1,i002000,7,i002001,4,i002002,1,i002100,7,i002101,4,i002102,1',lv:7},
-        m24:{id:"m24",name:"牛魔王",hp:10000,defense:10,hurt:200,expDead:1000,heal:100,
+        m24:{id:"m24",name:"牛魔王",hp:10000,defense:40,hurt:200,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum26/026"
             ,drop:'i001700,7,i001701,4,i001702,1,i001800,7,i001801,4,i001802,1,i001900,7,i001901,4,i001902,1,i002000,7,i002001,4,i002002,1,i002100,7,i002101,4,i002102,1',lv:7},
-        m25:{id:"m25",name:"嗜血魔王",hp:8000,defense:10,hurt:200,expDead:800,heal:100,
+        m25:{id:"m25",name:"嗜血魔王",hp:8000,defense:30,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum55/055",drop:'',lv:6},
-        m26:{id:"m26",name:"幻灵魔王",hp:8000,defense:10,hurt:200,expDead:800,heal:100,
+        m26:{id:"m26",name:"幻灵魔王",hp:8000,defense:30,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum56/056",drop:'',lv:6},
-        m27:{id:"m27",name:"九天神龙",hp:30000,defense:100,hurt:400,expDead:2000,heal:500,
+        m27:{id:"m27",name:"九天神龙",hp:30000,defense:200,hurt:450,expDead:2000,heal:500,
             moveSpeed:1.5,attackSpeed:1.5,checkDistance:5,visibleDistance:5,attackDistance:5,model:"ani/hum57/057",drop:'',lv:9},
-        m28:{id:"m28",name:"狂龙教主",hp:30000,defense:100,hurt:400,expDead:2000,heal:500,
+        m28:{id:"m28",name:"狂龙教主",hp:30000,defense:200,hurt:450,expDead:2000,heal:500,
             moveSpeed:1.5,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum58/058",drop:'',lv:9},
-        m29:{id:"m29",name:"狱火魔龙",hp:30000,defense:100,hurt:400,expDead:2000,heal:500,
+        m29:{id:"m29",name:"狱火魔龙",hp:30000,defense:200,hurt:450,expDead:2000,heal:500,
             moveSpeed:1.5,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum59/059",drop:'',lv:9},
-        m30:{id:"m30",name:"幽冥蝇王",hp:8000,defense:10,hurt:200,expDead:800,heal:100,
+        m30:{id:"m30",name:"幽冥蝇王",hp:8000,defense:40,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum60/060",drop:'',lv:6},
-        m31:{id:"m31",name:"幽冥流星锤统领",hp:8000,defense:10,hurt:200,expDead:800,heal:100,
+        m31:{id:"m31",name:"幽冥流星锤统领",hp:8000,defense:40,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum61/061",drop:'',lv:6},
-        m32:{id:"m32",name:"幽冥追魂斧王",hp:8000,defense:10,hurt:200,expDead:800,heal:100,
+        m32:{id:"m32",name:"幽冥追魂斧王",hp:8000,defense:40,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum62/062",drop:'',lv:6},
-        m33:{id:"m33",name:"幽冥猪王",hp:8000,defense:10,hurt:200,expDead:800,heal:100,
+        m33:{id:"m33",name:"幽冥猪王",hp:8000,defense:40,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum63/063",drop:'',lv:6},
-        m34:{id:"m34",name:"圣兽之王",hp:8800,defense:10,hurt:200,expDead:880,heal:100,
+        m34:{id:"m34",name:"圣兽之王",hp:8800,defense:100,hurt:280,expDead:880,heal:100,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum64/064",drop:'',lv:8},
-        m35:{id:"m35",name:"天宫之主",hp:10000,defense:50,hurt:300,expDead:1000,heal:100,
+        m35:{id:"m35",name:"天宫之主",hp:10000,defense:150,hurt:350,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum65/065",drop:'',lv:8},
-        m36:{id:"m36",name:"神王",hp:15000,defense:20,hurt:300,expDead:1500,heal:200,
+        m36:{id:"m36",name:"神王",hp:15000,defense:160,hurt:300,expDead:1500,heal:200,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum65/065",drop:'',lv:8},
         m37:{id:"m37",name:"天宫侍卫",hp:2500,defense:10,hurt:100,expDead:250,heal:0,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum66/066",drop:'',lv:4},
@@ -556,23 +561,23 @@ module.exports = {
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum67/067",drop:'',lv:4},
         m39:{id:"m39",name:"天宫祭师",hp:2500,defense:10,hurt:100,expDead:250,heal:0,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum68/068",drop:'',lv:4},
-        m40:{id:"m40",name:"天宫女王",hp:10000,defense:50,hurt:300,expDead:1000,heal:100,
+        m40:{id:"m40",name:"天宫女王",hp:10000,defense:130,hurt:400,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum69/069",drop:'',lv:8},
-        m41:{id:"m41",name:"舞后",hp:15000,defense:50,hurt:300,expDead:1500,heal:200,
+        m41:{id:"m41",name:"舞后",hp:15000,defense:130,hurt:400,expDead:1500,heal:200,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum69/069",drop:'',lv:8},
-        m42:{id:"m42",name:"天宫大神官",hp:10000,defense:50,hurt:300,expDead:1000,heal:100,
+        m42:{id:"m42",name:"天宫大神官",hp:10000,defense:150,hurt:400,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum70/070",drop:'',lv:8},
-        m43:{id:"m43",name:"招魂王",hp:15000,defense:50,hurt:300,expDead:1500,heal:200,
+        m43:{id:"m43",name:"招魂王",hp:15000,defense:150,hurt:400,expDead:1500,heal:200,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum70/070",drop:'',lv:8},
-        m44:{id:"m44",name:"驽马法老",hp:6000,defense:10,hurt:200,expDead:600,heal:100,
+        m44:{id:"m44",name:"驽马法老",hp:6000,defense:20,hurt:251,expDead:600,heal:100,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum71/071",drop:'',lv:7},
-        m45:{id:"m45",name:"爱情鸟",hp:9000,defense:10,hurt:100,expDead:900,heal:50,
+        m45:{id:"m45",name:"爱情鸟",hp:9000,defense:15,hurt:251,expDead:900,heal:50,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum72/072",drop:'',lv:5},
-        m46:{id:"m46",name:"蚁王",hp:8000,defense:20,hurt:200,expDead:800,heal:100,
+        m46:{id:"m46",name:"蚁王",hp:8000,defense:40,hurt:251,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum73/073",drop:'',lv:6},
-        m47:{id:"m47",name:"蚁后",hp:8000,defense:20,hurt:200,expDead:800,heal:100,
+        m47:{id:"m47",name:"蚁后",hp:8000,defense:40,hurt:251,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum74/074",drop:'',lv:6},
-        m48:{id:"m48",name:"玉皇大帝",hp:30000,defense:100,hurt:500,expDead:2000,heal:500,
+        m48:{id:"m48",name:"玉皇大帝",hp:30000,defense:200,hurt:700,expDead:2000,heal:500,
             moveSpeed:0.8,attackSpeed:0.8,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum10/010",drop:'',lv:9},
     },
 
@@ -607,6 +612,8 @@ module.exports = {
         i001020 : {id:'i001020',name:'金雨魔刀',type:0,hurt:70,exclusive:[2,3],model:'ani/hum87/087',level:9},
         i001021 : {id:'i001021',name:'倚天金剑',type:0,hurt:70,exclusive:[4,5],model:'ani/hum88/088',level:9},
 
+        i001030 : {id:'i001030',name:'天龙之刃',type:0,hurt:80,exclusive:[0,1,2,3,4,5],model:'ani/hum112/112',level:10},
+
         i001100 : {id:'i001100',name:'道士头盔',type:1,defense:4,exclusive:[0,1,2,3,4,5],model:'',level:1},
         i001101 : {id:'i001101',name:'圣战头盔',type:1,hurt:1,defense:5,exclusive:[0,1],model:'',level:3},
         i001102 : {id:'i001102',name:'法神头盔',type:1,hurt:1,defense:5,exclusive:[2,3],model:'',level:3},
@@ -626,6 +633,7 @@ module.exports = {
         i001116 : {id:'i001116',name:'狂龙盔',type:1,hurt:7,defense:11,exclusive:[0,1],model:'',level:9},
         i001117 : {id:'i001117',name:'魔龙盔',type:1,hurt:7,defense:11,exclusive:[2,3],model:'',level:9},
         i001118 : {id:'i001118',name:'神龙盔',type:1,hurt:7,defense:11,exclusive:[4,5],model:'',level:9},
+        i001130 : {id:'i001130',name:'天龙头盔',type:1,hurt:8,defense:12,exclusive:[0,1,2,3,4,5],model:'',level:10},
 
         i001200 : {id:'i001200',name:'布衣(男)',type:2,defense:1,exclusive:[0,2,4],model:'ani/hum2/002',level:1},
         i001201 : {id:'i001201',name:'布衣(女)',type:2,defense:1,exclusive:[1,3,5],model:'ani/hum3/003',level:1},
@@ -649,6 +657,8 @@ module.exports = {
         i001219 : {id:'i001219',name:'噬血凤舞',type:2,hurt:9,defense:13,exclusive:[1,3,5],model:'ani/hum49/049',level:8},
         i001220 : {id:'i001220',name:'金龙圣甲(男)',type:2,hurt:10,defense:20,exclusive:[0,2,4],model:'ani/hum50/050',level:9},
         i001221 : {id:'i001221',name:'金龙圣甲(女)',type:2,hurt:10,defense:20,exclusive:[1,3,5],model:'ani/hum51/051',level:9},
+        i001230 : {id:'i001230',name:'天龙战甲(男)',type:2,hurt:11,defense:21,exclusive:[0,2,4],model:'ani/hum113/113',level:10},
+        i001231 : {id:'i001231',name:'天龙战甲(女)',type:2,hurt:11,defense:21,exclusive:[1,3,5],model:'ani/hum114/114',level:10},
 
         i001300 : {id:'i001300',name:'蓝色翡翠项链',type:3,hurt:3,exclusive:[0,1,2,3,4,5],model:'',level:1},
         i001301 : {id:'i001301',name:'绿色项链',type:3,hurt:6,exclusive:[0,1],model:'',level:2},
@@ -673,6 +683,7 @@ module.exports = {
         i001320 : {id:'i001320',name:'狂龙项链',type:3,hurt:27,exclusive:[0,1],model:'',level:9},
         i001321 : {id:'i001321',name:'魔龙项链',type:3,hurt:27,exclusive:[2,3],model:'',level:9},
         i001322 : {id:'i001322',name:'神龙项链',type:3,hurt:27,exclusive:[4,5],model:'',level:9},
+        i001330 : {id:'i001330',name:'天龙项链',type:3,hurt:30,exclusive:[0,1,2,3,4,5],model:'',level:10},
 
         i001400 : {id:'i001400',name:'金手镯',type:4,hurt:2,exclusive:[0,1,2,3,4,5],model:'',level:1},
         i001401 : {id:'i001401',name:'骑士手镯',type:4,hurt:4,exclusive:[0,1],model:'',level:2},
@@ -697,6 +708,7 @@ module.exports = {
         i001420 : {id:'i001420',name:'狂龙手镯',type:4,hurt:18,exclusive:[0,1],model:'',level:9},
         i001421 : {id:'i001421',name:'魔龙手镯',type:4,hurt:18,exclusive:[2,3],model:'',level:9},
         i001422 : {id:'i001422',name:'神龙手镯',type:4,hurt:18,exclusive:[4,5],model:'',level:9},
+        i001430 : {id:'i001430',name:'天龙手镯',type:4,hurt:20,exclusive:[0,1,2,3,4,5],model:'',level:10},
 
         i001500 : {id:'i001500',name:'降魔除妖戒指',type:5,hurt:2,exclusive:[0,1,2,3,4,5],model:'',level:1},
         i001501 : {id:'i001501',name:'力量戒指',type:5,hurt:4,exclusive:[0,1],model:'',level:2},
@@ -721,21 +733,26 @@ module.exports = {
         i001520 : {id:'i001520',name:'狂龙戒指',type:5,hurt:18,exclusive:[0,1],model:'',level:9},
         i001521 : {id:'i001521',name:'魔龙戒指',type:5,hurt:18,exclusive:[2,3],model:'',level:9},
         i001522 : {id:'i001522',name:'神龙戒指',type:5,hurt:18,exclusive:[4,5],model:'',level:9},
+        i001530 : {id:'i001530',name:'天龙戒指',type:5,hurt:20,exclusive:[0,1,2,3,4,5],model:'',level:10},
 
         i001700 : {id:'i001700',name:'赤月腰带',type:7,hurt:1,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:3},
         i001701 : {id:'i001701',name:'黄金腰带',type:7,hurt:2,defense:4,exclusive:[0,1,2,3,4,5],model:'',level:6},
         i001702 : {id:'i001702',name:'金龙腰带',type:7,hurt:3,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:9},
+        i001730 : {id:'i001730',name:'天龙腰带',type:7,hurt:4,defense:8,exclusive:[0,1,2,3,4,5],model:'',level:10},
         i001800 : {id:'i001800',name:'赤月靴',type:8,hurt:1,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:3},
         i001801 : {id:'i001801',name:'黄金靴',type:8,hurt:2,defense:4,exclusive:[0,1,2,3,4,5],model:'',level:6},
         i001802 : {id:'i001802',name:'金龙靴',type:8,hurt:3,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:9},
-        i001900 : {id:'i001900',name:'赤月石',type:9,hurt:2,defense:1,exclusive:[0,1,2,3,4,5],model:'',level:3},
-        i001901 : {id:'i001901',name:'黄金石',type:9,hurt:4,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:6},
-        i001902 : {id:'i001902',name:'金龙石',type:9,hurt:6,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:9},
-        i002000 : {id:'i002000',name:'赤月盾',type:10,hurt:1,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:3},
-        i002001 : {id:'i002001',name:'黄金盾',type:10,hurt:2,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:6},
-        i002002 : {id:'i002002',name:'金龙盾',type:10,hurt:3,defense:9,exclusive:[0,1,2,3,4,5],model:'',level:9},
+        i001830 : {id:'i001830',name:'天龙靴',type:8,hurt:4,defense:8,exclusive:[0,1,2,3,4,5],model:'',level:10},
+        i001900 : {id:'i001900',name:'赤月宝石',type:9,hurt:2,defense:1,exclusive:[0,1,2,3,4,5],model:'',level:3},
+        i001901 : {id:'i001901',name:'黄金宝石',type:9,hurt:4,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:6},
+        i001902 : {id:'i001902',name:'金龙宝石',type:9,hurt:6,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:9},
+        i001930 : {id:'i001930',name:'天龙宝石',type:9,hurt:6,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:9},
+        i002000 : {id:'i002000',name:'释迦摩尼盾',type:10,hurt:1,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:3},
+        i002001 : {id:'i002001',name:'唯我独尊盾',type:10,hurt:2,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:6},
+        i002002 : {id:'i002002',name:'毁天灭地盾',type:10,hurt:3,defense:9,exclusive:[0,1,2,3,4,5],model:'',level:9},
         i002100 : {id:'i002100',name:'赤月勋章',type:11,hurt:3,exclusive:[0,1,2,3,4,5],model:'',level:3},
         i002101 : {id:'i002101',name:'黄金勋章',type:11,hurt:6,exclusive:[0,1,2,3,4,5],model:'',level:6},
         i002102 : {id:'i002102',name:'金龙勋章',type:11,hurt:9,exclusive:[0,1,2,3,4,5],model:'',level:9},
+        i002130 : {id:'i002130',name:'天龙勋章',type:11,hurt:12,exclusive:[0,1,2,3,4,5],model:'',level:10},
     },
 };

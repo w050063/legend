@@ -155,6 +155,7 @@ var Handler = cc.Class.extend({
         var id = ag.userManager.getAccountByUid(session.uid);
         ag.gameLayer.deleteRole(id);
         ag.db.setItems();//道具保存
+        ag.auctionShop.deleteInvalid();//拍卖行的无效数据
         next(null, {
             code: code
         });
@@ -167,9 +168,9 @@ var Handler = cc.Class.extend({
         if(player){
             var str = null;
             if(msg.chatType==ag.gameConst.chatAll){
-                str = '(全体)'+msg.str;
+                str = '(世界)'+msg.str;
             }else if(msg.chatType==ag.gameConst.chatMap){
-                str = '(地图)'+msg.str;
+                str = '(当前)'+msg.str;
             }else if(msg.chatType==ag.gameConst.chatGuild){
                 str = '(行会)'+msg.str;
             }
@@ -668,6 +669,25 @@ var Handler = cc.Class.extend({
         var role =  ag.gameLayer.getRole(id);
         if(role){
             ag.auctionShop.sendData(id);
+        }
+        next();
+    },
+
+
+    sellToAuctionShop:function(msg, session, next){
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var role =  ag.gameLayer.getRole(id);
+        if(role){
+            ag.auctionShop.sellToAuctionShop(msg.id,id,msg.price);
+        }
+        next();
+    },
+
+    buyAuctionShop:function(msg, session, next){
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var role =  ag.gameLayer.getRole(id);
+        if(role){
+            ag.auctionShop.buyAuctionShop(msg.id,id);
         }
         next();
     },

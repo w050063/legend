@@ -42,7 +42,13 @@ module.exports = ag.class.extend({
             var hpex = 0;//加上转生血量
             var come = this._data.come;
             if(come>0){
-                hpex+=ag.gameConst.comeHP[come];
+                if(this._data.type=='m0'){
+                    hpex+=ag.gameConst.comeHPWarrior[come];
+                }else if(this._data.type=='m1'){
+                    hpex+=ag.gameConst.comeHPWizard[come];
+                }else if(this._data.type=='m2'){
+                    hpex+=ag.gameConst.comeHPTaoist[come];
+                }
             }
 
             if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51))+hpex;
@@ -276,18 +282,20 @@ module.exports = ag.class.extend({
         var map = ag.itemManager._itemMap.getMap();
         for(var key in map){
             var itemData = map[key]._data;
-            var role = ag.gameLayer.getRole(itemData.owner);
-            if(role==this){
-                ag.jsUtil.sendData("sItem",itemData,this._data.id);
-            }else if(itemData.mapId==this._data.mapId && itemData.puton==ag.gameConst.putonGround){
-                ag.jsUtil.sendData("sItem",itemData,this._data.id);
-            }else if(role && role._data.mapId==this._data.mapId && itemData.puton>=0){
-                ag.jsUtil.sendData("sItem",itemData,this._data.id);
-            }
+            if(itemData.puton!=ag.gameConst.putonAuctionShop){
+                var role = ag.gameLayer.getRole(itemData.owner);
+                if(role==this){
+                    ag.jsUtil.sendData("sItem",itemData,this._data.id);
+                }else if(itemData.mapId==this._data.mapId && itemData.puton==ag.gameConst.putonGround){
+                    ag.jsUtil.sendData("sItem",itemData,this._data.id);
+                }else if(role && role._data.mapId==this._data.mapId && itemData.puton>=0){
+                    ag.jsUtil.sendData("sItem",itemData,this._data.id);
+                }
 
-            //发给别人装备
-            if(role==this && itemData.puton>=0){
-                ag.jsUtil.sendDataExcept("sItem",itemData,this._data.id);
+                //发给别人装备
+                if(role==this && itemData.puton>=0){
+                    ag.jsUtil.sendDataExcept("sItem",itemData,this._data.id);
+                }
             }
         }
 
