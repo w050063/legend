@@ -42,6 +42,7 @@ cc.Class({
         for(i=0;i<ag.gameConst.bagMaxCount;++i){
             this._wharehouseArray.push(-1);
         }
+        cc.find('Canvas/nodeBag/equip/buttonWing').setLocalZOrder(10);
 
         //自动攻击
         var temp = !(cc.sys.localStorage.getItem('setupAutoAttack')=='false');
@@ -49,11 +50,19 @@ cc.Class({
         cc.sys.localStorage.setItem('setupAutoAttack',''+temp);
         cc.find('Canvas/nodeHelp/toggleAutoAttack').getComponent(cc.Toggle).isChecked = temp;
 
+
         //启用摇杆
         temp = cc.sys.localStorage.getItem('setupRock')=='true';
         cc.sys.localStorage.setItem('setupRock',''+temp);
         cc.find('Canvas/nodeHelp/toggleSetupRock').getComponent(cc.Toggle).isChecked = temp;
         cc.find('Canvas/nodeRock').active = temp;
+
+        //是否显示翅膀
+        temp = !(cc.sys.localStorage.getItem('setupShowWing')=='false');
+        cc.sys.localStorage.setItem('setupShowWing',''+temp);
+        cc.find('Canvas/nodeHelp/toggleShowWing').getComponent(cc.Toggle).isChecked = temp;
+        this._setupShowWing = temp;
+        this.showWing(this._setupShowWing);
 
         //背景音乐
         cc.find('Canvas/nodeHelp/toggleSetupMusic').getComponent(cc.Toggle).isChecked = ag.musicManager._musicSetup;
@@ -112,7 +121,7 @@ cc.Class({
         this._equipArray.push(cc.find('Canvas/nodeBag/labelExp').getComponent(cc.Label));
         this._labelGold = cc.find('Canvas/nodeBag/labelGold').getComponent(cc.Label);
         cc.find('Canvas/nodeBag/labelCome').getComponent(cc.Label).string = '转生:'+ag.userInfo._data.come;
-        cc.find('Canvas/nodeBag/labelPractice').getComponent(cc.Label).string = '修为:'+ag.userInfo._data.practice;
+        cc.find('Canvas/nodeBag/labelPractice').getComponent(cc.Label).string = '修为:'+ag.userInfo._data.practice+'/'+ag.gameConst.comeArray[ag.userInfo._data.come];
 
         //聊天相关
         this._chatContentArray = [];
@@ -647,10 +656,13 @@ cc.Class({
         node.off(cc.Node.EventType.TOUCH_END);
         node.on(cc.Node.EventType.TOUCH_END, function (event) {
             ag.musicManager.playEffect("resources/voice/button.mp3");
-            cc.find('Canvas/nodeItemInfo').active = true;
-            if(cc.find('Canvas/nodeWharehouse').active){
+            if(this._auctionShop.node.active){
+                this._auctionShop.selectItem(id);
+            }else if(cc.find('Canvas/nodeWharehouse').active){
+                cc.find('Canvas/nodeItemInfo').active = true;
                 cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemIdByWharehouse(id);
             }else{
+                cc.find('Canvas/nodeItemInfo').active = true;
                 cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
             }
         }.bind(this));
@@ -857,7 +869,7 @@ cc.Class({
                 node.name = 'equip'+puton;
                 node.setPosition(ag.gameConst.putonPositionArray[puton]);
                 node.addComponent(cc.Sprite);
-                father.addChild(node);
+                father.addChild(node,10);
             }
             var sprite = node.getComponent(cc.Sprite);
             sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
@@ -1173,6 +1185,26 @@ cc.Class({
     toggleSoundEffect: function (event) {
         ag.musicManager.setupSoundEffect(event.isChecked);
     },
+    toggleEventShowWing: function (event) {
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.sys.localStorage.setItem('setupShowWing',''+event.isChecked);
+        this._setupShowWing = event.isChecked;
+        this.showWing(this._setupShowWing);
+    },
+
+
+    showWing:function(bShow){
+        for(var key in this._roleMap){
+            var role = this._roleMap[key];
+            if(role.getIsPlayer()){
+                if(bShow){
+                    role.idleAnimation();
+                }else{
+                    if(role._wingAni){role._wingAni.getComponent(AGAni).putCache();role._wingAni = undefined;}
+                }
+            }
+        }
+    },
 
 
     onKeyUp: function (event) {
@@ -1205,7 +1237,57 @@ cc.Class({
         return false;
     },
 
+
+
+    onShareResult:function(code, msg){
+        cc.log("share result, resultcode:"+code+", msg: "+msg);
+        switch ( code ) {
+            case anysdk.ShareResultCode.kShareSuccess:
+                ag.jsUtil.showText(this.node,'分享成功！');
+                break;
+            case anysdk.ShareResultCode.kShareFail:
+                ag.jsUtil.showText(this.node,'分享失败！');
+                break;
+            case anysdk.ShareResultCode.kShareCancel:
+                ag.jsUtil.showText(this.node,'分享取消！');
+                break;
+            case anysdk.ShareResultCode.kShareNetworkError:
+                ag.jsUtil.showText(this.node,'分享网络错误！');
+                break;
+        }
+    },
+
+
     showNodeNpcContent:function(data){
+        if(data.content.length==1){
+            var transferMst = ag.gameConst._transferMst[data.content[0]];
+            if(transferMst.id=='t8000'){
+                this._auctionShop.show();
+                return;
+            }else if(transferMst.id=='t6000'){
+                cc.find('Canvas/nodeWharehouse').getComponent(Wharehouse).show();
+                return;
+            }else if(transferMst.id=='t5000'){
+                cc.find('Canvas/nodeTreasure').active = true;
+                var tempArray = ['001021','001020','001019','001016','001017','001018'
+                    ,'001216','001217','001218','001219','001220','001221'
+                    ,'001317','001318','001319','001320','001321','001322'
+                    ,'001417','001418','001419','001420','001421','001422'
+                    ,'001517','001518','001519','001520','001521','001522'
+                    ,'001702','001802','002002'
+                    ,'icon3','icon4','icon5','icon6','icon7','icon8','icon9','icon10'
+                    ,'icon11','icon12','icon13','icon14'];
+
+                var tempNode = cc.find('Canvas/nodeTreasure/spriteBack');
+                for(var j=3;j<15;++j){
+                    var random = Math.floor(Math.random()*tempArray.length);
+                    tempNode.getChildByName('sprite'+j).getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(tempArray[random]);
+                }
+                ag.agSocket.send("requestTreasureString",{});
+                return;
+            }
+        }
+
         this._nodeNpcContent.active = true;
         this._nodeNpcContent.stopAllActions();
         this._nodeNpcContent.runAction(cc.sequence(cc.delayTime(30),cc.callFunc(function(){
@@ -1236,8 +1318,21 @@ cc.Class({
                     label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
                         ag.musicManager.playEffect("resources/voice/button.mp3");
                         var npcStr = transferMst.name;
-                        if(transferMst.id=='t8000'){
-                            self._auctionShop.show();
+                        if(transferMst.id=='t7100'){
+                            var agent = anysdk.agentManager;
+                            var share_plugin = agent.getSharePlugin();
+                            share_plugin.setListener(self.onShareResult, self);
+                            var info = {
+                                title : "邹平传奇",   // title 标题，印象笔记、邮箱、信息、微信、人人网和 QQ 空间使用
+                                imagePath:"",            // imagePath 是图片的本地路径，Linked-In 以外的平台都支持此参数
+                                url:"http://botsu.gitee.io/chuanqi",        // url 仅在微信（包括好友和朋友圈）中使用
+                                mediaType:'2',
+                                text : "手机版的传奇私服！",            // text 是分享文本，所有平台都需要这个字段
+                                thumbImage:'',
+                                thumbSize:'64',
+                                shareTo:'1'
+                            }
+                            share_plugin.share(info);
                         }else if(transferMst.id=='t7000'){
                             if(self._player._data.gold>=ag.gameConst.dailyPriceArray[ag.gameConst.dailyWing]){
                                 ag.agSocket.send("daily",{index:ag.gameConst.dailyWing});
@@ -1250,27 +1345,6 @@ cc.Class({
                             }else{
                                 ag.jsUtil.showText(self.node,'元宝不足'+ag.gameConst.dailyPriceArray[ag.gameConst.dailyWingWithGold]+'个！');
                             }
-                        }else if(transferMst.id=='t6000'){
-                            cc.find('Canvas/nodeWharehouse').getComponent(Wharehouse).show();
-                            self.buttonEventNpcClose();
-                        }else if(transferMst.id=='t5000'){
-                            cc.find('Canvas/nodeTreasure').active = true;
-                            var tempArray = ['001021','001020','001019','001016','001017','001018'
-                                ,'001216','001217','001218','001219','001220','001221'
-                                ,'001317','001318','001319','001320','001321','001322'
-                                ,'001417','001418','001419','001420','001421','001422'
-                                ,'001517','001518','001519','001520','001521','001522'
-                                ,'001702','001802','002002'
-                                ,'icon3','icon4','icon5','icon6','icon7','icon8','icon9','icon10'
-                                ,'icon11','icon12','icon13','icon14'];
-
-                            var tempNode = cc.find('Canvas/nodeTreasure/spriteBack');
-                            for(var j=3;j<15;++j){
-                                var random = Math.floor(Math.random()*tempArray.length);
-                                tempNode.getChildByName('sprite'+j).getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(tempArray[random]);
-                            }
-                            ag.agSocket.send("requestTreasureString",{});
-                            self.buttonEventNpcClose();
                         }else if(transferMst.id=='t4002') {
                             var index = self._bagArray.indexOf(-1);
                             if(index!=-1 && self._player._data.gold>=500){

@@ -186,7 +186,13 @@ cc.Class({
             var hpex = 0;//加上转生血量
             var come = this._data.come;
             if(come>0){
-                hpex+=ag.gameConst.comeHP[come];
+                if(this._data.type=='m0'){
+                    hpex+=ag.gameConst.comeHPWarrior[come];
+                }else if(this._data.type=='m1'){
+                    hpex+=ag.gameConst.comeHPWizard[come];
+                }else if(this._data.type=='m2'){
+                    hpex+=ag.gameConst.comeHPTaoist[come];
+                }
             }
 
             if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51))+hpex;
@@ -525,12 +531,14 @@ cc.Class({
                 }
                 //翅膀
                 if(this._wingAni){this._wingAni.getComponent(AGAni).putCache();this._wingAni = undefined;}
-                var wing = ag.gameConst.wingModel[this.getWingIndex()];
-                if(wing){
-                    this._wingAni = this.getAgAni(this._wingAni,wing+array[0],parseInt(array[1]),ag.gameConst.roleWingZorder[this._data.direction],0.4);
-                    this._agAni.addControl(this._wingAni);
-                }else{
-                    this._wingAni = null;
+                if(ag.gameLayer._setupShowWing){
+                    var wing = ag.gameConst.wingModel[this.getWingIndex()];
+                    if(wing){
+                        this._wingAni = this.getAgAni(this._wingAni,wing+array[0],parseInt(array[1]),ag.gameConst.roleWingZorder[this._data.direction],0.4);
+                        this._agAni.addControl(this._wingAni);
+                    }else{
+                        this._wingAni = null;
+                    }
                 }
             }
             this.setAniColor(this._aniColor);
@@ -611,12 +619,14 @@ cc.Class({
                 }
                 //翅膀
                 if(this._wingAni){this._wingAni.getComponent(AGAni).putCache();this._wingAni = undefined;}
-                var wing = ag.gameConst.wingModel[this.getWingIndex()];
-                if(wing){
-                    this._wingAni = this.getAgAni(this._wingAni,wing+array[0],count,ag.gameConst.roleWingZorder[this._data.direction],moveSpeed/count);
-                    this._agAni.addControl(this._wingAni);
-                }else{
-                    this._wingAni = null;
+                if(ag.gameLayer._setupShowWing){
+                    var wing = ag.gameConst.wingModel[this.getWingIndex()];
+                    if(wing){
+                        this._wingAni = this.getAgAni(this._wingAni,wing+array[0],count,ag.gameConst.roleWingZorder[this._data.direction],moveSpeed/count);
+                        this._agAni.addControl(this._wingAni);
+                    }else{
+                        this._wingAni = null;
+                    }
                 }
             }
             this.setAniColor(this._aniColor);
@@ -681,12 +691,14 @@ cc.Class({
                 }
                 //翅膀
                 if(this._wingAni){this._wingAni.getComponent(AGAni).putCache();this._wingAni = undefined;}
-                var wing = ag.gameConst.wingModel[this.getWingIndex()];
-                if(wing){
-                    this._wingAni = this.getAgAni(this._wingAni,wing+array[0],parseInt(array[1]),ag.gameConst.roleWingZorder[this._data.direction],0.1);
-                    this._agAni.addControl(this._wingAni);
-                }else{
-                    this._wingAni = null;
+                if(ag.gameLayer._setupShowWing){
+                    var wing = ag.gameConst.wingModel[this.getWingIndex()];
+                    if(wing){
+                        this._wingAni = this.getAgAni(this._wingAni,wing+array[0],parseInt(array[1]),ag.gameConst.roleWingZorder[this._data.direction],0.1);
+                        this._agAni.addControl(this._wingAni);
+                    }else{
+                        this._wingAni = null;
+                    }
                 }
             }
             this.setAniColor(this._aniColor);
