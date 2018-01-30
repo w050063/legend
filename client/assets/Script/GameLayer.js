@@ -1012,8 +1012,8 @@ cc.Class({
         }
 
         if(role==this._player || father.active){
-            father.labelTitle.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
-            father.labelProp.string = '攻击:'+hurt+' 防御:'+defense;
+            if(father.labelTitle)father.labelTitle.string = role._data.name + '(' + ag.gameConst._roleMst[role._data.type].name + ')';
+            if(father.labelProp)father.labelProp.string = '攻击:'+hurt+' 防御:'+defense;
         }
     },
 
@@ -1319,20 +1319,24 @@ cc.Class({
                         ag.musicManager.playEffect("resources/voice/button.mp3");
                         var npcStr = transferMst.name;
                         if(transferMst.id=='t7100'){
-                            var agent = anysdk.agentManager;
-                            var share_plugin = agent.getSharePlugin();
-                            share_plugin.setListener(self.onShareResult, self);
-                            var info = {
-                                title : "邹平传奇",   // title 标题，印象笔记、邮箱、信息、微信、人人网和 QQ 空间使用
-                                imagePath:"",            // imagePath 是图片的本地路径，Linked-In 以外的平台都支持此参数
-                                url:"http://botsu.gitee.io/chuanqi",        // url 仅在微信（包括好友和朋友圈）中使用
-                                mediaType:'2',
-                                text : "手机版的传奇私服！",            // text 是分享文本，所有平台都需要这个字段
-                                thumbImage:'',
-                                thumbSize:'64',
-                                shareTo:'1'
+                            if (cc.sys.isNative && (cc.sys.os === cc.sys.OS_ANDROID || cc.sys.os === cc.sys.OS_IOS)) {
+                                var agent = anysdk.agentManager;
+                                var share_plugin = agent.getSharePlugin();
+                                share_plugin.setListener(self.onShareResult, self);
+                                var info = {
+                                    title : "邹平传奇",   // title 标题，印象笔记、邮箱、信息、微信、人人网和 QQ 空间使用
+                                    imagePath:"",            // imagePath 是图片的本地路径，Linked-In 以外的平台都支持此参数
+                                    url:"http://botsu.gitee.io/chuanqi",        // url 仅在微信（包括好友和朋友圈）中使用
+                                    mediaType:'2',
+                                    text : "手机版的传奇私服！",            // text 是分享文本，所有平台都需要这个字段
+                                    thumbImage:'',
+                                    thumbSize:'64',
+                                    shareTo:'1'
+                                }
+                                share_plugin.share(info);
+                            }else{
+                                ag.jsUtil.showText(self.node,'分享只支持安卓和苹果APP包！');
                             }
-                            share_plugin.share(info);
                         }else if(transferMst.id=='t7000'){
                             if(self._player._data.gold>=ag.gameConst.dailyPriceArray[ag.gameConst.dailyWing]){
                                 ag.agSocket.send("daily",{index:ag.gameConst.dailyWing});

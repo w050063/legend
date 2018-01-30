@@ -3403,8 +3403,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": 404.1,
-      "y": 215.5
+      "x": 295.9,
+      "y": 153.8
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -5016,7 +5016,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "New Label",
+    "_name": "labelVersion",
     "_objFlags": 0,
     "_parent": {
       "__id__": 2

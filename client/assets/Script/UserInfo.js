@@ -35,6 +35,7 @@ module.exports={
     _version:'0.0.3',
     _needGameEnd:'',
 
+
 	init:function () {
         //角色动画：衣服，性别，动作，朝向
         this.agAniClothes = {

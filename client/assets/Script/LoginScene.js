@@ -14,6 +14,8 @@ cc.Class({
         editBoxPassword.string = cc.sys.localStorage.getItem('password') || '';
         cc.audioEngine.stopAll();
         ag.musicManager.playMusic("resources/music/Dragon Rider.mp3");
+        cc.find("Canvas/labelVersion").getComponent(cc.Label).string = ag.userInfo._version;
+
     },
 
 
