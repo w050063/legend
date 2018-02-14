@@ -100,6 +100,10 @@
     "optional string id": 1,
     "optional int32 wing": 2
   },
+  "message sAskTeam": {
+    "optional string id": 1,
+    "optional string name": 2
+  },
   "onData" : {
     "repeated sMove sMoveArray": 1,
     "repeated sAttack sAttackArray": 2,
@@ -132,6 +136,7 @@
     "repeated sCome sComeArray": 29,
     "repeated sSetWing sSetWingArray": 30,
     "repeated string treasureStringArray": 31,
-    "repeated string sAuctionShopArray": 32
+    "repeated string sAuctionShopArray": 32,
+    "repeated sAskTeam sAskTeamArray": 33
   }
 }

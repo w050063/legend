@@ -61,8 +61,9 @@ module.exports = ag.class.extend({
             this._itemMap.add(item);
             ++role._bagLength;
             ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
-            console.log('okkkkk!');
+            return true;
         }
+        return false;
     },
 
 
@@ -73,9 +74,9 @@ module.exports = ag.class.extend({
             if(i%2==0){
                 var rand = Math.random()*100;
                 if(rand<parseInt(array[i+1])){
-                    var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-                    pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
-                    var item = new Item(array[i],mapId,pos);
+                    //var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+                    //pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+                    var item = new Item(array[i],mapId,this.getDropPos(mapId,location));
                     item._duration = ag.gameConst.itemDuration;
                     item._data.owner = '';
                     item._data.puton = ag.gameConst.putonGround;
@@ -91,12 +92,33 @@ module.exports = ag.class.extend({
     },
 
 
+    getDropPos:function(mapId,location){
+        var dirArray = [ag.jsUtil.p(-1,1),ag.jsUtil.p(0,1),ag.jsUtil.p(1,1),ag.jsUtil.p(-1,0),ag.jsUtil.p(1,0)
+            ,ag.jsUtil.p(-1,-1),ag.jsUtil.p(0,-1),ag.jsUtil.p(1,-1)];
+
+        var bFind = false;
+        for(var i=0;i<dirArray.length;++i){
+            var dirPoint = ag.jsUtil.p(location.x+dirArray[i].x,location.y+dirArray[i].y);
+            var array = ag.itemManager.getDropByLocation(mapId,dirPoint);
+            var array2 = ag.gameLayer._roleXYMap[''+mapId+','+dirPoint.x+','+dirPoint.y];
+            if((array && array.length>0) || (array2 && array2.length>0)){
+                //...
+            }else{
+                return ag.gameLayer.getStandLocation(mapId,dirPoint.x,dirPoint.y);
+            }
+        }
+        location = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+        return ag.gameLayer.getStandLocation(mapId,location.x,location.y);
+    },
+
+
     dropEquipOneByArray:function (role,array,mapId,location,name) {
         if(array.length>0){
             var map = ag.gameConst._itemMst;
             var index = Math.floor(Math.random()*array.length);
-            var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-            pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+            //var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+            //pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+            var pos = this.getDropPos(mapId,location);
             var item =this._itemMap.get(array[index]);
             this._itemMap.setMapXYById(item._data.id,mapId,pos.x,pos.y);
             item._duration = ag.gameConst.itemDuration;
@@ -122,9 +144,9 @@ module.exports = ag.class.extend({
             if(rand<cur){
                 var array2 = ag.gameConst.itemLevelIdArray[array[i]-1];
                 var itemId = array2[Math.floor(Math.random()*array2.length)];
-                var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-                pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
-                var item = new Item(itemId,mapId,pos);
+                //var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+                //pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+                var item = new Item(itemId,mapId,this.getDropPos(mapId,location));
                 item._data.owner = '';
                 item._data.puton = ag.gameConst.putonGround;
                 item._duration = ag.gameConst.itemDuration;
@@ -145,9 +167,9 @@ module.exports = ag.class.extend({
                 'i001404','i001405','i001406','i001407','i001408','i001409',
                 'i001504','i001505','i001506','i001507','i001508','i001509'];
             var rand = Math.floor(Math.random()*tempArray.length);
-            var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-            pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
-            var item = new Item(tempArray[rand],mapId,pos);
+            //var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+            //pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+            var item = new Item(tempArray[rand],mapId,this.getDropPos(mapId,location));
             item._data.owner = '';
             item._data.puton = ag.gameConst.putonGround;
             item._duration = ag.gameConst.itemDuration;
@@ -160,9 +182,9 @@ module.exports = ag.class.extend({
                 'i001401','i001402','i001403',
                 'i001501','i001502','i001503'];
             var rand = Math.floor(Math.random()*tempArray.length);
-            var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-            pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
-            var item = new Item(tempArray[rand],mapId,pos);
+            //var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+            //pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+            var item = new Item(tempArray[rand],mapId,this.getDropPos(mapId,location));
             item._data.owner = '';
             item._data.puton = ag.gameConst.putonGround;
             item._duration = ag.gameConst.itemDuration;
@@ -191,8 +213,9 @@ module.exports = ag.class.extend({
         var role = ag.gameLayer.getRole(rid);
         if(obj && role){
             var location = role.getLocation();
-            var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-            pos = ag.gameLayer.getStandLocation(role._data.mapId,pos.x,pos.y);
+            //var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+            //pos = ag.gameLayer.getStandLocation(role._data.mapId,pos.x,pos.y);
+            var pos = this.getDropPos(role._data.mapId,location);
             this._itemMap.setMapXYById(id,role._data.mapId,pos.x,pos.y);
             obj._data.owner = '';
             obj._data.puton = ag.gameConst.putonGround;
@@ -206,9 +229,9 @@ module.exports = ag.class.extend({
 
     //背包装备回收
     bagItemRecycle:function(array,rid){
-        var expArray = [20,20,20,20,100,200,300,400,800];
+        var expArray = [20,20,20,20,100,300,500,1000,2000];
         var goldArray = [0,0,0,0,1,2,4,8,16];
-        var officeArray = [0,0,0,0,1,3,8,20,100];
+        var officeArray = [0,0,0,0,1,2,4,10,40];
         var role = ag.gameLayer.getRole(rid);
         if(role){
             var sum = 0;
@@ -294,37 +317,37 @@ module.exports = ag.class.extend({
     treasure:function (role) {
         var rand = Math.random();
         if(rand<0.4){
-            role.addExp(100);
-            ag.jsUtil.sendData("sSystemNotify",role._data.name+"在龙族宝藏寻到100点经验",role._data.id);
-        }else if(rand<0.5){
+            role.addExp(2000);
+            ag.jsUtil.sendData("sSystemNotify",role._data.name+"在龙族宝藏寻到2000点经验",role._data.id);
+        }else if(rand<0.6){
             role.addOffice(10);
             var str = role._data.name+"在龙族宝藏寻到10点官职";
             ag.jsUtil.sendData("sSystemNotify",str,role._data.id);
-            if(this._treasureStringArray.length>=20)this._treasureStringArray.splice(0,1);
-            this._treasureStringArray.push(str);
-            this.sendTreasureString(role._data.id);
+            //if(this._treasureStringArray.length>=20)this._treasureStringArray.splice(0,1);
+            //this._treasureStringArray.push(str);
+            //this.sendTreasureString(role._data.id);
         }else{
             var array = [];
             var map = ag.gameConst._itemMst;
-            if(rand<0.95){
-                for(var key in map){
-                    if(map[key].level==1 || map[key].level==2 || map[key].level==3 || map[key].level==4 || map[key].level==5)array.push(key);
-                }
-            }else if(rand<0.98){
+            if(rand<0.7){
                 for(var key in map){
                     if(map[key].level==6)array.push(key);
                 }
-            }else if(rand<0.998){
+            }else if(rand<0.875){
                 for(var key in map){
                     if(map[key].level==7)array.push(key);
                 }
-            }else if(rand<0.9995){
+            }else if(rand<0.975){
                 for(var key in map){
                     if(map[key].level==8)array.push(key);
                 }
-            }else{
+            }else if(rand<0.995){
                 for(var key in map){
                     if(map[key].level==9)array.push(key);
+                }
+            }else{
+                for(var key in map){
+                    if(map[key].level==10)array.push(key);
                 }
             }
             var index = Math.floor(Math.random()*array.length);

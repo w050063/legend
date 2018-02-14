@@ -11,6 +11,9 @@ module.exports = ag.class.extend({
         if(ag.db && ag.db._customData){
             this._guildWinId = ag.db._customData.guildWinId?ag.db._customData.guildWinId:'0';
         }
+
+
+        //this.start(new Date().getTime()+30*1000,200*60*1000);
     },
 
 
@@ -54,14 +57,20 @@ module.exports = ag.class.extend({
                 }
             }else{//存在则检测皇宫是否还有本行会的人
                 var bFind = false;
+                var bFindOther = false;
                 for(var key in ag.gameLayer._roleMap){
                     var role = ag.gameLayer._roleMap[key];
-                    if(role.getIsPlayer() && ag.userManager.getOnline(role._data.id) && role._state!=ag.gameConst.stateDead && role._data.mapId=='t16' && ag.guild.getGuildId(key)==this._guildWinId){
-                        bFind = true;
-                        break;
+                    if(role.getIsPlayer() && ag.userManager.getOnline(role._data.id) && role._state!=ag.gameConst.stateDead && role._data.mapId=='t16'){
+                        var guildId = ag.guild.getGuildId(key);
+                        if(guildId && guildId!=this._guildWinId){
+                            bFindOther = true;
+                        }else if(guildId==this._guildWinId){
+                            bFind = true;
+                            break;
+                        }
                     }
                 }
-                if(bFind==false){
+                if(bFind==false && bFindOther==true){
                     this._guildWinId = '';
                     this.reset();
                 }

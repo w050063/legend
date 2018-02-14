@@ -22,7 +22,7 @@ module.exports = ag.class.extend({
             }
         }
         for(var key in this._dataMap){
-            if(map[key]){
+            if(!map[key]){
                 delete this._dataMap[key];
             }
         }
@@ -36,7 +36,6 @@ module.exports = ag.class.extend({
             map[key].mid = item._data.mid;
             var role = ag.gameLayer.getRole(item._data.owner);
             map[key].name = role?role._data.name:'';
-            delete map[key].owner;
         }
         ag.jsUtil.sendData("sAuctionShop",JSON.stringify(map),id);
     },
@@ -45,7 +44,8 @@ module.exports = ag.class.extend({
     //删除无效的数据
     deleteInvalid:function(){
         for(var key in this._dataMap){
-            if(!ag.gameLayer.getRole(this._dataMap[key].owner)){
+            var item = ag.itemManager._itemMap.get(key);
+            if(!ag.gameLayer.getRole(item._data.owner)){
                 delete this._dataMap[key];
             }
         }

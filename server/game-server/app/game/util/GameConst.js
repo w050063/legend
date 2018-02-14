@@ -67,7 +67,8 @@ module.exports = {
     attackModeAll:0,
     attackModePeace:1,
     attackModeGuild:2,
-    attackModeTextArray:['全体','和平','行会'],
+    attackModeTeam:3,
+    attackModeTextArray:['全','和','行','组'],
 
 
     //性别
@@ -127,10 +128,10 @@ module.exports = {
 
 
     //aliquot time,怪物刷新时间
-    refreshArray:[30,60,60,120,1200,3600,3600,7200,7200],
+    refreshArray:[30,60,60,120,1200,1200,1800,3600,7200,7200],
 
     itemLevelDropArray:[[1,20],[1,10,2,100],[3,100],[4,100],[5,50],[4,32.7,5,30,6,15,7,6.4,8,0.5,9,0.01],[5,38.2,6,30,7,30,8,1.6,9,0.1]
-        ,[6,61.6,7,15,8,8,9,0.4],[7,90,8,8,9,2,10,0.2]],
+        ,[6,61.6,7,15,8,8,9,0.4],[7,90,8,8,9,1.8,10,0.2],[8,90,9,9,10,1]],
     itemLevelIdArray:[[],[],[],[],[],[],[],[],[],[]],
 
     //转生
@@ -150,7 +151,7 @@ module.exports = {
             res: 'map/0',
             resPad: '000',
             music:'Heart Of Courage.mp3',
-            npc:[{name:"新手村接待员",x:32,y:10,title:"安全区域传送:",content:['t16','t1']}],
+            npc:[{name:"新手村接待员",model:'ani/hum41/041',x:32,y:10,title:"安全区域传送:",content:['t16','t1']}],
             mapX: 40,
             mapY: 40,
             safe:{x:29,y:7,xx:31,yy:9},
@@ -163,17 +164,22 @@ module.exports = {
             res: 'map/3',
             resPad: '001',
             music:'Victory.mp3',
-            npc:[{name:"传送员",x:25,y:33,title:"区域传送:",content:['t17','t0','t2','t5','t11','t18']},
-                {name:"装备回收",x:6,y:32,title:"装备回收:",content:['t1000','t1001','t1002','t1003','t1004','t1005']},
-                {name:"比奇国王",x:27,y:43,title:"是否加入行会:",content:['t4000','t4001','t4002','t4003','t4004','t4005','t4006']},
-                {name:"比奇城市大使",x:18,y:47,title:"比奇路途遥远，确认要去:",content:['t23']},
-                {name:"拍卖行",x:16,y:47,title:"不用的东西让我帮你卖:",content:['t8000']},
-                {name:"龙族宝藏",x:12,y:25,title:"200元宝一次:",content:['t5000']},
-                {name:"皇宫",x:46,y:36,title:"危险区域:",content:['t19','t20','t21']},
-                {name:"仓库管理",x:24,y:25,title:"有什么宝贝尽管存到我这里吧:",content:['t6000']},
-                {name:"每日奖励",x:26,y:25,title:"每日奖励:",content:['t7000','t7001','t7100']},
-                {name:"王者幻境",x:10,y:25,title:"虚幻的世界，分不清真真假假:",content:['t22']},
-                {name:"苍月使者",x:18,y:25,title:"区域传送:",content:['t9','t10','t8']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:25,y:33,title:"区域传送:",content:['t17','t9','t10','t8','t2','t0','t11','t18']},
+                {name:"充值中心",model:'ani/hum41/041',x:29,y:29,title:"充值中心:",content:['t9000']},
+                {name:"比奇国王",model:'ani/hum41/119',x:27,y:43,title:"是否加入行会:",content:['t4000','t4001','t4002','t4003','t4004','t4005','t4006']},
+                {name:"比奇城市大使",model:'ani/hum41/220',x:20,y:47,title:"比奇路途遥远，确认要去:",content:['t23']},
+                {name:"拍卖行",model:'ani/hum41/221',x:16,y:47,title:"不用的东西让我帮你卖:",content:['t8000']},
+                {name:"龙族宝藏",model:'ani/hum41/222',x:12,y:47,title:"200元宝一次:",content:['t5000']},
+                {name:"皇宫",model:'ani/hum41/041',x:46,y:36,title:"限制40级以上",content:['t19','t20','t21']},
+                {name:"仓库管理",model:'ani/hum41/117',x:23,y:25,title:"有什么宝贝尽管存到我这里吧:",content:['t6000']},
+                {name:"每日奖励",model:'ani/hum41/222',x:26,y:25,title:"每日奖励:",content:['t7000','t7001','t7100']},
+                {name:"王者幻境",model:'ani/hum41/116',x:5,y:39,title:"限制47级以上",content:['t22']},
+                {name:"装备回收",model:'ani/hum41/222',x:5,y:29,title:"装备回收:",content:['t1000','t1001','t1002','t1003','t1004','t1005']},
+                {name:"皇家陵墓",model:'ani/hum41/115',x:5,y:34,title:"限制47级以上",content:['t5']},
+                {name:"真天宫",model:'ani/hum41/116',x:9,y:25,title:"限制44级以上",content:['t11']},
+                {name:"轮回地带",model:'ani/hum41/116',x:17,y:25,title:"限制45-47级",content:['t28']},
+                {name:"烈焰地狱",model:'ani/hum41/116',x:13,y:25,title:"限制48-50级",content:['t29','t32']},
+                {name:"火龙洞窟",model:'ani/hum41/115',x:5,y:44,title:"限制50级以上",content:['t18']}],
             mapX: 60,
             mapY: 60,
             safe:{x:7,y:27,xx:26,yy:46},
@@ -186,7 +192,8 @@ module.exports = {
             res: 'map/d5071',
             resPad: '002',
             music:'For The Win.mp3',
-            npc:[{name:"传送员",x:7,y:40,title:"传送:",content:['t1']},{name:"传送员",x:41,y:12,title:"传送:",content:['t4','t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:7,y:40,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:41,y:12,title:"传送:",content:['t4','t1']}],
             mapX: 50,
             mapY: 50,
             refresh: [["m4",2],["m5",2],["m6",2],["m7",2],["m45",2],["m21",2],["m30",2],["m31",2]]
@@ -198,7 +205,7 @@ module.exports = {
             res: 'map/d515',
             resPad: '003',
             music:'For The Win.mp3',
-            npc:[{name:"传送员",x:29,y:24,title:"传送:",content:['t3','t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:29,y:24,title:"传送:",content:['t3','t1']}],
             mapX: 40,
             mapY: 40,
             refresh: [["m6",2],["m7",2],["m34",2],["m32",2],["m33",2],["m46",2],["m47",2]]
@@ -206,11 +213,12 @@ module.exports = {
         t4:{
             id : "t4",
             name: "皇家陵墓一层",
-            level:48,
+            level:47,
             res: 'map/d717',
             resPad: '004',
             music:'Star Sky.mp3',
-            npc:[{name:"传送员",x:25,y:24,title:"传送:",content:['t1']},{name:"传送员",x:83,y:74,title:"传送:",content:['t7','t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:25,y:24,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:83,y:74,title:"传送:",content:['t7','t1']}],
             mapX: 100,
             mapY: 100,
             refresh: [["m4",20],["m5",20],["m6",10],["m7",10]
@@ -219,11 +227,11 @@ module.exports = {
         t5:{
             id : "t5",
             name: "皇家陵墓二层",
-            level:48,
+            level:47,
             res: 'map/dm002',
             resPad: '005',
             music:'Star Sky.mp3',
-            npc:[{name:"传送员",x:7,y:9,title:"传送:",content:['t6','t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:7,y:9,title:"传送:",content:['t6','t1']}],
             mapX: 32,
             mapY: 38,
             refresh: [["m36",1],["m41",1],["m43",1],["m27",1,22,25],["m28",1],["m29",1],["m37",2],["m38",2],["m39",2]]
@@ -235,7 +243,9 @@ module.exports = {
             res: 'map/d2052',
             resPad: '006',
             music:'Strength Of A Thousand Men.mp3',
-            npc:[{name:"传送员",x:87,y:32,title:"传送:",content:['t1']},{name:"传送员",x:18,y:18,title:"传送:",content:['t1']},{name:"传送员",x:50,y:75,title:"传送:",content:['t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:87,y:32,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:18,y:18,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:50,y:75,title:"传送:",content:['t1']}],
             mapX: 100,
             mapY: 100,
             refresh: [["m4",20],["m5",20],["m6",10],["m7",10],["m23",2]]
@@ -247,7 +257,11 @@ module.exports = {
             res: 'map/d2079',
             resPad: '007',
             music:'Strength Of A Thousand Men.mp3',
-            npc:[{name:"传送员",x:14,y:86,title:"传送:",content:['t1']},{name:"传送员",x:15,y:12,title:"传送:",content:['t1']},{name:"传送员",x:52,y:48,title:"传送:",content:['t1']},{name:"传送员",x:89,y:84,title:"传送:",content:['t1']},{name:"传送员",x:89,y:10,title:"传送:",content:['t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:14,y:86,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:15,y:12,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:52,y:48,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:89,y:84,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:89,y:10,title:"传送:",content:['t1']}],
             mapX: 100,
             mapY: 100,
             refresh: [["m4",20],["m5",20],["m6",10],["m7",10],["m24",2]]
@@ -259,7 +273,8 @@ module.exports = {
             res: 'map/d2063',
             resPad: '008',
             music:'Strength Of A Thousand Men.mp3',
-            npc:[{name:"传送员",x:106,y:52,title:"传送:",content:['t1']},{name:"传送员",x:19,y:33,title:"传送:",content:['t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:106,y:52,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:19,y:33,title:"传送:",content:['t1']}],
             mapX: 130,
             mapY: 60,
             refresh: [["m4",20],["m5",20],["m6",10],["m7",10],["m22",2]]
@@ -267,11 +282,12 @@ module.exports = {
         t9:{
             id : "t9",
             name: "真天宫一层",
-            level:50,
+            level:44,
             res: 'map/d2013',
             resPad: '009',
             music:'Never Back Down.mp3',
-            npc:[{name:"传送员",x:79,y:21,title:"传送:",content:['t1']},{name:"传送员",x:24,y:74,title:"传送:",content:['t13','t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:79,y:21,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:24,y:74,title:"传送:",content:['t13','t1']}],
             mapX: 100,
             mapY: 100,
             refresh: [["m37",15],["m38",15],["m39",15],["m42",1],["m43",1]]
@@ -279,11 +295,12 @@ module.exports = {
         t10:{
             id : "t10",
             name: "真天宫二层",
-            level:50,
+            level:44,
             res: 'map/d2013',
             resPad: '009',
             music:'Never Back Down.mp3',
-            npc:[{name:"传送员",x:79,y:21,title:"传送:",content:['t12','t1']},{name:"传送员",x:24,y:74,title:"传送:",content:['t15','t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:79,y:21,title:"传送:",content:['t12','t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:24,y:74,title:"传送:",content:['t15','t1']}],
             mapX: 100,
             mapY: 100,
             refresh: [["m37",15],["m38",15],["m39",15],["m40",1],["m41",1]]
@@ -291,11 +308,12 @@ module.exports = {
         t11:{
             id : "t11",
             name: "真天宫三层",
-            level:50,
+            level:44,
             res: 'map/d2013',
             resPad: '009',
             music:'Never Back Down.mp3',
-            npc:[{name:"传送员",x:79,y:21,title:"传送:",content:['t14','t1']},{name:"传送员",x:24,y:74,title:"传送:",content:['t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:79,y:21,title:"传送:",content:['t14','t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:24,y:74,title:"传送:",content:['t1']}],
             mapX: 100,
             mapY: 100,
             refresh: [["m37",15],["m38",15],["m39",15],["m35",1],["m36",1],["m48",1]]
@@ -308,7 +326,7 @@ module.exports = {
             res: 'map/d515',
             resPad: '003',
             music:'Heart Of Courage.mp3',
-            npc:[{name:"传送员",x:29,y:24,title:"传送:",content:['t0']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:29,y:24,title:"传送:",content:['t0']}],
             mapX: 40,
             mapY: 40,
             refresh: [["m20",100]]
@@ -320,8 +338,10 @@ module.exports = {
             res: 'map/1',
             resPad: '012',
             music:'Heart Of Courage.mp3',
-            npc:[{name:"比奇接待员",x:33,y:48,title:"安全区域传送:",content:['t1']}
-                ,{name:"危险区域",x:35,y:46,title:"危险区域传送:",content:['t25','t26','t27']}],
+            npc:[{name:"比奇接待员",model:'ani/hum41/041',x:33,y:48,title:"安全区域传送:",content:['t1']}
+                ,{name:"通天阁",model:'ani/hum41/116',x:38,y:43,title:"限制2转以上进入",content:['t30']}
+                ,{name:"黑魔宫",model:'ani/hum41/115',x:41,y:40,title:"限制4转以上进入",content:['t31']}
+                ,{name:"危险区域",model:'ani/hum41/115',x:35,y:46,title:"危险区域传送:",content:['t25','t26','t27']}],
             mapX: 70,
             mapY: 84,
             safe:{x:0,y:0,xx:69,yy:83},
@@ -334,7 +354,8 @@ module.exports = {
             res: 'map/d717',
             resPad: '004',
             music:'Star Sky.mp3',
-            npc:[{name:"传送员",x:25,y:24,title:"传送:",content:['t1']},{name:"传送员",x:83,y:74,title:"传送:",content:['t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:25,y:24,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:83,y:74,title:"传送:",content:['t1']}],
             mapX: 100,
             mapY: 100,
             refresh: [["m4",100],["m5",20],["m6",30],["m7",30]]
@@ -346,10 +367,10 @@ module.exports = {
             res: 'map/d2083',
             resPad: '010',
             music:'Victory.mp3',
-            npc:[{name:"传送员",x:8,y:12,title:"传送:",content:['t1']}
-                ,{name:"传送员",x:28,y:26,title:"传送:",content:['t1']}
-                ,{name:"传送员",x:34,y:57,title:"传送:",content:['t1']}
-                ,{name:"传送员",x:57,y:34,title:"传送:",content:['t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:8,y:12,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:28,y:26,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:34,y:57,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:57,y:34,title:"传送:",content:['t1']}],
             mapX: 64,
             mapY: 72,
             refresh: [["m36",1],["m41",1],["m43",1],["m27",1,48,49],["m28",1],["m29",1],["m37",6],["m38",6],["m39",6]]
@@ -357,11 +378,11 @@ module.exports = {
         t16:{
             id : "t16",
             name: "皇宫",
-            level:35,
+            level:40,
             res: 'map/0150',
             resPad: '011',
             music:'Victory.mp3',
-            npc:[{name:"国王",x:8,y:15,title:"传送:",content:['t1']}],
+            npc:[{name:"国王",model:'ani/hum41/041',x:8,y:15,title:"传送:",content:['t1']}],
             mapX: 23,
             mapY: 27,
             refresh: []
@@ -369,15 +390,19 @@ module.exports = {
         t17:{
             id : "t17",
             name: "王者幻境",
-            level:48,
+            level:47,
             res: 'map/d2079',
             resPad: '007',
             music:'Strength Of A Thousand Men.mp3',
-            npc:[{name:"传送员",x:14,y:86,title:"传送:",content:['t1']},{name:"传送员",x:15,y:12,title:"传送:",content:['t1']},{name:"传送员",x:52,y:48,title:"传送:",content:['t1']},{name:"传送员",x:89,y:84,title:"传送:",content:['t1']},{name:"传送员",x:89,y:10,title:"传送:",content:['t1']}],
+            npc:[{name:"传送员",model:'ani/hum41/041',x:14,y:86,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:15,y:12,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:52,y:48,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:89,y:84,title:"传送:",content:['t1']}
+                ,{name:"传送员",model:'ani/hum41/041',x:89,y:10,title:"传送:",content:['t1']}],
             mapX: 100,
             mapY: 100,
-            refresh: [["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
-                ,["m27",1,48,51],["m28",1],["m29",1],["m8",10],["m9",1]]
+            refresh: [["m4",20],["m5",20],["m6",10],["m7",10],["m10",3],["m11",3],["m12",3],["m13",3],["m14",3],["m15",3],["m16",3],["m17",3],["m18",3]
+                ,["m27",1,48,51],["m28",1],["m29",1],["m8",5]]
         },
         t19:{
             id : "t19",
@@ -389,8 +414,8 @@ module.exports = {
             npc:[],
             mapX: 200,
             mapY: 200,
-            refresh: [["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
-                ,["m27",1],["m28",1],["m29",1],["m8",10],["m9",1]]
+            refresh: [["m37",10],["m38",10],["m39",10],["m10",3],["m11",3],["m12",3],["m13",3],["m14",3],["m15",3],["m16",3],["m17",3],["m18",3]
+                ,["m27",1],["m28",1],["m29",1],["m8",5]]
         },
         t20:{
             id : "t20",
@@ -402,8 +427,8 @@ module.exports = {
             npc:[],
             mapX: 100,
             mapY: 100,
-            refresh: [["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
-                ,["m27",1],["m28",1],["m29",1],["m8",10],["m9",1]]
+            refresh: [["m37",5],["m38",5],["m39",5],["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
+                ,["m27",1],["m28",1],["m29",1],["m8",5]]
         },
         t21:{
             id : "t21",
@@ -415,8 +440,75 @@ module.exports = {
             npc:[],
             mapX: 100,
             mapY: 100,
-            refresh: [["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
-                ,["m27",1],["m28",1],["m29",1],["m8",10],["m9",1]]
+            refresh: [["m37",5],["m38",5],["m39",5],["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
+                ,["m27",1],["m28",1],["m29",1],["m8",5]]
+        },
+        t22:{
+            id : "t22",
+            name: "轮回地带",
+            level:45,
+            maxLevel:47,
+            res: 'map/d2013',
+            resPad: '009',
+            music:'Never Back Down.mp3',
+            npc:[],
+            mapX: 100,
+            mapY: 100,
+            refresh: [["m4",10],["m5",10],["m6",10],["m7",10],["m37",10],["m38",10],["m39",10],["m22",1],["m23",1],["m24",1]]
+        },
+        t23:{
+            id : "t23",
+            name: "烈焰地狱",
+            level:48,
+            maxLevel:50,
+            res: 'map/d2052',
+            resPad: '006',
+            music:'Strength Of A Thousand Men.mp3',
+            npc:[],
+            mapX: 100,
+            mapY: 100,
+            refresh: [["m4",10],["m5",10],["m6",5],["m7",5],["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
+                ,["m8",5]]
+        },
+        t24:{
+            id : "t24",
+            name: "通天阁",
+            level:0,
+            come:2,
+            res: 'map/t0006',
+            resPad: '015',
+            music:'Strength Of A Thousand Men.mp3',
+            npc:[],
+            mapX: 100,
+            mapY: 100,
+            refresh: [["m37",5],["m38",5],["m39",5],["m49",1,56,45]]
+        },
+        t25:{
+            id : "t25",
+            name: "黑魔宫",
+            level:0,
+            come:4,
+            res: 'map/d2013',
+            resPad: '009',
+            music:'Never Back Down.mp3',
+            npc:[],
+            mapX: 100,
+            mapY: 100,
+            refresh: [["m37",5],["m38",5],["m39",5],["m50",1,60,37]]
+        },
+        t26:{
+            id : "t26",
+            name: "烈焰地狱2",
+            level:48,
+            maxLevel:50,
+            res: 'map/d2013',
+            resPad: '009',
+            music:'Never Back Down.mp3',
+            npc:[],
+            mapX: 100,
+            mapY: 100,
+            refresh: [["m4",10],["m5",10],["m6",5],["m7",5],["m10",2],["m11",2],["m12",2],["m13",2],["m14",2],["m15",2],["m16",2],["m17",2],["m18",2]
+                ,["m8",5]]
         },
     },
 
@@ -449,6 +541,11 @@ module.exports = {
         t25:{id:'t25',name:'相思墓穴',mapId:'t19',x:123,y:125},
         t26:{id:'t26',name:'藏宝阁',mapId:'t20',x:50,y:50},
         t27:{id:'t27',name:'埋没之城',mapId:'t21',x:20,y:76},
+        t28:{id:'t28',name:'轮回地带',mapId:'t22',x:78,y:19},
+        t29:{id:'t29',name:'烈焰地狱',mapId:'t23',x:84,y:33},
+        t30:{id:'t30',name:'通天阁',mapId:'t24',x:50,y:50},
+        t31:{id:'t31',name:'黑魔宫',mapId:'t25',x:78,y:19},
+        t32:{id:'t32',name:'烈焰地狱2',mapId:'t26',x:78,y:19},
         t1000:{id:'t1000',name:'四级以下回收',levels:[1,2,3,4]},
         t1001:{id:'t1001',name:'五级回收',levels:[5]},
         t1002:{id:'t1002',name:'六级回收',levels:[6]},
@@ -474,13 +571,14 @@ module.exports = {
         t7001:{id:'t7001',name:'100元宝翻倍'},
         t7100:{id:'t7100',name:'分享奖励'},
         t8000:{id:'t8000',name:'拍卖行'},
+        t9000:{id:'t9000',name:'充值中心'},
     },
 
 
     _roleMst: {
         m0:{id:"m0",name:"战",hp:19,hpAdd:[15,28,31,34,35],defense:0,defenseAdd:0.2,hurt:3,hurtAdd:0.45,expDead:0,heal:5,healAdd:1,
             moveSpeed:0.4,attackSpeed:0.8,checkDistance:5,visibleDistance:8,attackDistance:0,lv:1},
-        m1:{id:"m1",name:"法",hp:16,hpAdd:[4,7,8,9,9],defense:0,defenseAdd:0.4,hurt:2,hurtAdd:0.5,expDead:0,heal:5,healAdd:1.5,
+        m1:{id:"m1",name:"法",hp:16,hpAdd:[4,7,8,9,9],defense:0,defenseAdd:0.3,hurt:2,hurtAdd:0.5,expDead:0,heal:5,healAdd:1.5,
             moveSpeed:0.4,attackSpeed:1.2,checkDistance:5,visibleDistance:8,attackDistance:5,lv:1},
         m2:{id:"m2",name:"道",hp:17,hpAdd:[8,17,17,16,20],defense:0,defenseAdd:0.1,hurt:5,hurtAdd:0.45,expDead:0,heal:5,healAdd:1,
             moveSpeed:0.4,attackSpeed:1.2,checkDistance:5,visibleDistance:8,attackDistance:5,lv:1},
@@ -520,7 +618,7 @@ module.exports = {
             moveSpeed:1,attackSpeed:0.7,checkDistance:4,visibleDistance:6,attackDistance:1.5,model:"ani/hum32/032",lv:1},
         m20:{id:"m20",name:"鸡",hp:1,defense:0,hurt:1,expDead:10,heal:0,
             moveSpeed:2,attackSpeed:2,checkDistance:5,visibleDistance:9,attackDistance:1.5,model:"ani/hum72/072",drop:'',lv:1},
-        m21:{id:"m21",name:"幽冥大魔神",hp:8000,defense:30,hurt:200,expDead:800,heal:100,
+        m21:{id:"m21",name:"幽冥大魔神",hp:8000,defense:20,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum52/052",drop:'',lv:6},
         m22:{id:"m22",name:"天界魔王",hp:10000,defense:50,hurt:300,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum53/053"
@@ -531,29 +629,29 @@ module.exports = {
         m24:{id:"m24",name:"牛魔王",hp:10000,defense:40,hurt:200,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum26/026"
             ,drop:'i001700,7,i001701,4,i001702,1,i001800,7,i001801,4,i001802,1,i001900,7,i001901,4,i001902,1,i002000,7,i002001,4,i002002,1,i002100,7,i002101,4,i002102,1',lv:7},
-        m25:{id:"m25",name:"嗜血魔王",hp:8000,defense:30,hurt:200,expDead:800,heal:100,
+        m25:{id:"m25",name:"嗜血魔王",hp:8000,defense:20,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum55/055",drop:'',lv:6},
-        m26:{id:"m26",name:"幻灵魔王",hp:8000,defense:30,hurt:200,expDead:800,heal:100,
+        m26:{id:"m26",name:"幻灵魔王",hp:8000,defense:20,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum56/056",drop:'',lv:6},
-        m27:{id:"m27",name:"九天神龙",hp:30000,defense:200,hurt:450,expDead:2000,heal:500,
+        m27:{id:"m27",name:"九天神龙",hp:30000,defense:150,hurt:450,expDead:2000,heal:500,
             moveSpeed:1.5,attackSpeed:1.5,checkDistance:5,visibleDistance:5,attackDistance:5,model:"ani/hum57/057",drop:'',lv:9},
-        m28:{id:"m28",name:"狂龙教主",hp:30000,defense:200,hurt:450,expDead:2000,heal:500,
-            moveSpeed:1.5,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum58/058",drop:'',lv:9},
-        m29:{id:"m29",name:"狱火魔龙",hp:30000,defense:200,hurt:450,expDead:2000,heal:500,
-            moveSpeed:1.5,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum59/059",drop:'',lv:9},
-        m30:{id:"m30",name:"幽冥蝇王",hp:8000,defense:40,hurt:200,expDead:800,heal:100,
+        m28:{id:"m28",name:"狂龙教主",hp:30000,defense:150,hurt:450,expDead:2000,heal:500,
+            moveSpeed:1.2,attackSpeed:1.2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum58/058",drop:'',lv:9},
+        m29:{id:"m29",name:"狱火魔龙",hp:30000,defense:150,hurt:450,expDead:2000,heal:500,
+            moveSpeed:1.2,attackSpeed:1.2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum59/059",drop:'',lv:9},
+        m30:{id:"m30",name:"幽冥蝇王",hp:8000,defense:20,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum60/060",drop:'',lv:6},
-        m31:{id:"m31",name:"幽冥流星锤统领",hp:8000,defense:40,hurt:200,expDead:800,heal:100,
+        m31:{id:"m31",name:"幽冥流星锤统领",hp:8000,defense:20,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum61/061",drop:'',lv:6},
-        m32:{id:"m32",name:"幽冥追魂斧王",hp:8000,defense:40,hurt:200,expDead:800,heal:100,
+        m32:{id:"m32",name:"幽冥追魂斧王",hp:8000,defense:20,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum62/062",drop:'',lv:6},
-        m33:{id:"m33",name:"幽冥猪王",hp:8000,defense:40,hurt:200,expDead:800,heal:100,
+        m33:{id:"m33",name:"幽冥猪王",hp:8000,defense:20,hurt:200,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum63/063",drop:'',lv:6},
         m34:{id:"m34",name:"圣兽之王",hp:8800,defense:100,hurt:280,expDead:880,heal:100,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum64/064",drop:'',lv:8},
-        m35:{id:"m35",name:"天宫之主",hp:10000,defense:150,hurt:350,expDead:1000,heal:100,
+        m35:{id:"m35",name:"天宫之主",hp:10000,defense:100,hurt:350,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum65/065",drop:'',lv:8},
-        m36:{id:"m36",name:"神王",hp:15000,defense:160,hurt:300,expDead:1500,heal:200,
+        m36:{id:"m36",name:"神王",hp:15000,defense:100,hurt:300,expDead:1500,heal:200,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum65/065",drop:'',lv:8},
         m37:{id:"m37",name:"天宫侍卫",hp:2500,defense:10,hurt:100,expDead:250,heal:0,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum66/066",drop:'',lv:4},
@@ -561,24 +659,28 @@ module.exports = {
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum67/067",drop:'',lv:4},
         m39:{id:"m39",name:"天宫祭师",hp:2500,defense:10,hurt:100,expDead:250,heal:0,
             moveSpeed:2,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum68/068",drop:'',lv:4},
-        m40:{id:"m40",name:"天宫女王",hp:10000,defense:130,hurt:400,expDead:1000,heal:100,
+        m40:{id:"m40",name:"天宫女王",hp:10000,defense:100,hurt:400,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum69/069",drop:'',lv:8},
-        m41:{id:"m41",name:"舞后",hp:15000,defense:130,hurt:400,expDead:1500,heal:200,
+        m41:{id:"m41",name:"舞后",hp:15000,defense:100,hurt:400,expDead:1500,heal:200,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum69/069",drop:'',lv:8},
-        m42:{id:"m42",name:"天宫大神官",hp:10000,defense:150,hurt:400,expDead:1000,heal:100,
+        m42:{id:"m42",name:"天宫大神官",hp:10000,defense:100,hurt:400,expDead:1000,heal:100,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum70/070",drop:'',lv:8},
-        m43:{id:"m43",name:"招魂王",hp:15000,defense:150,hurt:400,expDead:1500,heal:200,
+        m43:{id:"m43",name:"招魂王",hp:15000,defense:100,hurt:400,expDead:1500,heal:200,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum70/070",drop:'',lv:8},
         m44:{id:"m44",name:"驽马法老",hp:6000,defense:20,hurt:251,expDead:600,heal:100,
             moveSpeed:1,attackSpeed:1.5,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum71/071",drop:'',lv:7},
-        m45:{id:"m45",name:"爱情鸟",hp:9000,defense:15,hurt:251,expDead:900,heal:50,
+        m45:{id:"m45",name:"爱情鸟",hp:9000,defense:0,hurt:100,expDead:900,heal:50,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum72/072",drop:'',lv:5},
-        m46:{id:"m46",name:"蚁王",hp:8000,defense:40,hurt:251,expDead:800,heal:100,
+        m46:{id:"m46",name:"蚁王",hp:8000,defense:20,hurt:251,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum73/073",drop:'',lv:6},
-        m47:{id:"m47",name:"蚁后",hp:8000,defense:40,hurt:251,expDead:800,heal:100,
+        m47:{id:"m47",name:"蚁后",hp:8000,defense:20,hurt:251,expDead:800,heal:100,
             moveSpeed:1,attackSpeed:2,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum74/074",drop:'',lv:6},
-        m48:{id:"m48",name:"玉皇大帝",hp:30000,defense:200,hurt:700,expDead:2000,heal:500,
+        m48:{id:"m48",name:"丁春秋",hp:30000,defense:150,hurt:600,expDead:2000,heal:500,
             moveSpeed:0.8,attackSpeed:0.8,checkDistance:4,visibleDistance:9,attackDistance:1.5,model:"ani/hum10/010",drop:'',lv:9},
+        m49:{id:"m49",name:"玄冰魔王",hp:40000,defense:150,hurt:700,expDead:3000,heal:500,
+            moveSpeed:1.2,attackSpeed:1.2,checkDistance:5,visibleDistance:9,attackDistance:5,model:"ani/hum223/223",drop:'',lv:10},
+        m50:{id:"m50",name:"黑鬼天葬",hp:50000,defense:150,hurt:800,expDead:4000,heal:500,
+            moveSpeed:1,attackSpeed:1,checkDistance:5,visibleDistance:9,attackDistance:5,model:"ani/hum224/224",drop:'',lv:10},
     },
 
 
@@ -746,7 +848,7 @@ module.exports = {
         i001900 : {id:'i001900',name:'赤月宝石',type:9,hurt:2,defense:1,exclusive:[0,1,2,3,4,5],model:'',level:3},
         i001901 : {id:'i001901',name:'黄金宝石',type:9,hurt:4,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:6},
         i001902 : {id:'i001902',name:'金龙宝石',type:9,hurt:6,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:9},
-        i001930 : {id:'i001930',name:'天龙宝石',type:9,hurt:6,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:9},
+        i001930 : {id:'i001930',name:'天龙宝石',type:9,hurt:8,defense:4,exclusive:[0,1,2,3,4,5],model:'',level:10},
         i002000 : {id:'i002000',name:'释迦摩尼盾',type:10,hurt:1,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:3},
         i002001 : {id:'i002001',name:'唯我独尊盾',type:10,hurt:2,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:6},
         i002002 : {id:'i002002',name:'毁天灭地盾',type:10,hurt:3,defense:9,exclusive:[0,1,2,3,4,5],model:'',level:9},

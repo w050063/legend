@@ -52,6 +52,8 @@ WorkRemote.prototype.add = function(uid, sid, cb) {
         ag.guild = new Guild();
         var Shabake = require("../../../game/Shabake.js");
         ag.shabake = new Shabake();
+        var Team = require("../../../game/Team.js");
+        ag.team = new Team();
     }
 	var channel = this.channelService.getChannel(ag.jsUtil.dataChannel, true);
 	var param = {

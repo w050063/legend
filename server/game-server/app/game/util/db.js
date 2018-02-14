@@ -10,20 +10,25 @@ var Item = require('../Item');
 module.exports = ag.class.extend({
     ctor:function () {
         this._chatCount = 0;
-
+        this._dataArray = [];
+        this._cardMap = {};
+        this._bDoing = false;
 
         this._pool = mysql.createPool({
             host: '127.0.0.1',
             user: 'root',
             password: 'jiqiren316S+',
             database: 'legend',
+            connectionLimit: 10,
             port: 3306,
             multipleStatements:true,
         });
+
+
         this.getAccounts(function(rows){
             for(var i=0;i<rows.length;++i){
                 var name = crypto.fromBase64(rows[i].name);
-                ag.userManager.add(rows[i].id,rows[i].password,name);
+                ag.userManager.add(rows[i].id,rows[i].password,name,rows[i].create_time);
             }
         });
         this.getRoles(function(rows){
@@ -79,10 +84,10 @@ module.exports = ag.class.extend({
                 var obj = {id:rows[i].id,price:rows[i].price,create_time:rows[i].create_time};
                 ag.auctionShop._dataMap[obj.id] = obj;
             }
+            //拍卖数据矫正
+            ag.auctionShop.correct();
         });
 
-        //拍卖数据矫正
-        ag.auctionShop.correct();
 
 
         //自定义数据
@@ -99,25 +104,42 @@ module.exports = ag.class.extend({
         }.bind(this));
 
 
+        //获得卡密数据
+        this.getCard();
+
+
         ag.actionManager.runAction(this,3,function(){
             ag.gameLayer.theCountryIsAtPeace(35);
+        }.bind(this));
+
+        //启动定时器,每秒执行一次
+        ag.actionManager.schedule(this,0.01,function (dt) {
+            if(this._dataArray.length>0 && this._bDoing==false){
+                var obj = this._dataArray[0];
+                this._dataArray.splice(0,1);
+                this._bDoing = true;
+                var self = this;
+                this._pool.getConnection(function(err,conn){
+                    if(err){
+                        self._bDoing = false;
+                        obj.callback(err,null,null);
+                    }else{
+                        conn.query(obj.sql,function(qerr,vals){
+                            //释放连接
+                            conn.release();
+                            //事件驱动回调
+                            self._bDoing = false;
+                            obj.callback(qerr,vals);
+                        });
+                    }
+                });
+            }
         }.bind(this));
     },
 
 
     query:function (sql,callback){
-        this._pool.getConnection(function(err,conn){
-            if(err){
-                callback(err,null,null);
-            }else{
-                conn.query(sql,function(qerr,vals){
-                    //释放连接
-                    conn.release();
-                    //事件驱动回调
-                    callback(qerr,vals);
-                });
-            }
-        });
+        this._dataArray.push({sql:sql,callback:callback});
     },
 
 
@@ -282,6 +304,8 @@ module.exports = ag.class.extend({
                 + ', practice = ' + data.practice
                 + ' WHERE id = "' + data.id + '";';
             allSql = allSql+sql;
+        }
+        if(allSql.length>0){
             this.query(allSql, function(err, rows) {
                 if (err) {
                     if(err.code == 'ER_DUP_ENTRY'){
@@ -472,6 +496,7 @@ module.exports = ag.class.extend({
 
     //生成聊天
     insertChat:function(aid,chat,chat_time,callback){
+        return;
         if(aid && chat && chat_time){
             ++this._chatCount;
             if(this._chatCount>99){
@@ -545,7 +570,6 @@ module.exports = ag.class.extend({
             var str = member.length==0?'':member.join(',');
             var sql = 'UPDATE t_guilds SET member = "' + str
                 + '" WHERE id = "' + id + '";';
-
             this.query(sql, function(err, rows) {
                 if (err) {
                     if(err.code == 'ER_DUP_ENTRY'){
@@ -596,5 +620,40 @@ module.exports = ag.class.extend({
         var sql = 'UPDATE t_custom SET data = "' + JSON.stringify(data).replace(/"/g,'%')
             + '" WHERE id = "0";';
         this.query(sql, function(err, rows) {});
+    },
+
+
+    getCard:function(){
+        var sql = 'SELECT * FROM t_card';
+        this.query(sql, function(err, rows) {
+            for(var i=0;i<rows.length;++i){
+                this._cardMap[rows[i].id] = rows[i];
+            }
+        }.bind(this));
+    },
+
+
+    cardBuy:function(rid,psw){
+        var sql = 'SELECT * FROM t_card';
+        var obj = this._cardMap[psw];
+        if(obj){
+            if(obj.rid=='0'){
+                var timeCounter = ''+new Date().getTime();
+                obj.rid = rid;
+                obj.buy_time = timeCounter;
+                var role =  ag.gameLayer.getRole(rid);
+                role.addGold(obj.gold);
+                var sql2 = 'UPDATE t_card SET rid = "' + obj.rid
+                    + '", buy_time = "' + obj.buy_time
+                    + '" WHERE id = "' + obj.id + '";';
+                this.query(sql2, function(err, rows) {});
+                ag.jsUtil.sendData("sSystemNotify","兑换元宝成功！",rid);
+                ag.jsUtil.sendDataAll("sSystemNotify","玩家【"+role._data.name+"】用秘卡购买"+obj.gold+"个元宝！");
+            }else{
+                ag.jsUtil.sendData("sSystemNotify","卡密已经使用！",rid);
+            }
+        }else{
+            ag.jsUtil.sendData("sSystemNotify","卡密不存在！",rid);
+        }
     },
 });

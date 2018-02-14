@@ -354,7 +354,7 @@ module.exports = ag.class.extend({
                 var count = Math.min(array.length,left);
                 for(var i=count-1;i>=0;--i){
                     var id = array[i]._data.id;
-                    if(!array[i]._their || array[i]._their==this._data.id){
+                    if(!array[i]._their || array[i]._their==this._data.id || ag.team.isSameTeam(array[i]._their,this._data.id)){
                         ag.itemManager.addBagItem(id,this._data.id);
                         ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
                         ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
@@ -370,24 +370,27 @@ module.exports = ag.class.extend({
 
     //掉血
     changeHPByHurt:function(attacker,hurt,bCisha){
+        var rate = 0.9+Math.random()*0.2;
         if(bCisha){
-            if(this.getIsMonster() && this.getMst().lv==9){
-                this._data.hp -=  Math.round(hurt*0.75);
+            if(this.getIsMonster() && this.getMst().lv==10){
+                this._data.hp -=  Math.round(hurt*0.4*rate);
+            }else if(this.getIsMonster() && this.getMst().lv==9){
+                this._data.hp -=  Math.round(hurt*0.5*rate);
             }else if(this._data.type=='m1'){
-                this._data.hp -=  Math.round(hurt*0.5);
+                this._data.hp -=  Math.round(hurt*0.5*rate);
             }else{
-                this._data.hp -=  Math.round(hurt);
+                this._data.hp -=  Math.round(hurt*rate);
             }
         }else{
-            if(this.getIsMonster() && this.getMst().lv==9){
-                var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
-                this._data.hp -= Math.round(hurt*0.5/correct);
+            var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
+            if(this.getIsMonster() && this.getMst().lv==10){
+                this._data.hp -= Math.round(hurt*0.4/correct*rate);
+            }else if(this.getIsMonster() && this.getMst().lv==9){
+                this._data.hp -= Math.round(hurt*0.5/correct*rate);
             }else if(this._data.type=='m1'){
-                var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
-                this._data.hp -= Math.round(hurt*0.5/correct);
+                this._data.hp -= Math.round(hurt*0.5/correct*rate);
             }else{
-                var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
-                this._data.hp -=  Math.round(hurt/correct);
+                this._data.hp -=  Math.round(hurt/correct*rate);
             }
         }
         ag.jsUtil.sendDataAll("sHP",{id:this._data.id,hp:this._data.hp},this._data.mapId);
@@ -485,7 +488,7 @@ module.exports = ag.class.extend({
                     }
                 }
             }
-        }else if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27") {
+        }else if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27" || this._data.type=="m49" || this._data.type=="m50") {
             var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(),this.getMst().attackDistance);
             for(i = 0; i < array.length; ++i) {
                 var tempRole = array[i];
@@ -590,6 +593,8 @@ module.exports = ag.class.extend({
                 ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
                 if(this._data.type=='m48'){//玉皇大帝双倍爆率
                     ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
+                }else if(this._data.type=='m50'){//黑鬼天葬双倍爆率
+                    ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
                 }
             }else if(this.getIsPlayer()){
                 if(Math.random()<0.3333){
@@ -665,7 +670,20 @@ module.exports = ag.class.extend({
                 ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
             }else{
                 ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
-                this.changeMap((this._data.mapId=='t0' || this._data.mapId=='t12')?'t0':'t1');
+                if(this._data.mapId=='t18'
+                    || this._data.mapId=='t13'
+                    || this._data.mapId=='t19'
+                    || this._data.mapId=='t20'
+                    || this._data.mapId=='t21'
+                    || this._data.mapId=='t24'
+                    || this._data.mapId=='t25'){
+                    this.changeMap('t23');
+                }else if(this._data.mapId=='t12'
+                    || this._data.mapId=='t0'){
+                    this.changeMap('t0');
+                }else{
+                    this.changeMap('t1');
+                }
             }
         }
     },

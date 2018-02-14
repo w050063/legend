@@ -125,7 +125,7 @@ module.exports = ag.class.extend({
                     for(var i = 0; i < array.length; ++i) {
                         var tempRole = array[i];
                         if (ag.gameLayer.isEnemyForAttack(attacker, tempRole)) {
-                            tempRole.changeHPByHurt(attacker, attacker._hurt * 0.5);
+                            tempRole.changeHPByHurt(attacker, attacker._hurt * 0.4);
                             if (tempRole._data.hp <= 0) {
                                 tempRole.dead(attacker);
                             }

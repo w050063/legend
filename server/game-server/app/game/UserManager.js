@@ -21,16 +21,21 @@ module.exports = ag.class.extend({
     },
     
     
-    add:function (id,password,name) {
+    add:function (id,password,name,create_time) {
         if(!this._infoMap[id]){
             name = name?name:'r'+this._nLength;
-            this._infoMap[id] = {id:id,name:name,password:password,sessions:0,score:0,online:false};
+            this._infoMap[id] = {id:id,name:name,password:password,create_time:create_time,online:false};
             ++this._nLength;
         }
         return this._infoMap[id];
     },
     changeName:function (id,name) {
-        if(!id)return 1;
+        if(!id || !this._infoMap[id])return 1;
+
+
+        var day = 1000 * 60 * 60 * 24;
+        if(new Date().getTime() - parseInt(this._infoMap[id].create_time) > day)return 3;
+
         var bFind = false;
         for(var key in this._infoMap){
             if(key!=id && this._infoMap[key].name==name){
@@ -38,13 +43,15 @@ module.exports = ag.class.extend({
             }
         }
         if(bFind)return 2;
-        this._infoMap[id].name = name;
-        var role = ag.gameLayer.getRole(id);
-        if(role){
-            role._data.name = name;
-            if(role._tiger)role._tiger._data.name = '白虎('+name+')';
-        }
-        ag.db.setAccountName(id,name);
+        try{
+            this._infoMap[id].name = name;
+            var role = ag.gameLayer.getRole(id);
+            if(role){
+                role._data.name = name;
+                if(role._tiger)role._tiger._data.name = '白虎('+name+')';
+            }
+            ag.db.setAccountName(id,name);
+        }catch(e){}
         return 0;
     },
     getName:function(id){
@@ -63,7 +70,7 @@ module.exports = ag.class.extend({
 
     //账号密码是否正确
     isRightAccountAndPassword:function(account,password){
-        if(account && this._infoMap[account].password==password)return true;
+        if(account && this._infoMap[account] && this._infoMap[account].password==password)return true;
         return false;
     },
 
@@ -103,5 +110,21 @@ module.exports = ag.class.extend({
             return this._infoMap[account].uid;
         }
         return undefined;
+    },
+
+
+    //设置禁言
+    setOffline:function(account,offline){
+        if(this._infoMap[account]){
+            this._infoMap[account].offline = offline;
+        }
+    },
+
+    //获得是否
+    getOffline:function(account){
+        if(this._infoMap[account] && this._infoMap[account].offline){
+            return true;
+        }
+        return false;
     },
 });

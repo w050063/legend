@@ -108,6 +108,19 @@ CREATE TABLE `t_auctionShop` (
 
 
 -- ----------------------------
+-- Table structure for `t_card`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_card`;
+CREATE TABLE `t_card` (
+  `id` varchar(12) NOT NULL,
+  `gold` int(8) NOT NULL,
+  `rid` varchar(16) NOT NULL,
+  `buy_time` varchar(16) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
 -- alter table
 -- ----------------------------
 alter table t_roles add column gold int(8) NOT NULL DEFAULT 0;

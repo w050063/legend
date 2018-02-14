@@ -30,7 +30,9 @@ module.exports = {
         //每隔60秒发送一次在线人数
         ag.actionManager.schedule(this,60,function (dt) {
             var rand = Math.random();
-            if(rand<0.5){
+            if(rand<0.33){
+                ag.jsUtil.sendDataAll("sSystemNotify","元宝可以在商城购买养成属性！");
+            }else if(rand<0.66){
                 ag.jsUtil.sendDataAll("sSystemNotify","提示：战士刺杀第二格无视防御！");
             }else{
                 ag.jsUtil.sendDataAll("sSystemNotify","提示：安全区外可随意杀人！");
@@ -120,6 +122,14 @@ module.exports = {
     //获得某玩家
     getRole:function(id){
         return this._roleMap[id];
+    },
+
+    //获得某玩家
+    getRoleByName:function(name){
+        for(var key in this._roleMap){
+            if(this._roleMap[key]._data.name==name)return this._roleMap[key];
+        }
+        return null;
     },
 	
 	
@@ -434,6 +444,18 @@ module.exports = {
                     }
                     if(role1._data.camp!=role2._data.camp)return true;
                     if(role2._data.camp==ag.gameConst.campPlayerNone)return true;
+                }else if(role1._data.attackMode==ag.gameConst.attackModeTeam){
+                    if(role2.getIsPlayer()){
+                        var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
+                        if(safe){
+                            var lx = role2.getLocation().x,ly = role2.getLocation().y;
+                            if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+                        }
+                        console.log(!ag.team.isSameTeam(role1._data.id,role2._data.id));
+                        return !ag.team.isSameTeam(role1._data.id,role2._data.id);
+                    }else{
+                        return true;
+                    }
                 }else{
                     if(role1._data.camp!=role2._data.camp)return true;
                 }
