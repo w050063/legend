@@ -113,6 +113,11 @@ cc.Class({
         var father = cc.find('Canvas/nodeAuctionShop/nodeSell');
         father.active = true;
 
+        var father2 = cc.find('Canvas/nodeAuctionShop/nodeSell/spriteBack');
+        father2.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("firstLayer/circle",cc.SpriteFrame);
+        father2.getChildByName('labelName').getComponent(cc.Label).string =  '物品名称';
+        this._itemId = '';
+
         var node = cc.find('Canvas/nodeBag/bag');
         node.removeFromParent(false);
         node.setPosition(237,0);

@@ -4,6 +4,7 @@
  */
 
 
+var NodeLocked = require('NodeLocked');
 cc.Class({
     extends: cc.Component,
     properties: {},
@@ -31,13 +32,25 @@ cc.Class({
 		var location = event.getLocation();
 		this._locked = this._role.getPlayerForTouch(location);
 		if(this._locked){
-            if(this._locked._data.camp==ag.gameConst.campNpc){
+            if(this._locked._data.camp==ag.gameConst.campNpc) {
                 ag.gameLayer.showNodeNpcContent(this._locked._data);
                 this._locked = null;
                 this._bShowNPCMoment = true;
-                ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(0.2),cc.callFunc(function(){
+                ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(0.2), cc.callFunc(function () {
                     this._bShowNPCMoment = false;
                 }.bind(this))));
+            }else if(this._locked.getIsPlayer()){
+                cc.find('Canvas/buttonLocked/buttonBoy').active = this._locked._data.sex==ag.gameConst.sexBoy;
+                cc.find('Canvas/buttonLocked/buttonGirl').active = this._locked._data.sex==ag.gameConst.sexGirl;
+                cc.find('Canvas/buttonLocked/labelName').getComponent(cc.Label).string = this._locked._data.name;
+                cc.find('Canvas/nodeLockedList').getComponent(NodeLocked).setRid(this._locked._data.id);
+                var temp = cc.find('Canvas/buttonLocked');
+                temp.active = true;
+                temp.stopAllActions();
+                temp.runAction(cc.sequence(cc.delayTime(30),cc.callFunc(function(){
+                    temp.active = false;
+                }.bind(this))));
+                this._locked.nameDisapper();
             }else{
                 this._locked.nameDisapper();
             }

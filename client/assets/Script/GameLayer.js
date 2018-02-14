@@ -10,7 +10,9 @@ var AGTileMap = require("AGTileMap");
 var ItemInfoNode = require('ItemInfoNode');
 var Wharehouse = require('Wharehouse');
 var AuctionShop = require('AuctionShop');
+var Card = require('Card');
 var AGAni = require("AGAni");
+var TeamAsk = require('TeamAsk');
 var baseNpcId = 5000;
 cc.Class({
     extends: cc.Component,
@@ -33,6 +35,8 @@ cc.Class({
         this._stableMinMapNpcBoss = [];
         this._bagArray = [];
         this._auctionShop = cc.find('Canvas/nodeAuctionShop').getComponent(AuctionShop);
+        this._card = cc.find('Canvas/nodeCard').getComponent(Card);
+        this._teamAsk = cc.find('Canvas/nodeTeamAsk').getComponent(TeamAsk);
         var i=0;
 
         for(i=0;i<ag.gameConst.bagMaxCount;++i){
@@ -43,6 +47,8 @@ cc.Class({
             this._wharehouseArray.push(-1);
         }
         cc.find('Canvas/nodeBag/equip/buttonWing').setLocalZOrder(10);
+        cc.find('Canvas/buttonLocked').active = false;
+        cc.find('Canvas/nodeLockedList').active = false;
 
         //自动攻击
         var temp = !(cc.sys.localStorage.getItem('setupAutoAttack')=='false');
@@ -67,6 +73,10 @@ cc.Class({
         //背景音乐
         cc.find('Canvas/nodeHelp/toggleSetupMusic').getComponent(cc.Toggle).isChecked = ag.musicManager._musicSetup;
         cc.find('Canvas/nodeHelp/toggleSetupEffect').getComponent(cc.Toggle).isChecked = ag.musicManager._soundEffectSetup;
+
+
+        //允许组队
+        //cc.find('Canvas/nodeHelp/toggleAllowTeam').getComponent(cc.Toggle).isChecked = !!ag.userInfo._data.allowTeam;
 
 
         this._flyBloodArray = [];//飘血数组
@@ -141,7 +151,7 @@ cc.Class({
         this._map = cc.find("Canvas/nodeMap").addComponent(AGTileMap);
         this._map.node.setScale(1.5);
         this._nameMap = cc.find("Canvas/nodeNameMap").addComponent(AGTileMap);
-        this._nameMap.node.setScale(1.5);
+        //this._nameMap.node.setScale(1.5);
 
 
         //创建主角
@@ -234,11 +244,6 @@ cc.Class({
         }
         var mapId = ag.userInfo._data.mapId;
         var map = ag.gameConst._terrainMap[mapId];
-        if(this._backMusicName!=map.music){
-            this._backMusicName = map.music;
-            cc.audioEngine.stopAll();
-            ag.musicManager.playMusic("resources/music/"+map.music);
-        }
 
 
         //地图更新
@@ -330,8 +335,6 @@ cc.Class({
         this._roleMap = {};
         ag.agSocket._dataArray = [];
         ag.userInfo._itemMap = {};
-        cc.audioEngine.stopAll();
-        ag.musicManager.playMusic("resources/music/Dragon Rider.mp3");
         ag.spriteCache.release();
         cc.director.loadScene('CreateRoleScene');
         ag.gameLayer = null;
@@ -1005,7 +1008,7 @@ cc.Class({
 
 
         //加上转生属性
-        var come = this._player._data.come;
+        var come = role._data.come;
         if(come>0){
             hurt+=ag.gameConst.comeHurt[come];
             defense+=ag.gameConst.comeDefense[come];
@@ -1191,6 +1194,12 @@ cc.Class({
         this._setupShowWing = event.isChecked;
         this.showWing(this._setupShowWing);
     },
+    toggleEventAllowTeam: function (event) {
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        if(!event.isChecked){
+            ag.agSocket.send("exitTeam",{});
+        }
+    },
 
 
     showWing:function(bShow){
@@ -1261,7 +1270,10 @@ cc.Class({
     showNodeNpcContent:function(data){
         if(data.content.length==1){
             var transferMst = ag.gameConst._transferMst[data.content[0]];
-            if(transferMst.id=='t8000'){
+            if(transferMst.id=='t9000'){
+                this._card.show();
+                return;
+            }else if(transferMst.id=='t8000'){
                 this._auctionShop.show();
                 return;
             }else if(transferMst.id=='t6000'){
@@ -1351,10 +1363,10 @@ cc.Class({
                             }
                         }else if(transferMst.id=='t4002') {
                             var index = self._bagArray.indexOf(-1);
-                            if(index!=-1 && self._player._data.gold>=500){
+                            if(index!=-1 && self._player._data.gold>=100){
                                 cc.find('Canvas/nodeCreateGuild').active = true;
                             }else{
-                                ag.jsUtil.showText(self.node,'元宝不足500个！');
+                                ag.jsUtil.showText(self.node,'元宝不足100个！');
                             }
                         }else if(transferMst.id=='t4003'){
                             if(ag.userInfo._guildMap[self._player._data.id]){
@@ -1416,7 +1428,16 @@ cc.Class({
                             var level = ag.gameConst._terrainMap[transferMst.mapId].level;
                             var maxLevel = ag.gameConst._terrainMap[transferMst.mapId].maxLevel;
                             if(!maxLevel)maxLevel = 65535;
-                            if(self._player._data.level>=level && self._player._data.level<=maxLevel){
+                            var come = ag.gameConst._terrainMap[transferMst.mapId].come;
+                            if(!come)come = 0;
+
+                            if(self._player._data.come<come) {
+                                ag.jsUtil.showText(self.node, '此地图要求转生等级' + come + '!!!');
+                            }else if(self._player._data.level<level){
+                                ag.jsUtil.showText(self.node,'此地图要求等级'+level+'!!!');
+                            }else if(self._player._data.level>maxLevel){
+                                ag.jsUtil.showText(self.node,'此地图要求最高等级'+maxLevel+'!!!');
+                            }else{
                                 if(transferMst.mapId=='t20'){
                                     if(ag.userInfo._guildMap[self._player._data.id]){
                                         if(ag.userInfo._guildWinId==self._player._data.id){
@@ -1448,8 +1469,6 @@ cc.Class({
                                     self.changeMap(transferMst.id);
                                     ag.agSocket.send("changeMap",transferMst.id);
                                 }
-                            }else{
-                                ag.jsUtil.showText(self.node,'此地图要求等级'+level+'!!!');
                             }
                         }
                     });
@@ -1528,6 +1547,8 @@ cc.Class({
         }else if(this._player._data.attackMode==ag.gameConst.attackModePeace){
             this._player._data.attackMode=ag.gameConst.attackModeGuild;
         }else if(this._player._data.attackMode==ag.gameConst.attackModeGuild){
+            this._player._data.attackMode=ag.gameConst.attackModeTeam;
+        }else if(this._player._data.attackMode==ag.gameConst.attackModeTeam){
             this._player._data.attackMode=ag.gameConst.attackModeAll;
         }
         cc.find('Canvas/buttonAttackMode/Label').getComponent(cc.Label).string = ag.gameConst.attackModeTextArray[this._player._data.attackMode];
@@ -1597,14 +1618,18 @@ cc.Class({
         ag.musicManager.playEffect("resources/voice/button.mp3");
         var transferMst = ag.gameConst._transferMst['t1'];
         if(this._player._data.mapId=='t18'
+            || this._player._data.mapId=='t13'
             || this._player._data.mapId=='t19'
             || this._player._data.mapId=='t20'
             || this._player._data.mapId=='t21'
-            || this._player._data.mapId=='t22'){
+            || this._player._data.mapId=='t24'
+            || this._player._data.mapId=='t25'){
             transferMst = ag.gameConst._transferMst['t23'];
         }else if(this._player._data.mapId=='t12'
             || this._player._data.mapId=='t0'){
             transferMst = ag.gameConst._transferMst['t0'];
+        }else{
+            transferMst = ag.gameConst._transferMst['t1'];
         }
 
         var level = ag.gameConst._terrainMap[transferMst.mapId].level;
@@ -1636,5 +1661,18 @@ cc.Class({
     buttonEventShop:function(event){
         ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find('Canvas/nodeShop').active = true;
+    },
+
+
+    //显示锁定角色信息列表
+    buttonEventNodeLockedList:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        cc.find('Canvas/nodeLockedList').active = true;
+    },
+
+    //查看组队信息
+    buttonEventSeeTeam:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        ag.agSocket.send("seeTeam",{});
     },
 });

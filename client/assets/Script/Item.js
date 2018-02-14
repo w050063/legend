@@ -24,8 +24,9 @@ cc.Class({
 
         var tips = ag.jsUtil.getLabelFromName(mst.name);
         var node = tips.node;
-        node.setPosition(this.node.getPosition());
-        tips.fontSize = 14;
+        var scale = ag.gameLayer._map.node.getScale();
+        node.setPosition(cc.pMult(ag.gameLayer._player.getTruePosition(cc.p(this._data.x,this._data.y)),scale));
+        tips.fontSize = 22;
         var color = cc.color(255,255,255);
         if(mst.level==3){
             color = cc.color(255,0,0);
@@ -44,7 +45,7 @@ cc.Class({
         }
         if(node.color.r!=color.r || node.color.g!=color.g || node.color.b!=color.b)node.color = color;
         var outline = node.addComponent(cc.LabelOutline);
-        outline.width = 1;
+        outline.width = 2;
         if(outline.color.r!=0 || outline.color.g!=0 || outline.color.b!=0)outline.color = cc.color(0,0,0);
 
         ag.gameLayer._nameMap.node.addChild(node);

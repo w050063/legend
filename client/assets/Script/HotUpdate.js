@@ -149,7 +149,7 @@ cc.Class({
         this.node.runAction(cc.sequence(cc.delayTime(0.1),cc.callFunc(function(){
             cc.eventManager.removeListener(this._updateListener);
             this._updateListener = null;
-            cc.director.loadScene('ConnectingLayer');
+            cc.director.loadScene('ServerListScene');
         }.bind(this))));
     },
 

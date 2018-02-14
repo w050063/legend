@@ -68,21 +68,21 @@ cc.Class({
 
     resetName:function(){
         if(this._propNode && this._propNode._labelName){
-            var name = this._data.name+'('+ag.gameConst._roleMst[this._data.type].name+')\n';
+            var name = this._data.name+'('+ag.gameConst._roleMst[this._data.type].name+')';
             if(ag.userInfo._guildMap[this._data.id]){
                 if(ag.userInfo._guildWinId==this._data.id){
-                    name = name + '[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(沙城主)';
+                    name = name + '\n[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(沙城主)';
                 }else{
-                    name = name + '[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(掌门人)';
+                    name = name + '\n[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(掌门人)';
                 }
             }else{
                 for(var key in ag.userInfo._guildMap){
                     var index = ag.userInfo._guildMap[key].member.indexOf(this._data.id);
                     if(index!=-1){
                         if(ag.userInfo._guildWinId==key){
-                            name = name + '[' + ag.userInfo._guildMap[key].name + ']' + '(沙巴克)';
+                            name = name + '\n[' + ag.userInfo._guildMap[key].name + ']' + '(沙巴克)';
                         }else{
-                            name = name + '[' + ag.userInfo._guildMap[key].name + ']';
+                            name = name + '\n[' + ag.userInfo._guildMap[key].name + ']';
                         }
                         break;
                     }
@@ -150,16 +150,16 @@ cc.Class({
     setZorderAndMapPos:function(){
         ag.jsUtil.startTime();
         if(!ag.gameLayer)return;
+        var scale = ag.gameLayer._map.node.getScale();
         //更新位置
         if(ag.gameLayer._player == this){
-            var scale = ag.gameLayer._map.node.getScale();
             ag.gameLayer._map.node.setPosition(Math.round(-this.node.x*scale),Math.round((-this.node.y-40)*scale));
             ag.gameLayer._nameMap.node.setPosition(Math.round(-this.node.x*scale),Math.round((-this.node.y-40)*scale));
         }
 
         var zorder = Math.round(10000-this.node.y);
         this.node.setLocalZOrder(zorder);
-        if(this._propNode)this._propNode.setPosition(this.node.getPosition());
+        if(this._propNode)this._propNode.setPosition(cc.pMult(this.node.getPosition(),scale));
         ag.jsUtil.addTime('position');
     },
 
@@ -391,8 +391,9 @@ cc.Class({
 
                 //all
                 if(this._data.camp==ag.gameConst.campNpc || this.getIsPlayer()){
+                    var scale = ag.gameLayer._map.node.getScale();
                     this._propNode = new cc.Node();
-                    this._propNode.setPosition(this.node.getPosition());
+                    this._propNode.setPosition(cc.pMult(this.node.getPosition(),scale));
                     this._propNode.setLocalZOrder(ag.gameConst.roleNameZorder);
                     ag.gameLayer._nameMap.node.addChild(this._propNode);
                 }
@@ -504,7 +505,7 @@ cc.Class({
         if(this._nearFlag){
             if(this._data.camp==ag.gameConst.campNpc){
                 var array = ag.userInfo.agAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
-                var name = 'ani/hum41/041';
+                var name = this._data.model;
                 this._agAni = this.getAgAni(this._agAni,name+array[0],parseInt(array[1]),ag.gameConst.roleAniZorder,0.4);
             }else if(this.getIsMonster() || this.getIsTiger()){
                 var str = 'nudeboy0'+ag.gameConst.stateIdle+this._data.direction;
@@ -822,10 +823,11 @@ cc.Class({
                 var node = cc.instantiate(hpStr[0]=='+'?ag.gameLayer._labelNumAddClone:ag.gameLayer._labelNumMinuteClone);
                 var tips = node.getComponent(cc.Label);
                 node.x = 0;
-                node.y = 71;
+                node.y = 105;
                 tips.string = ':'+hpStr.substr(1);
+                tips.fontSize = 28;
                 this._propNode.addChild(node,30);
-                node.runAction(cc.sequence(cc.moveBy(0.4, cc.p(0,30)), cc.fadeOut(0.2),cc.callFunc(function(){
+                node.runAction(cc.sequence(cc.moveBy(0.5, cc.p(0,45)), cc.fadeOut(0.2),cc.callFunc(function(){
                     node.destroy();
                 })));
 
@@ -881,8 +883,9 @@ cc.Class({
         ag.jsUtil.startTime();
         if(this.node.active){
             if(!this._propNode){
+                var scale = ag.gameLayer._map.node.getScale();
                 this._propNode = new cc.Node();
-                this._propNode.setPosition(this.node.getPosition());
+                this._propNode.setPosition(cc.pMult(this.node.getPosition(),scale));
                 this._propNode.setLocalZOrder(ag.gameConst.roleNameZorder);
                 ag.gameLayer._nameMap.node.addChild(this._propNode);
             }
@@ -990,7 +993,20 @@ cc.Class({
             if(this._ai)this._ai._busy = false;
 
             if(this==ag.gameLayer._player){
-                ag.gameLayer.changeMap((this._data.mapId=='t0' || this._data.mapId=='t12')?'t0':'t1');
+                if(this._data.mapId=='t18'
+                    || this._data.mapId=='t13'
+                    || this._data.mapId=='t19'
+                    || this._data.mapId=='t20'
+                    || this._data.mapId=='t21'
+                    || this._data.mapId=='t24'
+                    || this._data.mapId=='t25'){
+                    ag.gameLayer.changeMap('t23');
+                }else if(this._data.mapId=='t12'
+                    || this._data.mapId=='t0'){
+                    ag.gameLayer.changeMap('t0');
+                }else{
+                    ag.gameLayer.changeMap('t1');
+                }
             }else{
                 this.setLocation(cc.p(data.x,data.y));
             }

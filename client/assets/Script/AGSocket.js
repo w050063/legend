@@ -13,7 +13,7 @@ module.exports={
         var self = this;
         if(self._step != 0)pomelo.disconnect();
         self._step = 0;
-        pomelo.init({host: "114.115.216.44",port: 3014,log: true}, function() {
+        pomelo.init({host: ag.userInfo._serverIP,port: ag.userInfo._serverPort,log: true}, function() {
             pomelo.request('gate.GateHandler.queryEntry', {version:ag.userInfo._version}, function(data) {
                 if(data.code==0){
                     var uid = data.uid;
@@ -48,7 +48,6 @@ module.exports={
                 var node = cc.director.getScene();
                 ag.agSocket._dataArray = [];
                 ag.userInfo._itemMap = {};
-                cc.audioEngine.stopAll();
                 ag.gameLayer = null;
                 if(node.name!='ConnectingLayer'){
                     cc.director.loadScene('ConnectingLayer');
@@ -262,6 +261,10 @@ module.exports={
             }else if(obj.key=='sAuctionShopArray'){
                 if(ag.gameLayer){
                     ag.gameLayer._auctionShop.refresh(JSON.parse(obj.value));
+                }
+            }else if(obj.key=='sAskTeamArray'){
+                if(ag.gameLayer){
+                    ag.gameLayer._teamAsk.show(obj.value.id,obj.value.name);
                 }
             }
         }

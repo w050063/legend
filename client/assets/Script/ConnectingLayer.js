@@ -10,46 +10,6 @@ cc.Class({
 
     // use this for initialization
     onLoad: function () {
-        if(!window.ag){
-            //if (cc._renderType === cc.game.RENDER_TYPE_WEBGL) {
-            //    cc.director.setProjection(cc.Director.PROJECTION_2D);
-            //}else{
-            //    cc.renderer.enableDirtyRegion(false);
-            //}
-            window.ag = {};
-            ag.jsUtil = require("JsUtil");
-            ag.userInfo = require("UserInfo");
-            ag.userInfo.init();
-            ag.gameConst = require("GameConst");
-            ag.agSocket = require("AGSocket");
-            ag.gameConst.init();
-            var BuffManager = require("BuffManager");
-            ag.buffManager = new BuffManager();
-            ag.buffManager.init();
-            var AgSpriteCache = require("AgSpriteCache");
-            ag.spriteCache = new AgSpriteCache();
-            ag.spriteCache.init();
-            var MusicManager = require("MusicManager");
-            ag.musicManager = new MusicManager();
-            ag.musicManager.init();
-
-
-            //注册前后台切换事件
-            cc.game.on(cc.game.EVENT_HIDE, function () {
-                if(ag.gameLayer && ag.gameLayer._player && ag.gameLayer._player._ai){
-                    ag.gameLayer._player._ai._touchPointArray = [];
-                }
-            });
-            cc.game.on(cc.game.EVENT_SHOW , function () {
-                if(ag.gameLayer && ag.gameLayer._player && ag.gameLayer._player._ai){
-                    ag.gameLayer._player._ai._touchPointArray = [];
-                }
-            });
-
-            //cc.director.setDisplayStats(false);
-        }
-
-
         var node = cc.find("Canvas/door");
         node.setPosition(ag.userInfo.backGroundPos);
         var dis0 = cc.pDistance(cc.p(280,230),cc.p(-100,-330));

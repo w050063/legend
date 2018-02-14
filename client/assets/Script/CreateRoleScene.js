@@ -176,8 +176,16 @@ cc.Class({
         ag.musicManager.playEffect("resources/voice/button.mp3");
         if(sender.string.length>=2){
             ag.jsUtil.request(this.node,'changeName',sender.string,function (data) {
-                ag.userInfo._accountData.name = sender.string;
-                ag.jsUtil.showText(this.node,'名字更新成功');
+                if(data.code==0) {
+                    ag.userInfo._accountData.name = sender.string;
+                    ag.jsUtil.showText(this.node, '名字更新成功!');
+                }else if(data.code==1) {
+                    ag.jsUtil.showText(this.node, '账号不存在！');
+                }else if(data.code==2) {
+                    ag.jsUtil.showText(this.node, '名字已经存在');
+                }else if(data.code==3) {
+                    ag.jsUtil.showText(this.node, '超过一天不再允许修改名字！');
+                }
             }.bind(this));
         }else{
             ag.jsUtil.showText(this.node,'名字至少2个字符');
@@ -192,7 +200,8 @@ cc.Class({
     back:function(){
         ag.musicManager.playEffect("resources/voice/button.mp3");
         ag.userInfo.backGroundPos = cc.find("Canvas/door").getPosition();
-        cc.director.loadScene('LoginScene');
+        //cc.director.loadScene('LoginScene');
+        pomelo.disconnect(function () {});
     },
 
     buttonEventLeft:function(){

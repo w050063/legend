@@ -45,7 +45,7 @@
     "_globalZOrder": 0,
     "_opacityModifyRGB": false,
     "groupIndex": 0,
-    "autoReleaseAssets": {}
+    "autoReleaseAssets": true
   },
   {
     "__type__": "cc.Node",
@@ -2370,7 +2370,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 287
+      "y": 211
     },
     "_skewX": 0,
     "_skewY": 0,

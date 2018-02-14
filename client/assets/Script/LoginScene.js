@@ -12,8 +12,6 @@ cc.Class({
         var editBoxPassword = cc.find("Canvas/nodeLogin/editBoxPassword").getComponent(cc.EditBox);
         editBoxAccount.string = cc.sys.localStorage.getItem('account') || '';
         editBoxPassword.string = cc.sys.localStorage.getItem('password') || '';
-        cc.audioEngine.stopAll();
-        ag.musicManager.playMusic("resources/music/Dragon Rider.mp3");
         cc.find("Canvas/labelVersion").getComponent(cc.Label).string = ag.userInfo._version;
 
     },
@@ -26,6 +24,8 @@ cc.Class({
             var code = str[i].charCodeAt();
             if(code>=48 && code<=57){
                 result = result+str[i];
+            }else{
+                ag.jsUtil.showText(this.node,'账号仅限数字，推荐QQ，方便找回！');
             }
         }
         editbox.string = result;
@@ -113,9 +113,11 @@ cc.Class({
                     ag.userInfo.backGroundPos = cc.find("Canvas/door").getPosition();
                     UserInfo._accountData = data.data;
                     cc.director.loadScene('CreateRoleScene');
-                }else{
+                }else if(data.code==1){
                     editBoxPassword.string = '';
                     ag.jsUtil.showText(this.node,'账号或者密码错误!');
+                }else{
+                    ag.jsUtil.showText(this.node,'未知错误!');
                 }
             }.bind(this));
         }

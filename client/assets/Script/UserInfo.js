@@ -32,8 +32,11 @@ module.exports={
     _guildInvite:null,
     _guildWinId:'',//沙巴克占领者
     _startGameTime :0,
-    _version:'0.0.3',
+    _version:'0.1.2',
     _needGameEnd:'',
+    _serverIP:'',
+    _serverPort:3014,
+
 
 
 	init:function () {
@@ -72,6 +75,8 @@ module.exports={
             "nudeboy036":"164,6",
             "nudeboy037":"170,6",
         };
+
+
 	},
 
 

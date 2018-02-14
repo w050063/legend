@@ -1,0 +1,30 @@
+{
+  "ver": "1.0.0",
+  "uuid": "b5372d87-288e-40ff-8f9c-fdb722a2fca0",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "subMetas": {
+    "lockedGirl": {
+      "ver": "1.0.3",
+      "uuid": "9b311347-8fe5-4699-8284-4600ee9fee1d",
+      "rawTextureUuid": "b5372d87-288e-40ff-8f9c-fdb722a2fca0",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -1,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 122,
+      "height": 114,
+      "rawWidth": 124,
+      "rawHeight": 114,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

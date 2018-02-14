@@ -66,6 +66,7 @@ cc.Class({
         var node = ag.jsUtil.getNode(ag.gameLayer._map.node,"ani/effect4/507000",6,ag.gameConst.roleEffectZorder,0.1,function(sender){});
         node.setPosition(ag.gameLayer._player.getTruePosition(cc.p(parseInt(array[1]),parseInt(array[2]))));
         node.setLocalZOrder(Math.round(10000-node.y)-1);
+        node.scale = 0.3;
         this._fireWallMap[mapXYString] = {id:role._data.id,tag:tag,node:node};
     },
 
