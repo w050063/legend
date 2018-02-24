@@ -42,4 +42,10 @@ cc.Class({
         ag.musicManager.playEffect("resources/voice/button.mp3");
         cc.find('Canvas/nodeShop').active = false;
     },
+
+
+    buttonEventShowCard:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        ag.gameLayer._card.show();
+    },
 });

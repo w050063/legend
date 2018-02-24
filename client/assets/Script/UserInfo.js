@@ -32,7 +32,7 @@ module.exports={
     _guildInvite:null,
     _guildWinId:'',//沙巴克占领者
     _startGameTime :0,
-    _version:'0.1.2',
+    _version:'0.1.3',
     _needGameEnd:'',
     _serverIP:'',
     _serverPort:3014,

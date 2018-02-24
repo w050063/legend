@@ -10,7 +10,9 @@ var AGTileMap = require("AGTileMap");
 var ItemInfoNode = require('ItemInfoNode');
 var Wharehouse = require('Wharehouse');
 var AuctionShop = require('AuctionShop');
+var GuildMember = require('GuildMember');
 var Card = require('Card');
+var Rank = require('Rank');
 var AGAni = require("AGAni");
 var TeamAsk = require('TeamAsk');
 var baseNpcId = 5000;
@@ -36,7 +38,9 @@ cc.Class({
         this._bagArray = [];
         this._auctionShop = cc.find('Canvas/nodeAuctionShop').getComponent(AuctionShop);
         this._card = cc.find('Canvas/nodeCard').getComponent(Card);
+        this._rank = cc.find('Canvas/nodeRank').getComponent(Rank);
         this._teamAsk = cc.find('Canvas/nodeTeamAsk').getComponent(TeamAsk);
+        this._guildMember = cc.find('Canvas/nodeGuildMember').getComponent(GuildMember);
         var i=0;
 
         for(i=0;i<ag.gameConst.bagMaxCount;++i){
@@ -1106,8 +1110,8 @@ cc.Class({
             var node = new cc.Node();
             var tips = node.addComponent(cc.Label);
             node.x = 0;
-            node.y = 87;
-            tips.fontSize = 12;
+            node.y = 140;
+            tips.fontSize = 20;
             node.color = cc.color(255,255,255);
             tips.string = content;
             //role.node.addChild(node,30);
@@ -1270,7 +1274,10 @@ cc.Class({
     showNodeNpcContent:function(data){
         if(data.content.length==1){
             var transferMst = ag.gameConst._transferMst[data.content[0]];
-            if(transferMst.id=='t9000'){
+            if(transferMst.id=='t9001'){
+                this._rank.show();
+                return;
+            }else if(transferMst.id=='t9000'){
                 this._card.show();
                 return;
             }else if(transferMst.id=='t8000'){
@@ -1310,11 +1317,11 @@ cc.Class({
         if(data.content.length>0){
             if(data.content[0]=='t4000'){
                 if(this.getIsGuildmember()){
-                    content = ['t4006'];
+                    content = ['t4006','t4007'];
                 }else if(ag.userInfo._guildInvite){
                     content = ['t4000','t4001'];
                 }else{
-                    content = ['t4002','t4003','t4004','t4005'];
+                    content = ['t4002','t4003','t4004','t4005','t4007'];
                 }
             }
         }
@@ -1388,6 +1395,8 @@ cc.Class({
                             ag.jsUtil.alert(ag.gameLayer.node,'退出行会!',function () {
                                 ag.agSocket.send("guildExit",{});
                             },function () {});
+                        }else if(transferMst.id=='t4007'){
+                            self._guildMember.show();
                         }else if(npcStr=='四级以下回收' || npcStr=='五级回收' || npcStr=='六级回收' || npcStr=='七级回收' || npcStr=='八级回收' || npcStr=='九级回收'){
                             var curLevels = transferMst.levels;
                             var array = [];
@@ -1675,4 +1684,72 @@ cc.Class({
         ag.musicManager.playEffect("resources/voice/button.mp3");
         ag.agSocket.send("seeTeam",{});
     },
+
+
+
+    //一键穿戴装备
+    buttonEventPuton:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        for(var key in ag.userInfo._itemMap){
+            var obj = ag.userInfo._itemMap[key];
+            if(obj._data.owner==this._player._data.id && obj._data.puton==ag.gameConst.putonBag){
+                var mst = ag.gameConst._itemMst[obj._data.mid];
+                if(mst.exclusive.indexOf(this._player.getTypeNum())!=-1){
+                    var index = ag.gameConst.putonTypes.indexOf(mst.type);
+                    var putOnId = this.getPlayerItemId(index);
+                    if(putOnId) {//手和戒指右边的处理
+                        var mst2 = ag.gameConst._itemMst[ag.userInfo._itemMap[putOnId]._data.mid];
+                        if ((mst.type == 4 || mst.type == 5)) {
+                            var indexRight = index + 1;
+                            var putOnIdRight = this.getPlayerItemId(indexRight);
+                            if (putOnIdRight) {
+                                var mstOther = ag.gameConst._itemMst[ag.userInfo._itemMap[putOnIdRight]._data.mid];
+                                if (mstOther.level < mst2.level) {
+                                    index = indexRight;
+                                    putOnId = putOnIdRight;
+                                }
+                            } else {
+                                index = indexRight;
+                                putOnId = putOnIdRight;
+                            }
+                        }
+                    }
+
+                    if(putOnId){//如果有装备，则切换装备
+                        var mst2 = ag.gameConst._itemMst[ag.userInfo._itemMap[putOnId]._data.mid];
+                        if(mst.level>mst2.level){
+                            var id = obj._data.id;
+                            ag.agSocket.send("bagItemToEquip",{id:id,puton:index});
+                            if(putOnId)ag.userInfo._itemMap[putOnId]._data.puton = ag.gameConst.putonBag;
+                            ag.userInfo._itemMap[id]._data.puton = index;
+                            ag.gameLayer._player.addEquip(id);
+                            ag.gameLayer.itemBagToEquip(id);
+                            if(putOnId)ag.gameLayer.addItemToBag(putOnId);
+                        }
+                    }else{
+                        var id = obj._data.id;
+                        ag.agSocket.send("bagItemToEquip",{id:id,puton:index});
+                        ag.userInfo._itemMap[id]._data.puton = index;
+                        ag.gameLayer._player.addEquip(id);
+                        ag.gameLayer.itemBagToEquip(id);
+                    }
+                }
+            }
+        }
+    },
+
+
+    //获得身上位置的道具id
+    getPlayerItemId:function(index){
+        var tempId = null;
+        for(var key in ag.userInfo._itemMap){
+            var obj = ag.userInfo._itemMap[key]._data;
+            if(obj.owner==ag.gameLayer._player._data.id && obj.puton==index){
+                tempId = obj.id;
+                break;
+            }
+        }
+        return tempId;
+    },
+
 });

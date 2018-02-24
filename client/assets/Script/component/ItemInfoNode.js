@@ -123,7 +123,7 @@ cc.Class({
             var mst = ag.gameConst._itemMst[this._obj._data.mid];
             ag.agSocket.send("equipItemToBag",id);
             var puton = ag.userInfo._itemMap[id]._data.puton;
-            delete ag.userInfo._itemMap[id]._data.puton;
+            ag.userInfo._itemMap[id]._data.puton = ag.gameConst.putonBag;
             ag.gameLayer.itemEquipToBag(id,puton);
         }else if(label.string=='穿戴'){
             var id = this._obj._data.id;
@@ -131,24 +131,16 @@ cc.Class({
             if(mst.exclusive.indexOf(ag.gameLayer._player.getTypeNum())!=-1){
                 var index = ag.gameConst.putonTypes.indexOf(mst.type);
                 if((mst.type==4 || mst.type==5) && ag.userInfo.operatePuton=='right')++index;
-                cc.log('chuan:'+index);
                 ag.agSocket.send("bagItemToEquip",{id:id,puton:index});
 
 
                 //如果有装备，则切换装备
-                var tempId = -1;
-                for(var key in ag.userInfo._itemMap){
-                    var obj = ag.userInfo._itemMap[key]._data;
-                    if(obj.owner==ag.gameLayer._player._data.id && obj.puton==index && mst.type==ag.gameConst._itemMst[obj.mid].type){
-                        obj.puton = ag.gameConst.putonBag;
-                        tempId = obj.id;
-                        break;
-                    }
-                }
+                var tempId = ag.gameLayer.getPlayerItemId(index);
+                if(tempId)ag.userInfo._itemMap[tempId]._data.puton = ag.gameConst.putonBag;
                 ag.userInfo._itemMap[id]._data.puton = index;
                 ag.gameLayer._player.addEquip(id);
                 ag.gameLayer.itemBagToEquip(id);
-                if(tempId!=-1)ag.gameLayer.addItemToBag(obj.id);
+                if(tempId)ag.gameLayer.addItemToBag(tempId);
             }else{
                 var tempArray = ['男战','女战','男法','女法','男道','女道'];
                 var str = '此装备限于：';

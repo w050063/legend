@@ -266,6 +266,14 @@ module.exports={
                 if(ag.gameLayer){
                     ag.gameLayer._teamAsk.show(obj.value.id,obj.value.name);
                 }
+            }else if(obj.key=='guildMemberStringArray'){
+                if(ag.gameLayer) {
+                    ag.gameLayer._guildMember.guildMemberString(obj.value);
+                }
+            }else if(obj.key=='sRankArray'){
+                if(ag.gameLayer) {
+                    ag.gameLayer._rank.setData(obj.value);
+                }
             }
         }
         this._dataArray = [];

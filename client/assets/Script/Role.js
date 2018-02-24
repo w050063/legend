@@ -340,7 +340,8 @@ cc.Class({
             if (index > 0) {
                 if(this._propNode._spriteOffice)this._propNode._spriteOffice.node.destroy();
                 this._propNode._spriteOffice = new cc.Node().addComponent(cc.Sprite);
-                this._propNode._spriteOffice.node.y = 103;
+                this._propNode._spriteOffice.node.y = 150;
+                this._propNode._spriteOffice.node.scale = 1.5;
                 this._propNode.addChild(this._propNode._spriteOffice.node);
                 cc.loader.loadRes('office/' + index, cc.SpriteFrame, function (err, spriteFrame) {
                     if (this._propNode && this._propNode._spriteOffice && cc.isValid(this._propNode._spriteOffice)) {
@@ -1104,10 +1105,11 @@ cc.Class({
 
 
     //获得当前的称号索引
-    getOfficeIndex:function(){
+    getOfficeIndex:function(temp){
+        if(temp==undefined)temp = this._data.office;
         var office = 0;
         for(var i=0;i<ag.gameConst.officeProgress.length;++i){
-            if(ag.gameConst.officeProgress[i]<=this._data.office){
+            if(ag.gameConst.officeProgress[i]<=temp){
                 office = i;
             }
         }
