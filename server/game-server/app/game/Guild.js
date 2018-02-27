@@ -96,4 +96,22 @@ module.exports = ag.class.extend({
         }
         return null;
     },
+
+
+    requestGuildMemberString:function(rid){
+        var guildId = this.getGuildId(rid);
+        if(guildId){
+            var result = '\n掌门人：\n';
+            var role = ag.gameLayer.getRole(guildId);
+            result = result+(role?role._data.name:'XXX')+'\n\n成员列表：\n';
+            var array = this._dataMap[guildId].member;
+            for(var i=0;i<array.length;++i){
+                var role = ag.gameLayer.getRole(array[i]);
+                result = result+(role?role._data.name:'XXX')+'        ';
+            }
+            ag.jsUtil.sendData("guildMemberString",result,rid);
+        }else{
+            ag.jsUtil.sendData("guildMemberString",'您还没加入行会！',rid);
+        }
+    },
 });

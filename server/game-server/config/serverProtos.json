@@ -137,6 +137,8 @@
     "repeated sSetWing sSetWingArray": 30,
     "repeated string treasureStringArray": 31,
     "repeated string sAuctionShopArray": 32,
-    "repeated sAskTeam sAskTeamArray": 33
+    "repeated sAskTeam sAskTeamArray": 33,
+    "repeated string guildMemberStringArray": 34,
+    "repeated string sRankArray": 35
   }
 }

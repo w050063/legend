@@ -39,7 +39,6 @@ var Handler = cc.Class.extend({
                 console.error('set uid for session service failed! error is : %j', err.stack);
             }
         });
-
         session.on('closed', this.onUserLeave.bind(null, self.app));
 
         //put user into channel

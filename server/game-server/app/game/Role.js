@@ -377,18 +377,19 @@ module.exports = ag.class.extend({
             }else if(this.getIsMonster() && this.getMst().lv==9){
                 this._data.hp -=  Math.round(hurt*0.5*rate);
             }else if(this._data.type=='m1'){
-                this._data.hp -=  Math.round(hurt*0.5*rate);
+                this._data.hp -=  Math.round(hurt*0.6*rate);
             }else{
                 this._data.hp -=  Math.round(hurt*rate);
             }
         }else{
-            var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
+            //var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
+            var correct = (1+0.03*this._defense);
             if(this.getIsMonster() && this.getMst().lv==10){
                 this._data.hp -= Math.round(hurt*0.4/correct*rate);
             }else if(this.getIsMonster() && this.getMst().lv==9){
                 this._data.hp -= Math.round(hurt*0.5/correct*rate);
             }else if(this._data.type=='m1'){
-                this._data.hp -= Math.round(hurt*0.5/correct*rate);
+                this._data.hp -= Math.round(hurt*0.4/correct*rate);
             }else{
                 this._data.hp -=  Math.round(hurt/correct*rate);
             }
@@ -483,7 +484,7 @@ module.exports = ag.class.extend({
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
-                        tempRole.changeHPByHurt(this,this._hurt*1.5);
+                        tempRole.changeHPByHurt(this,this._hurt*2);
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }
@@ -597,7 +598,7 @@ module.exports = ag.class.extend({
                     ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
                 }
             }else if(this.getIsPlayer()){
-                if(Math.random()<0.3333){
+                if(Math.random()<0.2){
                     var array = [];
                     var map = ag.itemManager._itemMap.getMap();
                     for(var key in map){

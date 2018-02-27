@@ -5,6 +5,7 @@
 
 
 var cc = require("../../../game/util/cc");
+var pomelo = require('pomelo');
 
 
 module.exports = function(app) {
@@ -26,7 +27,7 @@ var Handler = cc.Class.extend({
                 var map = ag.gameLayer._roleMap;
                 for(var key in map){
                     if(map[key].getIsPlayer() && ag.userManager.getOnline(key)){
-                        result = result+map[key]._data.name+'\n';
+                        result = result+map[key]._data.id+','+map[key]._data.name+'\n';
                     }
                 }
                 code = 0;
@@ -317,9 +318,12 @@ var Handler = cc.Class.extend({
             var id = ag.userManager.getAccountByUid(session.uid);
             var role = ag.gameLayer.getRole(id);
             if(role && typeof msg=='number'){
-                if(ag.gameLayer._gameTime-role._startGameTime+20<msg){
-                    ag.jsUtil.sendData("sAlert","请勿使用作弊软件！",role._data.id);
+                if(ag.gameLayer._gameTime-role._startGameTime+10<msg){
+                    this.app.rpc.conn.ConnRemote.kick(session, session.get("uid"),null, function(){});
+                    //ag.jsUtil.sendData("sAlert","请勿使用作弊软件！",role._data.id);
                 }
+            }else{
+                this.app.rpc.conn.ConnRemote.kick(session, session.get("uid"),null, function(){});
             }
         }catch(e){}
         next();
@@ -578,6 +582,19 @@ var Handler = cc.Class.extend({
                         break;
                     }
                 }
+            }
+        }catch(e){}
+        next();
+    },
+
+
+    //请求行会成员
+    requestGuildMemberString:function(msg, session, next) {
+        try{
+            var id = ag.userManager.getAccountByUid(session.uid);
+            var role =  ag.gameLayer.getRole(id);
+            if(role){
+                ag.guild.requestGuildMemberString(id);
             }
         }catch(e){}
         next();
@@ -897,4 +914,16 @@ var Handler = cc.Class.extend({
     },
 
 
+
+    //请求排行榜
+    requestRank:function(msg, session, next) {
+        try{
+            var id = ag.userManager.getAccountByUid(session.uid);
+            var role =  ag.gameLayer.getRole(id);
+            if(role && ag.gameLayer._rankString){
+                ag.jsUtil.sendData("sRank",ag.gameLayer._rankString,id);
+            }
+        }catch(e){}
+        next();
+    },
 });

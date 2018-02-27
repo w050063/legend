@@ -97,9 +97,9 @@
   ],
 
   "levels": {
-	"rpc-log": "ERROR",
-	"forward-log": "ERROR"
-},
+    "rpc-log" : "ERROR",
+    "forward-log": "ERROR"
+  },
 
   "replaceConsole": true,
 

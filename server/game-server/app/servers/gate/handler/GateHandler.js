@@ -60,7 +60,8 @@ var Handler = cc.Class.extend({
 
 
         // select conn
-        var res = connectors[Math.floor(Math.random()*connectors.length)];
+        var rand = Math.floor(Math.random()*connectors.length);
+        var res = connectors[rand];
         next(null, {
             code: 0,
             host: res.host,

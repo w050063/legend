@@ -23,6 +23,10 @@ module.exports = ag.class.extend({
     doMoveOperate:function (location) {
         var myLocation = this._role.getLocation();
         if(myLocation.x!=location.x || myLocation.y!=location.y){
+            if(Math.abs(myLocation.x-location.x)>=7 || Math.abs(myLocation.y-location.y)>=7){
+                this._role.setLocation(location);
+                ag.jsUtil.sendDataAll("sMoveForce",{id:this._role._data.id,x:location.x,y:location.y},this._role._data.mapId);
+            }
             var direction = ag.gameLayer.getDirection(myLocation,location);
             direction = ag.gameLayer.getOffsetWithColloison(this._role, direction);
             if (direction!=-1){

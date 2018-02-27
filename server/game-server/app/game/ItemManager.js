@@ -35,7 +35,7 @@ module.exports = ag.class.extend({
     //为初始化准备道具
     presentWith:function(id){
         var role = ag.gameLayer.getRole(id);
-        if(role && role._bagLength==0){
+        if(role && role._data.level<=1){
             //var array = ['i000','i001','i014','i019','i026','i033','i038','i045','i048','i055','i059','i063','i066'];
             var array = ['i001000','i001200','i001201'];
             for(var i=0;i<array.length;++i){
@@ -316,7 +316,7 @@ module.exports = ag.class.extend({
     //寻宝一次
     treasure:function (role) {
         var rand = Math.random();
-        if(rand<0.4){
+        if(rand<0.5){
             role.addExp(2000);
             ag.jsUtil.sendData("sSystemNotify",role._data.name+"在龙族宝藏寻到2000点经验",role._data.id);
         }else if(rand<0.6){

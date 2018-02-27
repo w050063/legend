@@ -79,7 +79,7 @@ module.exports = ag.class.extend({
             this.delPoison(key);
         }
         var tag = ++this._baseTag;
-        var value = Math.round(attacker._hurt*0.1);
+        var value = Math.round(attacker._hurt*0.4);
         this._poisonMap[key] = {id:attacker._data.id,value:value,tag:tag};
         role._data.defense -=value;
         ag.actionManager.runAction(role,30,function(){
@@ -125,7 +125,7 @@ module.exports = ag.class.extend({
                     for(var i = 0; i < array.length; ++i) {
                         var tempRole = array[i];
                         if (ag.gameLayer.isEnemyForAttack(attacker, tempRole)) {
-                            tempRole.changeHPByHurt(attacker, attacker._hurt * 0.4);
+                            tempRole.changeHPByHurt(attacker, attacker._hurt * 0.5);
                             if (tempRole._data.hp <= 0) {
                                 tempRole.dead(attacker);
                             }
@@ -144,8 +144,7 @@ module.exports = ag.class.extend({
             var attacker = ag.gameLayer.getRole(this._poisonMap[key].id);
             if(tempRole && attacker){
                 if(ag.gameLayer.isEnemyForAttack(attacker,tempRole)){
-                    tempRole._data.hp -= 1;
-                    tempRole.changeHPByHurt(attacker,attacker._hurt*0.1);
+                    tempRole.changeHPByHurt(attacker,attacker._hurt*0.6);
                     if(tempRole._data.hp<=0){
                         tempRole.dead(attacker);
                     }

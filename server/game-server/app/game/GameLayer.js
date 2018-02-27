@@ -19,6 +19,7 @@ module.exports = {
         ag.gameLayer = this;
         this._roleMap = {};
         this._roleXYMap = {};
+        this._rankString = "";
 
 
         //启动定时器,每秒执行一次
@@ -31,12 +32,14 @@ module.exports = {
         ag.actionManager.schedule(this,60,function (dt) {
             var rand = Math.random();
             if(rand<0.33){
-                ag.jsUtil.sendDataAll("sSystemNotify","元宝可以在商城购买养成属性！");
+                ag.jsUtil.sendDataAll("sSystemNotify","元宝可以在商城购买道具,提升战斗力！");
             }else if(rand<0.66){
                 ag.jsUtil.sendDataAll("sSystemNotify","提示：战士刺杀第二格无视防御！");
             }else{
                 ag.jsUtil.sendDataAll("sSystemNotify","提示：安全区外可随意杀人！");
             }
+
+            this.getRank();//获取排行榜数据
 
             //更新新的一天的数据
             var date = new Date();
@@ -425,8 +428,10 @@ module.exports = {
                     if(role2.getIsPlayer()){
                         var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
                         if(safe){
-                            var lx = role2.getLocation().x,ly = role2.getLocation().y;
-                            if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+                            var lx1 = role1.getLocation().x,ly1 = role1.getLocation().y;
+                            var lx2 = role2.getLocation().x,ly2 = role2.getLocation().y;
+                            if(lx1>=safe.x && lx1<=safe.xx && ly1>=safe.y && ly1<=safe.yy)return false;
+                            if(lx2>=safe.x && lx2<=safe.xx && ly2>=safe.y && ly2<=safe.yy)return false;
                         }
                     }
                     return true;
@@ -438,8 +443,10 @@ module.exports = {
                     if(role2.getIsPlayer()){
                         var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
                         if(safe){
-                            var lx = role2.getLocation().x,ly = role2.getLocation().y;
-                            if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+                            var lx1 = role1.getLocation().x,ly1 = role1.getLocation().y;
+                            var lx2 = role2.getLocation().x,ly2 = role2.getLocation().y;
+                            if(lx1>=safe.x && lx1<=safe.xx && ly1>=safe.y && ly1<=safe.yy)return false;
+                            if(lx2>=safe.x && lx2<=safe.xx && ly2>=safe.y && ly2<=safe.yy)return false;
                         }
                     }
                     if(role1._data.camp!=role2._data.camp)return true;
@@ -448,10 +455,11 @@ module.exports = {
                     if(role2.getIsPlayer()){
                         var safe = ag.gameConst._terrainMap[role2._data.mapId].safe;
                         if(safe){
-                            var lx = role2.getLocation().x,ly = role2.getLocation().y;
-                            if(lx>=safe.x && lx<=safe.xx && ly>=safe.y && ly<=safe.yy)return false;
+                            var lx1 = role1.getLocation().x,ly1 = role1.getLocation().y;
+                            var lx2 = role2.getLocation().x,ly2 = role2.getLocation().y;
+                            if(lx1>=safe.x && lx1<=safe.xx && ly1>=safe.y && ly1<=safe.yy)return false;
+                            if(lx2>=safe.x && lx2<=safe.xx && ly2>=safe.y && ly2<=safe.yy)return false;
                         }
-                        console.log(!ag.team.isSameTeam(role1._data.id,role2._data.id));
                         return !ag.team.isSameTeam(role1._data.id,role2._data.id);
                     }else{
                         return true;
@@ -462,5 +470,55 @@ module.exports = {
             }
         }
         return false;
+    },
+
+
+    //请求排行榜
+    getRank:function(){
+        var levels = [],hurts = [],offices = [],i = 0,len = 0,data = {},array = [];
+        for(var key in this._roleMap){
+            if(this._roleMap[key].getIsPlayer()){
+                array.push(this._roleMap[key]);
+            }
+        }
+        len = Math.min(10,array.length);
+        var sexTypes = {m0:['男战','女战'],m1:['男法','女法'],m2:['男道','女道']};
+
+
+        //等级
+        array.sort(function(a,b){
+            if(b._data.level == a._data.level){
+                return b._exp - a._exp;
+            }
+            return b._data.level - a._data.level;
+        });
+        for(i=0;i<len;++i){
+            levels.push(array[i]._data.id);
+            data[array[i]._data.id] = {name:array[i]._data.name,level:array[i]._data.level
+                ,sexType:sexTypes[array[i]._data.type][array[i]._data.sex],hurt:array[i]._hurt,office:array[i]._data.office};
+        }
+
+
+        //攻击
+        array.sort(function(a,b){
+            return b._hurt - a._hurt;
+        });
+        for(i=0;i<len;++i){
+            hurts.push(array[i]._data.id);
+            data[array[i]._data.id] = {name:array[i]._data.name,level:array[i]._data.level
+                ,sexType:sexTypes[array[i]._data.type][array[i]._data.sex],hurt:array[i]._hurt,office:array[i]._data.office};
+        }
+
+
+        //称号
+        array.sort(function(a,b){
+            return b._data.office - a._data.office;
+        });
+        for(i=0;i<len;++i){
+            offices.push(array[i]._data.id);
+            data[array[i]._data.id] = {name:array[i]._data.name,level:array[i]._data.level
+                ,sexType:sexTypes[array[i]._data.type][array[i]._data.sex],hurt:array[i]._hurt,office:array[i]._data.office};
+        }
+        this._rankString = JSON.stringify({levels:levels,hurts:hurts,offices:offices,data:data});
     },
 };

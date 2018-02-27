@@ -9,6 +9,7 @@ var crypto = require('./crypto');
 var Item = require('../Item');
 module.exports = ag.class.extend({
     ctor:function () {
+        //console.log(crypto.toBase64("大王来巡山"));
         this._chatCount = 0;
         this._dataArray = [];
         this._cardMap = {};
@@ -42,13 +43,16 @@ module.exports = ag.class.extend({
             for(var i=0;i<rows.length;++i){
                 var data = rows[i];
                 if(ag.gameConst._itemMst[data.mid]){
-                    var item = new Item(data.mid,undefined,undefined,data.id);
-                    item._duration = 0;
-                    item._data.owner = data.owner;
-                    item._data.puton = data.puton;
-                    ag.itemManager._itemMap.add(item);
                     var role = ag.gameLayer.getRole(data.owner);
                     if(role){
+                        var item = new Item(data.mid,undefined,undefined,data.id);
+                        item._duration = 0;
+                        item._data.owner = data.owner;
+                        item._data.puton = data.puton;
+                        ag.itemManager._itemMap.add(item);
+                        if(item._data.puton==ag.gameConst.putonBag){
+                            ++role._bagLength;
+                        }
                         ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
                         role.refreshItemProp();
                     }

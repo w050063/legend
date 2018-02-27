@@ -27,6 +27,10 @@ module.exports = ag.class.extend({
                     this._guildWinId = data.guildWinId;
                 }.bind(this));
                 ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
+                ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
+                ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
+                ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
+                ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
                 this.reset();
                 setTimeout(function(){
                     this._bRunning = 0;
@@ -35,6 +39,10 @@ module.exports = ag.class.extend({
                         ag.db._customData.guildWinId = this._guildWinId;
                         ag.db.setCustomData(data2);
                     }.bind(this));
+                    ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
+                    ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
+                    ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
+                    ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
                     ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
                 }.bind(this),duration2);
             }.bind(this),duration);
