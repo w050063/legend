@@ -64,7 +64,7 @@ cc.Class({
 
 
             var self = this;
-            pomelo.init({host: '123.56.218.100',port: 3014,log: true}, function() {
+            pomelo.init({host: '127.0.0.1',port: 3014,log: true}, function() {
                 pomelo.request('gate.GateHandler.serverlist', {}, function(data) {
                     pomelo.disconnect(function () {});
                     if(data.code==0){
@@ -75,7 +75,6 @@ cc.Class({
             });
         }
     },
-
 
 
     refresh2: function() {
