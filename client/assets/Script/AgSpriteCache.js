@@ -77,7 +77,6 @@ cc.Class({
 
     // called every frame
     update001: function (dt) {
-        ag.jsUtil.startTime();
         if(this._bLoading==false){
             //先显示图片20张，再进行下载，最后处理无法显示的图片
             var bDisposeCount = 0;
@@ -158,7 +157,6 @@ cc.Class({
                 }
             }
         }
-        ag.jsUtil.addTime('spritecache');
     },
 
 

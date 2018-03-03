@@ -22,6 +22,9 @@ cc.Class({
         this.node.getChildByName('labelTeam').on(cc.Node.EventType.TOUCH_END, function (event) {
             this.buttonEventTeam();
         }.bind(this));
+        this.node.getChildByName('labelDeal').on(cc.Node.EventType.TOUCH_END, function (event) {
+            this.buttonEventDeal();
+        }.bind(this));
     },
 
     setRid:function(rid){
@@ -56,6 +59,17 @@ cc.Class({
         var role = ag.gameLayer.getRole(this._rid);
         if(role){
             ag.agSocket.send("askTeam",{id:role._data.id});
+        }
+    },
+
+
+
+    //交易
+    buttonEventDeal:function(){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        var role = ag.gameLayer.getRole(this._rid);
+        if(role){
+            ag.agSocket.send("askDeal",{id:role._data.id});
         }
     },
 });

@@ -80,6 +80,39 @@ cc.Class({
     },
 
 
+    setItemIdByDeal:function(id){
+        var obj = ag.userInfo._itemMap[id];
+        var mst = ag.gameConst._itemMst[obj._data.mid];
+        var back = this.node.getChildByName('back');
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
+        back.getChildByName('labelContent').getComponent(cc.Label).string = ag.gameLayer.getItemBagShow(mst);
+        var buttonNode = back.getChildByName('buttonDispose');
+        buttonNode.x = 0;
+        var label = buttonNode.getChildByName('label').getComponent(cc.Label);
+        label.string = ag.gameLayer._deal.getInMyDealDataArray(id)?'确定':'放入';
+        var label1 = back.getChildByName('buttonDispose1').getChildByName('label').getComponent(cc.Label);
+        back.getChildByName('buttonDispose1').active = false;
+        this._obj = obj;
+        ag.jsUtil.secondInterfaceAnimation(back);
+    },
+
+
+    setItemMidByDealDest:function(mid){
+        var mst = ag.gameConst._itemMst[mid];
+        var back = this.node.getChildByName('back');
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
+        back.getChildByName('labelContent').getComponent(cc.Label).string = ag.gameLayer.getItemBagShow(mst);
+        var buttonNode = back.getChildByName('buttonDispose');
+        buttonNode.x = 0;
+        var label = buttonNode.getChildByName('label').getComponent(cc.Label);
+        label.string = '确定';
+        var label1 = back.getChildByName('buttonDispose1').getChildByName('label').getComponent(cc.Label);
+        back.getChildByName('buttonDispose1').active = false;
+        this._obj = null;
+        ag.jsUtil.secondInterfaceAnimation(back);
+    },
+
+
     setItemId:function(id){
         var obj = ag.userInfo._itemMap[id];
         var mst = ag.gameConst._itemMst[obj._data.mid];
@@ -163,6 +196,12 @@ cc.Class({
                 this._obj._data.puton = ag.gameConst.putonBag;
                 ag.agSocket.send("itemWharehouseToBag", this._obj._data.id);
                 ag.gameLayer.itemWharehouseToBag(this._obj._data.id);
+            }
+        }else if(label.string=='放入'){
+            if(ag.gameLayer._deal._dealDataArray1.length<10){
+                ag.gameLayer._deal.itemBagToDeal(this._obj._data.id);
+            }else{
+                ag.jsUtil.showText(ag.gameLayer.node,"一次最多交易10个装备");
             }
         }
         this.node.active = false;

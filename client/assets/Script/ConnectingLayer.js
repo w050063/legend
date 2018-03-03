@@ -10,6 +10,48 @@ cc.Class({
 
     // use this for initialization
     onLoad: function () {
+        if(!window.ag){
+            //if (cc._renderType === cc.game.RENDER_TYPE_WEBGL) {
+            //    cc.director.setProjection(cc.Director.PROJECTION_2D);
+            //}else{
+            //    cc.renderer.enableDirtyRegion(false);
+            //}
+            window.ag = {};
+            ag.jsUtil = require("JsUtil");
+            ag.userInfo = require("UserInfo");
+            ag.userInfo.init();
+            ag.gameConst = require("GameConst");
+            ag.agSocket = require("AGSocket");
+            ag.gameConst.init();
+            var BuffManager = require("BuffManager");
+            ag.buffManager = new BuffManager();
+            ag.buffManager.init();
+            var AgSpriteCache = require("AgSpriteCache");
+            ag.spriteCache = new AgSpriteCache();
+            ag.spriteCache.init();
+            var MusicManager = require("MusicManager");
+            ag.musicManager = new MusicManager();
+            ag.musicManager.init();
+
+
+            //注册前后台切换事件
+            cc.game.on(cc.game.EVENT_HIDE, function () {
+                if(ag.gameLayer && ag.gameLayer._player && ag.gameLayer._player._ai){
+                    ag.gameLayer._player._ai._touchPointArray = [];
+                }
+            });
+            cc.game.on(cc.game.EVENT_SHOW , function () {
+                if(ag.gameLayer && ag.gameLayer._player && ag.gameLayer._player._ai){
+                    ag.gameLayer._player._ai._touchPointArray = [];
+                }
+            });
+
+            //cc.director.setDisplayStats(false);
+        }
+
+        ag.musicManager.playMusic("resources/voice/Victory.mp3");
+
+
         var node = cc.find("Canvas/door");
         node.setPosition(ag.userInfo.backGroundPos);
         var dis0 = cc.pDistance(cc.p(280,230),cc.p(-100,-330));
@@ -20,32 +62,11 @@ cc.Class({
 
 
         this._nodeLoading = cc.find("Canvas/nodeLoading").getComponent(NodeLoading);
-        this._nodeLoading.setShow("正在连接网络...");
-        this._nodeLoading.setPercent(".");
+        //this._nodeLoading.setShow("正在连接网络...");
+        //this._nodeLoading.setPercent(".");
 
 
-        var self = this;
-        var times = 0,sec = 5;
-        var scheduleFunc = function (dt) {
-            if(ag.userInfo._needGameEnd){//版本过低，终止进入游戏
-                self.unschedule(scheduleFunc);
-                ag.jsUtil.alert(self.node,ag.userInfo._needGameEnd,function () {
-                    cc.game.end();
-                });
-            }else{
-                ++sec;
-                if(sec==6){
-                    sec = 0;
-                    ++times;
-                    ag.agSocket.init(function(){
-                        self.unschedule(scheduleFunc);
-                        self.loadPrefab();
-                    });
-                }
-                self._nodeLoading.setPercent('第'+times+'次'+sec+'秒');
-            }
-        };
-        this.schedule(scheduleFunc,1);
+        this.loadPrefab();
     },
 
 

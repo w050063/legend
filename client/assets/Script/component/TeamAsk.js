@@ -10,14 +10,18 @@ cc.Class({
 
 
     onLoad: function () {
-
     },
 
-    show:function(rid,name){
+    show:function(askType,rid,name){
+        this._type = askType;
         if(cc.find('Canvas/nodeHelp/toggleAllowTeam').getComponent(cc.Toggle).isChecked){
             this.node.active = true;
             this._rid = rid;
-            this.node.getChildByName('label').getComponent(cc.Label).string = ''+name+'邀请你组队';
+            if(this._type==ag.gameConst.askTeam){
+                this.node.getChildByName('label').getComponent(cc.Label).string = ''+name+'邀请你组队';
+            }else if(this._type==ag.gameConst.askDeal){
+                this.node.getChildByName('label').getComponent(cc.Label).string = ''+name+'请求交易';
+            }
             this.node.stopAllActions();
             this.node.runAction(cc.sequence(cc.delayTime(10),cc.callFunc(function(){
                 this.node.active = false;
@@ -35,7 +39,11 @@ cc.Class({
     //同意
     buttonEventYES:function(){
         ag.musicManager.playEffect("resources/voice/button.mp3");
-        ag.agSocket.send("addTeam",{id:this._rid});
+        if(this._type==ag.gameConst.askTeam){
+            ag.agSocket.send("addTeam",{id:this._rid});
+        }else if(this._type==ag.gameConst.askDeal){
+            ag.agSocket.send("addDeal",{id:this._rid});
+        }
         this.node.active = false;
     },
 });

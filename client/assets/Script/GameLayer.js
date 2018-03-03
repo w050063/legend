@@ -9,6 +9,7 @@ var Item = require("Item");
 var AGTileMap = require("AGTileMap");
 var ItemInfoNode = require('ItemInfoNode');
 var Wharehouse = require('Wharehouse');
+var Deal = require('Deal');
 var AuctionShop = require('AuctionShop');
 var GuildMember = require('GuildMember');
 var Card = require('Card');
@@ -41,6 +42,7 @@ cc.Class({
         this._rank = cc.find('Canvas/nodeRank').getComponent(Rank);
         this._teamAsk = cc.find('Canvas/nodeTeamAsk').getComponent(TeamAsk);
         this._guildMember = cc.find('Canvas/nodeGuildMember').getComponent(GuildMember);
+        this._deal = cc.find('Canvas/nodeDeal').getComponent(Deal);
         var i=0;
 
         for(i=0;i<ag.gameConst.bagMaxCount;++i){
@@ -54,11 +56,20 @@ cc.Class({
         cc.find('Canvas/buttonLocked').active = false;
         cc.find('Canvas/nodeLockedList').active = false;
 
+
+        cc.find('Canvas/nodeMinMap').active = true;
+
         //自动攻击
         var temp = !(cc.sys.localStorage.getItem('setupAutoAttack')=='false');
         this._setupAutoAttack = temp;
         cc.sys.localStorage.setItem('setupAutoAttack',''+temp);
         cc.find('Canvas/nodeHelp/toggleAutoAttack').getComponent(cc.Toggle).isChecked = temp;
+
+        //自动玩家
+        temp = cc.sys.localStorage.getItem('setupAutoPlayer')=='true';
+        this._setupAutoPlayer = temp;
+        cc.sys.localStorage.setItem('setupAutoPlayer',''+temp);
+        cc.find('Canvas/nodeHelp/toggleAutoPlayer').getComponent(cc.Toggle).isChecked = temp;
 
 
         //启用摇杆
@@ -373,13 +384,27 @@ cc.Class({
     //初始化道具
     initItem:function(data){
         if(ag.userInfo._itemMap[data.id]){
+            var lastItem = ag.userInfo._itemMap[data.id];
             ag.userInfo._itemMap[data.id]={_data:data};
-            if(data.owner && data.puton>=0){
+            ag.userInfo._itemMapBack[data.id] = ag.userInfo._itemMap[data.id];
+            if(data.owner){
                 var role = this.getRole(data.owner);
-                if(role)role.addEquip(data.id);
+                if(role){
+                    if(data.puton>=0){
+                        role.addEquip(data.id);
+                    }else if(data.puton==ag.gameConst.putonBag){
+                        if(role==this._player)this.itemEquipToBag(data.id);
+                    }
+                }
+            }
+            if(lastItem._data.owner==this._player._data.id
+                && lastItem._data.puton==ag.gameConst.putonBag
+                && data.owner!=this._player._data.id ){//取消背包的装备
+                this.delItemFormBag(data.id);
             }
         }else{
             ag.userInfo._itemMap[data.id]={_data:data};
+            ag.userInfo._itemMapBack[data.id] = ag.userInfo._itemMap[data.id];
             if(data.owner){
                 var role = this._roleMap[data.owner];
                 if(role){
@@ -636,6 +661,7 @@ cc.Class({
 
 
     addItemToBag:function(id){
+        this._deal.close();//防止背包不在当前界面
         for(var i=0;i<this._bagArray.length;++i){
             if(this._bagArray[i].id==id){
                 cc.log('error: bag have already had!');
@@ -668,6 +694,9 @@ cc.Class({
             }else if(cc.find('Canvas/nodeWharehouse').active){
                 cc.find('Canvas/nodeItemInfo').active = true;
                 cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemIdByWharehouse(id);
+            }else if(cc.find('Canvas/nodeDeal').active){
+                cc.find('Canvas/nodeItemInfo').active = true;
+                cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemIdByDeal(id);
             }else{
                 cc.find('Canvas/nodeItemInfo').active = true;
                 cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
@@ -678,6 +707,7 @@ cc.Class({
 
     //删除一件道具
     delItemFormBag:function(id){
+        this._deal.close();//防止背包不在当前界面
         var index = -1;
         for(var i=0;i<this._bagArray.length;++i){
             if(this._bagArray[i].id==id){
@@ -1179,6 +1209,11 @@ cc.Class({
         ag.musicManager.playEffect("resources/voice/button.mp3");
         this._setupAutoAttack = event.isChecked;
         cc.sys.localStorage.setItem('setupAutoAttack',''+event.isChecked);
+    },
+    toggleAutoPlayer: function (event) {
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        this._setupAutoPlayer = event.isChecked;
+        cc.sys.localStorage.setItem('setupAutoPlayer',''+event.isChecked);
     },
     toggleEventSetupRock: function (event) {
         ag.musicManager.playEffect("resources/voice/button.mp3");

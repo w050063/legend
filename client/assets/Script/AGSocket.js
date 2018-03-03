@@ -5,63 +5,86 @@
 
 module.exports={
     _dataArray:[],
-    _step : 0,
+    _normalDis:false,
 
 
     //setup socket.
     init: function(callback) {
         var self = this;
-        if(self._step != 0)pomelo.disconnect();
-        self._step = 0;
-        pomelo.init({host: ag.userInfo._serverIP,port: ag.userInfo._serverPort,log: true}, function() {
-            pomelo.request('gate.GateHandler.queryEntry', {version:ag.userInfo._version}, function(data) {
-                if(data.code==0){
-                    var uid = data.uid;
-                    pomelo.disconnect(function () {
-                        self._step = 1;
-                        pomelo.init({
-                            host : data.host,
-                            port : data.port,
-                            reconnect : true
-                        }, function (data1) {
-                            pomelo.request("conn.ConnHandler.connect", {uid:uid}, function(data2) {
-                                self._step = 2;
-                                cc.log("网关 successed!");
-                                if(callback)callback(data2);
-                            });
-                        })
-                    });
-                }else{
-                    ag.userInfo._needGameEnd = data.text;
-                    pomelo.disconnect(function () {});
-                }
+        if(pomelo.getSocket()){
+            self._normalDis = true;
+            pomelo.disconnect(function(){
+                self._normalDis = false;
+                self.connect(callback);
             });
-        });
-
+        }else{
+            self.connect(callback);
+        }
 
         //设置断开逻辑
         pomelo.removeAllListeners('disconnect');
         pomelo.on('disconnect',function () {
-            if(self._step == 0){
-            }else if(self._step == 1){
-            }else if(self._step == 2){
-                var node = cc.director.getScene();
+            cc.log("disconnect",self._normalDis);
+            if(!self._normalDis){
                 ag.agSocket._dataArray = [];
                 ag.userInfo._itemMap = {};
                 ag.gameLayer = null;
-                if(node.name!='ConnectingLayer'){
-                    cc.director.loadScene('ConnectingLayer');
+                ag.userInfo._legendID = "";
+                ag.userInfo._serverIP = "";
+                ag.userInfo._serverPort = "";
+                var node = cc.director.getScene();
+                if(node.name!='LoginScene'){
+                    cc.director.loadScene('LoginScene');
+                }else{
+                    var label = cc.find("Canvas/labelState").getComponent(cc.Label);
+                    label.string = "网络关闭...";
+                    label.node.color = cc.color(255,0,0);
                 }
             }
         });
 
         pomelo.removeAllListeners('sOtherLogin');
         pomelo.on('sOtherLogin',function(data) {
-            ag.jsUtil.alert(cc.director.getScene().getChildByName('Canvas'),data.msg,function () {
-                pomelo.disconnect();
+            pomelo.disconnect(function () {
+                ag.userInfo._otherLogin = data.msg;
             });
         }.bind(this));
 	},
+
+    //连接
+    connect: function(callback) {
+        var self = this;
+        pomelo.init({host: ag.userInfo._serverIP,port: ag.userInfo._serverPort,log: true}, function() {
+            pomelo.request('gate.GateHandler.queryEntry', {version:ag.userInfo._version}, function(data) {
+                if(data.code==0){
+                    var uid = data.uid;
+                    self._normalDis = true;
+                    cc.log("connect1",self._normalDis);
+                    pomelo.disconnect(function () {
+                        self._normalDis = false;
+                        cc.log("connect2",self._normalDis);
+                        pomelo.init({
+                            host : data.host,
+                            port : data.port,
+                            reconnect : true
+                        }, function (data1) {
+                            pomelo.request("conn.ConnHandler.connect", {uid:ag.userInfo._legendID+'_'+uid}, function(data2) {
+                                cc.log("网关 successed!");
+                                if(callback)callback(data2);
+                            });
+                        });
+                    });
+                }else{
+                    pomelo.disconnect(function () {
+                        ag.userInfo._otherLogin = data.text;
+                        cc.director.loadScene('LoginScene');
+                    });
+                }
+            });
+        });
+    },
+
+
 
     //发送数据封装
     send: function(key,obj) {
@@ -110,7 +133,6 @@ module.exports={
 
     //缓存的数据，需要的时候调用。
     doWork:function(){
-        ag.jsUtil.startTime();
         for(var i=0;i<this._dataArray.length;++i){
             var obj = this._dataArray[i];
             if(obj.key=='sMoveArray'){
@@ -158,6 +180,11 @@ module.exports={
                 ag.gameLayer.itemBagAdd(obj.value);
             }else if(obj.key=='sItemArray'){
                 ag.gameLayer.initItem(obj.value);
+            }else if(obj.key=='sItemBackArray'){
+                var temp = ag.userInfo._itemMapBack[obj.value];
+                if(temp){
+                    ag.gameLayer.initItem(temp._data);
+                }
             }else if(obj.key=='sItemDisappearArray'){
                 ag.gameLayer.sItemDisappear(obj.value);
             }else if(obj.key=='sDeleteRoleArray'){
@@ -264,7 +291,11 @@ module.exports={
                 }
             }else if(obj.key=='sAskTeamArray'){
                 if(ag.gameLayer){
-                    ag.gameLayer._teamAsk.show(obj.value.id,obj.value.name);
+                    ag.gameLayer._teamAsk.show(ag.gameConst.askTeam,obj.value.id,obj.value.name);
+                }
+            }else if(obj.key=='sAskDealArray'){
+                if(ag.gameLayer){
+                    ag.gameLayer._teamAsk.show(ag.gameConst.askDeal,obj.value.id,obj.value.name);
                 }
             }else if(obj.key=='guildMemberStringArray'){
                 if(ag.gameLayer) {
@@ -274,9 +305,24 @@ module.exports={
                 if(ag.gameLayer) {
                     ag.gameLayer._rank.setData(obj.value);
                 }
+            }else if(obj.key=='sAddDealArray'){
+                if(ag.gameLayer) {
+                    ag.gameLayer._deal.show(obj.value);
+                }
+            }else if(obj.key=='sDelDealArray'){
+                if(ag.gameLayer) {
+                    ag.gameLayer._deal.close();
+                }
+            }else if(obj.key=='sDealAddItemArray'){
+                if(ag.gameLayer) {
+                    ag.gameLayer._deal.dealAddItem(obj.value);
+                }
+            }else if(obj.key=='sDealAddGoldArray'){
+                if(ag.gameLayer) {
+                    ag.gameLayer._deal.dealAddGold(obj.value);
+                }
             }
         }
         this._dataArray = [];
-        ag.jsUtil.addTime('socket');
     },
 };

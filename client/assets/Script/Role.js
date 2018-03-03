@@ -148,7 +148,6 @@ cc.Class({
 
     //刷新层级关系,设置地图位置
     setZorderAndMapPos:function(){
-        ag.jsUtil.startTime();
         if(!ag.gameLayer)return;
         var scale = ag.gameLayer._map.node.getScale();
         //更新位置
@@ -160,7 +159,6 @@ cc.Class({
         var zorder = Math.round(10000-this.node.y);
         this.node.setLocalZOrder(zorder);
         if(this._propNode)this._propNode.setPosition(cc.pMult(this.node.getPosition(),scale));
-        ag.jsUtil.addTime('position');
     },
 
 
@@ -388,7 +386,6 @@ cc.Class({
 
             //人名字创建
             if(!this._propNode && this.node.active){
-                ag.jsUtil.startTime();
 
                 //all
                 if(this._data.camp==ag.gameConst.campNpc || this.getIsPlayer()){
@@ -432,7 +429,6 @@ cc.Class({
                         this._propNode._labelHP.string = ""+this._data.hp+"/"+this._totalHP+" Lv:"+(this.getIsMonster()?this.getMst().lv:this._data.level);
                     }
                 }
-                ag.jsUtil.addTime('propNode');
             }
         }else{
             this.clearAgAni();
@@ -881,7 +877,6 @@ cc.Class({
 
     //名字逐渐消失
     nameDisapper:function(){
-        ag.jsUtil.startTime();
         if(this.node.active){
             if(!this._propNode){
                 var scale = ag.gameLayer._map.node.getScale();
@@ -935,7 +930,6 @@ cc.Class({
                 }.bind(this)))));
             }
         }
-        ag.jsUtil.addTime('propNode');
     },
 
 

@@ -97,7 +97,8 @@ cc.Class({
         ag.musicManager.playEffect("resources/voice/button.mp3");
         if(!this._lineId){
             ag.jsUtil.showText(this.node,'请选择一个道具！');
-        }else if(ag.gameLayer._player._data.gold<this._dataMap[this._lineId].price){
+        }else if(!(ag.gameLayer._player._data.gold>=this._dataMap[this._lineId].price
+            || ag.gameLayer._player._data.name==this._dataMap[this._lineId].name)){
             ag.jsUtil.showText(this.node,'没钱寸步难行！');
         }else{
             ag.jsUtil.alertOKCancel(this.node,'确认购买？',function(){

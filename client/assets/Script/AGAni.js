@@ -114,15 +114,11 @@ cc.Class({
                     bFinished = true;
                     this._curIndex = 0;
                 }
-                //ag.jsUtil.startTime();
                 this.modifyFrame();
-                //ag.jsUtil.addTime('modifyFrame');
 
-                ag.jsUtil.startTime();
                 if (bFinished && this._finishedCallback){
                     this._finishedCallback(this);
                 }
-                ag.jsUtil.addTime('Callback');
             }
         }
     },

@@ -1374,6 +1374,11 @@
     }
   };
 
+    //ag add.
+    pomelo.getSocket = function() {
+        return socket;
+    };
+
   var reset = function() {
     reconnect = false;
     reconnectionDelay = 1000 * 5;

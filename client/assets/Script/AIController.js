@@ -139,7 +139,6 @@ cc.Class({
 
     // called every frame
     update: function (dt) {
-        ag.jsUtil.startTime();
         //执行玩家操作
         if(this._busy==false && this._state != ag.gameConst.stateDead){
             if(this._touchMoveDirection!=-1 || (this._touchMoveDirection==-1 && this._dirBackUp!=-1)){
@@ -163,17 +162,52 @@ cc.Class({
                 this._role.idle();
             }
         }
-        ag.jsUtil.addTime('ai');
     },
 
 
     update02: function (dt) {
-        ag.jsUtil.startTime();
         //执行玩家操作
         if(ag.gameLayer && this._busy==false && this._state != ag.gameConst.stateDead && !this._locked && this._touchMoveDirection==-1){
-            if(ag.gameLayer._setupAutoAttack)this._locked = this.findLocked();
+            if(ag.gameLayer._setupAutoPlayer){
+                this._locked = this.findLockedPlayer();
+            }else if(ag.gameLayer._setupAutoAttack){
+                this._locked = this.findLocked();
+            }
         }
-        ag.jsUtil.addTime('ai2');
+    },
+
+
+    //查找目标,怪物
+    findLockedPlayer:function(){
+        var locked = null;
+        var lockedDis = 9999;
+        var checkDistance = this._role.getMst().checkDistance;
+        var l1=this._role.getLocation();
+        var playerCamp = ag.gameLayer._player.getGuildId();
+        for(var key in ag.gameLayer._roleMap){
+            var role = ag.gameLayer._roleMap[key];
+            var camp = role.getGuildId();
+            if(role.getIsPlayer() && camp!=ag.gameConst.campPlayerNone && camp!=playerCamp && this.isInSafe(role)==false){//是玩家，没在安全区域，别的行会
+                var l2=role.getLocation();
+                var x = Math.abs(l1.x-l2.x), y = Math.abs(l1.y-l2.y);
+                if(Math.max(x,y)<=checkDistance && x+y<lockedDis){
+                    locked = role;
+                    lockedDis = x+y;
+                }
+            }
+        }
+        return locked;
+    },
+
+
+    //是否在安全区
+    isInSafe:function(role){
+        var safe = ag.gameConst._terrainMap[role._data.mapId].safe;
+        if(safe){
+            var lx1 = role.getLocation().x,ly1 = role.getLocation().y;
+            if(lx1>=safe.x && lx1<=safe.xx && ly1>=safe.y && ly1<=safe.yy)return true;
+        }
+        return false;
     },
 
 
