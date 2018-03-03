@@ -184,6 +184,7 @@ module.exports = ag.class.extend({
         if(this.getIsPlayer()){
             ag.jsUtil.sendDataExcept("sDeleteRole",this._data.id,this._data.id);
             if(this._tiger)ag.jsUtil.sendDataExcept("sDeleteRole",this._tiger._data.id,this._data.id);
+            ag.deal.delDeal(this._data.id);
         }
     },
 
@@ -220,7 +221,7 @@ module.exports = ag.class.extend({
             }
 
             var map = ag.gameConst._terrainMap[mapId];
-            if(!map.safe){
+            if(!map.safe && map.id!='t16'){
                 ag.jsUtil.sendDataAll("sSystemNotify",'玩家【'+this._data.name+'】冲向'+map.name+'寻宝去啦！');
             }
 
@@ -284,17 +285,22 @@ module.exports = ag.class.extend({
             var itemData = map[key]._data;
             if(itemData.puton!=ag.gameConst.putonAuctionShop){
                 var role = ag.gameLayer.getRole(itemData.owner);
-                if(role==this){
-                    ag.jsUtil.sendData("sItem",itemData,this._data.id);
-                }else if(itemData.mapId==this._data.mapId && itemData.puton==ag.gameConst.putonGround){
-                    ag.jsUtil.sendData("sItem",itemData,this._data.id);
-                }else if(role && role._data.mapId==this._data.mapId && itemData.puton>=0){
-                    ag.jsUtil.sendData("sItem",itemData,this._data.id);
+                if((role==this && !transferMst)
+                    || (itemData.mapId==this._data.mapId && itemData.puton==ag.gameConst.putonGround)
+                    || (role && role!=this && role._data.mapId==this._data.mapId && itemData.puton>=0 && ag.userManager.getOnline(role._data.id))){
+                    var temp = JSON.parse(JSON.stringify(itemData));
+                    this.sendItemForCheckBack(this._data.id,temp);
                 }
 
                 //发给别人装备
                 if(role==this && itemData.puton>=0){
-                    ag.jsUtil.sendDataExcept("sItem",itemData,this._data.id);
+                    var temp2 = JSON.parse(JSON.stringify(itemData));
+                    for(var key2 in ag.gameLayer._roleMap){
+                        var role2 = ag.gameLayer._roleMap[key2];
+                        if(role2.getIsPlayer() && role2._data.mapId==this._data.mapId && role2._data.id!==this._data.id){
+                            this.sendItemForCheckBack(role2._data.id,temp2);
+                        }
+                    }
                 }
             }
         }
@@ -306,6 +312,21 @@ module.exports = ag.class.extend({
             var str = temp.member.length==0?'':temp.member.join(',');
 
             ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:temp.id,name:temp.name,member:str});//ag add for test./行会成员
+        }
+    },
+
+
+    //发送道具，先检查备份
+    sendItemForCheckBack:function(id,temp){
+        var back = ag.userManager._itemMapBack[id];
+        if(back){
+            var obj = back[temp.id];
+            if(!obj || obj.mapId!=temp.mapId || obj.x!=temp.x || obj.y!=temp.y || obj.owner!=temp.owner || obj.puton!=temp.puton){
+                ag.jsUtil.sendData("sItem",temp,id);
+                back[temp.id] = temp;
+            }else{
+                ag.jsUtil.sendData("sItemBack",temp.id,id);
+            }
         }
     },
 
@@ -484,7 +505,7 @@ module.exports = ag.class.extend({
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
-                        tempRole.changeHPByHurt(this,this._hurt*2);
+                        tempRole.changeHPByHurt(this,this._hurt*1.9);
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }
@@ -598,6 +619,7 @@ module.exports = ag.class.extend({
                     ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
                 }
             }else if(this.getIsPlayer()){
+                ag.deal.delDeal(this._data.id);//死亡时如果正在交易，则取消交易
                 if(Math.random()<0.2){
                     var array = [];
                     var map = ag.itemManager._itemMap.getMap();

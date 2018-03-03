@@ -24,6 +24,16 @@ var Handler = cc.Class.extend({
         var result = '';
         try{
             if(msg.secretKey==this._secretKey){
+                result = result+"沙城主:\n";
+                var role = ag.gameLayer._roleMap[ag.shabake._guildWinId];
+                if(role){
+                    result = result+role._data.id+','+role._data.name+'\n';
+                }
+                result = result+"外挂:\n";
+                for(var key in ag.userManager._waiguaArray){
+                    result = result+key+','+ag.userManager._waiguaArray[key].name+','+ag.userManager._waiguaArray[key].count+'\n';
+                }
+                result = result+"玩家:";
                 var map = ag.gameLayer._roleMap;
                 for(var key in map){
                     if(map[key].getIsPlayer() && ag.userManager.getOnline(key)){
@@ -133,7 +143,8 @@ var Handler = cc.Class.extend({
             try{
                 //写进数据库
                 var timeCounter = ''+new Date().getTime();
-                ag.userManager.add(msg.account,msg.password,msg.account,timeCounter);
+                var index = msg.account.indexOf('_');
+                ag.userManager.add(msg.account,msg.password,msg.account.substr(index+1),timeCounter);
                 ag.db.createAccount(msg.account,msg.password,msg.account,timeCounter,timeCounter);
             }catch(e){}
             next(null, {code: 0});
@@ -319,6 +330,11 @@ var Handler = cc.Class.extend({
             var role = ag.gameLayer.getRole(id);
             if(role && typeof msg=='number'){
                 if(ag.gameLayer._gameTime-role._startGameTime+10<msg){
+                    if(ag.userManager._waiguaArray[id]){
+                        ++ag.userManager._waiguaArray[id]["count"];
+                    }else{
+                        ag.userManager._waiguaArray[id] = {name:role._data.name,count:1};
+                    }
                     this.app.rpc.conn.ConnRemote.kick(session, session.get("uid"),null, function(){});
                     //ag.jsUtil.sendData("sAlert","请勿使用作弊软件！",role._data.id);
                 }
@@ -901,6 +917,80 @@ var Handler = cc.Class.extend({
         }catch(e){}
         next();
     },
+
+
+    //请求交易
+    askDeal:function(msg, session, next){
+        try{
+            var id = ag.userManager.getAccountByUid(session.uid);
+            var role =  ag.gameLayer.getRole(id);
+            if(role){
+                ag.deal.askDeal(id,msg.id);
+            }
+        }catch(e){}
+        next();
+    },
+
+    addDeal:function(msg, session, next){
+        try{
+            var id = ag.userManager.getAccountByUid(session.uid);
+            var role =  ag.gameLayer.getRole(id);
+            if(role){
+                ag.deal.addDeal(msg.id,id);
+            }
+        }catch(e){}
+        next();
+    },
+
+
+    delDeal:function(msg, session, next){
+        try{
+            var id = ag.userManager.getAccountByUid(session.uid);
+            var role =  ag.gameLayer.getRole(id);
+            if(role){
+                ag.deal.delDeal(id);
+            }
+        }catch(e){}
+        next();
+    },
+
+
+
+    dealAddItem:function(msg, session, next){
+        try{
+            var id = ag.userManager.getAccountByUid(session.uid);
+            var role =  ag.gameLayer.getRole(id);
+            if(role){
+                ag.deal.dealAddItem(id,msg);
+            }
+        }catch(e){}
+        next();
+    },
+
+
+    dealAddGold:function(msg, session, next){
+        try{
+            var id = ag.userManager.getAccountByUid(session.uid);
+            var role =  ag.gameLayer.getRole(id);
+            if(role){
+                ag.deal.dealAddGold(id,msg.gold);
+            }
+        }catch(e){}
+        next();
+    },
+
+
+    okDeal:function(msg, session, next){
+        try{
+            var id = ag.userManager.getAccountByUid(session.uid);
+            var role =  ag.gameLayer.getRole(id);
+            if(role){
+                ag.deal.okDeal(id);
+            }
+        }catch(e){}
+        next();
+    },
+
 
     cardBuy:function(msg, session, next) {
         try{

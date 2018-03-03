@@ -73,7 +73,7 @@ module.exports = ag.class.extend({
 
         if(item && role && lastRole && item._data.puton==ag.gameConst.putonAuctionShop
             && role._bagLength<ag.gameConst.bagLength
-            &&role._data.gold>=this._dataMap[id].price){
+            &&(role._data.gold>=this._dataMap[id].price || role._data.id==item._data.owner)){
             role.addGold(-this._dataMap[id].price);
             lastRole.addGold(this._dataMap[id].price);
             item._data.puton = ag.gameConst.putonBag;

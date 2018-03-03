@@ -97,7 +97,7 @@
   ],
 
   "levels": {
-    "rpc-log" : "ERROR",
+    "rpc-log": "ERROR",
     "forward-log": "ERROR"
   },
 

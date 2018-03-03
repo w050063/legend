@@ -57,6 +57,25 @@ app.configure('production|development', function() {
         cb(null, res.id);
     });
 
+
+    app.route('work', function(session, msg, app, cb) {
+        var chatServers = app.getServersByType('work');
+        var sessionService = app.get('sessionService');
+        var session2 = sessionService.get(session.id);
+        var index = 0;
+        var legendId = 1;
+        if(session2){
+            var uid = session2.get('uid');
+            if(uid)legendId = uid.split('_')[0];
+        }
+        else if(msg['args'][0])legendId = msg['args'][0].split('_')[0];
+        if(legendId==1)index = 0;
+        if(legendId==2)index = 1;
+        var res = chatServers[index];
+        cb(null, res.id);
+    });
+
+
     // filter configures
     app.filter(pomelo.timeout());
 });

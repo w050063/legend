@@ -15,11 +15,13 @@ module.exports = {
 	
 	
 	//初始化战斗数据
-	init:function(){
+	init:function(legendID){
         ag.gameLayer = this;
         this._roleMap = {};
         this._roleXYMap = {};
         this._rankString = "";
+        this._rankFirstArray = [];
+        this._legendID = legendID;
 
 
         //启动定时器,每秒执行一次
@@ -207,7 +209,15 @@ module.exports = {
         ag.jsUtil.send("sEnter",JSON.stringify(player._data),[id]);
         ag.jsUtil.sendData("sGuildWinId",ag.shabake._guildWinId,id);
         //player.changeMap();
-        ag.jsUtil.sendDataAll("sSystemNotify","玩家【"+player._data.name+"】上线！");
+        if(this._rankFirstArray[0]==player._data.id){
+            ag.jsUtil.sendDataAll("sSystemNotify","天下第一等级【"+player._data.name+"】上线！");
+        }else if(this._rankFirstArray[1]==player._data.id){
+            ag.jsUtil.sendDataAll("sSystemNotify","天下第一攻击【"+player._data.name+"】上线！");
+        }else if(this._rankFirstArray[2]==player._data.id){
+            ag.jsUtil.sendDataAll("sSystemNotify","天下第一称号【"+player._data.name+"】上线！");
+        }else{
+            ag.jsUtil.sendDataAll("sSystemNotify","玩家【"+player._data.name+"】上线！");
+        }
     },
 
 
@@ -520,5 +530,6 @@ module.exports = {
                 ,sexType:sexTypes[array[i]._data.type][array[i]._data.sex],hurt:array[i]._hurt,office:array[i]._data.office};
         }
         this._rankString = JSON.stringify({levels:levels,hurts:hurts,offices:offices,data:data});
+        this._rankFirstArray = [levels[0],hurts[0],offices[0]];
     },
 };

@@ -10,8 +10,9 @@ module.exports = ag.class.extend({
         this._infoMap = {};
         this._nLength = 0;
         this._uidBindMap = {};
+        this._itemMapBack = {};
+        this._waiguaArray = {};
     },
-
 
     existAccount:function (id) {
         if(this._infoMap[id]){
@@ -65,7 +66,14 @@ module.exports = ag.class.extend({
     },
 
     setOnline:function(id,online){
-        if(id && this._infoMap[id])this._infoMap[id].online = online;
+        if(id && this._infoMap[id]){
+            this._infoMap[id].online = online;
+            if(online){
+                this._itemMapBack[id] = {};
+            }else{
+                delete this._itemMapBack[id];
+            }
+        }
     },
 
     //账号密码是否正确

@@ -104,6 +104,10 @@
     "optional string id": 1,
     "optional string name": 2
   },
+  "message sAskDeal": {
+    "optional string id": 1,
+    "optional string name": 2
+  },
   "onData" : {
     "repeated sMove sMoveArray": 1,
     "repeated sAttack sAttackArray": 2,
@@ -139,6 +143,12 @@
     "repeated string sAuctionShopArray": 32,
     "repeated sAskTeam sAskTeamArray": 33,
     "repeated string guildMemberStringArray": 34,
-    "repeated string sRankArray": 35
+    "repeated string sRankArray": 35,
+    "repeated string sItemBackArray": 36,
+    "repeated sAskDeal sAskDealArray": 37,
+    "repeated string sAddDealArray": 38,
+    "repeated int32 sDelDealArray": 39,
+    "repeated string sDealAddItemArray": 40,
+    "repeated int32 sDealAddGoldArray": 41
   }
 }

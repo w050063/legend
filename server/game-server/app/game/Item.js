@@ -11,9 +11,9 @@ module.exports = ag.class.extend({
         if(id){
             this._data.id = id;
         }else{
-            this._data.id = 'i'+(++baseItemId);
+            this._data.id = ''+ag.gameLayer._legendID+'_i'+(++baseItemId);
             while(ag.itemManager._itemMap.get(this._data.id)){
-                this._data.id = 'i'+(++baseItemId);
+                this._data.id = ''+ag.gameLayer._legendID+'_i'+(++baseItemId);
             }
         }
         this._data.mid = mid;

@@ -32,6 +32,15 @@ var Handler = cc.Class.extend({
             return;
         }
 
+        var legendId = uid.split('_')[0];
+        if(legendId!=1 && legendId!=2){
+            next(null, {
+                code: 500,
+                error: true
+            });
+            return;
+        }
+
         session.bind(uid);
         session.set('uid', uid);
         session.push('uid', function(err) {

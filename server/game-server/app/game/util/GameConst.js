@@ -68,7 +68,7 @@ module.exports = {
     attackModePeace:1,
     attackModeGuild:2,
     attackModeTeam:3,
-    attackModeTextArray:['全','和','行','组'],
+    attackModeTextArray:['全体','和平','行会','组队'],
 
 
     //性别
@@ -171,7 +171,7 @@ module.exports = {
                 {name:"拍卖行",model:'ani/hum41/221',x:16,y:47,title:"不用的东西让我帮你卖:",content:['t8000']},
                 {name:"排行榜",model:'ani/hum41/117',x:8,y:47,title:"排行榜:",content:['t9001']},
                 {name:"龙族宝藏",model:'ani/hum41/222',x:12,y:47,title:"200元宝一次:",content:['t5000']},
-                {name:"皇宫",model:'ani/hum41/041',x:46,y:36,title:"限制40级以上",content:['t19','t20','t21']},
+                {name:"皇宫",model:'ani/hum41/041',x:46,y:36,title:"限制40级以上",content:['t19','t20','t21','t33','t34','t35']},
                 {name:"仓库管理",model:'ani/hum41/117',x:23,y:25,title:"有什么宝贝尽管存到我这里吧:",content:['t6000']},
                 {name:"每日奖励",model:'ani/hum41/222',x:26,y:25,title:"每日奖励:",content:['t7000','t7001','t7100']},
                 {name:"王者幻境",model:'ani/hum41/116',x:5,y:39,title:"限制47级以上",content:['t22']},
@@ -547,6 +547,9 @@ module.exports = {
         t30:{id:'t30',name:'通天阁',mapId:'t24',x:50,y:50},
         t31:{id:'t31',name:'黑魔宫',mapId:'t25',x:78,y:19},
         t32:{id:'t32',name:'烈焰地狱2',mapId:'t26',x:78,y:19},
+        t33:{id:'t33',name:'皇宫四号点',mapId:'t16',x:17,y:17},
+        t34:{id:'t34',name:'皇宫五号点',mapId:'t16',x:12,y:17},
+        t35:{id:'t35',name:'皇宫六号点',mapId:'t16',x:6,y:4},
         t1000:{id:'t1000',name:'四级以下回收',levels:[1,2,3,4]},
         t1001:{id:'t1001',name:'五级回收',levels:[5]},
         t1002:{id:'t1002',name:'六级回收',levels:[6]},
@@ -583,7 +586,7 @@ module.exports = {
             moveSpeed:0.4,attackSpeed:0.8,checkDistance:5,visibleDistance:8,attackDistance:0,lv:1},
         m1:{id:"m1",name:"法",hp:16,hpAdd:[4,7,8,9,9],defense:0,defenseAdd:0.4,hurt:2,hurtAdd:0.5,expDead:0,heal:5,healAdd:1.5,
             moveSpeed:0.4,attackSpeed:1.2,checkDistance:5,visibleDistance:8,attackDistance:5,lv:1},
-        m2:{id:"m2",name:"道",hp:17,hpAdd:[8,17,17,16,20],defense:0,defenseAdd:0.3,hurt:5,hurtAdd:0.45,expDead:0,heal:5,healAdd:1,
+        m2:{id:"m2",name:"道",hp:17,hpAdd:[8,17,17,16,20],defense:0,defenseAdd:0.3,hurt:5,hurtAdd:0.45,expDead:0,heal:10,healAdd:1.5,
             moveSpeed:0.4,attackSpeed:1.2,checkDistance:5,visibleDistance:8,attackDistance:5,lv:1},
         m3:{id:"m3",name:"甲壳虫",hp:300,defense:2,hurt:30,expDead:30,heal:0,
             moveSpeed:2,attackSpeed:2,checkDistance:3,visibleDistance:9,attackDistance:1.5,model:"ani/hum16/016",drop:'',lv:2},

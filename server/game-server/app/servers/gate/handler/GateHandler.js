@@ -15,7 +15,7 @@ var Handler = cc.Class.extend({
     ctor:function (app) {
         this.app = app;
         this._baseUid = 0;
-        this._version = '0.0.7';
+        this._version = '0.1.4';
         this._serverList = fs.readFileSync('./app/serverlist/serverlist.txt', 'utf8');
     },
 

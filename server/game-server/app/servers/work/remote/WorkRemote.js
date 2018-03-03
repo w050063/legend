@@ -27,6 +27,7 @@ var WorkRemote = function(app) {
 WorkRemote.prototype.add = function(uid, sid, cb) {
     if(!global.ag){
         global.ag = {};
+        var legendId = uid.split('_')[0];
         ag.class = require("../../../game/util/cc").Class;
         ag.actionManager = require("../../../game/util/ActionManager");
         ag.actionManager.init();
@@ -37,7 +38,7 @@ WorkRemote.prototype.add = function(uid, sid, cb) {
         var AuctionShop = require("../../../game/AuctionShop.js");
         ag.auctionShop = new AuctionShop();
         ag.gameLayer = require("../../../game/GameLayer");
-        ag.gameLayer.init();
+        ag.gameLayer.init(legendId);
         var BuffManager = require("../../../game/BuffManager");
         ag.buffManager = new BuffManager();
 		var UserManager = require("../../../game/UserManager");
@@ -54,6 +55,8 @@ WorkRemote.prototype.add = function(uid, sid, cb) {
         ag.shabake = new Shabake();
         var Team = require("../../../game/Team.js");
         ag.team = new Team();
+        var Deal = require("../../../game/Deal.js");
+        ag.deal = new Deal();
     }
 	var channel = this.channelService.getChannel(ag.jsUtil.dataChannel, true);
 	var param = {

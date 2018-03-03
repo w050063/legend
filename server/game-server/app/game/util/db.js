@@ -160,7 +160,16 @@ module.exports = ag.class.extend({
                 if(callback)callback([]);
                 return;
             }
-            if(callback)callback(rows);
+            if(callback){
+                var legendId = ''+ag.gameLayer._legendID+'_';
+                var len = legendId.length;
+                for(var i=rows.length-1;i>=0;--i){
+                    if(rows[i].id.substr(0,len)!=legendId){
+                        rows.splice(i,1);
+                    }
+                }
+                callback(rows);
+            }
         });
     },
 
@@ -260,7 +269,16 @@ module.exports = ag.class.extend({
                 if(callback)callback([]);
                 return;
             }
-            if(callback)callback(rows);
+            if(callback){
+                var legendId = ''+ag.gameLayer._legendID+'_';
+                var len = legendId.length;
+                for(var i=rows.length-1;i>=0;--i){
+                    if(rows[i].id.substr(0,len)!=legendId){
+                        rows.splice(i,1);
+                    }
+                }
+                callback(rows);
+            }
         });
     },
 
@@ -288,42 +306,54 @@ module.exports = ag.class.extend({
 
 
     setRoles:function(array,callback){
-        var allSql = '';
-        for(var i=0;i<array.length;++i){
-            var role = array[i];
-            var data = role._data;
-            var sql = 'UPDATE t_roles SET map_id = "' + data.mapId
-                + '", x = ' + data.x
-                + ', y = ' + data.y
-                + ', type = "' + data.type
-                + '", camp = ' + data.camp
-                + ', sex = ' + data.sex
-                + ', direction = ' + data.direction
-                + ', level = ' + data.level
-                + ', exp = ' + role._exp
-                + ', gold = ' + data.gold
-                + ', office = ' + data.office
-                + ', wing = ' + data.wing
-                + ', come = ' + data.come
-                + ', practice = ' + data.practice
-                + ' WHERE id = "' + data.id + '";';
-            allSql = allSql+sql;
-        }
-        if(allSql.length>0){
-            this.query(allSql, function(err, rows) {
-                if (err) {
-                    if(err.code == 'ER_DUP_ENTRY'){
+        this.getRoles(function(roles){
+            var roleMap = {};
+            for(var i=0;i<roles.length;++i){
+                roleMap[roles[i].id] = roles[i];
+            }
+
+            var allSql = '';
+
+            for(var i=0;i<array.length;++i){
+                var role = array[i];
+                var data = role._data;
+                var base = roleMap[data.id];
+                if(data.mapId!=base.mapId || data.x!=base.x || data.y!=base.y || data.level!=base.level
+                    || role._exp!=base.exp || data.gold!=base.gold || data.office!=base.office || data.wing!=base.wing
+                    || data.come!=base.come || data.practice!=base.practice)
+                var sql = 'UPDATE t_roles SET map_id = "' + data.mapId
+                    + '", x = ' + data.x
+                    + ', y = ' + data.y
+                    + ', type = "' + data.type
+                    + '", camp = ' + data.camp
+                    + ', sex = ' + data.sex
+                    + ', direction = ' + data.direction
+                    + ', level = ' + data.level
+                    + ', exp = ' + role._exp
+                    + ', gold = ' + data.gold
+                    + ', office = ' + data.office
+                    + ', wing = ' + data.wing
+                    + ', come = ' + data.come
+                    + ', practice = ' + data.practice
+                    + ' WHERE id = "' + data.id + '";';
+                allSql = allSql+sql;
+            }
+            if(allSql.length>0){
+                this.query(allSql, function(err, rows) {
+                    if (err) {
+                        if(err.code == 'ER_DUP_ENTRY'){
+                            if(callback)callback(false);
+                            return;
+                        }
                         if(callback)callback(false);
-                        return;
+                        throw err;
                     }
-                    if(callback)callback(false);
-                    throw err;
-                }
-                else{
-                    if(callback)callback(true);
-                }
-            });
-        }
+                    else{
+                        if(callback)callback(true);
+                    }
+                });
+            }
+        }.bind(this));
     },
 
     deleteRole:function(id,callback){
@@ -357,7 +387,16 @@ module.exports = ag.class.extend({
                 if(callback)callback([]);
                 return;
             }
-            if(callback)callback(rows);
+            if(callback){
+                var legendId = ''+ag.gameLayer._legendID+'_';
+                var len = legendId.length;
+                for(var i=rows.length-1;i>=0;--i){
+                    if(rows[i].id.substr(0,len)!=legendId){
+                        rows.splice(i,1);
+                    }
+                }
+                callback(rows);
+            }
         });
     },
 
@@ -434,7 +473,16 @@ module.exports = ag.class.extend({
                 if(callback)callback([]);
                 return;
             }
-            if(callback)callback(rows);
+            if(callback){
+                var legendId = ''+ag.gameLayer._legendID+'_';
+                var len = legendId.length;
+                for(var i=rows.length-1;i>=0;--i){
+                    if(rows[i].id.substr(0,len)!=legendId){
+                        rows.splice(i,1);
+                    }
+                }
+                callback(rows);
+            }
         });
     },
 
@@ -541,7 +589,16 @@ module.exports = ag.class.extend({
                 if(callback)callback([]);
                 return;
             }
-            if(callback)callback(rows);
+            if(callback){
+                var legendId = ''+ag.gameLayer._legendID+'_';
+                var len = legendId.length;
+                for(var i=rows.length-1;i>=0;--i){
+                    if(rows[i].id.substr(0,len)!=legendId){
+                        rows.splice(i,1);
+                    }
+                }
+                callback(rows);
+            }
         });
     },
 
@@ -612,7 +669,7 @@ module.exports = ag.class.extend({
 
     //获得当前行会数据
     getCustomData:function(callback){
-        var sql = 'SELECT * FROM t_custom';
+        var sql = 'SELECT * FROM t_custom where id = "'+ag.gameLayer._legendID+'_0";';
         this.query(sql, function(err, rows) {
             var data = rows[0].data.replace(/%/g,'"');
             if(callback)callback(JSON.parse(data));
@@ -622,7 +679,7 @@ module.exports = ag.class.extend({
     //创建行会
     setCustomData:function(data){
         var sql = 'UPDATE t_custom SET data = "' + JSON.stringify(data).replace(/"/g,'%')
-            + '" WHERE id = "0";';
+            + '" WHERE id = "'+ag.gameLayer._legendID+'_0";';
         this.query(sql, function(err, rows) {});
     },
 
