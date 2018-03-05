@@ -40,14 +40,16 @@ module.exports = ag.class.extend({
 
 
     //设置某个位置出现火墙
-    setFireWall:function (mapXYString, role) {
-        if(!this._fireWallMap[mapXYString]){
-            var tag = ++this._baseTag;
-            this._fireWallMap[mapXYString] = {id:role._data.id,tag:tag};
-            ag.actionManager.runAction(role,20,function(){
-                this.delFireWall(mapXYString);
-            }.bind(this),tag);
-            ag.jsUtil.sendDataAll("sFireWall",{id:mapXYString,rid:role._data.id},role._data.mapId);
+    setFireWall:function (mapXYString, locked,role) {
+        if(!locked.isInSafe() && !role.isInSafe()){
+            if(!this._fireWallMap[mapXYString]){
+                var tag = ++this._baseTag;
+                this._fireWallMap[mapXYString] = {id:role._data.id,tag:tag};
+                ag.actionManager.runAction(role,20,function(){
+                    this.delFireWall(mapXYString);
+                }.bind(this),tag);
+                ag.jsUtil.sendDataAll("sFireWall",{id:mapXYString,rid:role._data.id},role._data.mapId);
+            }
         }
     },
 
@@ -73,18 +75,20 @@ module.exports = ag.class.extend({
 
     //设置毒
     setPoison:function (role,attacker) {
-        var key = role._data.id;
+        if(!role.isInSafe() && !attacker.isInSafe()){
+            var key = role._data.id;
 
-        if(this._poisonMap[key]){
-            this.delPoison(key);
+            if(this._poisonMap[key]){
+                this.delPoison(key);
+            }
+            var tag = ++this._baseTag;
+            var value = Math.round(attacker._hurt*0.4);
+            this._poisonMap[key] = {id:attacker._data.id,value:value,tag:tag};
+            role._data.defense -=value;
+            ag.actionManager.runAction(role,30,function(){
+                this.delPoison(key);
+            }.bind(this),tag);
         }
-        var tag = ++this._baseTag;
-        var value = Math.round(attacker._hurt*0.4);
-        this._poisonMap[key] = {id:attacker._data.id,value:value,tag:tag};
-        role._data.defense -=value;
-        ag.actionManager.runAction(role,30,function(){
-            this.delPoison(key);
-        }.bind(this),tag);
     },
 
 

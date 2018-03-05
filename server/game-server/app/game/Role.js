@@ -492,7 +492,7 @@ module.exports = ag.class.extend({
             for(i=0;i<9;++i){
                 var x = locked._data.x+tempArray[i][0],y = locked._data.y+tempArray[i][1];
                 if(ag.gameLayer.isCollision(this._data.mapId,x,y)==false){
-                    ag.buffManager.setFireWall(this.getMapXYString(this._data.mapId,x,y),this);
+                    ag.buffManager.setFireWall(this.getMapXYString(this._data.mapId,x,y),locked,this);
                 }
             }
         }else if(this._data.type=='m2'){
@@ -750,5 +750,16 @@ module.exports = ag.class.extend({
     //获得角色位置
     getLocation:function () {
         return {x:this._data.x,y:this._data.y};
+    },
+
+
+    //是否在安全区
+    isInSafe:function(){
+        var safe = ag.gameConst._terrainMap[this._data.mapId].safe;
+        if(safe){
+            var lx1 = this.getLocation().x,ly1 = this.getLocation().y;
+            if(lx1>=safe.x && lx1<=safe.xx && ly1>=safe.y && ly1<=safe.yy)return true;
+        }
+        return false;
     },
 });

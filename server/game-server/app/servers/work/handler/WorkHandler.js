@@ -33,7 +33,7 @@ var Handler = cc.Class.extend({
                 for(var key in ag.userManager._waiguaArray){
                     result = result+key+','+ag.userManager._waiguaArray[key].name+','+ag.userManager._waiguaArray[key].count+'\n';
                 }
-                result = result+"玩家:";
+                result = result+"玩家:\n";
                 var map = ag.gameLayer._roleMap;
                 for(var key in map){
                     if(map[key].getIsPlayer() && ag.userManager.getOnline(key)){

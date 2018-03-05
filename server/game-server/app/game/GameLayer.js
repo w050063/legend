@@ -210,13 +210,13 @@ module.exports = {
         ag.jsUtil.sendData("sGuildWinId",ag.shabake._guildWinId,id);
         //player.changeMap();
         if(this._rankFirstArray[0]==player._data.id){
-            ag.jsUtil.sendDataAll("sSystemNotify","天下第一等级【"+player._data.name+"】上线！");
+            ag.jsUtil.sendDataAll("sSystemNotify","欢迎天下第一等级【"+player._data.name+"】上线！");
         }else if(this._rankFirstArray[1]==player._data.id){
-            ag.jsUtil.sendDataAll("sSystemNotify","天下第一攻击【"+player._data.name+"】上线！");
+            ag.jsUtil.sendDataAll("sSystemNotify","欢迎天下第一攻击【"+player._data.name+"】上线！");
         }else if(this._rankFirstArray[2]==player._data.id){
-            ag.jsUtil.sendDataAll("sSystemNotify","天下第一称号【"+player._data.name+"】上线！");
+            ag.jsUtil.sendDataAll("sSystemNotify","欢迎天下第一称号【"+player._data.name+"】上线！");
         }else{
-            ag.jsUtil.sendDataAll("sSystemNotify","玩家【"+player._data.name+"】上线！");
+            ag.jsUtil.sendDataAll("sSystemNotify","欢迎玩家【"+player._data.name+"】上线！");
         }
     },
 
@@ -421,9 +421,12 @@ module.exports = {
 
     //是否攻击
     isEnemyForCheck:function(role1,role2){
+        var lastRole2 = role2;
         if(role2._master)role2 = role2._master;
         if(role2.getIsMonster() || (role2.getIsPlayer() && ag.userManager.getOnline(role2._data.id))){
-            if(role1!=role2 && role1._state != ag.gameConst.stateDead && role2._state != ag.gameConst.stateDead){
+            if(role1!=role2 && role1._state != ag.gameConst.stateDead
+                && role2._state != ag.gameConst.stateDead
+                && lastRole2._state != ag.gameConst.stateDead){
                 if(role1._data.camp!=role2._data.camp)return true;
             }
         }

@@ -44,6 +44,7 @@ module.exports = ag.class.extend({
             }
         }
         if(bFind)return 2;
+        if(name.indexOf(' ')!=-1 || name.indexOf('\n')!=-1)return 2;
         try{
             this._infoMap[id].name = name;
             var role = ag.gameLayer.getRole(id);
