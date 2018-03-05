@@ -174,7 +174,7 @@ cc.Class({
     //回车发送信息
     editBoxConfirm: function (sender) {
         ag.musicManager.playEffect("resources/voice/button.mp3");
-        if(sender.string.length>=2 && sender.string.indexOf(' ')==-1){
+        if(sender.string.length>=2 && sender.string.indexOf(' ')==-1 && sender.string.indexOf('\n')==-1){
             ag.jsUtil.request(this.node,'changeName',sender.string,function (data) {
                 if(data.code==0) {
                     ag.userInfo._accountData.name = sender.string;
@@ -188,7 +188,7 @@ cc.Class({
                 }
             }.bind(this));
         }else{
-            ag.jsUtil.showText(this.node,'名字至少2个字符且不能有空格！');
+            ag.jsUtil.showText(this.node,'名字至少2个字符且不能有空格换行！');
         }
     },
 

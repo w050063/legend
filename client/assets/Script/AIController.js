@@ -167,10 +167,11 @@ cc.Class({
 
     update02: function (dt) {
         //执行玩家操作
-        if(ag.gameLayer && this._busy==false && this._state != ag.gameConst.stateDead && !this._locked && this._touchMoveDirection==-1){
-            if(ag.gameLayer._setupAutoPlayer){
+        if(ag.gameLayer && this._busy==false && this._state != ag.gameConst.stateDead && this._touchMoveDirection==-1){
+            if(!this._locked && ag.gameLayer._setupAutoPlayer){
                 this._locked = this.findLockedPlayer();
-            }else if(ag.gameLayer._setupAutoAttack){
+            }
+            if(!this._locked && ag.gameLayer._setupAutoAttack){
                 this._locked = this.findLocked();
             }
         }
@@ -187,7 +188,7 @@ cc.Class({
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
             var camp = role.getGuildId();
-            if(role.getIsPlayer() && camp!=ag.gameConst.campPlayerNone && camp!=playerCamp && this.isInSafe(role)==false){//是玩家，没在安全区域，别的行会
+            if(role.getIsPlayer() && role._state!=ag.gameConst.stateDead && camp!=ag.gameConst.campPlayerNone && camp!=playerCamp && !role.isInSafe()){//是玩家，没在安全区域，别的行会
                 var l2=role.getLocation();
                 var x = Math.abs(l1.x-l2.x), y = Math.abs(l1.y-l2.y);
                 if(Math.max(x,y)<=checkDistance && x+y<lockedDis){
@@ -200,16 +201,6 @@ cc.Class({
     },
 
 
-    //是否在安全区
-    isInSafe:function(role){
-        var safe = ag.gameConst._terrainMap[role._data.mapId].safe;
-        if(safe){
-            var lx1 = role.getLocation().x,ly1 = role.getLocation().y;
-            if(lx1>=safe.x && lx1<=safe.xx && ly1>=safe.y && ly1<=safe.yy)return true;
-        }
-        return false;
-    },
-
 
     //查找目标,怪物
     findLocked:function(){
@@ -219,7 +210,7 @@ cc.Class({
         var l1=this._role.getLocation();
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
-            if(role.getIsMonster()){
+            if(role.getIsMonster() && role._state!=ag.gameConst.stateDead){
                 var l2=role.getLocation();
                 var x = Math.abs(l1.x-l2.x), y = Math.abs(l1.y-l2.y);
                 if(Math.max(x,y)<=checkDistance && x+y<lockedDis){

@@ -94,17 +94,19 @@ cc.Class({
 
     //设置毒
     setPoison:function (role,attacker) {
-        var id = role._data.id;
-        if(this._poisonMap[id]){
-            this.delPoison(id);
+        if(!role.isInSafe() && !attacker.isInSafe()){
+            var id = role._data.id;
+            if(this._poisonMap[id]){
+                this.delPoison(id);
+            }
+            var tag = ++this._baseTag;
+            this._poisonMap[id] = {id:attacker._data.id,tag:tag};
+            role.setAniColor(cc.color(0,255,0));
+            ag.gameLayer.tagAction(cc.sequence(cc.delayTime(30),cc.callFunc(function(){
+                var tempRole = ag.gameLayer.getRole(id);
+                if(tempRole)this.delPoison(id);
+            }.bind(this))),tag);
         }
-        var tag = ++this._baseTag;
-        this._poisonMap[id] = {id:attacker._data.id,tag:tag};
-        role.setAniColor(cc.color(0,255,0));
-        ag.gameLayer.tagAction(cc.sequence(cc.delayTime(30),cc.callFunc(function(){
-            var tempRole = ag.gameLayer.getRole(id);
-            if(tempRole)this.delPoison(id);
-        }.bind(this))),tag);
     },
 
 

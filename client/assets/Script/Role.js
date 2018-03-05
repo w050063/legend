@@ -247,7 +247,10 @@ cc.Class({
                 ag.jsUtil.showText(ag.gameLayer.node,'装备回收成功');
             }
         }
-        if(last < this._data.level && this==ag.gameLayer._player && this._data.level==35){
+
+        //超过等级自动飞回
+        var maxLevel = ag.gameConst._terrainMap[this._data.mapId].maxLevel;
+        if(maxLevel && last < this._data.level && this==ag.gameLayer._player && this._data.level>maxLevel){
             ag.gameLayer.changeMap('t1');
             ag.agSocket.send("changeMap",'t1');
         }
@@ -1120,6 +1123,17 @@ cc.Class({
             }
         }
         return wing;
+    },
+
+
+    //是否在安全区
+    isInSafe:function(){
+        var safe = ag.gameConst._terrainMap[this._data.mapId].safe;
+        if(safe){
+            var lx1 = this.getLocation().x,ly1 = this.getLocation().y;
+            if(lx1>=safe.x && lx1<=safe.xx && ly1>=safe.y && ly1<=safe.yy)return true;
+        }
+        return false;
     },
 
     // called every frame
