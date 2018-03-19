@@ -21,8 +21,37 @@ module.exports = {
         this._roleXYMap = {};
         this._rankString = "";
         this._rankFirstArray = [];
-        this._legendID = legendID;
+        this._invincibleMap = {};
 
+
+        var serverZoneArray = [[1,2],[3]];
+        var index = -1;
+        for(var i=0;i<serverZoneArray.length;++i){
+            if(serverZoneArray[i].indexOf(parseInt(legendID))!=-1){
+                index = i;
+                break;
+            }
+        }
+
+
+        if(index!=-1){
+            this._legendID = serverZoneArray[index][0];
+            this._legendIDMax = serverZoneArray[index].length==2?serverZoneArray[index][1]:this._legendID;
+        }else{
+            console.log('error legendID!!!');
+            return;
+        }
+
+
+        //启动定时器,每0.1秒执行一次 , 0.1-1.2
+        ag.actionManager.schedule(this,0.1,function (dt) {
+            for(var key in this._invincibleMap){
+                ++this._invincibleMap[key];
+                if(this._invincibleMap[key]>=20){
+                    delete this._invincibleMap[key];
+                }
+            }
+        }.bind(this));
 
         //启动定时器,每秒执行一次
         ag.actionManager.schedule(this,1,function (dt) {
@@ -68,8 +97,14 @@ module.exports = {
 	},
 
 
+    addInvincibile:function(id){
+        this._invincibleMap[id] = 1;
+    },
+
+
     //所有离线角色，土城归一
     theCountryIsAtPeace:function(level){
+        return;// 暂时禁用这个功能
         var array = [];
         var safe = ag.gameConst._terrainMap['t1'].safe;
         for(var key in this._roleMap){
@@ -120,6 +155,7 @@ module.exports = {
             player._state = ag.gameConst.stateIdle;
             player.dead();
             ag.db.deleteRole(id);
+            ag.db.setItems();//道具保存
         }
     },
 
@@ -176,29 +212,7 @@ module.exports = {
             this._roleXYMap[xyStr].push(player);
 
             //如果是道士，还要增加宝宝
-            if(player._data.type=='m2'){
-                var dog = new Role();
-                dog._data = {};
-                dog._data.id = 'm'+(++this._baseMonsterId);
-                dog._data.type = 'm19';
-                var dirPos = ag.gameConst.directionArray[player._data.direction];
-                var pos = this.getStandLocation(player._data.mapId,player._data.x+dirPos.x,player._data.y+dirPos.y);
-                dog._data.x = pos.x;
-                dog._data.y = pos.y;
-                dog._data.name = '白虎('+player._data.name+')';
-                dog._data.camp = player._data.camp;
-                dog._data.mapId = player._data.mapId;
-                dog._data.direction = 4;//默认朝下
-                dog._data.level = 0;
-                dog._master = player;
-                player._tiger = dog;
-                dog.resetAllProp();
-                this._roleMap[dog._data.id] = dog;
-                var xyStr = dog.getMapXYString();
-                if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
-                this._roleXYMap[xyStr].push(dog);
-                dog.setAIController(new TigerAIController(dog));
-            }
+            this.createTiger(player);
 
             //新手送装备
             ag.itemManager.presentWith(player._data.id);
@@ -217,6 +231,33 @@ module.exports = {
             ag.jsUtil.sendDataAll("sSystemNotify","欢迎天下第一称号【"+player._data.name+"】上线！");
         }else{
             ag.jsUtil.sendDataAll("sSystemNotify","欢迎玩家【"+player._data.name+"】上线！");
+        }
+    },
+
+
+    createTiger:function(player){
+        if(player._data.type=='m2'){
+            var dog = new Role();
+            dog._data = {};
+            dog._data.id = 'm'+(++this._baseMonsterId);
+            dog._data.type = 'm19';
+            var dirPos = ag.gameConst.directionArray[player._data.direction];
+            var pos = this.getStandLocation(player._data.mapId,player._data.x+dirPos.x,player._data.y+dirPos.y);
+            dog._data.x = pos.x;
+            dog._data.y = pos.y;
+            dog._data.name = '白虎('+player._data.name+')';
+            dog._data.camp = player._data.camp;
+            dog._data.mapId = player._data.mapId;
+            dog._data.direction = 4;//默认朝下
+            dog._data.level = 0;
+            dog._master = player;
+            player._tiger = dog;
+            dog.resetAllProp();
+            this._roleMap[dog._data.id] = dog;
+            var xyStr = dog.getMapXYString();
+            if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
+            this._roleXYMap[xyStr].push(dog);
+            dog.setAIController(new TigerAIController(dog));
         }
     },
 
@@ -433,6 +474,8 @@ module.exports = {
         return false;
     },
     isEnemyForAttack:function(role1,role2){
+        if(role1==role2)return false;
+        if(this._invincibleMap[role2._data.id])return false;
         if(role1._master)role1 = role1._master;
         if(role2._master)role2 = role2._master;
         if(role2.getIsMonster() || (role2.getIsPlayer() && ag.userManager.getOnline(role2._data.id))){

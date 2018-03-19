@@ -10,6 +10,7 @@ module.exports = ag.class.extend({
         this._infoMap = {};
         this._nLength = 0;
         this._uidBindMap = {};
+        this._roleMapBack = {};
         this._itemMapBack = {};
         this._waiguaArray = {};
     },
@@ -71,8 +72,10 @@ module.exports = ag.class.extend({
             this._infoMap[id].online = online;
             if(online){
                 this._itemMapBack[id] = {};
+                this._roleMapBack[id] = {};
             }else{
                 delete this._itemMapBack[id];
+                delete this._roleMapBack[id];
             }
         }
     },
@@ -110,7 +113,13 @@ module.exports = ag.class.extend({
 
     //根据uid获得账号
     getAccountByUid:function(uid){
-        return this._uidBindMap[uid];
+        var id = this._uidBindMap[uid];
+        if(id){
+            var rid = parseInt(id.split('_')[0]);
+            if(rid && rid>=ag.gameLayer._legendID && rid<=ag.gameLayer._legendIDMax)
+            return id;
+        }
+        return undefined;
     },
 
     //根据账号获得uid

@@ -33,7 +33,7 @@ var Handler = cc.Class.extend({
         }
 
         var legendId = uid.split('_')[0];
-        if(legendId!=1 && legendId!=2){
+        if(legendId!=1 && legendId!=2 && legendId!=3){
             next(null, {
                 code: 500,
                 error: true
@@ -42,10 +42,16 @@ var Handler = cc.Class.extend({
         }
 
         session.bind(uid);
-        session.set('uid', uid);
-        session.push('uid', function(err) {
+        //session.set('uid', uid);
+        //session.push('uid', function(err) {
+        //    if(err) {
+        //        console.error('set uid for session service failed! error is : %j', err.stack);
+        //    }
+        //});
+        session.set('rid', legendId);
+        session.push('rid', function(err) {
             if(err) {
-                console.error('set uid for session service failed! error is : %j', err.stack);
+                console.error('set rid for session service failed! error is : %j', err.stack);
             }
         });
         session.on('closed', this.onUserLeave.bind(null, self.app));
@@ -65,10 +71,10 @@ var Handler = cc.Class.extend({
      *
      */
     onUserLeave : function(app, session) {
-        if(!session || !session.get("uid")) {
+        if(!session || !session.uid) {
             return;
         }
-        app.rpc.work.WorkRemote.kick(session, session.get("uid"), app.get('serverId'), function(){
+        app.rpc.work.WorkRemote.kick(session, session.uid, app.get('serverId'), function(){
             //console.log("====== kick callback over! ======");
         });
     },

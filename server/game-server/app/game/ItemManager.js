@@ -345,9 +345,13 @@ module.exports = ag.class.extend({
                 for(var key in map){
                     if(map[key].level==9)array.push(key);
                 }
-            }else{
+            }else if(rand<0.9975){
                 for(var key in map){
                     if(map[key].level==10)array.push(key);
+                }
+            }else{
+                for(var key in map){
+                    if(map[key].level==11)array.push(key);
                 }
             }
             var index = Math.floor(Math.random()*array.length);

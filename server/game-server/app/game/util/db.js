@@ -9,11 +9,12 @@ var crypto = require('./crypto');
 var Item = require('../Item');
 module.exports = ag.class.extend({
     ctor:function () {
-        //console.log(crypto.toBase64("大王来巡山"));
+        //console.log(crypto.fromBase64("5YeJ5Yaw5bCP5rOV"));
         this._chatCount = 0;
         this._dataArray = [];
         this._cardMap = {};
         this._bDoing = false;
+        this._bFirstReadOver = false;
 
         this._pool = mysql.createPool({
             host: '127.0.0.1',
@@ -27,11 +28,37 @@ module.exports = ag.class.extend({
 
 
         this.getAccounts(function(rows){
+            //先处理同名问题
+            var map = {};
             for(var i=0;i<rows.length;++i){
                 var name = crypto.fromBase64(rows[i].name);
                 name = name.replace(/ /g,"*");
                 name = name.replace(/\n/g,"*");
-                ag.userManager.add(rows[i].id,rows[i].password,name,rows[i].create_time);
+                if(name.length==0)name='**';
+                if(name.length==1)name='*'+name;
+                for(var j=ag.gameLayer._legendID;j<=ag.gameLayer._legendIDMax;++j){
+                    if(name.substr(name.length-3)==('.s'+j)){
+                        name = name.substr(0,name.length-3);
+                    }
+                }
+                rows[i].name = name;
+                if(!map[name])map[name] = [];
+                map[name].push(i);
+            }
+
+            for(var key in map){
+                if(map[key].length>=2){
+                    for(var i=0;i<map[key].length;++i){
+                        var index = map[key][i];
+                        var legendId = rows[index].id.split('_')[0];
+                        rows[index].name = rows[index].name + '.s' + legendId;
+                    }
+                }
+            }
+
+
+            for(var i=0;i<rows.length;++i){
+                ag.userManager.add(rows[i].id,rows[i].password,rows[i].name,rows[i].create_time);
             }
         });
         this.getRoles(function(rows){
@@ -51,16 +78,22 @@ module.exports = ag.class.extend({
                         item._duration = 0;
                         item._data.owner = data.owner;
                         item._data.puton = data.puton;
+                        if(this.existSamePuton(role._data.id,data.puton)){
+                            item._data.puton = ag.gameConst.putonBag;
+                        }
                         ag.itemManager._itemMap.add(item);
                         if(item._data.puton==ag.gameConst.putonBag){
                             ++role._bagLength;
                         }
-                        ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
-                        role.refreshItemProp();
+                        //ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
+                        //role.refreshItemProp();
                     }
                 }
             }
-        });
+            for(var key in ag.gameLayer._roleMap){
+                ag.gameLayer._roleMap[key].refreshItemProp();
+            }
+        }.bind(this));
         this.getGuilds(function(rows){
             for(var i=0;i<rows.length;++i){
                 var name = crypto.fromBase64(rows[i].name);
@@ -97,7 +130,7 @@ module.exports = ag.class.extend({
 
 
         //自定义数据
-        this.getCustomData(function(data){
+        this.getCustomData(this._legendID,function(data){
             this._customData = data;
             if(!this._customData.guildWinId)this._customData.guildWinId = '0';
             if(ag.shabake)ag.shabake._guildWinId = this._customData.guildWinId;
@@ -127,15 +160,15 @@ module.exports = ag.class.extend({
                 var self = this;
                 this._pool.getConnection(function(err,conn){
                     if(err){
-                        self._bDoing = false;
                         obj.callback(err,null,null);
+                        self._bDoing = false;
                     }else{
                         conn.query(obj.sql,function(qerr,vals){
                             //释放连接
                             conn.release();
                             //事件驱动回调
-                            self._bDoing = false;
                             obj.callback(qerr,vals);
+                            self._bDoing = false;
                         });
                     }
                 });
@@ -144,8 +177,35 @@ module.exports = ag.class.extend({
     },
 
 
+
+    existSamePuton:function (id,puton){
+        if(puton>=0){
+            var map = ag.itemManager._itemMap.getMap();
+            for (var key in map) {
+                var obj = map[key]._data;
+                if (obj.owner == id && obj.puton==puton) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
+
     query:function (sql,callback){
         this._dataArray.push({sql:sql,callback:callback});
+    },
+
+
+    //获得当前区域的数据
+    getCurZone:function(rows){
+        for(var i=rows.length-1;i>=0;--i){
+            var zone = parseInt(rows[i].id.split('_')[0]);
+            if(!zone || zone<ag.gameLayer._legendID || zone>ag.gameLayer._legendIDMax){
+                rows.splice(i,1);
+            }
+        }
+        return rows;
     },
 
 
@@ -163,16 +223,9 @@ module.exports = ag.class.extend({
                 return;
             }
             if(callback){
-                var legendId = ''+ag.gameLayer._legendID+'_';
-                var len = legendId.length;
-                for(var i=rows.length-1;i>=0;--i){
-                    if(rows[i].id.substr(0,len)!=legendId){
-                        rows.splice(i,1);
-                    }
-                }
-                callback(rows);
+                callback(this.getCurZone(rows));
             }
-        });
+        }.bind(this));
     },
 
     createAccount:function(id,password,name,create_time,last_time,callback){
@@ -272,16 +325,9 @@ module.exports = ag.class.extend({
                 return;
             }
             if(callback){
-                var legendId = ''+ag.gameLayer._legendID+'_';
-                var len = legendId.length;
-                for(var i=rows.length-1;i>=0;--i){
-                    if(rows[i].id.substr(0,len)!=legendId){
-                        rows.splice(i,1);
-                    }
-                }
-                callback(rows);
+                callback(this.getCurZone(rows));
             }
-        });
+        }.bind(this));
     },
 
 
@@ -390,16 +436,9 @@ module.exports = ag.class.extend({
                 return;
             }
             if(callback){
-                var legendId = ''+ag.gameLayer._legendID+'_';
-                var len = legendId.length;
-                for(var i=rows.length-1;i>=0;--i){
-                    if(rows[i].id.substr(0,len)!=legendId){
-                        rows.splice(i,1);
-                    }
-                }
-                callback(rows);
+                callback(this.getCurZone(rows));
             }
-        });
+        }.bind(this));
     },
 
 
@@ -467,25 +506,18 @@ module.exports = ag.class.extend({
         var sql = 'SELECT * FROM t_auctionShop';
         this.query(sql, function(err, rows) {
             if (err) {
-                if(callback)callback([]);
+                callback([]);
                 throw err;
             }
 
             if(rows.length == 0){
-                if(callback)callback([]);
+                callback([]);
                 return;
             }
             if(callback){
-                var legendId = ''+ag.gameLayer._legendID+'_';
-                var len = legendId.length;
-                for(var i=rows.length-1;i>=0;--i){
-                    if(rows[i].id.substr(0,len)!=legendId){
-                        rows.splice(i,1);
-                    }
-                }
-                callback(rows);
+                callback(this.getCurZone(rows));
             }
-        });
+        }.bind(this));
     },
 
 
@@ -592,16 +624,9 @@ module.exports = ag.class.extend({
                 return;
             }
             if(callback){
-                var legendId = ''+ag.gameLayer._legendID+'_';
-                var len = legendId.length;
-                for(var i=rows.length-1;i>=0;--i){
-                    if(rows[i].id.substr(0,len)!=legendId){
-                        rows.splice(i,1);
-                    }
-                }
-                callback(rows);
+                callback(this.getCurZone(rows));
             }
-        });
+        }.bind(this));
     },
 
     //创建行会
@@ -670,18 +695,32 @@ module.exports = ag.class.extend({
 
 
     //获得当前行会数据
-    getCustomData:function(callback){
-        var sql = 'SELECT * FROM t_custom where id = "'+ag.gameLayer._legendID+'_0";';
+    getCustomData:function(legendID,callback){
+        var self = this;
+        var sql = 'SELECT * FROM t_custom where id = "'+legendID+'_0";';
         this.query(sql, function(err, rows) {
-            var data = rows[0].data.replace(/%/g,'"');
+            var data = '';
+            if(rows.length>=1){
+                data = rows[0].data.replace(/%/g,'"');
+            }else{
+                data = '{}';
+                self.createCustomData();
+            }
             if(callback)callback(JSON.parse(data));
         });
     },
 
-    //创建行会
+    //创建自定义数据
     setCustomData:function(data){
         var sql = 'UPDATE t_custom SET data = "' + JSON.stringify(data).replace(/"/g,'%')
             + '" WHERE id = "'+ag.gameLayer._legendID+'_0";';
+        this.query(sql, function(err, rows) {});
+    },
+
+    //创建自定义数据
+    createCustomData:function(){
+        var sql = 'INSERT INTO t_custom(id,data) VALUES("'
+            + ag.gameLayer._legendID + '_0","{}")';
         this.query(sql, function(err, rows) {});
     },
 
@@ -692,6 +731,9 @@ module.exports = ag.class.extend({
             for(var i=0;i<rows.length;++i){
                 this._cardMap[rows[i].id] = rows[i];
             }
+
+            //数据库读取完毕
+            this._bFirstReadOver = true;
         }.bind(this));
     },
 

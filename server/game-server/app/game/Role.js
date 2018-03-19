@@ -191,12 +191,19 @@ module.exports = ag.class.extend({
 
     //更换地图
     changeMap:function(transferId){
+        var lastMap = this._data.mapId;
+        var nowMap = null;
         var transferMst = ag.gameConst._transferMst[transferId];
         if(transferMst){
             var lastMapId = this._data.mapId;
             var mapId = transferMst.mapId;
-            ag.jsUtil.sendDataExcept("sDeleteRole",this._data.id,this._data.id);
-            if(this._tiger)ag.jsUtil.sendDataExcept("sDeleteRole",this._tiger._data.id,this._data.id);
+            nowMap = mapId;
+
+            if(lastMap!=nowMap){
+                ag.jsUtil.sendDataExcept("sDeleteRole",this._data.id,this._data.id);
+                if(this._tiger)ag.jsUtil.sendDataExcept("sDeleteRole",this._tiger._data.id,this._data.id);
+            }
+
 
             //更新地图数据
             var oldStr = this.getMapXYString();
@@ -220,98 +227,119 @@ module.exports = ag.class.extend({
                 ag.gameLayer._roleXYMap[newStr].push(this._tiger);
             }
 
+
             var map = ag.gameConst._terrainMap[mapId];
-            if(!map.safe && map.id!='t16'){
+            if(!map.safe){
                 ag.jsUtil.sendDataAll("sSystemNotify",'玩家【'+this._data.name+'】冲向'+map.name+'寻宝去啦！');
             }
 
             //判断是否退出皇宫
-            if(this.getIsPlayer() && (this._data.mapId=='t16' || lastMapId=='t16')){
+            if(this.getIsPlayer() && (this._data.mapId=='t27' || lastMapId=='t27')){
                 ag.shabake.reset();
             }
         }
-        ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp},this._data.mapId);
 
-        //返回当前地图非自己的角色。
-        for(var key in ag.gameLayer._roleMap){
-            var role = ag.gameLayer._roleMap[key];
-            if(role._data.mapId==this._data.mapId){
-                if(role.getIsPlayer()){
-                    if(ag.userManager.getOnline(role._data.id)){
-                        if(role._data.id!=this._data.id){
-                            var temp = JSON.parse(JSON.stringify(role._data));
-                            delete temp.gold;
-                            delete temp.attackMode;
-                            delete temp.practice;
-                            ag.jsUtil.sendData("sRole",temp,this._data.id);
-                        }
+        if(lastMap!=nowMap){
+            ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp},this._data.mapId);
 
-                        if(role._tiger){
-                            role = role._tiger;
-                            temp = JSON.parse(JSON.stringify(role._data));
-                            delete temp.gold;
-                            delete temp.attackMode;
-                            delete temp.practice;
-                            ag.jsUtil.sendData("sRole",temp,this._data.id);
+
+            //重置玩家列表缓存
+            ag.userManager._roleMapBack[this._data.id] = {};
+            for(var key in  ag.userManager._roleMapBack){
+                delete ag.userManager._roleMapBack[key][this._data.id];
+            }
+            //返回当前地图非自己的角色。
+            for(var key in ag.gameLayer._roleMap){
+                var role = ag.gameLayer._roleMap[key];
+                if(role._data.mapId==this._data.mapId){
+                    if(role.getIsPlayer()){
+                        if(ag.userManager.getOnline(role._data.id)){
+                            if(role._data.id!=this._data.id){
+                                var temp = JSON.parse(JSON.stringify(role._data));
+                                this.sendRoleForCheckBack(this._data.id,temp);
+                            }
+
+                            if(role._tiger){
+                                role = role._tiger;
+                                temp = JSON.parse(JSON.stringify(role._data));
+                                this.sendRoleForCheckBack(this._data.id,temp);
+                            }
                         }
+                    }else if(role.getIsMonster()){
+                        var temp = JSON.parse(JSON.stringify(role._data));
+                        this.sendRoleForCheckBack(this._data.id,temp);
                     }
-                }else if(role.getIsMonster()){
-                    var temp = JSON.parse(JSON.stringify(role._data));
-                    delete temp.gold;
-                    delete temp.attackMode;
-                    delete temp.practice;
-                    ag.jsUtil.sendData("sRole",temp,this._data.id);
                 }
             }
         }
 
+
         //通知其他人。
-        var temp = JSON.parse(JSON.stringify(this._data));
-        delete temp.gold;
-        delete temp.attackMode;
-        ag.jsUtil.sendDataExcept("sRole",temp,this._data.id);
-        if(this._tiger){
-            role = this._tiger;
-            temp = JSON.parse(JSON.stringify(role._data));
-            delete temp.gold;
-            delete temp.attackMode;
-            delete temp.practice;
-            ag.jsUtil.sendDataExcept("sRole",temp,this._data.id);
+        for(var key in ag.gameLayer._roleMap){
+            var role = ag.gameLayer._roleMap[key];
+            if(role.getIsPlayer() && role._data.mapId==this._data.mapId && role._data.id!==this._data.id){
+                var temp = JSON.parse(JSON.stringify(this._data));
+                this.sendRoleForCheckBack(role._data.id,temp);
+                if(this._tiger){
+                    temp = JSON.parse(JSON.stringify(this._tiger._data));
+                    this.sendRoleForCheckBack(role._data.id,temp);
+                }
+            }
         }
 
         //发送装备情况
-        var map = ag.itemManager._itemMap.getMap();
-        for(var key in map){
-            var itemData = map[key]._data;
-            if(itemData.puton!=ag.gameConst.putonAuctionShop){
-                var role = ag.gameLayer.getRole(itemData.owner);
-                if((role==this && !transferMst)
-                    || (itemData.mapId==this._data.mapId && itemData.puton==ag.gameConst.putonGround)
-                    || (role && role!=this && role._data.mapId==this._data.mapId && itemData.puton>=0 && ag.userManager.getOnline(role._data.id))){
-                    var temp = JSON.parse(JSON.stringify(itemData));
-                    this.sendItemForCheckBack(this._data.id,temp);
-                }
+        if(lastMap!=nowMap) {
+            var map = ag.itemManager._itemMap.getMap();
+            for (var key in map) {
+                var itemData = map[key]._data;
+                if (itemData.puton != ag.gameConst.putonAuctionShop) {
+                    var role = ag.gameLayer.getRole(itemData.owner);
+                    if ((role == this && !transferMst)
+                        || (itemData.mapId == this._data.mapId && itemData.puton == ag.gameConst.putonGround)
+                        || (role && role != this && role._data.mapId == this._data.mapId && itemData.puton >= 0 && ag.userManager.getOnline(role._data.id))) {
+                        var temp = JSON.parse(JSON.stringify(itemData));
+                        this.sendItemForCheckBack(this._data.id, temp);
+                    }
 
-                //发给别人装备
-                if(role==this && itemData.puton>=0){
-                    var temp2 = JSON.parse(JSON.stringify(itemData));
-                    for(var key2 in ag.gameLayer._roleMap){
-                        var role2 = ag.gameLayer._roleMap[key2];
-                        if(role2.getIsPlayer() && role2._data.mapId==this._data.mapId && role2._data.id!==this._data.id){
-                            this.sendItemForCheckBack(role2._data.id,temp2);
+                    //发给别人装备
+                    if (role == this && itemData.puton >= 0) {
+                        var temp2 = JSON.parse(JSON.stringify(itemData));
+                        for (var key2 in ag.gameLayer._roleMap) {
+                            var role2 = ag.gameLayer._roleMap[key2];
+                            if (role2.getIsPlayer() && role2._data.mapId == this._data.mapId && role2._data.id !== this._data.id) {
+                                this.sendItemForCheckBack(role2._data.id, temp2);
+                            }
                         }
                     }
                 }
             }
         }
 
-
         //行会数据
-        for(var key in ag.guild._dataMap){
-            var temp = ag.guild._dataMap[key];
-            var str = temp.member.length==0?'':temp.member.join(',');
+        if(!transferMst) {
+            for (var key in ag.guild._dataMap) {
+                var temp = ag.guild._dataMap[key];
+                var str = temp.member.length == 0 ? '' : temp.member.join(',');
 
-            ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:temp.id,name:temp.name,member:str});//ag add for test./行会成员
+                ag.jsUtil.sendDataAll("sGuildCreate", {result: 0, id: temp.id, name: temp.name, member: str});//ag add for test./行会成员
+            }
+        }
+        //增加无敌
+        ag.gameLayer.addInvincibile(this._data.id);
+    },
+
+
+
+
+    //发送道具，先检查备份
+    sendRoleForCheckBack:function(id,temp){
+        var back = ag.userManager._roleMapBack[id];
+        if(back && !back[temp.id]){
+            delete temp.gold;
+            delete temp.attackMode;
+            //delete temp.practice;
+            ag.jsUtil.sendData("sRole",temp,id);
+            back[temp.id] = temp.id;
         }
     },
 
@@ -384,6 +412,12 @@ module.exports = ag.class.extend({
                     }
                 }
             }
+
+
+            //沙巴克检测
+            if(this.getIsPlayer() && (this._data.mapId=='t27' || lastMapId=='t27')){
+                ag.shabake.reset();
+            }
         }
         this._state = ag.gameConst.stateMove;
     },
@@ -392,28 +426,26 @@ module.exports = ag.class.extend({
     //掉血
     changeHPByHurt:function(attacker,hurt,bCisha){
         var rate = 0.9+Math.random()*0.2;
-        if(bCisha){
-            if(this.getIsMonster() && this.getMst().lv==10){
-                this._data.hp -=  Math.round(hurt*0.4*rate);
-            }else if(this.getIsMonster() && this.getMst().lv==9){
-                this._data.hp -=  Math.round(hurt*0.5*rate);
-            }else if(this._data.type=='m1'){
-                this._data.hp -=  Math.round(hurt*0.6*rate);
+        var array = [1,(this.getIsPlayer()?0.8:0.5),0];
+        if(!bCisha)bCisha = 0;
+        var deDefense = this._defense*array[bCisha];
+        var correct = (1+((this.getIsPlayer() && attacker.getIsPlayer())?0.02:0.03)*deDefense);
+        if(this.getIsMonster() && this.getMst().lv==11){
+            this._data.hp -= Math.round(hurt*0.3/correct*rate);
+        }else if(this.getIsMonster() && this.getMst().lv==10){
+            this._data.hp -= Math.round(hurt*0.4/correct*rate);
+        }else if(this.getIsMonster() && this.getMst().lv==9){
+            this._data.hp -= Math.round(hurt*0.5/correct*rate);
+        }else if(this._data.type=='m1'){
+            if(attacker._data.type=='m1'){
+                this._data.hp -= Math.round(hurt*0.8/correct*rate);
+            }if(bCisha==ag.gameConst.fighterAttackFar){
+                this._data.hp -= Math.round(hurt*0.6/correct*rate);
             }else{
-                this._data.hp -=  Math.round(hurt*rate);
+                this._data.hp -= Math.round(hurt*0.35/correct*rate);
             }
         }else{
-            //var correct = this._defense>=0 ? this._defense/25+1 : -1/(this._defense/25-1);
-            var correct = (1+0.03*this._defense);
-            if(this.getIsMonster() && this.getMst().lv==10){
-                this._data.hp -= Math.round(hurt*0.4/correct*rate);
-            }else if(this.getIsMonster() && this.getMst().lv==9){
-                this._data.hp -= Math.round(hurt*0.5/correct*rate);
-            }else if(this._data.type=='m1'){
-                this._data.hp -= Math.round(hurt*0.4/correct*rate);
-            }else{
-                this._data.hp -=  Math.round(hurt/correct*rate);
-            }
+            this._data.hp -=  Math.round(hurt/correct*rate);
         }
         ag.jsUtil.sendDataAll("sHP",{id:this._data.id,hp:this._data.hp},this._data.mapId);
 
@@ -447,9 +479,9 @@ module.exports = ag.class.extend({
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            tempRole.changeHPByHurt(this,this._hurt*3);
+                            tempRole.changeHPByHurt(this,this._hurt*3,ag.gameConst.fighterAttackNear);
                         }else{
-                            tempRole.changeHPByHurt(this,this._hurt);
+                            tempRole.changeHPByHurt(this,this._hurt,ag.gameConst.fighterAttackNear);
                         }
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
@@ -462,9 +494,9 @@ module.exports = ag.class.extend({
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
                         if(ag.buffManager.getCDForFireCrit(this)==false){
-                            tempRole.changeHPByHurt(this,this._hurt*3);
+                            tempRole.changeHPByHurt(this,this._hurt*3,ag.gameConst.fighterAttackNear);
                         }else{
-                            tempRole.changeHPByHurt(this,this._hurt,true);
+                            tempRole.changeHPByHurt(this,this._hurt,ag.gameConst.fighterAttackFar);
                         }
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
@@ -510,7 +542,7 @@ module.exports = ag.class.extend({
                     }
                 }
             }
-        }else if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27" || this._data.type=="m49" || this._data.type=="m50") {
+        }else if(this._data.type=='m8' || this._data.type=='m9' || this._data.type=="m27" || this._data.type=="m49" || this._data.type=="m50" || this._data.type=="m51" || this._data.type=="m52") {
             var array = ag.gameLayer.getRoleFromCenterXY(this._data.mapId,this.getLocation(),this.getMst().attackDistance);
             for(i = 0; i < array.length; ++i) {
                 var tempRole = array[i];
@@ -613,9 +645,9 @@ module.exports = ag.class.extend({
                     ag.itemManager.drop(master._data.id,str,this._data.mapId,this.getLocation(),name);
                 }
                 ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
-                if(this._data.type=='m48'){//玉皇大帝双倍爆率
+                ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
+                if(this._data.type=='m48' || this._data.type=='m50' || this._data.type=='m52'){//玉皇大帝双倍爆率
                     ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
-                }else if(this._data.type=='m50'){//黑鬼天葬双倍爆率
                     ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
                 }
             }else if(this.getIsPlayer()){
@@ -676,7 +708,7 @@ module.exports = ag.class.extend({
         }
 
         //判断是否退出皇宫
-        if(this.getIsPlayer() && this._data.mapId=='t16'){
+        if(this.getIsPlayer() && this._data.mapId=='t27'){
             ag.shabake.reset();
         }
     },
@@ -692,21 +724,8 @@ module.exports = ag.class.extend({
                 this.setLocation(this._master.getLocation());
                 ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
             }else{
+                this.changeMap(ag.gameConst._terrainMap[this._data.mapId].tranCity);
                 ag.jsUtil.sendDataAll("sRelife",{id:this._data.id, mapId:this._data.mapId,x:this._data.x, y:this._data.y},this._data.mapId);
-                if(this._data.mapId=='t18'
-                    || this._data.mapId=='t13'
-                    || this._data.mapId=='t19'
-                    || this._data.mapId=='t20'
-                    || this._data.mapId=='t21'
-                    || this._data.mapId=='t24'
-                    || this._data.mapId=='t25'){
-                    this.changeMap('t23');
-                }else if(this._data.mapId=='t12'
-                    || this._data.mapId=='t0'){
-                    this.changeMap('t0');
-                }else{
-                    this.changeMap('t1');
-                }
             }
         }
     },
@@ -761,5 +780,17 @@ module.exports = ag.class.extend({
             if(lx1>=safe.x && lx1<=safe.xx && ly1>=safe.y && ly1<=safe.yy)return true;
         }
         return false;
+    },
+
+
+    getEquipIsEmpty:function(){
+        var map = ag.itemManager._itemMap.getMap();
+        for (var key in map) {
+            var obj = map[key];
+            if(obj._data.owner==this._data.id && obj._data.puton>=0){
+                return false;
+            }
+        }
+        return true;
     },
 });

@@ -23,7 +23,7 @@ module.exports = ag.class.extend({
             this._bRunning = 1;
             setTimeout(function(){
                 this._bRunning = 2;
-                ag.db.getCustomData(function(data){
+                ag.db.getCustomData(this._legendID,function(data){
                     this._guildWinId = data.guildWinId;
                 }.bind(this));
                 ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
@@ -34,7 +34,7 @@ module.exports = ag.class.extend({
                 this.reset();
                 setTimeout(function(){
                     this._bRunning = 0;
-                    ag.db.getCustomData(function(data2){
+                    ag.db.getCustomData(this._legendID,function(data2){
                         data2.guildWinId = this._guildWinId;
                         ag.db._customData.guildWinId = this._guildWinId;
                         ag.db.setCustomData(data2);
@@ -56,8 +56,12 @@ module.exports = ag.class.extend({
             if(!this._guildWinId){//不存在则增加
                 for(var key in ag.gameLayer._roleMap){
                     var role = ag.gameLayer._roleMap[key];
-                    if(role.getIsPlayer() && ag.userManager.getOnline(role._data.id) && role._state!=ag.gameConst.stateDead && role._data.mapId=='t16' && ag.guild.getGuildId(key)){
+                    if(role.getIsPlayer() && ag.userManager.getOnline(role._data.id) && role._state!=ag.gameConst.stateDead && this.getInHg(role) && ag.guild.getGuildId(key)){
                         this._guildWinId = ag.guild.getGuildId(key);
+                        ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
+                        ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
+                        ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
+                        ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
                         ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
                         ag.jsUtil.sendDataAll("sGuildWinId",this._guildWinId);
                         break;
@@ -68,7 +72,7 @@ module.exports = ag.class.extend({
                 var bFindOther = false;
                 for(var key in ag.gameLayer._roleMap){
                     var role = ag.gameLayer._roleMap[key];
-                    if(role.getIsPlayer() && ag.userManager.getOnline(role._data.id) && role._state!=ag.gameConst.stateDead && role._data.mapId=='t16'){
+                    if(role.getIsPlayer() && ag.userManager.getOnline(role._data.id) && role._state!=ag.gameConst.stateDead && this.getInHg(role)){
                         var guildId = ag.guild.getGuildId(key);
                         if(guildId && guildId!=this._guildWinId){
                             bFindOther = true;
@@ -84,5 +88,13 @@ module.exports = ag.class.extend({
                 }
             }
         }
+    },
+
+
+    getInHg:function(role){
+        if(role._data.mapId=='t27' && role._data.y>=role._data.x+24){
+            return true;
+        }
+        return false;
     },
 });

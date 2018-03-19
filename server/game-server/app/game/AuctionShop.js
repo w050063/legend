@@ -33,9 +33,19 @@ module.exports = ag.class.extend({
         var map = JSON.parse(JSON.stringify(this._dataMap));
         for(var key in map){
             var item = ag.itemManager._itemMap.get(key);
-            map[key].mid = item._data.mid;
-            var role = ag.gameLayer.getRole(item._data.owner);
-            map[key].name = role?role._data.name:'';
+            if(item){
+                map[key].mid = item._data.mid;
+                var role = ag.gameLayer.getRole(item._data.owner);
+                map[key].name = role?role._data.name:'';
+
+                if(new Date().getTime() - map[key].create_time>1000 * 60*60* 24){
+                    this.buyAuctionShop(key, item._data.owner);
+                    delete map[key];
+                }
+            }else{
+                delete map[key];
+                delete this._dataMap[key];
+            }
         }
         ag.jsUtil.sendData("sAuctionShop",JSON.stringify(map),id);
     },
@@ -45,7 +55,7 @@ module.exports = ag.class.extend({
     deleteInvalid:function(){
         for(var key in this._dataMap){
             var item = ag.itemManager._itemMap.get(key);
-            if(!ag.gameLayer.getRole(item._data.owner)){
+            if(!item || !ag.gameLayer.getRole(item._data.owner)){
                 delete this._dataMap[key];
             }
         }
@@ -81,7 +91,7 @@ module.exports = ag.class.extend({
             delete this._dataMap[id];
             ++role._bagLength;
             this.sendData(rid);
-            ag.jsUtil.sendData("sSystemNotify","购买成功！",rid);
+            ag.jsUtil.sendData("sSystemNotify",lastRole._data.id==rid?'拍卖行已送回道具！':"购买成功！",rid);
             ag.jsUtil.sendData("sItem",item._data,rid);
         }else{
             ag.jsUtil.sendData("sSystemNotify","未知错误！",rid);

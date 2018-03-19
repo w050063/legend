@@ -4,6 +4,7 @@ var pomelo = require('pomelo');
  */
 var app = pomelo.createApp();
 app.set('name', 'server');
+var serverZoneArray = [[1,2],[3]];
 
 // app configuration
 app.configure('production|development', 'conn', function(){
@@ -60,19 +61,34 @@ app.configure('production|development', function() {
 
     app.route('work', function(session, msg, app, cb) {
         var chatServers = app.getServersByType('work');
-        var sessionService = app.get('sessionService');
-        var session2 = sessionService.get(session.id);
-        var index = 0;
-        var legendId = 1;
-        if(session2){
-            var uid = session2.get('uid');
-            if(uid)legendId = uid.split('_')[0];
+
+        //var sessionService = app.get('sessionService');
+        //var session2 = sessionService.get(session.id);
+        //var index = 0;
+        //var legendId = 1;
+        //if(session2){
+        //    var uid = session2.get('uid');
+        //    if(uid)legendId = uid.split('_')[0];
+        //}
+        //else if(msg['args'][0])legendId = msg['args'][0].split('_')[0];
+        //if(legendId==1)index = 0;
+        //if(legendId==2)index = 1;
+
+        var rid = parseInt(session.get('rid'));
+        var index = -1;
+        for(var i=0;i<serverZoneArray.length;++i){
+            if(serverZoneArray[i].indexOf(rid)!=-1){
+                index = i;
+                break;
+            }
         }
-        else if(msg['args'][0])legendId = msg['args'][0].split('_')[0];
-        if(legendId==1)index = 0;
-        if(legendId==2)index = 1;
-        var res = chatServers[index];
-        cb(null, res.id);
+
+        if(index!=-1){
+            var res = chatServers[index];
+            cb(null, res.id);
+        }else{
+            cb(null, null);
+        }
     });
 
 
