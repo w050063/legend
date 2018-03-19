@@ -37,7 +37,7 @@ cc.Class({
         var before = name.substr(0,pos);
         var after = name.substr(pos+1);
         var i=0;
-        for(;i<3;++i){//默认顶多2个备用plist
+        for(;i<10;++i){//默认顶多2个备用plist
             var trueBefore = i==0?before:(before+'_'+i);
             if(this._fileMap[trueBefore]){
                 if(this._fileMap[trueBefore].indexOf(after)!=-1)break;

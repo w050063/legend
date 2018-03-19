@@ -113,6 +113,10 @@ cc.Class({
     //开始游戏按钮
     buttonDelete: function () {
         ag.musicManager.playEffect("resources/voice/button.mp3");
+        ag.jsUtil.showText(this.node,'临时禁用删除角色功能！');
+        return;
+
+
         if(ag.userInfo._accountData.type!=undefined && ag.userInfo._accountData.sex!=undefined){
             ag.jsUtil.alertOKCancel(this.node,'确认要删除此角色及其装备？',function(){
                 ag.jsUtil.request(this.node,'deleteRole',ag.userInfo._accountData.id,function (data) {

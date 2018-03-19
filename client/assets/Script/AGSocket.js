@@ -100,10 +100,12 @@ module.exports={
                 var array = data[key];
                 for(var i=0;i<array.length;++i){
                     var value = array[i];
-                    if(this.getExistAttackOrMove(value.id,key)==false){
-                        var obj = {key:key,value:value};
-                        this._dataArray.push(obj);
+                    if(key=='sMoveArray'){
+                        this.delWithMove(value.id);
+                    }else if(key=='sAttackArray'){
+                        this.delWithAttack(value.id);
                     }
+                    this._dataArray.push({key:key,value:value});
                 }
             }
         }.bind(this));
@@ -117,19 +119,24 @@ module.exports={
     },
 
 
-    //获得有没有某id攻击移动数据
-    getExistAttackOrMove:function (id,key) {
-        if(key=='sMoveArray' || key=='sAttackArray'){
-            for(var i=0;i<this._dataArray.length;++i){
-                var obj = this._dataArray[i];
-                if(obj.value.id==id && (obj.key=='sMoveArray' || obj.key=='sAttackArray')){
-                    return true;
-                }
+
+    delWithMove:function (id) {
+        for(var i=this._dataArray.length-1;i>=0;--i){
+            var obj = this._dataArray[i];
+            if(obj.value.id==id && (obj.key=='sMoveArray' || obj.key=='sAttackArray')){
+                this._dataArray.splice(i,1);
             }
         }
-        return false;
     },
 
+    delWithAttack:function (id) {
+        for(var i=this._dataArray.length-1;i>=0;--i){
+            var obj = this._dataArray[i];
+            if(obj.value.id==id && obj.key=='sAttackArray'){
+                this._dataArray.splice(i,1);
+            }
+        }
+    },
 
     //缓存的数据，需要的时候调用。
     doWork:function(){
@@ -320,6 +327,14 @@ module.exports={
             }else if(obj.key=='sDealAddGoldArray'){
                 if(ag.gameLayer) {
                     ag.gameLayer._deal.dealAddGold(obj.value);
+                }
+            }else if(obj.key=='sChangeSexArray'){
+                var player =  ag.gameLayer.getRole(obj.value);
+                if(player && player.getIsPlayer()) {
+                    player._data.sex = player._data.sex==1?0:1;
+                    if(player==ag.gameLayer._player){
+                        ag.userInfo._accountData.sex = player._data.sex;
+                    }
                 }
             }
         }

@@ -228,71 +228,77 @@ cc.Class({
 
     //换地图
     changeMap:function(transferId){
-        var i=0;
-        this._player._ai._locked = null;
-        //清空所有内容
-        for(i=0;i<this._stableMinMapNpcBoss.length;++i){
-            this._stableMinMapNpcBoss[i].destroy();
-        }
-        this._stableMinMapNpcBoss = [];
-        ag.buffManager.changeMap();
-        this.buttonEventNpcClose();
-        for(var key in this._roleMap){
-            if(this._roleMap[key]!=this._player){
-                this._roleMap[key].putCache();
-                delete this._roleMap[key];
-            }
-        }
-        for(i=this._map.node.childrenCount-1;i>=0;--i){
-            var node = this._map.node.children[i];
-            if(node!=this._player.node){
-                node.destroy();
-            }
-        }
-        ag.spriteCache.release();
-
+        var lastMap = this._player._data.mapId;
+        var nowMap = null;
         if(transferId){
             var transferMst = ag.gameConst._transferMst[transferId];
             ag.userInfo._data.mapId = transferMst.mapId;
+            nowMap = transferMst.mapId;
             ag.userInfo._data.x = transferMst.x;
             ag.userInfo._data.y = transferMst.y;
         }
+
+        var i=0;
+        this._player._ai._locked = null;
         var mapId = ag.userInfo._data.mapId;
         var map = ag.gameConst._terrainMap[mapId];
 
-
-        //地图更新
-        //this._map.test(mapId);
-        this._map.init(map.res);
-
-
-        //增加npc
-        for(i=0;i<map.npc.length;++i){
-            var npc = new cc.Node().addComponent(Role);
-            this._map.node.addChild(npc.node);
-            var data = JSON.parse(JSON.stringify(map.npc[i]));
-            data.id = 'r'+baseNpcId;
-            data.mapId = mapId;
-            data.camp = ag.gameConst.campNpc;
-            this._roleMap[data.id] = npc;
-            npc.init(data);
-            ++baseNpcId;
-        }
-
-        //清空地上的道具，并更新
-        for(var key in ag.userInfo._itemMap){
-            if(ag.userInfo._itemMap[key]._data.owner!=this._player._data.id){
-                delete ag.userInfo._itemMap[key];
+        if(lastMap!=nowMap){
+            //清空所有内容
+            for(i=0;i<this._stableMinMapNpcBoss.length;++i){
+                this._stableMinMapNpcBoss[i].destroy();
             }
-        }
+            this._stableMinMapNpcBoss = [];
+            ag.buffManager.changeMap();
+            this.buttonEventNpcClose();
+            for(var key in this._roleMap){
+                if(this._roleMap[key]!=this._player){
+                    this._roleMap[key].putCache();
+                    delete this._roleMap[key];
+                }
+            }
+            for(i=this._map.node.childrenCount-1;i>=0;--i){
+                var node = this._map.node.children[i];
+                if(node!=this._player.node){
+                    node.destroy();
+                }
+            }
+            ag.spriteCache.release();
 
-        var minMap = map.res;
-        minMap = 'minMap'+minMap.substr(minMap.indexOf('/'));
-        cc.loader.loadRes(minMap, cc.SpriteFrame,function (err, spriteFrame) {
-            this._spriteMinMap.spriteFrame = spriteFrame;
-            //this._spriteTopRight.spriteFrame = spriteFrame.clone();
-            //this.resetMinMapPos();
-        }.bind(this));
+            //地图更新
+            //this._map.test(mapId);
+            this._map.init(map.res);
+
+            //增加npc
+            for(i=0;i<map.npc.length;++i){
+                var npc = new cc.Node().addComponent(Role);
+                this._map.node.addChild(npc.node);
+                var data = JSON.parse(JSON.stringify(map.npc[i]));
+                data.id = 'r'+baseNpcId;
+                data.mapId = mapId;
+                data.camp = ag.gameConst.campNpc;
+                this._roleMap[data.id] = npc;
+                npc.init(data);
+                ++baseNpcId;
+            }
+
+            //清空地上的道具，并更新
+            for(var key in ag.userInfo._itemMap){
+                if(ag.userInfo._itemMap[key]._data.owner!=this._player._data.id){
+                    delete ag.userInfo._itemMap[key];
+                }
+            }
+
+            var minMap = map.res;
+            minMap = 'minMap'+minMap.substr(minMap.indexOf('/'));
+            cc.loader.loadRes(minMap, cc.SpriteFrame,function (err, spriteFrame) {
+                this._spriteMinMap.spriteFrame = spriteFrame;
+                //this._spriteTopRight.spriteFrame = spriteFrame.clone();
+                //this.resetMinMapPos();
+            }.bind(this));
+        }else{
+            this._player.setLocation(ag.userInfo._data,true);
+        }
     },
 
 
@@ -432,6 +438,7 @@ cc.Class({
             if(obj && obj._data.owner && obj._data.puton>=0) {
                 this.itemEquipToGround(obj._data.id,obj._data.puton,this.getRole(obj._data.owner));
             }
+
 
 
             var node = new cc.Node();
@@ -849,7 +856,7 @@ cc.Class({
     itemEquipToGround:function(id,puton,role){
         var data = ag.userInfo._itemMap[id]._data;
         var mst = ag.gameConst._itemMst[data.mid];
-        var success = this._player.delEquip(id);
+        var success = role.delEquip(id);
         if(success && role==this._player){
             //var puton = ag.gameConst.putonTypes.indexOf(mst.type);
             if(puton>=0){
@@ -865,7 +872,7 @@ cc.Class({
             if(mst.type==2){
                 if(father.clothe){
                     father.clothe.getComponent(AGAni).putCache();
-                    this.defaultRoleAni(this._player);
+                    this.defaultRoleAni(role);
                 }
             }
             //武器
@@ -882,8 +889,8 @@ cc.Class({
                     father.wing = undefined;
                 }
             }
-            this.resetPlayerProp(this._player);
         }
+        this.resetPlayerProp(role);
     },
 
 
@@ -1250,6 +1257,7 @@ cc.Class({
                 }else{
                     if(role._wingAni){role._wingAni.getComponent(AGAni).putCache();role._wingAni = undefined;}
                 }
+                role.setOffice(role._data.office);
             }
         }
     },
@@ -1306,6 +1314,17 @@ cc.Class({
     },
 
 
+    getEquipIsEmpty:function(){
+        for(var key in ag.userInfo._itemMap){
+            var obj = ag.userInfo._itemMap[key];
+            if(obj._data.owner==this._player._data.id && obj._data.puton>=0){
+                return false;
+            }
+        }
+        return true;
+    },
+
+
     showNodeNpcContent:function(data){
         if(data.content.length==1){
             var transferMst = ag.gameConst._transferMst[data.content[0]];
@@ -1349,6 +1368,8 @@ cc.Class({
         }.bind(this))));
         this._nodeNpcContent.getChildByName('labelTitle').getComponent(cc.Label).string = data.title;
         var content = data.content;
+
+        //处理特出显示
         if(data.content.length>0){
             if(data.content[0]=='t4000'){
                 if(this.getIsGuildmember()){
@@ -1358,6 +1379,15 @@ cc.Class({
                 }else{
                     content = ['t4002','t4003','t4004','t4005','t4007'];
                 }
+            }else if(data.content[0]=='t9002'){
+                if(this._player._data.type=='m0'){
+                    content = ['t9003','t9004'];
+                }else if(this._player._data.type=='m1'){
+                    content = ['t9002','t9004'];
+                }else if(this._player._data.type=='m2'){
+                    content = ['t9002','t9003'];
+                }
+                content[2] = this._player._data.sex==ag.gameConst.sexBoy?'t9006':'t9005';
             }
         }
         var self = this;
@@ -1372,7 +1402,31 @@ cc.Class({
                     label.node.on(cc.Node.EventType.TOUCH_END, function (event) {
                         ag.musicManager.playEffect("resources/voice/button.mp3");
                         var npcStr = transferMst.name;
-                        if(transferMst.id=='t7100'){
+                        if(transferMst.id=='t9002' || transferMst.id=='t9003' || transferMst.id=='t9004'){
+                            if (self.getEquipIsEmpty()) {
+                                if(self._player._data.gold>=5000){
+                                    ag.jsUtil.alertOKCancel(self.node,'确认花费5000元宝'+transferMst.name+'？',function(){
+                                        ag.agSocket.send("changeType",{type:transferMst.type});
+                                    },function(){});
+                                }else{
+                                    ag.jsUtil.showText(self.node,'转职需要5000元宝的服务费！');
+                                }
+                            }else{
+                                ag.jsUtil.showText(self.node,'身上有装备不能进行转职！');
+                            }
+                        }else if(transferMst.id=='t9005' || transferMst.id=='t9006'){
+                            if (self.getEquipIsEmpty()) {
+                                if(self._player._data.gold>=3000){
+                                    ag.jsUtil.alertOKCancel(self.node,'确认花费3000元宝'+transferMst.name+'？',function(){
+                                        ag.agSocket.send("changeSex",{});
+                                    },function(){});
+                                }else{
+                                    ag.jsUtil.showText(self.node,'变性需要3000元宝的服务费！');
+                                }
+                            }else{
+                                ag.jsUtil.showText(self.node,'身上有装备不能进行变性！');
+                            }
+                        }else if(transferMst.id=='t7100'){
                             if (cc.sys.isNative && (cc.sys.os === cc.sys.OS_ANDROID || cc.sys.os === cc.sys.OS_IOS)) {
                                 var agent = anysdk.agentManager;
                                 var share_plugin = agent.getSharePlugin();
@@ -1524,6 +1578,20 @@ cc.Class({
     },
 
 
+    //整理背包
+    buttonEventSortBag:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        for(var key in ag.userInfo._itemMap){
+            var obj = ag.userInfo._itemMap[key];
+            if(obj._data.owner==this._player._data.id && obj._data.puton==ag.gameConst.putonBag){
+                var id = obj._data.id;
+                this.delItemFormBag(id);
+                this.addItemToBag(id);
+            }
+        }
+    },
+
+
     //绑定官职事件
     buttonEventOffice:function(event){
         ag.musicManager.playEffect("resources/voice/button.mp3");
@@ -1660,22 +1728,7 @@ cc.Class({
     //回城事件
     buttonEventGotoCity:function(event){
         ag.musicManager.playEffect("resources/voice/button.mp3");
-        var transferMst = ag.gameConst._transferMst['t1'];
-        if(this._player._data.mapId=='t18'
-            || this._player._data.mapId=='t13'
-            || this._player._data.mapId=='t19'
-            || this._player._data.mapId=='t20'
-            || this._player._data.mapId=='t21'
-            || this._player._data.mapId=='t24'
-            || this._player._data.mapId=='t25'){
-            transferMst = ag.gameConst._transferMst['t23'];
-        }else if(this._player._data.mapId=='t12'
-            || this._player._data.mapId=='t0'){
-            transferMst = ag.gameConst._transferMst['t0'];
-        }else{
-            transferMst = ag.gameConst._transferMst['t1'];
-        }
-
+        var transferMst = ag.gameConst._transferMst[ag.gameConst._terrainMap[this._player._data.mapId].tranCity];
         var level = ag.gameConst._terrainMap[transferMst.mapId].level;
         var maxLevel = ag.gameConst._terrainMap[transferMst.mapId].maxLevel;
         if(!maxLevel)maxLevel = 65535;
@@ -1729,7 +1782,8 @@ cc.Class({
             var obj = ag.userInfo._itemMap[key];
             if(obj._data.owner==this._player._data.id && obj._data.puton==ag.gameConst.putonBag){
                 var mst = ag.gameConst._itemMst[obj._data.mid];
-                if(mst.exclusive.indexOf(this._player.getTypeNum())!=-1){
+                if(this._player._data.come>=ag.gameConst.equipCome[mst.level]
+                    && mst.exclusive.indexOf(this._player.getTypeNum())!=-1){
                     var index = ag.gameConst.putonTypes.indexOf(mst.type);
                     var putOnId = this.getPlayerItemId(index);
                     if(putOnId) {//手和戒指右边的处理

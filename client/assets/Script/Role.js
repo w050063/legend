@@ -339,16 +339,22 @@ cc.Class({
         if(this.getIsPlayer() && this._propNode) {
             var index = this.getOfficeIndex();
             if (index > 0) {
-                if(this._propNode._spriteOffice)this._propNode._spriteOffice.node.destroy();
-                this._propNode._spriteOffice = new cc.Node().addComponent(cc.Sprite);
-                this._propNode._spriteOffice.node.y = 150;
-                this._propNode._spriteOffice.node.scale = 1.5;
-                this._propNode.addChild(this._propNode._spriteOffice.node);
-                cc.loader.loadRes('office/' + index, cc.SpriteFrame, function (err, spriteFrame) {
-                    if (this._propNode && this._propNode._spriteOffice && cc.isValid(this._propNode._spriteOffice)) {
-                        this._propNode._spriteOffice.spriteFrame = spriteFrame;
-                    }
-                }.bind(this));
+                if(this._propNode._spriteOffice){
+                    this._propNode._spriteOffice.node.destroy();
+                    this._propNode._spriteOffice = undefined;
+                }
+
+                if(ag.gameLayer._setupShowWing){
+                    this._propNode._spriteOffice = new cc.Node().addComponent(cc.Sprite);
+                    this._propNode._spriteOffice.node.y = 155;
+                    this._propNode._spriteOffice.node.scale = 1.5;
+                    this._propNode.addChild(this._propNode._spriteOffice.node);
+                    cc.loader.loadRes('office/' + index, cc.SpriteFrame, function (err, spriteFrame) {
+                        if (this._propNode && this._propNode._spriteOffice && cc.isValid(this._propNode._spriteOffice)) {
+                            this._propNode._spriteOffice.spriteFrame = spriteFrame;
+                        }
+                    }.bind(this));
+                }
             }
         }
     },
@@ -859,7 +865,9 @@ cc.Class({
 
         }else if(hp!=this._data.hp){
             if(this._nearFlag){
-                ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp)))});
+                if(ag.gameLayer._setupShowWing){
+                    ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp)))});
+                }
                 this.flyAnimation();
                 if(hp<this._data.hp){
                     this.nameDisapper();
@@ -991,20 +999,7 @@ cc.Class({
             if(this._ai)this._ai._busy = false;
 
             if(this==ag.gameLayer._player){
-                if(this._data.mapId=='t18'
-                    || this._data.mapId=='t13'
-                    || this._data.mapId=='t19'
-                    || this._data.mapId=='t20'
-                    || this._data.mapId=='t21'
-                    || this._data.mapId=='t24'
-                    || this._data.mapId=='t25'){
-                    ag.gameLayer.changeMap('t23');
-                }else if(this._data.mapId=='t12'
-                    || this._data.mapId=='t0'){
-                    ag.gameLayer.changeMap('t0');
-                }else{
-                    ag.gameLayer.changeMap('t1');
-                }
+                ag.gameLayer.changeMap(ag.gameConst._terrainMap[this._data.mapId].tranCity);
             }else{
                 this.setLocation(cc.p(data.x,data.y));
             }

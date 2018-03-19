@@ -17,11 +17,11 @@ cc.Class({
     //确认按钮
     buttonOKEvent:function(event){
         ag.musicManager.playEffect("resources/voice/button.mp3");
-        if(this._editBox.string.length>=2 && this._editBox.string.length<=8){
+        if(this._editBox.string.length>=2 && this._editBox.string.length<=20){
             ag.agSocket.send("guildKick",{name:this._editBox.string});
             this.node.active = false;
         }else{
-            ag.jsUtil.showText(ag.gameLayer.node,'名字长度必须为2-8');
+            ag.jsUtil.showText(ag.gameLayer.node,'名字长度必须为2-20');
         }
     },
 

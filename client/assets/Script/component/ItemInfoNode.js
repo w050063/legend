@@ -161,27 +161,31 @@ cc.Class({
         }else if(label.string=='穿戴'){
             var id = this._obj._data.id;
             var mst = ag.gameConst._itemMst[this._obj._data.mid];
-            if(mst.exclusive.indexOf(ag.gameLayer._player.getTypeNum())!=-1){
-                var index = ag.gameConst.putonTypes.indexOf(mst.type);
-                if((mst.type==4 || mst.type==5) && ag.userInfo.operatePuton=='right')++index;
-                ag.agSocket.send("bagItemToEquip",{id:id,puton:index});
+            if(ag.gameLayer._player._data.come>=ag.gameConst.equipCome[mst.level]){
+                if(mst.exclusive.indexOf(ag.gameLayer._player.getTypeNum())!=-1){
+                    var index = ag.gameConst.putonTypes.indexOf(mst.type);
+                    if((mst.type==4 || mst.type==5) && ag.userInfo.operatePuton=='right')++index;
+                    ag.agSocket.send("bagItemToEquip",{id:id,puton:index});
 
 
-                //如果有装备，则切换装备
-                var tempId = ag.gameLayer.getPlayerItemId(index);
-                if(tempId)ag.userInfo._itemMap[tempId]._data.puton = ag.gameConst.putonBag;
-                ag.userInfo._itemMap[id]._data.puton = index;
-                ag.gameLayer._player.addEquip(id);
-                ag.gameLayer.itemBagToEquip(id);
-                if(tempId)ag.gameLayer.addItemToBag(tempId);
-            }else{
-                var tempArray = ['男战','女战','男法','女法','男道','女道'];
-                var str = '此装备限于：';
-                for(var i=0;i<mst.exclusive.length;++i){
-                    str = str+tempArray[mst.exclusive[i]];
-                    if(i!=mst.exclusive.length-1)str = str+'，';
+                    //如果有装备，则切换装备
+                    var tempId = ag.gameLayer.getPlayerItemId(index);
+                    if(tempId)ag.userInfo._itemMap[tempId]._data.puton = ag.gameConst.putonBag;
+                    ag.userInfo._itemMap[id]._data.puton = index;
+                    ag.gameLayer._player.addEquip(id);
+                    ag.gameLayer.itemBagToEquip(id);
+                    if(tempId)ag.gameLayer.addItemToBag(tempId);
+                }else{
+                    var tempArray = ['男战','女战','男法','女法','男道','女道'];
+                    var str = '此装备限于：';
+                    for(var i=0;i<mst.exclusive.length;++i){
+                        str = str+tempArray[mst.exclusive[i]];
+                        if(i!=mst.exclusive.length-1)str = str+'，';
+                    }
+                    ag.jsUtil.showText(ag.gameLayer.node,str);
                 }
-                ag.jsUtil.showText(ag.gameLayer.node,str);
+            }else{
+                ag.jsUtil.showText(ag.gameLayer.node,'此装备需要转生'+ag.gameConst.equipCome[mst.level]+'级！');
             }
         }else if(label.string=='存储'){
             var index = ag.gameLayer._wharehouseArray.indexOf(-1);

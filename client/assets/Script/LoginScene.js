@@ -214,7 +214,7 @@ cc.Class({
 
 
             var self = this;
-            pomelo.init({host: '123.56.218.100',port: 4070,log: true}, function() {
+            pomelo.init({host: '127.0.0.1',port: 4070,log: true}, function() {
                 pomelo.request('gate.GateHandler.serverlist', {}, function(data) {
                     pomelo.disconnect(function () {});
                     if(data.code==0){
@@ -240,7 +240,7 @@ cc.Class({
         }
 
 
-        this.node.runAction(cc.sequence(cc.delayTime(1),cc.callFunc(function(){
+        this.node.runAction(cc.sequence(cc.delayTime(0.1),cc.callFunc(function(){
             var temp = cc.sys.localStorage.getItem('area') || '0';
             temp = parseInt(temp);
             this.buttonEventArea(temp);
