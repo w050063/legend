@@ -21,8 +21,8 @@ cc.Class({
             ag.userInfo = require("UserInfo");
             ag.userInfo.init();
             ag.gameConst = require("GameConst");
-            ag.agSocket = require("AGSocket");
             ag.gameConst.init();
+            ag.agSocket = require("AGSocket");
             var BuffManager = require("BuffManager");
             ag.buffManager = new BuffManager();
             ag.buffManager.init();
@@ -96,6 +96,7 @@ cc.Class({
         //for(var i=1;i<=17;++i)if(i!=7 && i!=8)array.push("ani/hum"+i);
         //for(var i=1;i<=3;++i)array.push("ani/effect"+i);
         array.push("ani/icon");
+        array.push("ani/neiguan");
         cc.loader.loadResArray(array, cc.SpriteAtlas,function(num, totalNum, item){
             this._nodeLoading.setPercent("("+Math.floor(num/totalNum*100)+"%)");
         }.bind(this),function (err, atlas) {

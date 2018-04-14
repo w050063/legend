@@ -19,7 +19,7 @@ cc.Class({
         var mst = ag.gameConst._itemMst[data.mid];
         this.node.setPosition(ag.gameLayer._player.getTruePosition(cc.p(this._data.x,this._data.y)));
         var sprite = this.node.addComponent(cc.Sprite);
-        sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+this._data.mid.substr(1));
+        sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.icon);
 
 
         var tips = ag.jsUtil.getLabelFromName(mst.name);
@@ -42,11 +42,16 @@ cc.Class({
             color = cc.color(0,0,255);
         }else if(mst.level==9){
             color = cc.color(128,0,255);
+        }else if(mst.level==10){
+            color = cc.color(128,0,255);
+        }else if(mst.level==11){
+            color = cc.color(128,0,255);
         }
         if(node.color.r!=color.r || node.color.g!=color.g || node.color.b!=color.b)node.color = color;
         var outline = node.addComponent(cc.LabelOutline);
         outline.width = 2;
         if(outline.color.r!=0 || outline.color.g!=0 || outline.color.b!=0)outline.color = cc.color(0,0,0);
+
 
         ag.gameLayer._nameMap.node.addChild(node);
         this._nameNode = node;

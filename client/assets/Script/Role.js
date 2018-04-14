@@ -21,33 +21,22 @@ cc.Class({
             if(data.owner==this){
                 if(data.puton>=0){
                     this.addEquip(data.id);
-                    if(this==ag.gameLayer._player)ag.gameLayer.itemBagToEquip(data.id);
-                }else{
-                    if(this==ag.gameLayer._player)ag.gameLayer.itemEquipToBag(data.id);
                 }
             }
         }
 
 
+        this._rightPos = cc.p(-1,-1);//理论上的准确位置
         this._aniCacheMap = {};
         this._weaponAni = null;
         this._wingAni = null;
+        this._mofadunSrite = null;
         this._agAni = null;
         this._labelName = null;
         this._aniColor = cc.color(255,255,255);
-        this.setLocation(this.getLocation(),true);
+        this.setLocation(this.getLocation());
         this.idle();
         this.changeHP(this._data.hp);
-
-
-        //法师的盾
-        if(this._data.type=='m1'){
-            var sprite = ag.spriteCache.get('ani/effect8/513000');
-            var array = AGAniOffset[513000].split(',');
-            sprite.node.setPosition(parseInt(array[0]),parseInt(array[1]));
-            //sprite.node.opacity = 128;
-            this.node.addChild(sprite.node,ag.gameConst.roleEffectZorder);
-        }
 
 
 
@@ -69,24 +58,9 @@ cc.Class({
     resetName:function(){
         if(this._propNode && this._propNode._labelName){
             var name = this._data.name+'('+ag.gameConst._roleMst[this._data.type].name+')';
-            if(ag.userInfo._guildMap[this._data.id]){
-                if(ag.userInfo._guildWinId==this._data.id){
-                    name = name + '\n[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(沙城主)';
-                }else{
-                    name = name + '\n[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(掌门人)';
-                }
-            }else{
-                for(var key in ag.userInfo._guildMap){
-                    var index = ag.userInfo._guildMap[key].member.indexOf(this._data.id);
-                    if(index!=-1){
-                        if(ag.userInfo._guildWinId==key){
-                            name = name + '\n[' + ag.userInfo._guildMap[key].name + ']' + '(沙巴克)';
-                        }else{
-                            name = name + '\n[' + ag.userInfo._guildMap[key].name + ']';
-                        }
-                        break;
-                    }
-                }
+            var guildShow = this.getGuildShow();
+            if(guildShow){
+                name = name+'\n'+guildShow;
             }
             if(this._propNode._labelName.string!=name){
                 ag.jsUtil.putLabelFromName(this._propNode._labelName.string,this._propNode._labelName);
@@ -95,6 +69,32 @@ cc.Class({
                 this.resetNameColor();
             }
         }
+    },
+
+
+    //getGuildShow
+    getGuildShow:function(){
+        var name = '';
+        if(ag.userInfo._guildMap[this._data.id]){
+            if(ag.userInfo._guildWinId==this._data.id){
+                name = '[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(沙城主)';
+            }else{
+                name = '[' + ag.userInfo._guildMap[this._data.id].name + ']' + '(掌门人)';
+            }
+        }else{
+            for(var key in ag.userInfo._guildMap){
+                var index = ag.userInfo._guildMap[key].member.indexOf(this._data.id);
+                if(index!=-1){
+                    if(ag.userInfo._guildWinId==key){
+                        name = '[' + ag.userInfo._guildMap[key].name + ']' + '(沙巴克)';
+                    }else{
+                        name = '[' + ag.userInfo._guildMap[key].name + ']';
+                    }
+                    break;
+                }
+            }
+        }
+        return name;
     },
 
 
@@ -132,9 +132,7 @@ cc.Class({
             if(this._state==ag.gameConst.stateIdle){
                 this.idleAnimation();
             }
-            return true;
         }
-        return false;
     },
 
 
@@ -221,6 +219,7 @@ cc.Class({
         var bShowLevelUp = false;
         var last = this._data.level;
         this._data.level = level;
+        this._data.exp = exp;
 
         if(last != this._data.level){
             this.resetAllProp();
@@ -238,11 +237,10 @@ cc.Class({
                 bShowLevelUp = true;
             }
             this.changeHP(this._totalHP);
-            ag.gameLayer.resetPlayerProp(this);
         }
         if(this==ag.gameLayer._player){
-            ag.gameLayer._equipArray[7].string = '等级:'+this._data.level;
-            ag.gameLayer._equipArray[8].string = '经验:'+exp+'/'+this._totalExp+' ('+(100*exp/this._totalExp).toFixed(2)+'%)';
+            //ag.gameLayer._equipArray[7].string = '等级:'+this._data.level;
+            //ag.gameLayer._equipArray[8].string = '经验:'+exp+'/'+this._totalExp+' ('+(100*exp/this._totalExp).toFixed(2)+'%)';
             if(source && bShowLevelUp==false){
                 ag.jsUtil.showText(ag.gameLayer.node,'装备回收成功');
             }
@@ -280,15 +278,14 @@ cc.Class({
 
 
     //设置逻辑位置
-    setLocation:function(location,refresh){
-        var bExec = (this._data.x != location.x || this._data.y != location.y || refresh);
-        this._data.x = location.x;
-        this._data.y = location.y;
-        if(bExec){
-            var mapData = ag.gameConst._terrainMap[this._data.mapId];
-            this.node.setPosition(this.getTruePosition());
-
-
+    setLocation:function(location){
+        if(this._data.x != location.x || this._data.y != location.y
+            || Math.abs(this.node.x-this._rightPos.x)>0.5 || Math.abs(this.node.y-this._rightPos.y)>0.5){
+            this.node.stopAllActions();
+            this._data.x = location.x;
+            this._data.y = location.y;
+            this._rightPos = this.getTruePosition(this.getLocation());
+            this.node.setPosition(this._rightPos);
             //优化显示和隐藏,上下左右各多两个地块,超过1.9就认为要更新了
             if(this._state!=ag.gameConst.stateDead){
                 var x = ag.gameLayer._player._data.x,y = ag.gameLayer._player._data.y;
@@ -349,6 +346,7 @@ cc.Class({
                     this._propNode._spriteOffice.node.y = 155;
                     this._propNode._spriteOffice.node.scale = 1.5;
                     this._propNode.addChild(this._propNode._spriteOffice.node);
+                    if(index>10)index = 10;
                     cc.loader.loadRes('office/' + index, cc.SpriteFrame, function (err, spriteFrame) {
                         if (this._propNode && this._propNode._spriteOffice && cc.isValid(this._propNode._spriteOffice)) {
                             this._propNode._spriteOffice.spriteFrame = spriteFrame;
@@ -365,22 +363,6 @@ cc.Class({
         this._data.wing = count;
         if(this.getIsPlayer() && this._propNode) {
             this.idleAnimation();
-            if(this==ag.gameLayer._player){
-                //翅膀
-                var father = cc.find('Canvas/nodeBag/equip');
-                var aniPos = cc.p(-2,-50);
-                var scale = 1.5;
-                var array = ag.userInfo.agAniClothes['nudeboy0'+ag.gameConst.stateIdle+4].split(',');
-                if(father.wing)father.wing.getComponent(AGAni).putCache();
-                var wing = ag.gameConst.wingModel[this.getWingIndex()];
-                if(wing){
-                    var node2 = ag.jsUtil.getNode(father,wing+array[0],parseInt(array[1]),0,0.3);
-                    if(father.clothe)father.clothe.getComponent(AGAni).addControl(node2.getComponent(AGAni));
-                    node2.setPosition(aniPos);
-                    node2.scale = scale;
-                    father.wing = node2;
-                }
-            }
         }
     },
 
@@ -462,13 +444,14 @@ cc.Class({
                 return lastAgAni;
             }else{
                 this._aniCacheMap[lastAgAni._name] = lastAgAni;
-                lastAgAni.node.active = false;
+                lastAgAni.node.x = 99999;
+                lastAgAni.pause();
             }
         }
         var tempAni = this._aniCacheMap[key];
         if(tempAni){
             delete this._aniCacheMap[key];
-            tempAni.node.active = true;
+            tempAni.node.x = 0;
             tempAni.setFinishedCallback(callback);
             tempAni.resume();
             return tempAni;
@@ -480,7 +463,9 @@ cc.Class({
     putAgAni:function(lastAgAni){
         if(lastAgAni){
             this._aniCacheMap[lastAgAni._name] = lastAgAni;
-            lastAgAni.node.active = false;
+            lastAgAni.node.x = 99999;
+            lastAgAni.setFinishedCallback(null);
+            lastAgAni.pause();
         }
     },
 
@@ -491,18 +476,22 @@ cc.Class({
             this._agAni = null;
         }
         if(this._weaponAni){
-            this._weaponAni.getComponent(AGAni).putCache();
+            this._weaponAni.putCache();
             this._weaponAni = null;
         }
         if(this._wingAni){
-            this._wingAni.getComponent(AGAni).putCache();
+            this._wingAni.putCache();
             this._wingAni = null;
         }
         for(var key in this._aniCacheMap){
-            this._aniCacheMap[key].node.active = true;
             this._aniCacheMap[key].putCache();
         }
         this._aniCacheMap = {};
+
+        if(this._mofadunSrite){
+            ag.spriteCache.put(this._mofadunSrite);
+            this._mofadunSrite = null;
+        }
     },
 
 
@@ -547,6 +536,13 @@ cc.Class({
                         this._wingAni = null;
                     }
                 }
+                //法师的盾
+                if(this._data.type=='m1' && !this._mofadunSrite){
+                    this._mofadunSrite = ag.spriteCache.get('ani/effect8/513000');
+                    var array = AGAniOffset[513000].split(',');
+                    this._mofadunSrite.node.setPosition(parseInt(array[0]),parseInt(array[1]));
+                    this.node.addChild(this._mofadunSrite.node,ag.gameConst.roleEffectZorder);
+                }
             }
             this.setAniColor(this._aniColor);
         }
@@ -556,7 +552,6 @@ cc.Class({
     //无事可以做状态，可以重复进入
     idle:function(){
         if(this._state != ag.gameConst.stateIdle && this._state != ag.gameConst.stateDead){
-            this.node.stopAllActions();
             this.setLocation(this.getLocation());
             if(this.getIsPlayer() && this._state == ag.gameConst.stateAttack){
                 if(this._agAni)this._agAni.pause();
@@ -577,7 +572,6 @@ cc.Class({
     move:function(location,bServer) {
         if(this._state==ag.gameConst.stateDead)return;
         if(Math.abs(this._data.x-location.x)>1 || Math.abs(this._data.y-location.y)>1){
-            this.node.stopAllActions();
             this.setLocation(location);
             return true;
         }
@@ -653,7 +647,6 @@ cc.Class({
 
     //按方向移动,强制玩家位置
     myMoveByServer:function(location) {
-        this.node.stopAllActions();
         this.setLocation(location);
         this.idle();
         if(this._ai)this._ai._busy = false;
@@ -665,7 +658,6 @@ cc.Class({
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
         //攻击动画
         if(this._nearFlag){
-            this.node.stopAllActions();
             this.setLocation(this.getLocation());
             if(this.getIsMonster() || this.getIsTiger()){
                 var str = 'nudeboy0'+ag.gameConst.stateAttack+this._data.direction;
@@ -730,46 +722,48 @@ cc.Class({
 
     //攻击特效
     attackEffect: function (locked) {
+        var id = this._data.id;
         if(this._data.type=="m0"){
             if(ag.buffManager.getCDForFireCrit(this)==false){
                 if(Math.random()>0.5){
                     this.getAgAni(null,"ani/effect2/"+(502000+this._data.direction*5),5,ag.gameConst.roleEffectZorder,0.1,function(sender){
-                        this.putAgAni(sender);
-                    }.bind(this));
+                        ag.gameLayer.getRole(id).putAgAni(sender);
+                    });
                 }else{
                     this.getAgAni(null,"ani/effect3/"+(503000+this._data.direction*8),8,ag.gameConst.roleEffectZorder,0.1,function(sender){
-                        this.putAgAni(sender);
-                    }.bind(this));
+                        ag.gameLayer.getRole(id).putAgAni(sender);
+                    });
                 }
                 ag.buffManager.setCDForFireCrit(this,true);
                 if(this._agAni)ag.musicManager.playEffect("resources/voice/liehuo.mp3");
             }else{
                 this.getAgAni(null,"ani/effect0/"+(500000+this._data.direction*6),6,ag.gameConst.roleEffectZorder,0.1,function(sender){
-                    this.putAgAni(sender);
-                }.bind(this));
+                    ag.gameLayer.getRole(id).putAgAni(sender);
+                });
                 if(this._agAni)ag.musicManager.playEffect(Math.random()>0.5?"resources/voice/cisha0.mp3":"resources/voice/cisha1.mp3");
             }
         }else if(this._data.type=="m1"){
             var pos = locked.getTruePosition();
             if(Math.random()>0.5){
                 this.getAgAni(null,"ani/effect4/504000",6,ag.gameConst.roleEffectUnderZorder,0.05,function(sender){
-                    this.putAgAni(sender);
+                    ag.gameLayer.getRole(id).putAgAni(sender);
                     var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect4/504006",13,9999999,0.05);
                     node.setPosition(pos);
-                }.bind(this));
+                });
             }else{
                 this.getAgAni(null,"ani/effect4/505000",10,ag.gameConst.roleEffectUnderZorder,0.05,function(sender){
-                    this.putAgAni(sender);
+                    ag.gameLayer.getRole(id).putAgAni(sender);
                     var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect4/505010",13,9999999,0.05);
                     node.setPosition(pos);
-                }.bind(this));
+                    node.scale = 0.8;
+                });
             }
             if(this._agAni)ag.musicManager.playEffect("resources/voice/mietianhuo.mp3");
         }else if(this._data.type=="m2"){
             var pos1 = cc.pAdd(this.node.getPosition(),cc.p(0,60));
             var pos2 = cc.pAdd(locked.node.getPosition(),cc.p(0,60));
             this.getAgAni(null,"ani/effect8/509000",6,ag.gameConst.roleEffectZorder,0.05,function(sender){
-                this.putAgAni(sender);
+                ag.gameLayer.getRole(id).putAgAni(sender);
                 var sprite = ag.spriteCache.get(Math.random()>0.5?'ani/effect8/508000':'ani/effect8/509015');
                 sprite.node.setPosition(pos1);
                 var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(pos2,pos1))));
@@ -780,7 +774,7 @@ cc.Class({
                     var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect8/509006",9,9999999,0.05);
                     node.setPosition(pos2.x,pos2.y-60);
                 })));
-            }.bind(this));
+            });
 
             ag.buffManager.setPoison(locked,this);//道士启用毒
             if(this._agAni)ag.musicManager.playEffect("resources/voice/huofu.mp3");
@@ -865,7 +859,7 @@ cc.Class({
 
         }else if(hp!=this._data.hp){
             if(this._nearFlag){
-                if(ag.gameLayer._setupShowWing){
+                if(ag.gameLayer._flyBloodArray.length<4){
                     ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp)))});
                 }
                 this.flyAnimation();
@@ -1020,11 +1014,14 @@ cc.Class({
 
     //获得逻辑上的position
     getTruePosition:function (location) {
-        if(!location)location = this.getLocation();
-        var mapData = ag.gameConst._terrainMap[this._data.mapId];
-        var x = parseInt(location.x)-mapData.mapX/2+0.5;
-        var y = parseInt(location.y)-mapData.mapY/2+0.5;
-        return cc.p(x*ag.gameConst.tileWidth,y*ag.gameConst.tileHeight);
+        if(location){
+            if(!location)location = this.getLocation();
+            var mapData = ag.gameConst._terrainMap[this._data.mapId];
+            var x = parseInt(location.x)-mapData.mapX/2+0.5;
+            var y = parseInt(location.y)-mapData.mapY/2+0.5;
+            return cc.p(x*ag.gameConst.tileWidth,y*ag.gameConst.tileHeight);
+        }
+        return this._rightPos;
     },
 
 
@@ -1129,6 +1126,63 @@ cc.Class({
             if(lx1>=safe.x && lx1<=safe.xx && ly1>=safe.y && ly1<=safe.yy)return true;
         }
         return false;
+    },
+
+
+    //获得自己的攻击
+    getHurt:function(){
+        var mst = this.getMst();
+        var hurt = mst.hurt+Math.floor(mst.hurtAdd*this._data.level);
+        for(var i=0;i<this._equipArray.length;++i){
+            if(this._equipArray[i]){
+                var itemMst = ag.gameConst._itemMst[ag.userInfo._itemMap[this._equipArray[i]]._data.mid];
+                if(itemMst.hurt)hurt+=itemMst.hurt;
+            }
+        }
+        //加上官职属性
+        var office = this.getOfficeIndex();
+        hurt+=ag.gameConst.officeHurt[office];
+
+
+        //加上翅膀属性
+        var wing = this.getWingIndex();
+        hurt+=ag.gameConst.wingHurt[wing];
+
+
+        //加上转生属性
+        var come = this._data.come;
+        if(come>0){
+            hurt+=ag.gameConst.comeHurt[come];
+        }
+        return hurt;
+    },
+
+    //获得自己的攻击
+    getDefense:function(){
+        var mst = this.getMst();
+        var defense = mst.defense+Math.floor(mst.defenseAdd*this._data.level);
+        for(var i=0;i<this._equipArray.length;++i){
+            if(this._equipArray[i]){
+                var itemMst = ag.gameConst._itemMst[ag.userInfo._itemMap[this._equipArray[i]]._data.mid];
+                if(itemMst.defense)defense+=itemMst.defense;
+            }
+        }
+        //加上官职属性
+        var office = this.getOfficeIndex();
+        defense+=ag.gameConst.officeDefense[office];
+
+
+        //加上翅膀属性
+        var wing = this.getWingIndex();
+        defense+=ag.gameConst.wingDefense[wing];
+
+
+        //加上转生属性
+        var come = this._data.come;
+        if(come>0){
+            defense+=ag.gameConst.comeDefense[come];
+        }
+        return defense;
     },
 
     // called every frame

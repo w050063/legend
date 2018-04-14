@@ -147,7 +147,7 @@ cc.Class({
         var mst = ag.gameConst._itemMst[obj._data.mid];
         if(ag.gameLayer._player._data.level>=45 && mst.level>=6){
             var father = cc.find('Canvas/nodeAuctionShop/nodeSell/spriteBack');
-            father.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
+            father.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.icon);
             father.getChildByName('labelName').getComponent(cc.Label).string =  mst.name;
             this._itemId = id;
         }else{

@@ -17,11 +17,12 @@ cc.Class({
     //确认按钮
     buttonOKEvent:function(event){
         ag.musicManager.playEffect("resources/voice/button.mp3");
-        if(this._editBox.string.length>=2 && this._editBox.string.length<=20){
+        var str = this._editBox.string;
+        if(str.length>=2 && str.length<=8 && str.indexOf(' ')==-1 && str.indexOf('\n')==-1 && str.indexOf('%')==-1){
             ag.agSocket.send("guildCreate",{name:this._editBox.string});
             this.node.active = false;
         }else{
-            ag.jsUtil.showText(ag.gameLayer.node,'名字长度必须为2-20');
+            ag.jsUtil.showText(ag.gameLayer.node,'名字长度必须为2-8，并且不能包含特殊字符');
         }
     },
 

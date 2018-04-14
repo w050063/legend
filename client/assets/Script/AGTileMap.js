@@ -23,8 +23,8 @@ cc.Class({
         cc.loader.loadRes(name,function(err,data){
             var array = data.split(',');
             this._dataArray = array;
-            if(ag.gameLayer && ag.gameLayer._player){
-                ag.gameLayer._player.setLocation(ag.gameLayer._player.getLocation(),true);
+            if(ag.gameLayer){
+                ag.gameLayer._player.setLocation(ag.gameLayer._player.getLocation());
             }
         }.bind(this));
     },

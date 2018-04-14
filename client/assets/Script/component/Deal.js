@@ -109,8 +109,9 @@ cc.Class({
 
     //增加对方的道具
     dealAddItem:function(mid){
+        var mst = ag.gameConst._itemMst[mid];
         var sprite = new cc.Node().addComponent(cc.Sprite);
-        sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(mid.substr(1));
+        sprite.spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(mst.icon);
         sprite.sizeMode = cc.Sprite.SizeMode.RAW;
         sprite.trim = false;
         var startPos = cc.p(-72,16);

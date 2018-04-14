@@ -229,7 +229,7 @@ cc.Class({
 
     refresh2: function() {
         cc.find('Canvas/labelTip').active = false;
-        for(var i=0;i<3;++i){
+        for(var i=0;i<4;++i){
             var button = cc.find('Canvas/button'+i);
             if(i<this._dataArray.length){
                 cc.find('Canvas/button'+i+'/Label').getComponent(cc.Label).string = this._dataArray[i].name;
@@ -253,10 +253,10 @@ cc.Class({
         var index = 0;
         if(typeof event=='number')index = event;
         else if(event)index = parseInt(event.target.name.substr(6));
-        if(index>=3)index = 0;
+        if(index>=4)index = 0;
         cc.sys.localStorage.setItem('area',''+index);
 
-        for(var i=0;i<3;++i){
+        for(var i=0;i<4;++i){
             cc.find('Canvas/button'+i+'/Label').color = i==index?cc.color(0,255,0):cc.color(255,255,255);
         }
 

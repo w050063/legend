@@ -151,6 +151,9 @@ cc.Class({
                     if((lx<=ad && ly<=ad) || (this._role._data.type=='m0' && lx<=2 && ly<=2 && lx+ly!=3)){
                         this._role.attack(this._locked);
                         this._busy = true;
+                        if(this._locked.isInSafe()){
+                            this._locked = null;
+                        }
                     }else{
                         this.doMoveOperate(this._locked.getLocation());
                     }
@@ -181,19 +184,21 @@ cc.Class({
     //查找目标,怪物
     findLockedPlayer:function(){
         var locked = null;
-        var lockedDis = 9999;
-        var checkDistance = this._role.getMst().checkDistance;
-        var l1=this._role.getLocation();
-        var playerCamp = ag.gameLayer._player.getGuildId();
-        for(var key in ag.gameLayer._roleMap){
-            var role = ag.gameLayer._roleMap[key];
-            var camp = role.getGuildId();
-            if(role.getIsPlayer() && role._state!=ag.gameConst.stateDead && camp!=ag.gameConst.campPlayerNone && camp!=playerCamp && !role.isInSafe()){//是玩家，没在安全区域，别的行会
-                var l2=role.getLocation();
-                var x = Math.abs(l1.x-l2.x), y = Math.abs(l1.y-l2.y);
-                if(Math.max(x,y)<=checkDistance && x+y<lockedDis){
-                    locked = role;
-                    lockedDis = x+y;
+        if(!ag.gameLayer._player.isInSafe()){
+            var lockedDis = 9999;
+            var checkDistance = this._role.getMst().checkDistance;
+            var l1=this._role.getLocation();
+            var playerCamp = ag.gameLayer._player.getGuildId();
+            for(var key in ag.gameLayer._roleMap){
+                var role = ag.gameLayer._roleMap[key];
+                var camp = role.getGuildId();
+                if(role.getIsPlayer() && role._state!=ag.gameConst.stateDead && camp!=ag.gameConst.campPlayerNone && camp!=playerCamp && !role.isInSafe()){//是玩家，没在安全区域，别的行会
+                    var l2=role.getLocation();
+                    var x = Math.abs(l1.x-l2.x), y = Math.abs(l1.y-l2.y);
+                    if(Math.max(x,y)<=checkDistance && x+y<lockedDis){
+                        locked = role;
+                        lockedDis = x+y;
+                    }
                 }
             }
         }

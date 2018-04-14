@@ -28,10 +28,21 @@ module.exports={
             if(!self._normalDis){
                 ag.agSocket._dataArray = [];
                 ag.userInfo._itemMap = {};
-                ag.gameLayer = null;
                 ag.userInfo._legendID = "";
                 ag.userInfo._serverIP = "";
                 ag.userInfo._serverPort = "";
+
+
+                //清空所有内容
+                if(ag.gameLayer){
+                    ag.buffManager.changeMap();
+                    ag.gameLayer._map.node.destroyAllChildren();
+                    ag.gameLayer._nameMap.node.destroyAllChildren();
+                    ag.gameLayer._roleMap = {};
+                    ag.spriteCache.release();
+                    ag.gameLayer = null;
+                }
+
                 var node = cc.director.getScene();
                 if(node.name!='LoginScene'){
                     cc.director.loadScene('LoginScene');
@@ -277,13 +288,8 @@ module.exports={
                 if(player && player.getIsPlayer()) {
                     player._data.come = obj.value.come;
                     player._data.practice = obj.value.practice;
-                    if(player==ag.gameLayer._player){
-                        cc.find('Canvas/nodeBag/labelCome').getComponent(cc.Label).string = '转生:'+obj.value.come;
-                        cc.find('Canvas/nodeBag/labelPractice').getComponent(cc.Label).string = '修为:'+obj.value.practice+'/'+ag.gameConst.comeArray[obj.value.come];
-                    }
                     player._data.level = obj.value.level;
                     player.resetAllProp();
-                    ag.gameLayer.resetPlayerProp(player);
                     player.addExp(obj.value.level,obj.value.exp);
                     player._data.hp = 1;//确保可以进入改血量
                     player.changeHP(player._totalHP);
@@ -336,6 +342,10 @@ module.exports={
                         ag.userInfo._accountData.sex = player._data.sex;
                     }
                 }
+            }else if(obj.key=='itemDelFromBagArray'){
+                ag.gameLayer.delItemFormBag(obj.value);
+                delete ag.userInfo._itemMap[obj.value];
+                delete ag.userInfo._itemMapBack[obj.value];
             }
         }
         this._dataArray = [];

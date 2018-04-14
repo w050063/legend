@@ -84,6 +84,8 @@ cc.Class({
     },
 
     putCache:function(){
+        this.setFinishedCallback(null);
+        this.pause();
         var i=0;
         if(this._color.r!=255 || this._color.g!=255 || this._color.b!=255){
             for(i=0;i<this._spriteFrameArray.length;++i){

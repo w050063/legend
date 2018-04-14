@@ -20,7 +20,7 @@ cc.Class({
     setOfficeByRole:function(role){
         if(!role)role = this._role;
         var back = this.node.getChildByName('back');
-        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.find('Canvas/nodeBag/equip/office').getComponent(cc.Sprite).spriteFrame.clone();
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.find('Canvas/nodeBag/nodePanel/equip0/office').getComponent(cc.Sprite).spriteFrame.clone();
 
 
         var office = role.getOfficeIndex();
@@ -67,7 +67,7 @@ cc.Class({
         var obj = ag.userInfo._itemMap[id];
         var mst = ag.gameConst._itemMst[obj._data.mid];
         var back = this.node.getChildByName('back');
-        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.icon);
         back.getChildByName('labelContent').getComponent(cc.Label).string = ag.gameLayer.getItemBagShow(mst);
         var buttonNode = back.getChildByName('buttonDispose');
         buttonNode.x = 0;
@@ -84,7 +84,7 @@ cc.Class({
         var obj = ag.userInfo._itemMap[id];
         var mst = ag.gameConst._itemMst[obj._data.mid];
         var back = this.node.getChildByName('back');
-        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.icon);
         back.getChildByName('labelContent').getComponent(cc.Label).string = ag.gameLayer.getItemBagShow(mst);
         var buttonNode = back.getChildByName('buttonDispose');
         buttonNode.x = 0;
@@ -100,7 +100,7 @@ cc.Class({
     setItemMidByDealDest:function(mid){
         var mst = ag.gameConst._itemMst[mid];
         var back = this.node.getChildByName('back');
-        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.icon);
         back.getChildByName('labelContent').getComponent(cc.Label).string = ag.gameLayer.getItemBagShow(mst);
         var buttonNode = back.getChildByName('buttonDispose');
         buttonNode.x = 0;
@@ -117,7 +117,7 @@ cc.Class({
         var obj = ag.userInfo._itemMap[id];
         var mst = ag.gameConst._itemMst[obj._data.mid];
         var back = this.node.getChildByName('back');
-        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.id.substr(1));
+        back.getChildByName('spriteIcon').getComponent(cc.Sprite).spriteFrame = cc.loader.getRes("ani/icon",cc.SpriteAtlas).getSpriteFrame(''+mst.icon);
         back.getChildByName('labelContent').getComponent(cc.Label).string = ag.gameLayer.getItemBagShow(mst);
         var str = '确定';
         var bOther = false;
@@ -172,7 +172,6 @@ cc.Class({
                     var tempId = ag.gameLayer.getPlayerItemId(index);
                     if(tempId)ag.userInfo._itemMap[tempId]._data.puton = ag.gameConst.putonBag;
                     ag.userInfo._itemMap[id]._data.puton = index;
-                    ag.gameLayer._player.addEquip(id);
                     ag.gameLayer.itemBagToEquip(id);
                     if(tempId)ag.gameLayer.addItemToBag(tempId);
                 }else{
