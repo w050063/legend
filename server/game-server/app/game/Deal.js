@@ -24,13 +24,13 @@ module.exports = ag.class.extend({
     //邀请
     askDeal:function(rid1,rid2){
         if(rid1==rid2){
-            ag.jsUtil.sendData("sSystemNotify","您不能和自己交易！",rid2);
+            ag.jsUtil.sendData("sSystemNotify","4",rid2);
         }else if(this.getDeal(rid1)){
-            ag.jsUtil.sendData("sSystemNotify","您正在交易，取消交易请关闭界面或者小退！",rid1);
+            ag.jsUtil.sendData("sSystemNotify","5",rid1);
         }else if(this.getDeal(rid2)){
-            ag.jsUtil.sendData("sSystemNotify","对方正在交易！",rid1);
+            ag.jsUtil.sendData("sSystemNotify","6",rid1);
         }else{
-            ag.jsUtil.sendData("sSystemNotify","已经发出交易请求！",rid1);
+            ag.jsUtil.sendData("sSystemNotify","7",rid1);
             var role = ag.gameLayer.getRole(rid1);
             ag.jsUtil.sendData("sAskDeal",{id:rid1,name:role._data.name},rid2);
         }
@@ -40,11 +40,11 @@ module.exports = ag.class.extend({
     //增加
     addDeal:function(rid1,rid2){
         if(rid1==rid2){
-            ag.jsUtil.sendData("sSystemNotify","您不能和自己交易！",rid2);
+            ag.jsUtil.sendData("sSystemNotify","4",rid2);
         }else if(this.getDeal(rid1)){
-            ag.jsUtil.sendData("sSystemNotify","您正在交易，取消交易请关闭界面或者小退！",rid1);
+            ag.jsUtil.sendData("sSystemNotify","5",rid1);
         }else if(this.getDeal(rid2)){
-            ag.jsUtil.sendData("sSystemNotify","对方正在交易！",rid1);
+            ag.jsUtil.sendData("sSystemNotify","6",rid1);
         }else{
             var role1 = ag.gameLayer.getRole(rid1);
             var role2 = ag.gameLayer.getRole(rid2);
@@ -76,12 +76,12 @@ module.exports = ag.class.extend({
             var rid2 = this._dataMap[id].rid2;
             if(rid1==rid){
                 this._dataMap[id].ok1 = true;
-                ag.jsUtil.sendData("sSystemNotify","您已经确认交易！",rid1);
-                ag.jsUtil.sendData("sSystemNotify","对方已经确认交易！",rid2);
+                ag.jsUtil.sendData("sSystemNotify","8",rid1);
+                ag.jsUtil.sendData("sSystemNotify","9",rid2);
             }else{
                 this._dataMap[id].ok2 = true;
-                ag.jsUtil.sendData("sSystemNotify","您已经确认交易！",rid2);
-                ag.jsUtil.sendData("sSystemNotify","对方已经确认交易！",rid1);
+                ag.jsUtil.sendData("sSystemNotify","8",rid2);
+                ag.jsUtil.sendData("sSystemNotify","9",rid1);
             }
 
             //执行交易
@@ -102,11 +102,11 @@ module.exports = ag.class.extend({
                         ag.jsUtil.sendData("sItem",JSON.parse(JSON.stringify(item._data)),rid1);
                         ag.jsUtil.sendData("sItem",JSON.parse(JSON.stringify(item._data)),rid2);
                     }
-                    ag.jsUtil.sendData("sSystemNotify","交易成功！",rid1);
-                    ag.jsUtil.sendData("sSystemNotify","交易成功！",rid2);
+                    ag.jsUtil.sendData("sSystemNotify","10",rid1);
+                    ag.jsUtil.sendData("sSystemNotify","10",rid2);
                 }else{
-                    ag.jsUtil.sendData("sSystemNotify","交易取消，一方元宝不够或者背包放不下！",rid1);
-                    ag.jsUtil.sendData("sSystemNotify","交易取消，一方元宝不够或者背包放不下！",rid2);
+                    ag.jsUtil.sendData("sSystemNotify","11",rid1);
+                    ag.jsUtil.sendData("sSystemNotify","11",rid2);
                 }
                 this.delDeal(rid);
             }

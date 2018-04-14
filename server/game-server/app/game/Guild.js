@@ -15,21 +15,34 @@ module.exports = ag.class.extend({
 
     //增加
     addGuild:function(name,id){
+        var player = ag.gameLayer.getRole(id);
+        if (player._data.gold < 100) {
+            ag.jsUtil.sendData("sSystemNotify", "56%100!", player._data.id);
+            ag.jsUtil.sendDataAll("sGuildCreate",{result:1});
+            return;
+        }
+
+        if(name.length<2 || name.length>8 || name.indexOf(' ')!=-1 || name.indexOf('\n')!=-1 || name.indexOf('%')!=-1){
+            ag.jsUtil.sendDataAll("sSystemNotify","20");
+            ag.jsUtil.sendDataAll("sGuildCreate",{result:1});
+            return;
+        }
+
         if(this._dataMap[id]){
-            ag.jsUtil.sendDataAll("sSystemNotify","创建失败，你已经创立行会！");
+            ag.jsUtil.sendDataAll("sSystemNotify","20");
             ag.jsUtil.sendDataAll("sGuildCreate",{result:1});
             return;
         }else{
             for(var key in this._dataMap){
                 var temp = this._dataMap[key];
                 if(temp.name==name){
-                    ag.jsUtil.sendDataAll("sSystemNotify","创建失败,名字已存在！");
+                    ag.jsUtil.sendDataAll("sSystemNotify","21");
                     ag.jsUtil.sendDataAll("sGuildCreate",{result:1});
                     return;
                 }else{
                     for(var i=0;i<temp.member.length;++i){
                         if(temp.member[i]==id){
-                            ag.jsUtil.sendDataAll("sSystemNotify","创建失败，你已经加入行会！");
+                            ag.jsUtil.sendDataAll("sSystemNotify","22");
                             ag.jsUtil.sendDataAll("sGuildCreate",{result:1});
                             return;
                         }
@@ -38,10 +51,11 @@ module.exports = ag.class.extend({
             }
         }
 
+        player.addGold(-100);
         this._dataMap[id] = {id:id,name:name,member:[],identify:++this._baseIdentify};
-        ag.gameLayer.getRole(id)._data.camp = this._dataMap[id].identify;
+        player._data.camp = this._dataMap[id].identify;
         ag.db.guildCreate(id,name);
-        ag.jsUtil.sendData("sSystemNotify","创建行会成功！",id);
+        ag.jsUtil.sendData("sSystemNotify","23",id);
         ag.jsUtil.sendDataAll("sGuildCreate",{result:0,id:id,name:name,member:''});
     },
 
@@ -51,7 +65,7 @@ module.exports = ag.class.extend({
         if(this._dataMap[id]){
             delete this._dataMap[id];
             ag.db.guildDelete(id);
-            ag.jsUtil.sendData("sSystemNotify","删除行会成功！",id);
+            ag.jsUtil.sendData("sSystemNotify","24",id);
             ag.jsUtil.sendDataAll("sGuildDelete",id);
         }
     },
@@ -74,13 +88,13 @@ module.exports = ag.class.extend({
             }
         }
         if(bFind){
-            ag.jsUtil.sendData("sSystemNotify","此人已经入会！",id);
+            ag.jsUtil.sendData("sSystemNotify","25",id);
         }else{
             this._inviteMap[rid] = id;
             ag.jsUtil.sendData("sGuildInvite",id,rid);
-            ag.jsUtil.sendData("sSystemNotify","已经发出邀请！",id);
+            ag.jsUtil.sendData("sSystemNotify","26",id);
             var role = ag.gameLayer.getRole(rid);
-            ag.jsUtil.sendData("sSystemNotify",role._data.name+"邀请您加入行会["+this._dataMap[id].name+"]！",rid);
+            ag.jsUtil.sendData("sSystemNotify",role._data.name+"%27%"+this._dataMap[id].name+"]！",rid);
         }
     },
 

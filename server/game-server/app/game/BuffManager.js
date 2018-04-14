@@ -82,7 +82,7 @@ module.exports = ag.class.extend({
                 this.delPoison(key);
             }
             var tag = ++this._baseTag;
-            var value = Math.round(role._data.defense*0.7);
+            var value = Math.round(role._data.defense*0.5);
             this._poisonMap[key] = {id:attacker._data.id,value:value,tag:tag};
             role._data.defense -=value;
             ag.actionManager.runAction(role,30,function(){
@@ -164,8 +164,8 @@ module.exports = ag.class.extend({
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
             if(role._data.camp!=ag.gameConst.campMonster && role._data.hp>0 && role._data.hp<role._totalHP){
-                role._data.hp = Math.min(role._data.hp+role._heal,role._totalHP);
-                ag.jsUtil.sendDataAll("sHP",{id:role._data.id,hp:role._data.hp},role._data.mapId);
+                role._data.hp = Math.min(role._data.hp+role._heal*(role.isInSafe()?5:1),role._totalHP);
+                role.sendHP();
             }
         }
     },
@@ -173,9 +173,9 @@ module.exports = ag.class.extend({
         //怪物自动回血
         for(var key in ag.gameLayer._roleMap){
             var role = ag.gameLayer._roleMap[key];
-            if(role._data.hp>0 && role._data.hp<role._totalHP && this.getIsRelife(role)){
+            if(role.getIsMonster() && role._data.hp>0 && role._data.hp<role._totalHP && this.getIsRelife(role)){
                 role._data.hp = Math.min(role._data.hp+role._heal,role._totalHP);
-                ag.jsUtil.sendDataAll("sHP",{id:role._data.id,hp:role._data.hp},role._data.mapId);
+                role.sendHP();
             }
         }
     }

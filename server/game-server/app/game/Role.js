@@ -24,7 +24,7 @@ module.exports = ag.class.extend({
         var mst = this.getMst();
         var lv = this._data.level;
         this._totalHP = this.getTotalHPFromDataBase();
-        this._data.hp = this._totalHP;
+        //this._data.hp = this._totalHP;
         this._totalExp = this.getTotalExpFromDataBase();
         this._exp = exp?exp:0;
         this._heal = this.getIsPlayer()?(mst.heal+Math.floor(mst.healAdd*lv)):mst.heal;
@@ -154,15 +154,6 @@ module.exports = ag.class.extend({
     },
 
 
-    //获得地图名字
-    getMapName : function(){
-        for(var key in ag.gameLayer._roleMap){
-            var array = ag.gameLayer._roleMap[key];
-            for(var i=0;i<array.length;++i)if(array[i]==this)return key;
-        }
-        return null;
-    },
-
     //设置逻辑位置
     setLocation:function(location){
         var oldStr = this.getMapXYString();
@@ -225,12 +216,15 @@ module.exports = ag.class.extend({
                 if(ag.gameLayer._roleXYMap[oldStr].length==0)delete ag.gameLayer._roleXYMap[oldStr];
                 if(!ag.gameLayer._roleXYMap[newStr])ag.gameLayer._roleXYMap[newStr] = [];
                 ag.gameLayer._roleXYMap[newStr].push(this._tiger);
+                ag.gameLayer._roleZoneMap[this._tiger._data.mapId].push(this._tiger._data.id);
+                var index = ag.gameLayer._roleZoneMap[lastMap].indexOf(this._tiger._data.id);
+                if(index!=-1)ag.gameLayer._roleZoneMap[lastMap].splice(index,1);
             }
 
 
             var map = ag.gameConst._terrainMap[mapId];
-            if(!map.safe){
-                ag.jsUtil.sendDataAll("sSystemNotify",'玩家【'+this._data.name+'】冲向'+map.name+'寻宝去啦！');
+            if(!map.safe && this._data.level>47){
+                ag.jsUtil.sendDataAll("sSystemNotify",'32%'+this._data.name+'%33%'+map.name+'%34');
             }
 
             //判断是否退出皇宫
@@ -249,35 +243,35 @@ module.exports = ag.class.extend({
                 delete ag.userManager._roleMapBack[key][this._data.id];
             }
             //返回当前地图非自己的角色。
-            for(var key in ag.gameLayer._roleMap){
-                var role = ag.gameLayer._roleMap[key];
-                if(role._data.mapId==this._data.mapId){
-                    if(role.getIsPlayer()){
-                        if(ag.userManager.getOnline(role._data.id)){
-                            if(role._data.id!=this._data.id){
-                                var temp = JSON.parse(JSON.stringify(role._data));
-                                this.sendRoleForCheckBack(this._data.id,temp);
-                            }
-
-                            if(role._tiger){
-                                role = role._tiger;
-                                temp = JSON.parse(JSON.stringify(role._data));
-                                this.sendRoleForCheckBack(this._data.id,temp);
-                            }
+            var array = ag.gameLayer._roleZoneMap[this._data.mapId];
+            for(var i=0;i<array.length;++i){
+                var role = ag.gameLayer._roleMap[array[i]];
+                if(role.getIsPlayer()){
+                    if(ag.userManager.getOnline(role._data.id)){
+                        if(role._data.id!=this._data.id){
+                            var temp = JSON.parse(JSON.stringify(role._data));
+                            this.sendRoleForCheckBack(this._data.id,temp);
                         }
-                    }else if(role.getIsMonster()){
-                        var temp = JSON.parse(JSON.stringify(role._data));
-                        this.sendRoleForCheckBack(this._data.id,temp);
+
+                        if(role._tiger){
+                            role = role._tiger;
+                            temp = JSON.parse(JSON.stringify(role._data));
+                            this.sendRoleForCheckBack(this._data.id,temp);
+                        }
                     }
+                }else if(role.getIsMonster() || role.getIsTiger()){
+                    var temp = JSON.parse(JSON.stringify(role._data));
+                    this.sendRoleForCheckBack(this._data.id,temp);
                 }
             }
         }
 
 
         //通知其他人。
-        for(var key in ag.gameLayer._roleMap){
-            var role = ag.gameLayer._roleMap[key];
-            if(role.getIsPlayer() && role._data.mapId==this._data.mapId && role._data.id!==this._data.id){
+        var array = ag.gameLayer._roleZoneMap[this._data.mapId];
+        for(var i=0;i<array.length;++i){
+            var role = ag.gameLayer._roleMap[array[i]];
+            if(role.getIsPlayer() && role._data.id!=this._data.id){
                 var temp = JSON.parse(JSON.stringify(this._data));
                 this.sendRoleForCheckBack(role._data.id,temp);
                 if(this._tiger){
@@ -304,9 +298,10 @@ module.exports = ag.class.extend({
                     //发给别人装备
                     if (role == this && itemData.puton >= 0) {
                         var temp2 = JSON.parse(JSON.stringify(itemData));
-                        for (var key2 in ag.gameLayer._roleMap) {
-                            var role2 = ag.gameLayer._roleMap[key2];
-                            if (role2.getIsPlayer() && role2._data.mapId == this._data.mapId && role2._data.id !== this._data.id) {
+                        var array = ag.gameLayer._roleZoneMap[this._data.mapId];
+                        for(var i=0;i<array.length;++i){
+                            var role2 = ag.gameLayer._roleMap[array[i]];
+                            if (role2.getIsPlayer() && role2._data.id != this._data.id) {
                                 this.sendItemForCheckBack(role2._data.id, temp2);
                             }
                         }
@@ -326,6 +321,9 @@ module.exports = ag.class.extend({
         }
         //增加无敌
         ag.gameLayer.addInvincibile(this._data.id);
+        ag.gameLayer._roleZoneMap[this._data.mapId].push(this._data.id);
+        var index = ag.gameLayer._roleZoneMap[lastMap].indexOf(this._data.id);
+        if(index!=-1)ag.gameLayer._roleZoneMap[lastMap].splice(index,1);
     },
 
 
@@ -334,12 +332,12 @@ module.exports = ag.class.extend({
     //发送道具，先检查备份
     sendRoleForCheckBack:function(id,temp){
         var back = ag.userManager._roleMapBack[id];
-        if(back && !back[temp.id]){
+        if(back){
             delete temp.gold;
             delete temp.attackMode;
             //delete temp.practice;
             ag.jsUtil.sendData("sRole",temp,id);
-            back[temp.id] = temp.id;
+            back[temp.id] = {id:temp.id,x:temp.x,y:temp.y};
         }
     },
 
@@ -376,12 +374,9 @@ module.exports = ag.class.extend({
             return;
         }
 
+
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),location);
         this.setLocation(location);
-
-
-        //通知其他人
-        ag.jsUtil.sendDataExcept("sMove",{id:myData.id, x:myData.x, y:myData.y},this._data.id);
 
 
         //忙碌状态
@@ -397,7 +392,7 @@ module.exports = ag.class.extend({
             var array = ag.itemManager.getDropByLocation(this._data.mapId,this.getLocation());
             var left = ag.gameConst.bagLength-this._bagLength;
             if(array.length>left && array.length>0){
-                ag.jsUtil.sendData("sSystemNotify","背包已满!",this._data.id);
+                ag.jsUtil.sendData("sSystemNotify","35",this._data.id);
             }
             if(left>0 && array.length>0){
                 var count = Math.min(array.length,left);
@@ -408,18 +403,74 @@ module.exports = ag.class.extend({
                         ag.jsUtil.sendData("sItemBagAdd",id,this._data.id);
                         ag.jsUtil.sendDataExcept("sItemDisappear",id,this._data.id);
                     }else{
-                        ag.jsUtil.sendData("sSystemNotify",''+(array[i]._duration-ag.gameConst.itemPickUpLeft)+"秒时间内无法捡取该装备!",this._data.id);
+                        ag.jsUtil.sendData("sSystemNotify",'^'+(array[i]._duration-ag.gameConst.itemPickUpLeft)+"%36",this._data.id);
                     }
                 }
             }
 
 
             //沙巴克检测
-            if(this.getIsPlayer() && (this._data.mapId=='t27' || lastMapId=='t27')){
+            if(this.getIsPlayer() && this._data.mapId=='t27'){
                 ag.shabake.reset();
             }
         }
         this._state = ag.gameConst.stateMove;
+
+
+        //通知所有人=
+        var msg = {id:myData.id, x:myData.x, y:myData.y};
+        //ag.jsUtil.sendDataExcept("sMove",msg,this._data.id);
+
+        var array = ag.gameLayer._roleZoneMap[this._data.mapId];
+        for(var i=0;i<array.length;++i){
+            var role = ag.gameLayer._roleMap[array[i]];
+            var map = ag.userManager._roleMapBack[role._data.id];
+            if(map && role._data.id!=this._data.id && role.getIsPlayer() && this.getDistance(role._data.id)<9){
+                ag.jsUtil.sendData("sMove",msg,role._data.id);
+                map[this._data.id] = {id:myData.id, x:myData.x, y:myData.y};
+            }
+        }
+
+        //再检测自己身边有没有假死人
+        if(this.getIsPlayer()){
+            var map = ag.userManager._roleMapBack[this._data.id];
+            if(map){
+                for(var key in map){
+                    var back = map[key];
+                    var role = ag.gameLayer.getRole(back.id);
+                    if(role){
+                        var dis = Math.max(Math.abs(this._data.x-back.x),Math.abs(this._data.y-back.y));
+                        var dis2 = this.getDistance(role._data.id);
+                        if((dis<9 || dis2<9) && back.x!=role._data.x && back.y!=role._data.y){
+                            ag.jsUtil.sendData("sMove",{id:role._data.id, x:role._data.x, y:role._data.y},this._data.id);
+                            map[key] = {id:role._data.id, x:role._data.x, y:role._data.y};
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+
+    sendHP:function(){
+        var msg = {id:this._data.id,hp:this._data.hp};
+        if(this._data.hp<=0){
+            var array = ag.gameLayer._roleZoneMap[this._data.mapId];
+            for(var i=0;i<array.length;++i){
+                var role = ag.gameLayer._roleMap[array[i]];
+                if(role.getIsPlayer()){
+                    ag.jsUtil.sendData("sHP",msg,role._data.id);
+                }
+            }
+        }else{
+            var array = ag.gameLayer._roleZoneMap[this._data.mapId];
+            for(var i=0;i<array.length;++i){
+                var role = ag.gameLayer._roleMap[array[i]];
+                if(role.getIsPlayer() && this.getDistance(role._data.id)<9){
+                    ag.jsUtil.sendData("sHP",msg,role._data.id);
+                }
+            }
+        }
     },
 
 
@@ -438,16 +489,18 @@ module.exports = ag.class.extend({
             this._data.hp -= Math.round(hurt*0.5/correct*rate);
         }else if(this._data.type=='m1'){
             if(attacker._data.type=='m1'){
-                this._data.hp -= Math.round(hurt*0.8/correct*rate);
+                this._data.hp -= Math.round(hurt*0.75/correct*rate);
             }if(bCisha==ag.gameConst.fighterAttackFar){
-                this._data.hp -= Math.round(hurt*0.6/correct*rate);
+                this._data.hp -= Math.round(hurt*0.55/correct*rate);
             }else{
-                this._data.hp -= Math.round(hurt*0.35/correct*rate);
+                this._data.hp -= Math.round(hurt*0.3/correct*rate);
             }
         }else{
             this._data.hp -=  Math.round(hurt/correct*rate);
         }
-        ag.jsUtil.sendDataAll("sHP",{id:this._data.id,hp:this._data.hp},this._data.mapId);
+
+        if(this._data.hp<0)this._data.hp = 0;
+        this.sendHP();
 
         if(ag.gameLayer.isEnemyForAttack(attacker,this)) {
             if (attacker._tiger && attacker._tiger != this && attacker._tiger._state != ag.gameConst.stateDead && !attacker._tiger._ai._locked)attacker._tiger._ai._locked = this;//如果有老虎，操作老虎攻击敌人。
@@ -537,7 +590,7 @@ module.exports = ag.class.extend({
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
-                        tempRole.changeHPByHurt(this,this._hurt*1.9);
+                        tempRole.changeHPByHurt(this,this._hurt*2.2);
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }
@@ -578,8 +631,16 @@ module.exports = ag.class.extend({
         }
 
 
-        //通知所有人
-        ag.jsUtil.sendDataExcept("sAttack",{id:this._data.id,lockedId:locked._data.id},this._data.id);
+        //通知所有人=
+        var msg = {id:this._data.id,lockedId:locked._data.id};
+        var array = ag.gameLayer._roleZoneMap[this._data.mapId];
+        for(var i=0;i<array.length;++i){
+            var role = ag.gameLayer._roleMap[array[i]];
+            if(role.getIsPlayer() && role._data.id!=this._data.id
+                && !ag.gameLayer._invincibleMap[role._data.id] && this.getDistance(role._data.id)<9){
+                ag.jsUtil.sendData("sAttack",msg,role._data.id);
+            }
+        }
 
 
         //删除本地死亡怪物数据,更新AI锁定
@@ -602,6 +663,7 @@ module.exports = ag.class.extend({
             ++this._data.level;
             var exp = this._exp-this._totalExp;
             this.resetAllProp(exp);
+            this._data.hp = this._totalHP;
         }
         if(source){
             ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp,source:source},this._data.mapId);
@@ -648,7 +710,6 @@ module.exports = ag.class.extend({
                 ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
                 if(this._data.type=='m48' || this._data.type=='m50' || this._data.type=='m52'){//玉皇大帝双倍爆率
                     ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
-                    ag.itemManager.dropByLevel(master._data.id,this.getMst().lv,this._data.mapId,this.getLocation(),name);
                 }
             }else if(this.getIsPlayer()){
                 ag.deal.delDeal(this._data.id);//死亡时如果正在交易，则取消交易
@@ -671,7 +732,7 @@ module.exports = ag.class.extend({
             master.addExp(this.getMst().expDead);
 
             if(this.getIsPlayer()){
-                ag.jsUtil.sendDataAll("sSystemNotify",master._data.name+' 击杀 '+this._data.name,this._data.mapId);
+                ag.jsUtil.sendDataAll("sSystemNotify",master._data.name+'%37%'+this._data.name);
             }
         }
 
@@ -690,6 +751,8 @@ module.exports = ag.class.extend({
             ag.gameLayer._roleXYMap[str].splice(ag.gameLayer._roleXYMap[str].indexOf(this),1);
             if(ag.gameLayer._roleXYMap[str].length==0)delete ag.gameLayer._roleXYMap[str];
             delete ag.gameLayer._roleMap[this._data.id];
+            var index = ag.gameLayer._roleZoneMap[this._data.mapId].indexOf(this._data.id);
+            if(index!=-1)ag.gameLayer._roleZoneMap[this._data.mapId].splice(index,1);
         }
 
         if(this._tiger){
@@ -792,5 +855,14 @@ module.exports = ag.class.extend({
             }
         }
         return true;
+    },
+
+
+    getDistance:function(id){
+        var role = ag.gameLayer.getRole(id);
+        if(role && this._data.mapId==role._data.mapId){
+            return Math.max(Math.abs(this._data.x-role._data.x),Math.abs(this._data.y-role._data.y));
+        }
+        return 9999;
     },
 });

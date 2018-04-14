@@ -129,7 +129,7 @@ var Handler = cc.Class.extend({
     theCountryIsAtPeace:function(msg, session, next){
         try{
             if(msg.secretKey==this._secretKey){
-                ag.gameLayer.theCountryIsAtPeace(47);
+                ag.gameLayer.theCountryIsAtPeace(48);
             }
         }catch(e){}
         next();
@@ -174,7 +174,6 @@ var Handler = cc.Class.extend({
     login:function(msg, session, next) {
         var retObj = {code: 1};
         try{
-
             if(ag.db._bFirstReadOver && msg.account
                 && msg.password && ag.userManager.isRightAccountAndPassword(msg.account,msg.password)
                 && ag.userManager.getOffline(msg.account)==false){
@@ -223,6 +222,18 @@ var Handler = cc.Class.extend({
         });
     },
 
+    //0正常,1id不存在,2名字重复
+    changeNameByGold:function(msg, session, next) {
+        var id = ag.userManager.getAccountByUid(session.uid);
+        var code = 1;
+        if(ag.db._bFirstReadOver && id){
+            code = ag.userManager.changeNameByGold(id,msg);
+        }
+        next(null, {
+            code: code
+        });
+    },
+
 
     //进入游戏,0正确,1Id为空
     getGameList:function(msg, session, next) {
@@ -258,10 +269,10 @@ var Handler = cc.Class.extend({
                 if(player && player._data.level>=47 && typeof msg.str=='string' && ag.userManager.getOffline(id)==false){
                     var bSay = true;
                     if(msg.chatType==ag.gameConst.chatAll){
-                        if (player._data.gold >= 1) {
-                            player.addGold(-1);
+                        if (player._data.gold >= 10) {
+                            player.addGold(-10);
                         } else {
-                            ag.jsUtil.sendData("sSystemNotify", "元宝不足1!", player._data.id);
+                            ag.jsUtil.sendData("sSystemNotify", "56%1!", player._data.id);
                             bSay = false;
                         }
                     }
@@ -279,7 +290,7 @@ var Handler = cc.Class.extend({
                                 ag.jsUtil.sendData("sChatYou",{id:id,name:player._data.name+'('+ag.gameConst._roleMst[player._data.type].name+')',content:str},id);
                                 ag.jsUtil.sendData("sChatYou",{id:id,name:player._data.name+'('+ag.gameConst._roleMst[player._data.type].name+')',content:str},lockedRole._data.id);
                             }else{
-                                ag.jsUtil.sendData("sSystemNotify","目标不存在！",id);
+                                ag.jsUtil.sendData("sSystemNotify","57",id);
                             }
                         }else if(msg.chatType==ag.gameConst.chatAll){
                             str = '(世界)'+msg.str;
@@ -309,7 +320,7 @@ var Handler = cc.Class.extend({
                         }
                     }
                 }else{
-                    ag.jsUtil.sendData("sSystemNotify","等级不足47，或者处于禁言状态！",id);
+                    ag.jsUtil.sendData("sSystemNotify","58",id);
                 }
             }
         }catch(e){}
@@ -491,12 +502,7 @@ var Handler = cc.Class.extend({
             if(id) {
                 var player = ag.gameLayer.getRole(id);
                 if (player) {
-                    if (player._data.gold >= 100) {
-                        player.addGold(-100);
-                        ag.guild.addGuild(msg.name, player._data.id);
-                    } else {
-                        ag.jsUtil.sendData("sSystemNotify", "元宝不足100!", player._data.id);
-                    }
+                    ag.guild.addGuild(msg.name, player._data.id);
                 }
             }
         }catch(e){}
@@ -539,7 +545,7 @@ var Handler = cc.Class.extend({
                     if (rid != '-1') {
                         ag.guild.guildInvite(player._data.id, rid);
                     } else {
-                        ag.jsUtil.sendData("sSystemNotify", "邀请人不存在！", player._data.id);
+                        ag.jsUtil.sendData("sSystemNotify", "59", player._data.id);
                     }
                 }
             }
@@ -561,14 +567,14 @@ var Handler = cc.Class.extend({
                         var obj = ag.guild._dataMap[laoda];
                         if (obj && laoda != id && obj.member.indexOf(id) == -1) {
                             obj.member.push(id);
-                            ag.jsUtil.sendData("sSystemNotify", "您已经加入[" + obj.name + "]！", id);
-                            ag.jsUtil.sendData("sSystemNotify", "玩家" + player._data.name + "加入行会[" + obj.name + "]！", laoda);
+                            ag.jsUtil.sendData("sSystemNotify", "60%" + obj.name + "]！", id);
+                            ag.jsUtil.sendData("sSystemNotify", "61%" + player._data.name + "%62%" + obj.name + "]！", laoda);
                             var str = obj.member.length == 0 ? '' : obj.member.join(',');
                             ag.jsUtil.sendDataAll("sGuildCreate", {result: 0, id: laoda, name: obj.name, member: str});
                             player._data.camp = obj.identify;
                             ag.db.guildSaveMember(laoda, obj.member);
                         } else {
-                            ag.jsUtil.sendData("sSystemNotify", "同意邀请发生了未知错误！", id);
+                            ag.jsUtil.sendData("sSystemNotify", "63", id);
                         }
                     }
                 }
@@ -588,8 +594,8 @@ var Handler = cc.Class.extend({
                     var id = ag.guild._inviteMap[id];
                     if (id) {
                         delete ag.guild._inviteMap[id];
-                        ag.jsUtil.sendData("sSystemNotify", "取消成功！", id);
-                        ag.jsUtil.sendData("sSystemNotify", "玩家" + player._data.name + "拒绝加入行会邀请！", id);
+                        ag.jsUtil.sendData("sSystemNotify", "64", id);
+                        ag.jsUtil.sendData("sSystemNotify", "61%" + player._data.name + "%65", id);
                     }
                 }
             }
@@ -621,15 +627,15 @@ var Handler = cc.Class.extend({
                             obj.member.splice(index, 1);
                             var str = obj.member.length == 0 ? '' : obj.member.join(',');
                             ag.jsUtil.sendDataAll("sGuildCreate", {result: 0, id: obj.id, name: obj.name, member: str});
-                            ag.jsUtil.sendData("sSystemNotify", "踢出成功！", id);
-                            ag.jsUtil.sendData("sSystemNotify", "您被踢出行会！", rid);
+                            ag.jsUtil.sendData("sSystemNotify", "66", id);
+                            ag.jsUtil.sendData("sSystemNotify", "67", rid);
                             ag.gameLayer.getRole(rid)._data.camp = ag.gameConst.campPlayerNone;
                             ag.db.guildSaveMember(id, obj.member);
                         } else {
-                            ag.jsUtil.sendData("sSystemNotify", "被踢人不在本行会！", id);
+                            ag.jsUtil.sendData("sSystemNotify", "68", id);
                         }
                     } else {
-                        ag.jsUtil.sendData("sSystemNotify", "被踢人不存在！", id);
+                        ag.jsUtil.sendData("sSystemNotify", "69", id);
                     }
                 }
             }
@@ -652,7 +658,7 @@ var Handler = cc.Class.extend({
                             obj.member.splice(index, 1);
                             var str = obj.member.length == 0 ? '' : obj.member.join(',');
                             ag.jsUtil.sendDataAll("sGuildCreate", {result: 0, id: obj.id, name: obj.name, member: str});
-                            ag.jsUtil.sendData("sSystemNotify", "退出行会成功！", id);
+                            ag.jsUtil.sendData("sSystemNotify", "70", id);
                             player._data.camp = ag.gameConst.campPlayerNone;
                             ag.db.guildSaveMember(key, obj.member);
                             break;
@@ -691,7 +697,7 @@ var Handler = cc.Class.extend({
                         player.addGold(-200);
                         ag.itemManager.treasure(player);
                     } else {
-                        ag.jsUtil.sendData("sSystemNotify", "元宝不足200!", player._data.id);
+                        ag.jsUtil.sendData("sSystemNotify", "56%200!", player._data.id);
                     }
                 }
             }
@@ -711,7 +717,7 @@ var Handler = cc.Class.extend({
                         player.addGold(-1000);
                         ag.itemManager.treasure5(player);
                     } else {
-                        ag.jsUtil.sendData("sSystemNotify", "元宝不足1000!", player._data.id);
+                        ag.jsUtil.sendData("sSystemNotify", "56%1000!", player._data.id);
                     }
                 }
             }
@@ -767,7 +773,7 @@ var Handler = cc.Class.extend({
                 var player = ag.gameLayer.getRole(id);
                 if (player && typeof msg.no == 'number' && msg.no >= ag.gameConst.attackModeAll && msg.no <= ag.gameConst.attackModeTeam) {
                     player._data.attackMode = msg.no;
-                    ag.jsUtil.sendData("sSystemNotify", "已经改为" + ag.gameConst.attackModeTextArray[msg.no] + "模式！", id);
+                    ag.jsUtil.sendData("sSystemNotify", "71%" + ag.gameConst.attackModeTextArray[msg.no] + "%72", id);
                 }
             }
         }catch(e){}
@@ -800,14 +806,19 @@ var Handler = cc.Class.extend({
 
 
                     try {
+                        var rate = 1;
+                        if(role._data.level>=65)rate = 4;
+                        else if(role._data.level>=60)rate = 3;
+                        else if(role._data.level>=55)rate = 2;
+
                         ++ag.db._customData.come[id];
-                        role._data.practice += 10;
-                        if (role._data.practice >= ag.gameConst.comeArray[role._data.come]) {
+                        role._data.practice += 10*rate;
+                        while(role._data.practice >= ag.gameConst.comeArray[role._data.come]) {
                             role._data.practice -= ag.gameConst.comeArray[role._data.come];
                             ++role._data.come;
                         }
-                        role._exp -= 40000;
-                        if (role._exp < 0) {
+                        role._exp -= 40000*rate;
+                        while(role._exp < 0) {
                             role._data.level -= 1;
                             role._exp += role.getTotalExpFromDataBase(role._data.level);
                         }
@@ -840,9 +851,9 @@ var Handler = cc.Class.extend({
                     var price = ag.gameConst.dailyPriceArray[msg.index];
                     if (!ag.db._customData.wing[id])ag.db._customData.wing[id] = 0;
                     if (ag.db._customData.wing[id] >= 1) {
-                        ag.jsUtil.sendData("sSystemNotify", "每天只能领取一次！", id);
+                        ag.jsUtil.sendData("sSystemNotify", "73", id);
                     } else if (role.getWingIndex() >= ag.gameConst.wingProgress.length) {
-                        ag.jsUtil.sendData("sSystemNotify", "已经到达上线！", id);
+                        ag.jsUtil.sendData("sSystemNotify", "74", id);
                     } else if (role._data.gold >= price) {
                         role.addGold(-price);
                         if (msg.index == ag.gameConst.dailyWing) {
@@ -861,9 +872,9 @@ var Handler = cc.Class.extend({
                             }, role._data.mapId);
                         }
                         role.resetAllProp(role._exp);
-                        ag.jsUtil.sendData("sSystemNotify", "领取成功！", id);
+                        ag.jsUtil.sendData("sSystemNotify", "75", id);
                     } else {
-                        ag.jsUtil.sendData("sSystemNotify", "您的元宝不足1000！", id);
+                        ag.jsUtil.sendData("sSystemNotify", "56%1000！", id);
                     }
                 }
             }
@@ -922,9 +933,9 @@ var Handler = cc.Class.extend({
                             }, role._data.mapId);
                         }
                         role.resetAllProp(role._exp);
-                        ag.jsUtil.sendData("sSystemNotify", "购买成功！", id);
+                        ag.jsUtil.sendData("sSystemNotify", "76", id);
                     } else {
-                        ag.jsUtil.sendData("sSystemNotify", "您的元宝不足1000！", id);
+                        ag.jsUtil.sendData("sSystemNotify", "56%1000！", id);
                     }
                 }
             }
@@ -1175,12 +1186,12 @@ var Handler = cc.Class.extend({
                             ag.gameLayer.createTiger(role);
 
                             this.app.rpc.conn.ConnRemote.kick(session, session.uid,'', function(){});
-                            ag.jsUtil.sendDataAll("sSystemNotify",'玩家【'+role._data.name+'】转职成功！');
+                            ag.jsUtil.sendDataAll("sSystemNotify",'32%'+role._data.name+'%77');
                         }else{
-                            ag.jsUtil.sendData("sSystemNotify",'转职需要5000元宝的服务费！',role._data.id);
+                            ag.jsUtil.sendData("sSystemNotify",'78',role._data.id);
                         }
                     }else{
-                        ag.jsUtil.sendData("sSystemNotify",'身上有装备不能进行转职！',role._data.id);
+                        ag.jsUtil.sendData("sSystemNotify",'79',role._data.id);
                     }
                 }
             }
@@ -1201,16 +1212,28 @@ var Handler = cc.Class.extend({
                             role.addGold(-3000);
                             role._data.sex = role._data.sex==1?0:1;
                             ag.jsUtil.sendDataAll("sChangeSex",role._data.id,role._data.mapId);
-                            ag.jsUtil.sendDataAll("sSystemNotify",'玩家【'+role._data.name+'】变性成功！');
+                            ag.jsUtil.sendDataAll("sSystemNotify",'32%'+role._data.name+'80');
                         }else{
-                            ag.jsUtil.sendData("sSystemNotify",'变性需要3000元宝的服务费！',role._data.id);
+                            ag.jsUtil.sendData("sSystemNotify",'81',role._data.id);
                         }
                     }else{
-                        ag.jsUtil.sendData("sSystemNotify",'身上有装备不能进行变性！',role._data.id);
+                        ag.jsUtil.sendData("sSystemNotify",'82',role._data.id);
                     }
                 }
             }
         }catch(e){}
+        next();
+    },
+
+
+    //请求转职
+    forge:function(msg, session, next) {
+        //try{
+        //    var id = ag.userManager.getAccountByUid(session.uid);
+        //    if(id) {
+        //        ag.itemManager.bagItemForge(id);
+        //    }
+        //}catch(e){}
         next();
     },
 });

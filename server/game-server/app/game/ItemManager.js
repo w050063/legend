@@ -19,7 +19,7 @@ module.exports = ag.class.extend({
         var map = this._itemMap.getMap();
         for (var key in map) {
             var obj = map[key];
-            if(!obj._data.owner){
+            if(!obj._data.owner && obj._data.puton==ag.gameConst.putonGround){
                 --obj._duration;
                 if(obj._duration<=0){
                     ag.jsUtil.sendDataAll("sItemDisappear",obj._data.id,obj._data.mapId);
@@ -60,10 +60,21 @@ module.exports = ag.class.extend({
             item._data.puton = ag.gameConst.putonBag;
             this._itemMap.add(item);
             ++role._bagLength;
-            ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
+            ag.jsUtil.sendData("sItem",item._data,rid);
+            ag.jsUtil.sendData("sSystemNotify",''+ag.gameConst._itemMst[item._data.mid].name+'被发现',rid);
             return true;
         }
         return false;
+    },
+
+    itemDelFromBag:function(rid,id){
+        var role = ag.gameLayer.getRole(rid);
+        var obj = this._itemMap.get(id);
+        if(role && obj && obj._data.owner == rid && obj._data.puton == ag.gameConst.putonBag){
+            this._itemMap.del(id);
+            --role._bagLength;
+            ag.jsUtil.sendData("itemDelFromBag",id,rid);
+        }
     },
 
 
@@ -83,8 +94,8 @@ module.exports = ag.class.extend({
                     item._their = rid;
                     this._itemMap.add(item);
                     ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
-                    if(map[item._data.mid].level>=6){
-                        ag.jsUtil.sendDataAll("sSystemNotify",'【'+map[item._data.mid].name+'】从'+name+'身上掉落在【'+ag.gameConst._terrainMap[mapId].name+'】');
+                    if(map[item._data.mid].level>=7){
+                        ag.jsUtil.sendDataAll("sSystemNotify",'【'+map[item._data.mid].name+'】从'+name+'%28%'+ag.gameConst._terrainMap[mapId].name+'】');
                     }
                 }
             }
@@ -100,10 +111,7 @@ module.exports = ag.class.extend({
         for(var i=0;i<dirArray.length;++i){
             var dirPoint = ag.jsUtil.p(location.x+dirArray[i].x,location.y+dirArray[i].y);
             var array = ag.itemManager.getDropByLocation(mapId,dirPoint);
-            var array2 = ag.gameLayer._roleXYMap[''+mapId+','+dirPoint.x+','+dirPoint.y];
-            if((array && array.length>0) || (array2 && array2.length>0)){
-                //...
-            }else{
+            if(array.length==0){
                 return ag.gameLayer.getStandLocation(mapId,dirPoint.x,dirPoint.y);
             }
         }
@@ -127,8 +135,8 @@ module.exports = ag.class.extend({
             delete item._their;
             role.refreshItemProp();
             ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
-            if(map[item._data.mid].level>=6){
-                ag.jsUtil.sendDataAll("sSystemNotify",'【'+map[item._data.mid].name+'】从'+name+'身上掉落在【'+ag.gameConst._terrainMap[mapId].name+'】');
+            if(map[item._data.mid].level>=7){
+                ag.jsUtil.sendDataAll("sSystemNotify",'【'+map[item._data.mid].name+'】从'+name+'%28%'+ag.gameConst._terrainMap[mapId].name+'】');
             }
         }
     },
@@ -153,14 +161,14 @@ module.exports = ag.class.extend({
                 item._their = rid;
                 this._itemMap.add(item);
                 ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
-                if(map[item._data.mid].level>=6){
-                    ag.jsUtil.sendDataAll("sSystemNotify",'【'+map[item._data.mid].name+'】从'+name+'身上掉落在【'+ag.gameConst._terrainMap[mapId].name+'】');            }
+                if(map[item._data.mid].level>=7){
+                    ag.jsUtil.sendDataAll("sSystemNotify",'【'+map[item._data.mid].name+'】从'+name+'%28%'+ag.gameConst._terrainMap[mapId].name+'】');            }
                 break;
             }
         }
 
 
-        //6级以上boss必爆圣战铜域系列装备2个
+        //6级以上boss必爆圣战铜域系列装备1个
         if(lv>=6){
             var tempArray = ['i001101','i001102','i001103','i001104','i001105','i001106',
                 'i001304','i001305','i001306','i001307','i001308','i001309',
@@ -257,6 +265,31 @@ module.exports = ag.class.extend({
     },
 
 
+    //背包装备合成
+    bagItemForge:function(rid){
+        var role = ag.gameLayer.getRole(rid);
+        if(role){
+            var map = this._itemMap.getMap();
+            var sameMap = {};
+            for(var key in map){
+                var obj = map[key];
+                if(obj && obj._data.owner==rid  && obj._data.puton==ag.gameConst.putonBag && ag.gameConst.forgeMap[obj._data.mid]){
+                    if(!sameMap[obj._data.mid])sameMap[obj._data.mid] = [];
+                    sameMap[obj._data.mid].push(obj._data.id);
+                }
+            }
+
+            for(var key in sameMap){
+                for(var i=0;i+1<sameMap[key].length;i=i+2){
+                    this.itemDelFromBag(rid,sameMap[key][i]);
+                    this.itemDelFromBag(rid,sameMap[key][i+1]);
+                    this.itemBuy(rid,ag.gameConst.forgeMap[key]);
+                }
+            }
+        }
+    },
+
+
     bagItemToEquip:function (id,puton,rid) {
         var item = this._itemMap.get(id);
         var role = ag.gameLayer.getRole(rid);
@@ -318,40 +351,36 @@ module.exports = ag.class.extend({
         var rand = Math.random();
         if(rand<0.5){
             role.addExp(2000);
-            ag.jsUtil.sendData("sSystemNotify",role._data.name+"在龙族宝藏寻到2000点经验",role._data.id);
+            ag.jsUtil.sendData("sSystemNotify",role._data.name+"%29%",role._data.id);
         }else if(rand<0.6){
             role.addOffice(10);
-            var str = role._data.name+"在龙族宝藏寻到10点官职";
-            ag.jsUtil.sendData("sSystemNotify",str,role._data.id);
-            //if(this._treasureStringArray.length>=20)this._treasureStringArray.splice(0,1);
-            //this._treasureStringArray.push(str);
-            //this.sendTreasureString(role._data.id);
+            ag.jsUtil.sendData("sSystemNotify",role._data.name+"%30%",role._data.id);
         }else{
             var array = [];
             var map = ag.gameConst._itemMst;
             if(rand<0.7){
                 for(var key in map){
-                    if(map[key].level==6)array.push(key);
+                    if(map[key].level==6 && map[key].forge<3)array.push(key);
                 }
             }else if(rand<0.875){
                 for(var key in map){
-                    if(map[key].level==7)array.push(key);
+                    if(map[key].level==7 && map[key].forge<3)array.push(key);
                 }
             }else if(rand<0.975){
                 for(var key in map){
-                    if(map[key].level==8)array.push(key);
+                    if(map[key].level==8 && map[key].forge<3)array.push(key);
                 }
             }else if(rand<0.995){
                 for(var key in map){
-                    if(map[key].level==9)array.push(key);
+                    if(map[key].level==9 && map[key].forge<3)array.push(key);
                 }
             }else if(rand<0.9975){
                 for(var key in map){
-                    if(map[key].level==10)array.push(key);
+                    if(map[key].level==10 && map[key].forge<3)array.push(key);
                 }
             }else{
                 for(var key in map){
-                    if(map[key].level==11)array.push(key);
+                    if(map[key].level==11 && map[key].forge<3)array.push(key);
                 }
             }
             var index = Math.floor(Math.random()*array.length);
@@ -363,11 +392,10 @@ module.exports = ag.class.extend({
             this._itemMap.add(item);
             ++role._bagLength;
             ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
-            var str = role._data.name+"在龙族宝藏寻到"+mst.name+"！";
-            ag.jsUtil.sendDataAll("sSystemNotify", str);
-            if(mst.level>=6){
+            ag.jsUtil.sendDataAll("sSystemNotify", role._data.name+"%31%"+mst.name+"！");
+            if(mst.level>=7){
                 if(this._treasureStringArray.length>=20)this._treasureStringArray.splice(0,1);
-                this._treasureStringArray.push(str);
+                this._treasureStringArray.push(role._data.name+"在龙族宝藏寻到"+mst.name+"！");
                 this.sendTreasureString(role._data.id);
             }
         }

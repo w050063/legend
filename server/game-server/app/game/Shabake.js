@@ -13,7 +13,7 @@ module.exports = ag.class.extend({
         }
 
 
-        //this.start(new Date().getTime()+30*1000,200*60*1000);
+        //this.start(new Date().getTime()+30*1000,1*60*1000);
     },
 
 
@@ -23,27 +23,33 @@ module.exports = ag.class.extend({
             this._bRunning = 1;
             setTimeout(function(){
                 this._bRunning = 2;
-                ag.db.getCustomData(this._legendID,function(data){
+                ag.db.getCustomData(function(data){
                     this._guildWinId = data.guildWinId;
                 }.bind(this));
-                ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
-                ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
-                ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
-                ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
-                ag.jsUtil.sendDataAll("sSystemNotify","攻城开始!!!");
+                ag.jsUtil.sendDataAll("sSystemNotify","38");
+                ag.jsUtil.sendDataAll("sSystemNotify","38");
+                ag.jsUtil.sendDataAll("sSystemNotify","38");
+                ag.jsUtil.sendDataAll("sSystemNotify","38");
+                ag.jsUtil.sendDataAll("sSystemNotify","38");
                 this.reset();
                 setTimeout(function(){
                     this._bRunning = 0;
-                    ag.db.getCustomData(this._legendID,function(data2){
+                    ag.db.getCustomData(function(data2){
                         data2.guildWinId = this._guildWinId;
                         ag.db._customData.guildWinId = this._guildWinId;
                         ag.db.setCustomData(data2);
                     }.bind(this));
-                    ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
-                    ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
-                    ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
-                    ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
-                    ag.jsUtil.sendDataAll("sSystemNotify","攻城结束,请城主联系管理员领取奖励!!!");
+                    ag.jsUtil.sendDataAll("sSystemNotify","39");
+                    ag.jsUtil.sendDataAll("sSystemNotify","39");
+                    ag.jsUtil.sendDataAll("sSystemNotify","39");
+                    ag.jsUtil.sendDataAll("sSystemNotify","39");
+                    ag.jsUtil.sendDataAll("sSystemNotify","39");
+                    if(this._guildWinId){
+                        var role = ag.gameLayer.getRole(this._guildWinId);
+                        if(role){
+                            role.addGold(20000);
+                        }
+                    }
                 }.bind(this),duration2);
             }.bind(this),duration);
         }
@@ -58,11 +64,11 @@ module.exports = ag.class.extend({
                     var role = ag.gameLayer._roleMap[key];
                     if(role.getIsPlayer() && ag.userManager.getOnline(role._data.id) && role._state!=ag.gameConst.stateDead && this.getInHg(role) && ag.guild.getGuildId(key)){
                         this._guildWinId = ag.guild.getGuildId(key);
-                        ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
-                        ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
-                        ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
-                        ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
-                        ag.jsUtil.sendDataAll("sSystemNotify","皇宫被("+ag.guild._dataMap[this._guildWinId].name+")占领！");
+                        ag.jsUtil.sendDataAll("sSystemNotify","40%"+ag.guild._dataMap[this._guildWinId].name+"%41");
+                        ag.jsUtil.sendDataAll("sSystemNotify","40%"+ag.guild._dataMap[this._guildWinId].name+"%41");
+                        ag.jsUtil.sendDataAll("sSystemNotify","40%"+ag.guild._dataMap[this._guildWinId].name+"%41");
+                        ag.jsUtil.sendDataAll("sSystemNotify","40%"+ag.guild._dataMap[this._guildWinId].name+"%41");
+                        ag.jsUtil.sendDataAll("sSystemNotify","40%"+ag.guild._dataMap[this._guildWinId].name+"%41");
                         ag.jsUtil.sendDataAll("sGuildWinId",this._guildWinId);
                         break;
                     }

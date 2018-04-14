@@ -45,7 +45,7 @@ module.exports = ag.class.extend({
             }
         }
         if(bFind)return 2;
-        if(name.indexOf(' ')!=-1 || name.indexOf('\n')!=-1)return 2;
+        if(name.length<2 || name.length>8 || name.indexOf(' ')!=-1 || name.indexOf('\n')!=-1 || name.indexOf('%')!=-1)return 2;
         try{
             this._infoMap[id].name = name;
             var role = ag.gameLayer.getRole(id);
@@ -57,6 +57,41 @@ module.exports = ag.class.extend({
         }catch(e){}
         return 0;
     },
+
+
+    changeNameByGold:function (id,name) {
+        var code = 1;
+        try{
+            var role = ag.gameLayer.getRole(id);
+            if(role && this._infoMap[id]){
+                if (role._data.gold >= 5000) {
+                    var bFind = false;
+                    for(var key in this._infoMap){
+                        if(this._infoMap[key].name==name){
+                            bFind = true;
+                        }
+                    }
+                    if(!bFind && name.length>=2 && name.length<=8 && name.indexOf(' ')==-1 && name.indexOf('\n')==-1 && name.indexOf('%')==-1){
+                        role.addGold(-5000);
+                        this._infoMap[id].name = name;
+                        role._data.name = name;
+                        if(role._tiger)role._tiger._data.name = '白虎('+name+')';
+                        ag.db.setAccountName(id,name);
+                        code = 0;
+                    }else {
+                        code = 2;
+                    }
+                }else {
+                    code = 3;
+                }
+            }else{
+                code = 1;
+            }
+        }catch(e){}
+        return code;
+    },
+
+
     getName:function(id){
         if(id && this._infoMap[id])return this._infoMap[id].name;
         return "";

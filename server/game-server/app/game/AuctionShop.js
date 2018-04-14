@@ -70,7 +70,7 @@ module.exports = ag.class.extend({
             this._dataMap[item._data.id] = {id:item._data.id,price:price,create_time:new Date().getTime()};
             --role._bagLength;
             this.sendData(rid);
-            ag.jsUtil.sendData("sSystemNotify","寄售成功！",rid);
+            ag.jsUtil.sendData("sSystemNotify","0",rid);
         }
     },
 
@@ -91,10 +91,10 @@ module.exports = ag.class.extend({
             delete this._dataMap[id];
             ++role._bagLength;
             this.sendData(rid);
-            ag.jsUtil.sendData("sSystemNotify",lastRole._data.id==rid?'拍卖行已送回道具！':"购买成功！",rid);
+            ag.jsUtil.sendData("sSystemNotify",lastRole._data.id==rid?'1':"2",rid);
             ag.jsUtil.sendData("sItem",item._data,rid);
         }else{
-            ag.jsUtil.sendData("sSystemNotify","未知错误！",rid);
+            ag.jsUtil.sendData("sSystemNotify","3",rid);
         }
     },
 });

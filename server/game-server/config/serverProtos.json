@@ -150,6 +150,7 @@
     "repeated int32 sDelDealArray": 39,
     "repeated string sDealAddItemArray": 40,
     "repeated int32 sDealAddGoldArray": 41,
-    "repeated string sChangeSexArray": 42
+    "repeated string sChangeSexArray": 42,
+    "repeated string itemDelFromBagArray": 43
   }
 }

@@ -22,9 +22,17 @@ module.exports = {
         this._rankString = "";
         this._rankFirstArray = [];
         this._invincibleMap = {};
+        this._sneerLockedMap = {};//嘲讽表,供怪物查找
 
 
-        var serverZoneArray = [[1,2],[3]];
+        //区域统计
+        this._roleZoneMap = {};
+        for(var key in ag.gameConst._terrainMap){
+            this._roleZoneMap[key] = [];
+        }
+
+
+        var serverZoneArray = [[1,2,3],[4]];
         var index = -1;
         for(var i=0;i<serverZoneArray.length;++i){
             if(serverZoneArray[i].indexOf(parseInt(legendID))!=-1){
@@ -36,7 +44,7 @@ module.exports = {
 
         if(index!=-1){
             this._legendID = serverZoneArray[index][0];
-            this._legendIDMax = serverZoneArray[index].length==2?serverZoneArray[index][1]:this._legendID;
+            this._legendIDMax = serverZoneArray[index][serverZoneArray[index].length-1];
         }else{
             console.log('error legendID!!!');
             return;
@@ -57,17 +65,27 @@ module.exports = {
         ag.actionManager.schedule(this,1,function (dt) {
             ++this._gameTime;
             this.refresh();
+
+
+            //计算嘲讽表
+            this._sneerLockedMap = {};
+            for(var key in this._roleMap){
+                var role = this._roleMap[key];
+                if((role.getIsPlayer() || role.getIsTiger()) && role._state != ag.gameConst.stateDead){
+                    this.findLocked(role);
+                }
+            }
         }.bind(this));
 
         //每隔60秒发送一次在线人数
         ag.actionManager.schedule(this,60,function (dt) {
             var rand = Math.random();
             if(rand<0.33){
-                ag.jsUtil.sendDataAll("sSystemNotify","元宝可以在商城购买道具,提升战斗力！");
+                ag.jsUtil.sendDataAll("sSystemNotify","12");
             }else if(rand<0.66){
-                ag.jsUtil.sendDataAll("sSystemNotify","提示：战士刺杀第二格无视防御！");
+                ag.jsUtil.sendDataAll("sSystemNotify","13");
             }else{
-                ag.jsUtil.sendDataAll("sSystemNotify","提示：安全区外可随意杀人！");
+                ag.jsUtil.sendDataAll("sSystemNotify","14");
             }
 
             this.getRank();//获取排行榜数据
@@ -93,8 +111,35 @@ module.exports = {
             ag.db.setItems();//道具保存
             ag.db.setCustomData(ag.db._customData);//自定义数据保存
             ag.db.setAuctionShop();//拍卖行
+
+
+            //每周三或者周末启动攻城
+            if((date.getDay()==0 || date.getDay()==3) && date.getHours()==20 && date.getMinutes()==0){
+                //if(this._legendID!=4){
+                    ag.shabake.start(date.getTime(),60*60*1000);
+                //}
+            }
         }.bind(this));
 	},
+
+
+    //查找目标
+    findLocked:function(role){
+        for(var i=0;i<121;++i){
+            var array = ag.gameLayer._roleXYMap[''+role._data.mapId+','+(role._data.x+ag.gameConst.searchEnemypath[i][0])+','+(role._data.y+ag.gameConst.searchEnemypath[i][1])];
+            if(array){
+                for(var k=0;k<array.length;++k){
+                    if(array[k].getIsMonster() && this.isEnemyForCheck(array[k],role)){
+                        if(!this._sneerLockedMap[array[k]._data.id]){
+                            this._sneerLockedMap[array[k]._data.id] = role._data.id;
+                        }else if(array[k].getDistance(role._data.id)<array[k].getDistance(this._sneerLockedMap[array[k]._data.id])){
+                            this._sneerLockedMap[array[k]._data.id] = role._data.id;
+                        }
+                    }
+                }
+            }
+        }
+    },
 
 
     addInvincibile:function(id){
@@ -104,7 +149,7 @@ module.exports = {
 
     //所有离线角色，土城归一
     theCountryIsAtPeace:function(level){
-        return;// 暂时禁用这个功能
+
         var array = [];
         var safe = ag.gameConst._terrainMap['t1'].safe;
         for(var key in this._roleMap){
@@ -181,7 +226,7 @@ module.exports = {
 		if(!player){
 			player = new Role();
             player._data = {};
-            player._data.attackMode = ag.gameConst.attackModeAll;
+            player._data.attackMode = ag.gameConst.attackModeGuild;
             player._data.gold = gold?gold:0;
             player._data.office = office?office:0;
             player._data.come = come?come:0;
@@ -205,11 +250,13 @@ module.exports = {
             player._data.direction = direction!=undefined?direction:4;//默认朝下
             player._data.level = level?level:0;
             player.resetAllProp(exp);
+            player._data.hp = player._totalHP;
 
 			this._roleMap[id] = player;
             var xyStr = player.getMapXYString();
             if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
             this._roleXYMap[xyStr].push(player);
+            this._roleZoneMap[player._data.mapId].push(player._data.id);
 
             //如果是道士，还要增加宝宝
             this.createTiger(player);
@@ -223,14 +270,16 @@ module.exports = {
         ag.jsUtil.send("sEnter",JSON.stringify(player._data),[id]);
         ag.jsUtil.sendData("sGuildWinId",ag.shabake._guildWinId,id);
         //player.changeMap();
-        if(this._rankFirstArray[0]==player._data.id){
-            ag.jsUtil.sendDataAll("sSystemNotify","欢迎天下第一等级【"+player._data.name+"】上线！");
-        }else if(this._rankFirstArray[1]==player._data.id){
-            ag.jsUtil.sendDataAll("sSystemNotify","欢迎天下第一攻击【"+player._data.name+"】上线！");
-        }else if(this._rankFirstArray[2]==player._data.id){
-            ag.jsUtil.sendDataAll("sSystemNotify","欢迎天下第一称号【"+player._data.name+"】上线！");
-        }else{
-            ag.jsUtil.sendDataAll("sSystemNotify","欢迎玩家【"+player._data.name+"】上线！");
+        if(player._data.level>47){
+            if(this._rankFirstArray[0]==player._data.id){
+                ag.jsUtil.sendDataAll("sSystemNotify","15%"+player._data.name+"%16");
+            }else if(this._rankFirstArray[1]==player._data.id){
+                ag.jsUtil.sendDataAll("sSystemNotify","17%"+player._data.name+"%16");
+            }else if(this._rankFirstArray[2]==player._data.id){
+                ag.jsUtil.sendDataAll("sSystemNotify","18%"+player._data.name+"%16");
+            }else{
+                ag.jsUtil.sendDataAll("sSystemNotify","19%"+player._data.name+"%16");
+            }
         }
     },
 
@@ -253,11 +302,13 @@ module.exports = {
             dog._master = player;
             player._tiger = dog;
             dog.resetAllProp();
+            dog._data.hp = dog._totalHP;
             this._roleMap[dog._data.id] = dog;
             var xyStr = dog.getMapXYString();
             if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
             this._roleXYMap[xyStr].push(dog);
             dog.setAIController(new TigerAIController(dog));
+            this._roleZoneMap[dog._data.mapId].push(dog._data.id);
         }
     },
 
@@ -295,6 +346,7 @@ module.exports = {
                         player._data.direction = Math.floor(Math.random()*8);
                         player._data.level = 0;
                         player.resetAllProp();
+                        player._data.hp = player._totalHP;
                         this._roleMap[player._data.id] = player;
                         var xyStr = player.getMapXYString();
                         if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];
@@ -305,6 +357,7 @@ module.exports = {
                         delete temp.attackMode;
                         delete temp.practice;
                         ag.jsUtil.sendDataAll("sRole",temp,player._data.mapId);
+                        this._roleZoneMap[player._data.mapId].push(player._data.id);
                     }
                 }
             }
@@ -313,10 +366,10 @@ module.exports = {
 
     //获得某个地图上，某个怪物剩余多少
     getCountWithType:function(mapId,monsterName){
-        var count =0;
-        for(var key in this._roleMap){
-            var data = this._roleMap[key]._data;
-            if(data.mapId==mapId && data.camp==ag.gameConst.campMonster && data.type==monsterName)++count;
+        var count = 0;
+        var array = this._roleZoneMap[mapId];
+        for(var i=0;i<array.length;++i){
+            if(this._roleMap[array[i]]._data.type==monsterName)++count;
         }
         return count;
     },
@@ -436,8 +489,9 @@ module.exports = {
 
     //解除此角色的所有锁定
     delLockedRole:function (role) {
-        for(var key in this._roleMap){
-            var temp = this._roleMap[key];
+        var array = this._roleZoneMap[role._data.mapId];
+        for(var i=0;i<array.length;++i){
+            var temp = this._roleMap[array[i]];
             if(temp._ai && temp._ai._locked==role){
                 temp._ai._locked = null;
             }

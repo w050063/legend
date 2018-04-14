@@ -28,6 +28,8 @@ module.exports = ag.class.extend({
 
 
         this.getAccounts(function(rows){
+            console.log('长度');
+            console.log(rows.length);
             //先处理同名问题
             var map = {};
             for(var i=0;i<rows.length;++i){
@@ -130,7 +132,7 @@ module.exports = ag.class.extend({
 
 
         //自定义数据
-        this.getCustomData(this._legendID,function(data){
+        this.getCustomData(function(data){
             this._customData = data;
             if(!this._customData.guildWinId)this._customData.guildWinId = '0';
             if(ag.shabake)ag.shabake._guildWinId = this._customData.guildWinId;
@@ -147,9 +149,9 @@ module.exports = ag.class.extend({
         this.getCard();
 
 
-        ag.actionManager.runAction(this,3,function(){
-            ag.gameLayer.theCountryIsAtPeace(35);
-        }.bind(this));
+        //ag.actionManager.runAction(this,3,function(){
+        //    ag.gameLayer.theCountryIsAtPeace(35);
+        //}.bind(this));
 
         //启动定时器,每秒执行一次
         ag.actionManager.schedule(this,0.01,function (dt) {
@@ -695,9 +697,9 @@ module.exports = ag.class.extend({
 
 
     //获得当前行会数据
-    getCustomData:function(legendID,callback){
+    getCustomData:function(callback){
         var self = this;
-        var sql = 'SELECT * FROM t_custom where id = "'+legendID+'_0";';
+        var sql = 'SELECT * FROM t_custom where id = "'+ag.gameLayer._legendID+'_0";';
         this.query(sql, function(err, rows) {
             var data = '';
             if(rows.length>=1){
@@ -712,9 +714,11 @@ module.exports = ag.class.extend({
 
     //创建自定义数据
     setCustomData:function(data){
-        var sql = 'UPDATE t_custom SET data = "' + JSON.stringify(data).replace(/"/g,'%')
-            + '" WHERE id = "'+ag.gameLayer._legendID+'_0";';
-        this.query(sql, function(err, rows) {});
+        if(data){
+            var sql = 'UPDATE t_custom SET data = "' + JSON.stringify(data).replace(/"/g,'%')
+                + '" WHERE id = "'+ag.gameLayer._legendID+'_0";';
+            this.query(sql, function(err, rows) {});
+        }
     },
 
     //创建自定义数据
@@ -752,13 +756,13 @@ module.exports = ag.class.extend({
                     + '", buy_time = "' + obj.buy_time
                     + '" WHERE id = "' + obj.id + '";';
                 this.query(sql2, function(err, rows) {});
-                ag.jsUtil.sendData("sSystemNotify","兑换元宝成功！",rid);
-                ag.jsUtil.sendDataAll("sSystemNotify","玩家【"+role._data.name+"】用秘卡购买"+obj.gold+"个元宝！");
+                ag.jsUtil.sendData("sSystemNotify","51",rid);
+                ag.jsUtil.sendDataAll("sSystemNotify","32%"+role._data.name+"%52%"+obj.gold+"%53");
             }else{
-                ag.jsUtil.sendData("sSystemNotify","卡密已经使用！",rid);
+                ag.jsUtil.sendData("sSystemNotify","54",rid);
             }
         }else{
-            ag.jsUtil.sendData("sSystemNotify","卡密不存在！",rid);
+            ag.jsUtil.sendData("sSystemNotify","55",rid);
         }
     },
 });

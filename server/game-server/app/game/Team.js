@@ -33,11 +33,11 @@ module.exports = ag.class.extend({
     //邀请
     askTeam:function(rid1,rid2){
         if(this.getTeam(rid2)){
-            ag.jsUtil.sendData("sSystemNotify","对方已经组队！",rid1);
+            ag.jsUtil.sendData("sSystemNotify","42",rid1);
         }else if(this._dataMap[rid1] && this._dataMap[rid1].length>=4){
-            ag.jsUtil.sendData("sSystemNotify","组队人数上线4人！",rid1);
+            ag.jsUtil.sendData("sSystemNotify","43",rid1);
         }else{
-            ag.jsUtil.sendData("sSystemNotify","已经发出邀请！",rid1);
+            ag.jsUtil.sendData("sSystemNotify","44",rid1);
             var role = ag.gameLayer.getRole(rid1);
             ag.jsUtil.sendData("sAskTeam",{id:rid1,name:role._data.name},rid2);
         }
@@ -47,11 +47,11 @@ module.exports = ag.class.extend({
     //增加
     addTeam:function(rid1,rid2){
         if(rid1==rid2){
-            ag.jsUtil.sendData("sSystemNotify","您不能加自己！",rid2);
+            ag.jsUtil.sendData("sSystemNotify","45",rid2);
         }else if(this.getTeam(rid2)){
-            ag.jsUtil.sendData("sSystemNotify","您已经组队！",rid2);
+            ag.jsUtil.sendData("sSystemNotify","46",rid2);
         }else if(this._dataMap[rid1] && this._dataMap[rid1].length>=4){
-            ag.jsUtil.sendData("sSystemNotify","此队伍人数已满4人！",rid2);
+            ag.jsUtil.sendData("sSystemNotify","47",rid2);
         }else{
             var id = this.getTeam(rid1);
             if(!id){
@@ -61,7 +61,7 @@ module.exports = ag.class.extend({
             this._dataMap[id].push(rid2);
 
             var i = 0;
-            var str = '当前队友：';
+            var str = '48%';
             for(i=0;i<this._dataMap[id].length;++i){
                 var role = ag.gameLayer.getRole(this._dataMap[id][i]);
                 str = str + role._data.name;
@@ -77,7 +77,7 @@ module.exports = ag.class.extend({
     seeTeam:function(rid){
         var id = this.getTeam(rid);
         if(id){
-            var str = '当前队友：';
+            var str = '48%';
             for(var i=0;i<this._dataMap[id].length;++i){
                 var role = ag.gameLayer.getRole(this._dataMap[id][i]);
                 str = str + role._data.name;
@@ -85,7 +85,7 @@ module.exports = ag.class.extend({
             }
             ag.jsUtil.sendData("sSystemNotify",str,rid);
         }else{
-            ag.jsUtil.sendData("sSystemNotify","您还没有组队！",rid);
+            ag.jsUtil.sendData("sSystemNotify","49",rid);
         }
     },
 
@@ -96,7 +96,7 @@ module.exports = ag.class.extend({
         if(id){
             var role = ag.gameLayer.getRole(rid);
             for(i=0;i<this._dataMap[id].length;++i){
-                ag.jsUtil.sendData("sSystemNotify",''+role._data.name+"已退出队伍！",this._dataMap[id][i]);
+                ag.jsUtil.sendData("sSystemNotify",''+role._data.name+"%50",this._dataMap[id][i]);
             }
             this._dataMap[id].splice(this._dataMap[id].indexOf(rid),1);
             if(this._dataMap[id].length==1){

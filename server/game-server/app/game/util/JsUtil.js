@@ -111,9 +111,11 @@ module.exports = {
     sendDataExcept : function(route,msg,id){
         var role = ag.gameLayer._roleMap[id];
         var mapId = role?role._data.mapId:'t0';
-        for(var key in ag.gameLayer._roleMap){
-            var role = ag.gameLayer._roleMap[key];
-            if(role.getIsPlayer() && role._data.mapId==mapId && role._data.id!==id){
+
+        var array = ag.gameLayer._roleZoneMap[mapId];
+        for(var i=0;i<array.length;++i){
+            var role = ag.gameLayer._roleMap[array[i]];
+            if(role.getIsPlayer() && role._data.id!=id){
                 this.sendData(route,msg,role._data.id);
             }
         }
@@ -123,9 +125,10 @@ module.exports = {
     //发送要合并的数据
     sendDataAll : function(route,msg,mapId){
         if(mapId){
-            for(var key in ag.gameLayer._roleMap){
-                var role = ag.gameLayer._roleMap[key];
-                if(role.getIsPlayer() && role._data.mapId==mapId){
+            var array = ag.gameLayer._roleZoneMap[mapId];
+            for(var i=0;i<array.length;++i){
+                var role = ag.gameLayer._roleMap[array[i]];
+                if(role.getIsPlayer()){
                     this.sendData(route,msg,role._data.id);
                 }
             }

@@ -79,17 +79,9 @@ module.exports = ag.class.extend({
     //查找目标
     findLocked:function(){
         var checkDistance = this._role.getMst().checkDistance;
-        var searchEnemypath = ag.gameConst.searchEnemypath;
-        var count = Math.min(Math.pow(checkDistance*2+1,2),searchEnemypath.length);
-        for(var i=0;i<count;++i){
-            var array = ag.gameLayer._roleXYMap[''+this._role._data.mapId+','+(this._role._data.x+searchEnemypath[i][0])+','+(this._role._data.y+searchEnemypath[i][1])];
-            if(array){
-                for(var k=0;k<array.length;++k){
-                    if(ag.gameLayer.isEnemyForCheck(this._role,array[k])){
-                        return array[k];
-                    }
-                }
-            }
+        var id = ag.gameLayer._sneerLockedMap[this._role._data.id];
+        if(this._role.getDistance(id)<=checkDistance){
+            return ag.gameLayer.getRole(id);
         }
         return null;
     },

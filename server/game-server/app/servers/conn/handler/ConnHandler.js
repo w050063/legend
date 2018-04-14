@@ -33,7 +33,7 @@ var Handler = cc.Class.extend({
         }
 
         var legendId = uid.split('_')[0];
-        if(legendId!=1 && legendId!=2 && legendId!=3){
+        if(legendId!=1 && legendId!=2 && legendId!=3 && legendId!=4){
             next(null, {
                 code: 500,
                 error: true
