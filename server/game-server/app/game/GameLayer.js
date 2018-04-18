@@ -23,6 +23,7 @@ module.exports = {
         this._rankFirstArray = [];
         this._invincibleMap = {};
         this._sneerLockedMap = {};//嘲讽表,供怪物查找
+        this._dirtyRoleArray = {};//脏数据数组
 
 
         //区域统计
@@ -32,7 +33,7 @@ module.exports = {
         }
 
 
-        var serverZoneArray = [[1,2,3],[4]];
+        var serverZoneArray = [[1,2,3],[4],[5]];
         var index = -1;
         for(var i=0;i<serverZoneArray.length;++i){
             if(serverZoneArray[i].indexOf(parseInt(legendID))!=-1){
@@ -67,6 +68,15 @@ module.exports = {
             this.refresh();
 
 
+            //处理脏数据
+            for(key in this._dirtyRoleArray) {
+                var role = this.getRole(key);
+                if(role){
+                    role.resetAllProp();
+                }
+                delete this._dirtyRoleArray[key];
+            }
+
             //计算嘲讽表
             this._sneerLockedMap = {};
             for(var key in this._roleMap){
@@ -93,7 +103,7 @@ module.exports = {
             //更新新的一天的数据
             var date = new Date();
             var now = ''+date .getFullYear()+'.'+date .getMonth()+'.'+date .getDate();
-            if(ag.db._customData.comeDate!=now){
+            if(ag.db && ag.db._customData && ag.db._customData.comeDate!=now){
                 ag.db._customData.comeDate = now;
                 ag.db._customData.come = {};
                 ag.db._customData.wing = {};
@@ -115,12 +125,31 @@ module.exports = {
 
             //每周三或者周末启动攻城
             if((date.getDay()==0 || date.getDay()==3) && date.getHours()==20 && date.getMinutes()==0){
-                //if(this._legendID!=4){
+                if(this._legendID!=5){
                     ag.shabake.start(date.getTime(),60*60*1000);
-                //}
+                }
             }
         }.bind(this));
+
+
+
+        //防止出问题，存不上
+        //ag.actionManager.runAction(this,300,function(){
+        //        for(var key in this._roleMap){
+        //            var role = this._roleMap[key];
+        //            if(role.getIsPlayer() && role._data.level>=50){
+        //                role.addGold(2000);
+        //                role.addExp(300000);
+        //                role.addOffice(1000);
+        //            }
+        //        }
+        //}.bind(this));
 	},
+
+
+    addDirty:function(id){
+        this._dirtyRoleArray[id] = true;
+    },
 
 
     //查找目标
@@ -249,8 +278,9 @@ module.exports = {
             player._data.camp = ag.gameConst.campPlayerNone;
             player._data.direction = direction!=undefined?direction:4;//默认朝下
             player._data.level = level?level:0;
-            player.resetAllProp(exp);
+            player.resetAllProp();
             player._data.hp = player._totalHP;
+            player._exp = exp?exp:0;
 
 			this._roleMap[id] = player;
             var xyStr = player.getMapXYString();
@@ -303,6 +333,7 @@ module.exports = {
             player._tiger = dog;
             dog.resetAllProp();
             dog._data.hp = dog._totalHP;
+            dog._exp = 0;
             this._roleMap[dog._data.id] = dog;
             var xyStr = dog.getMapXYString();
             if(!this._roleXYMap[xyStr])this._roleXYMap[xyStr] = [];

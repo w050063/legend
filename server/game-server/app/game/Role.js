@@ -20,64 +20,17 @@ module.exports = ag.class.extend({
 
 
     //重置所有属性
-    resetAllProp:function(exp){
+    resetAllProp:function(){
         var mst = this.getMst();
         var lv = this._data.level;
-        this._totalHP = this.getTotalHPFromDataBase();
-        //this._data.hp = this._totalHP;
         this._totalExp = this.getTotalExpFromDataBase();
-        this._exp = exp?exp:0;
         this._heal = this.getIsPlayer()?(mst.heal+Math.floor(mst.healAdd*lv)):mst.heal;
         this._attackSpeed = mst.attackSpeed;
         this._moveSpeed = mst.moveSpeed;
-        this.refreshItemProp();
-    },
 
 
-    getTotalHPFromDataBase:function(){
-        var mst = this.getMst();
+        this._totalHP = this.getTotalHPFromDataBase();
         if(this.getIsPlayer()){
-            var lv = this._data.level;
-
-            var hpex = 0;//加上转生血量
-            var come = this._data.come;
-            if(come>0){
-                if(this._data.type=='m0'){
-                    hpex+=ag.gameConst.comeHPWarrior[come];
-                }else if(this._data.type=='m1'){
-                    hpex+=ag.gameConst.comeHPWizard[come];
-                }else if(this._data.type=='m2'){
-                    hpex+=ag.gameConst.comeHPTaoist[come];
-                }
-            }
-
-            if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51))+hpex;
-            if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47))+hpex;
-            if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43))+hpex;
-            if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35))+hpex;
-            return Math.floor(mst.hp+mst.hpAdd[0]*lv)+hpex;
-        }
-        return mst.hp;
-    },
-
-    getTotalExpFromDataBase:function(paramLevel){
-        if(this.getIsPlayer()){
-            var lv = paramLevel==undefined?this._data.level:paramLevel;
-            var array = ag.gameConst.expDatabase;
-            if(lv>50)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*4+array[5]*(lv-50));
-            if(lv>46)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*(lv-46));
-            if(lv>42)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*(lv-42));
-            if(lv>34)return Math.floor(array[0]+array[1]*34+array[2]*(lv-34));
-            return Math.floor(array[0]+array[1]*lv);
-        }
-        return 0;
-    },
-
-
-    refreshItemProp:function(){
-        var mst = this.getMst();
-        if(this.getIsPlayer()){
-            var lv = this._data.level;
             var hurt = mst.hurt+Math.floor(mst.hurtAdd*lv);
             var defense = mst.defense+Math.floor(mst.defenseAdd*lv);
             var map = ag.itemManager._itemMap.getMap();
@@ -109,12 +62,83 @@ module.exports = ag.class.extend({
                 defense+=ag.gameConst.comeDefense[come];
             }
 
+
+            //加上套装属性
+            var equipLv = this.getEquipLv();
+            hurt+=ag.gameConst.equipHurt[equipLv];
+            defense+=ag.gameConst.equipDefense[equipLv];
+
             this._hurt = hurt;
             this._defense = defense;
         }else{
             this._hurt = mst.hurt;
             this._defense = mst.defense;
         }
+    },
+
+
+    getTotalHPFromDataBase:function(){
+        var mst = this.getMst();
+        if(this.getIsPlayer()){
+            var lv = this._data.level;
+
+            var hpex = 0;//加上转生血量
+            var come = this._data.come;
+            if(come>0){
+                if(this._data.type=='m0'){
+                    hpex+=ag.gameConst.comeHPWarrior[come];
+                }else if(this._data.type=='m1'){
+                    hpex+=ag.gameConst.comeHPWizard[come];
+                }else if(this._data.type=='m2'){
+                    hpex+=ag.gameConst.comeHPTaoist[come];
+                }
+            }
+
+            //加上套装属性
+            var equipLv = this.getEquipLv();
+            var tempArray = ag.gameConst.equipHPWarrior;
+            if(this._data.type=='m1')tempArray = ag.gameConst.equipHPWizard;
+            else if(this._data.type=='m2')tempArray = ag.gameConst.equipHPTaoist;
+            hpex+=tempArray[equipLv];
+
+            if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51))+hpex;
+            if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47))+hpex;
+            if(lv>43)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*(lv-43))+hpex;
+            if(lv>35)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*(lv-35))+hpex;
+            return Math.floor(mst.hp+mst.hpAdd[0]*lv)+hpex;
+        }
+        return mst.hp;
+    },
+
+    getTotalExpFromDataBase:function(paramLevel){
+        if(this.getIsPlayer()){
+            var lv = paramLevel==undefined?this._data.level:paramLevel;
+            var array = ag.gameConst.expDatabase;
+            if(lv>50)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*4+array[5]*(lv-50));
+            if(lv>46)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*4+array[4]*(lv-46));
+            if(lv>42)return Math.floor(array[0]+array[1]*34+array[2]*8+array[3]*(lv-42));
+            if(lv>34)return Math.floor(array[0]+array[1]*34+array[2]*(lv-34));
+            return Math.floor(array[0]+array[1]*lv);
+        }
+        return 0;
+    },
+
+
+    //获得套装属性
+    getEquipLv:function(){
+        var array = [];
+        var map = ag.itemManager._itemMap.getMap();
+        for(var key in map){
+            var obj = map[key]._data;
+            if(obj.owner==this._data.id && obj.puton>=0){
+                array.push(ag.gameConst._itemMst[obj.mid].level);
+            }
+        }
+        var lv = 0;
+        if(array.length==13){
+            lv = Math.min(array[0],array[1],array[2],array[3],array[4],array[5],array[6],array[7],array[8],array[9],array[10],array[11],array[12]);
+        }
+        return lv;
     },
 
 
@@ -207,6 +231,9 @@ module.exports = ag.class.extend({
             if(ag.gameLayer._roleXYMap[oldStr].length==0)delete ag.gameLayer._roleXYMap[oldStr];
             if(!ag.gameLayer._roleXYMap[newStr])ag.gameLayer._roleXYMap[newStr] = [];
             ag.gameLayer._roleXYMap[newStr].push(this);
+            ag.gameLayer._roleZoneMap[this._data.mapId].push(this._data.id);
+            var index = ag.gameLayer._roleZoneMap[lastMap].indexOf(this._data.id);
+            if(index!=-1)ag.gameLayer._roleZoneMap[lastMap].splice(index,1);
             if(this._tiger){
                 oldStr = this._tiger.getMapXYString();
                 this._tiger._data.mapId = mapId;
@@ -254,12 +281,11 @@ module.exports = ag.class.extend({
                         }
 
                         if(role._tiger){
-                            role = role._tiger;
-                            temp = JSON.parse(JSON.stringify(role._data));
+                            temp = JSON.parse(JSON.stringify(role._tiger._data));
                             this.sendRoleForCheckBack(this._data.id,temp);
                         }
                     }
-                }else if(role.getIsMonster() || role.getIsTiger()){
+                }else if(role.getIsMonster()){
                     var temp = JSON.parse(JSON.stringify(role._data));
                     this.sendRoleForCheckBack(this._data.id,temp);
                 }
@@ -321,9 +347,6 @@ module.exports = ag.class.extend({
         }
         //增加无敌
         ag.gameLayer.addInvincibile(this._data.id);
-        ag.gameLayer._roleZoneMap[this._data.mapId].push(this._data.id);
-        var index = ag.gameLayer._roleZoneMap[lastMap].indexOf(this._data.id);
-        if(index!=-1)ag.gameLayer._roleZoneMap[lastMap].splice(index,1);
     },
 
 
@@ -493,7 +516,7 @@ module.exports = ag.class.extend({
             }if(bCisha==ag.gameConst.fighterAttackFar){
                 this._data.hp -= Math.round(hurt*0.55/correct*rate);
             }else{
-                this._data.hp -= Math.round(hurt*0.3/correct*rate);
+                this._data.hp -= Math.round(hurt*0.32/correct*rate);
             }
         }else{
             this._data.hp -=  Math.round(hurt/correct*rate);
@@ -661,9 +684,11 @@ module.exports = ag.class.extend({
         this._exp +=  count;
         while(this._exp>=this._totalExp){
             ++this._data.level;
-            var exp = this._exp-this._totalExp;
-            this.resetAllProp(exp);
+            this._exp = this._exp-this._totalExp;
+            this._totalExp = this.getTotalExpFromDataBase();
+            this._totalHP = this.getTotalHPFromDataBase();
             this._data.hp = this._totalHP;
+            ag.gameLayer.addDirty(this._data.id);
         }
         if(source){
             ag.jsUtil.sendDataAll("sAddExp",{id:this._data.id,level:this._data.level,exp:this._exp,source:source},this._data.mapId);
@@ -675,7 +700,6 @@ module.exports = ag.class.extend({
 
     addGold:function(count){
         this._data.gold += count;
-        ag.db.setRoles([this]);
         ag.jsUtil.sendData("sSetGold",this._data.gold,this._data.id);
     },
 

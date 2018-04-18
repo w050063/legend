@@ -15,7 +15,7 @@ var Handler = cc.Class.extend({
     ctor:function (app) {
         this.app = app;
         this._baseUid = 0;
-        this._version = '0.1.4';
+        this._version = '0.1.23';
         this._serverList = fs.readFileSync('./app/serverlist/serverlist.txt', 'utf8');
     },
 
@@ -47,13 +47,13 @@ var Handler = cc.Class.extend({
             var array1 = this._version.split('.');
             var array2 = msg.version.split('.');
             if(parseInt(array1[0])>parseInt(array2[0])){
-                next(null, {code:1,text:'目前版本不支持热更，请下载最新版!'});
+                next(null, {code:1,text:'版本过低，请重新打开自动更新!'});
                 return;
             }else if(parseInt(array1[0])==parseInt(array2[0]) && parseInt(array1[1])>parseInt(array2[1])){
-                next(null, {code:1,text:'目前版本不支持热更，请下载最新版!'});
+                next(null, {code:1,text:'版本过低，请重新打开自动更新!'});
                 return;
             }else if(parseInt(array1[1])==parseInt(array2[1]) && parseInt(array1[2])>parseInt(array2[2])){
-                next(null, {code:1,text:'目前版本不支持热更，请下载最新版!'});
+                next(null, {code:1,text:'版本过低，请重新打开自动更新!'});
                 return;
             }
         }

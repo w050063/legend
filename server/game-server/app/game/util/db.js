@@ -28,8 +28,6 @@ module.exports = ag.class.extend({
 
 
         this.getAccounts(function(rows){
-            console.log('长度');
-            console.log(rows.length);
             //先处理同名问题
             var map = {};
             for(var i=0;i<rows.length;++i){
@@ -87,13 +85,11 @@ module.exports = ag.class.extend({
                         if(item._data.puton==ag.gameConst.putonBag){
                             ++role._bagLength;
                         }
-                        //ag.jsUtil.sendDataAll("sItem",item._data,role._data.mapId);
-                        //role.refreshItemProp();
                     }
                 }
             }
             for(var key in ag.gameLayer._roleMap){
-                ag.gameLayer._roleMap[key].refreshItemProp();
+                ag.gameLayer.addDirty(key);
             }
         }.bind(this));
         this.getGuilds(function(rows){
@@ -175,6 +171,15 @@ module.exports = ag.class.extend({
                     }
                 });
             }
+        }.bind(this));
+
+
+
+        //防止出问题，存不上
+        ag.actionManager.runAction(this,300,function(){
+            ag.actionManager.schedule(this,300,function (dt) {
+                this._bDoing = false;
+            }.bind(this));
         }.bind(this));
     },
 

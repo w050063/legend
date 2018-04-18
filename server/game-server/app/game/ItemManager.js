@@ -133,7 +133,7 @@ module.exports = ag.class.extend({
             item._data.owner = '';
             item._data.puton = ag.gameConst.putonGround;
             delete item._their;
-            role.refreshItemProp();
+            ag.gameLayer.addDirty(role._data.id);
             ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
             if(map[item._data.mid].level>=7){
                 ag.jsUtil.sendDataAll("sSystemNotify",'【'+map[item._data.mid].name+'】从'+name+'%28%'+ag.gameConst._terrainMap[mapId].name+'】');
@@ -237,9 +237,9 @@ module.exports = ag.class.extend({
 
     //背包装备回收
     bagItemRecycle:function(array,rid){
-        var expArray = [20,20,20,20,100,300,500,1000,2000];
-        var goldArray = [0,0,0,0,1,2,4,8,16];
-        var officeArray = [0,0,0,0,1,2,4,10,40];
+        var expArray = [20,20,20,20,100,300,500,1000,2000,5000];
+        var goldArray = [0,0,0,0,1,2,4,8,16,50];
+        var officeArray = [0,0,0,0,1,2,4,10,40,100];
         var role = ag.gameLayer.getRole(rid);
         if(role){
             var sum = 0;
@@ -308,7 +308,7 @@ module.exports = ag.class.extend({
                 item._data.puton = puton;
                 --role._bagLength;
                 ag.jsUtil.sendDataExcept("sBagItemToEquip",item._data,rid);
-                role.refreshItemProp();
+                ag.gameLayer.addDirty(role._data.id);
             }
         }
     },
@@ -320,7 +320,7 @@ module.exports = ag.class.extend({
         if(item && role){
             item._data.puton = ag.gameConst.putonBag;
             ++role._bagLength;
-            role.refreshItemProp();
+            ag.gameLayer.addDirty(role._data.id);
             ag.jsUtil.sendDataExcept("sEquipItemToBag",{id:id,rid:rid},rid);
         }
     },
@@ -378,9 +378,13 @@ module.exports = ag.class.extend({
                 for(var key in map){
                     if(map[key].level==10 && map[key].forge<3)array.push(key);
                 }
-            }else{
+            }else if(rand<0.9995){
                 for(var key in map){
                     if(map[key].level==11 && map[key].forge<3)array.push(key);
+                }
+            }else{
+                for(var key in map){
+                    if(map[key].level==12 && map[key].forge<3)array.push(key);
                 }
             }
             var index = Math.floor(Math.random()*array.length);

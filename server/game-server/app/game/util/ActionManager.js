@@ -9,14 +9,26 @@ module.exports = {
         this._actionArray = [];
         this._scheduleArray = [];
         this._nowTime = new Date().getTime()/1000;
+
+
         setInterval(function () {
+            // 此处是可能产生例外的语句
+            var curTime = new Date().getTime()/1000;
+            var elapse = curTime-this._nowTime;
+            var i=0;
+
+
             try {
-                // 此处是可能产生例外的语句
-                var curTime = new Date().getTime()/1000;
-                var elapse = curTime-this._nowTime;
-                var i=0;
-
-
+                for(i=0;i<this._scheduleArray.length;++i){
+                    this._scheduleArray[i].time += elapse;
+                    if(this._scheduleArray[i].time>=this._scheduleArray[i].interval){
+                        this._scheduleArray[i].time-=this._scheduleArray[i].interval;
+                        this._scheduleArray[i].callback(elapse);
+                    }
+                }
+            } catch(error) {
+                // 此处是负责例外处理的语句
+            } finally {
                 //防止错误，先遍历所有函数存起来，然后在统一执行，最后重新检索删除。
                 var callbacks = [];
                 for(i=0;i<this._actionArray.length;++i){
@@ -32,21 +44,9 @@ module.exports = {
                         this._actionArray.splice(i,1);
                     }
                 }
-
-
-                for(i=0;i<this._scheduleArray.length;++i){
-                    this._scheduleArray[i].time += elapse;
-                    if(this._scheduleArray[i].time>=this._scheduleArray[i].interval){
-                        this._scheduleArray[i].time-=this._scheduleArray[i].interval;
-                        this._scheduleArray[i].callback(elapse);
-                    }
-                }
-                this._nowTime = curTime;
-            } catch(error) {
-                // 此处是负责例外处理的语句
-            } finally {
-                // 此处是出口语句
             }
+
+            this._nowTime = curTime;
         }.bind(this),1);
     },
     

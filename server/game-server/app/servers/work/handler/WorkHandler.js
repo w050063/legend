@@ -126,6 +126,23 @@ var Handler = cc.Class.extend({
         });
     },
 
+
+    //查找密码
+    findPwd:function(msg, session, next){
+        var code = 1;
+        var pwd = '';
+        try{
+            if(msg.secretKey==this._secretKey && ag.userManager._infoMap[msg.rid]){
+                pwd = ag.userManager._infoMap[msg.rid].password;
+                code = 0;
+            }
+        }catch(e){}
+        next(null, {
+            code: code,
+            pwd:pwd
+        });
+    },
+
     theCountryIsAtPeace:function(msg, session, next){
         try{
             if(msg.secretKey==this._secretKey){
@@ -822,7 +839,7 @@ var Handler = cc.Class.extend({
                             role._data.level -= 1;
                             role._exp += role.getTotalExpFromDataBase(role._data.level);
                         }
-                        role.resetAllProp(role._exp);
+                        ag.gameLayer.addDirty(role._data.id);
                         ag.jsUtil.sendDataAll("sCome", {
                             id: role._data.id,
                             come: role._data.come,
@@ -871,7 +888,7 @@ var Handler = cc.Class.extend({
                                 wing: role._data.wing
                             }, role._data.mapId);
                         }
-                        role.resetAllProp(role._exp);
+                        ag.gameLayer.addDirty(role._data.id);
                         ag.jsUtil.sendData("sSystemNotify", "75", id);
                     } else {
                         ag.jsUtil.sendData("sSystemNotify", "56%1000！", id);
@@ -932,7 +949,7 @@ var Handler = cc.Class.extend({
                                 wing: role._data.wing
                             }, role._data.mapId);
                         }
-                        role.resetAllProp(role._exp);
+                        ag.gameLayer.addDirty(role._data.id);
                         ag.jsUtil.sendData("sSystemNotify", "76", id);
                     } else {
                         ag.jsUtil.sendData("sSystemNotify", "56%1000！", id);
@@ -1173,7 +1190,7 @@ var Handler = cc.Class.extend({
                         if(role._data.gold>=5000){
                             role.addGold(-5000);
                             role._data.type = msg.type;
-                            role.resetAllProp(role._exp);
+                            ag.gameLayer.addDirty(role._data.id);
 
                             //处理狗
                             if(role._tiger){
