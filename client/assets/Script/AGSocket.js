@@ -24,7 +24,6 @@ module.exports={
         //设置断开逻辑
         pomelo.removeAllListeners('disconnect');
         pomelo.on('disconnect',function () {
-            cc.log("disconnect",self._normalDis);
             if(!self._normalDis){
                 ag.agSocket._dataArray = [];
                 ag.userInfo._itemMap = {};
@@ -70,10 +69,8 @@ module.exports={
                 if(data.code==0){
                     var uid = data.uid;
                     self._normalDis = true;
-                    cc.log("connect1",self._normalDis);
                     pomelo.disconnect(function () {
                         self._normalDis = false;
-                        cc.log("connect2",self._normalDis);
                         pomelo.init({
                             host : data.host,
                             port : data.port,
@@ -106,7 +103,6 @@ module.exports={
     //启动战斗中网络
     onBattleEvent:function(){
         pomelo.on('onData',function(data) {
-            cc.log(data);
             for(var key in data){
                 var array = data[key];
                 for(var i=0;i<array.length;++i){
@@ -155,7 +151,7 @@ module.exports={
             var obj = this._dataArray[i];
             if(obj.key=='sMoveArray'){
                 var player =  ag.gameLayer._roleMap[obj.value.id];
-                if(player){
+                if(player && typeof obj.value.x=='number' && typeof obj.value.y=='number'){
                     player.move(cc.p(obj.value.x,obj.value.y),true);
                 }
             }else if(obj.key=='sAttackArray'){
@@ -209,6 +205,7 @@ module.exports={
                 ag.gameLayer.deleteRoleByServer(obj.value);
             }else if(obj.key=='sBagItemToEquipArray'){
                 ag.gameLayer.initItem(obj.value);
+                ag.gameLayer.addDirty(obj.value.owner);
             }else if(obj.key=='sEquipItemToBagArray'){
                 ag.gameLayer.equipItemToBag(obj.value.id,obj.value.rid);
             }else if(obj.key=='sChatYouArray'){
@@ -289,10 +286,8 @@ module.exports={
                     player._data.come = obj.value.come;
                     player._data.practice = obj.value.practice;
                     player._data.level = obj.value.level;
-                    player.resetAllProp();
+                    ag.gameLayer.addDirty(player._data.id);
                     player.addExp(obj.value.level,obj.value.exp);
-                    player._data.hp = 1;//确保可以进入改血量
-                    player.changeHP(player._totalHP);
                 }
             }else if(obj.key=='treasureStringArray'){
                 if(ag.gameLayer) {

@@ -188,7 +188,12 @@ module.exports= {
         i001221 : cc.p(4,-23),
         i001230 : cc.p(6,-50),
         i001231 : cc.p(-3,-53),
+
+        i001031 : cc.p(-75,54),
+        i001232 : cc.p(3,-2),
+        i001233 : cc.p(3,-2),
     },
+
 
 
     //商店物品编号
@@ -305,7 +310,16 @@ module.exports= {
 
 
     //穿戴转生要求,从10级开始
-    equipCome:[0,0,0,0,0,0,0,0,0,0,0,8],
+    equipCome:[0,0,0,0,0,0,0,0,0,0,0,8,10],
+
+
+
+    //套装属性
+    equipHurt:[0,0,0,0,0,0,0,5,12,25,42,62,85],
+    equipDefense:[0,0,0,0,0,0,0,2,5,12,21,31,42],
+    equipHPWarrior:[0,0,0,0,0,0,0,50,100,180,330,500,700],
+    equipHPWizard:[0,0,0,0,0,0,0,20,35,60,110,175,230],
+    equipHPTaoist:[0,0,0,0,0,0,0,25,50,90,165,250,350],
 
 
     //地图详细信息,refresh怪物相关刷新，坐标-1表示全地图随机刷--hero type,x,y,aliquot time,max count.
@@ -877,9 +891,9 @@ module.exports= {
             npc:[],
             mapX: 100,
             mapY: 100,
-            refresh: [["m16",10],["m17",10],["m18",10],["m8",10]
-                ,["m34",2],["m35",2],["m36",2],["m40",2],["m41",2],["m42",2],["m43",2]
-                ,["m27",1],["m28",1],["m29",1]
+            refresh: [["m16",12],["m17",12],["m18",12],["m8",12]
+                ,["m34",3],["m35",3],["m36",3],["m40",3],["m41",3],["m42",3],["m43",3]
+                ,["m27",2],["m28",2],["m29",2]
                 ,["m52",1]]
         },
         t38:{
@@ -895,10 +909,10 @@ module.exports= {
             npc:[],
             mapX: 100,
             mapY: 100,
-            refresh: [["m16",10],["m17",10],["m18",10],["m8",10]
-                ,["m34",2],["m35",2],["m36",2],["m40",2],["m41",2],["m42",2],["m43",2]
-                ,["m27",1],["m28",1],["m29",1]
-                ,["m52",1]]
+            refresh: [["m16",12],["m17",12],["m18",12],["m8",12]
+                ,["m34",3],["m35",3],["m36",3],["m40",3],["m41",3],["m42",3],["m43",3]
+                ,["m27",2],["m28",2],["m29",2]
+                ,["m52",2]]
         },
     },
 
@@ -953,12 +967,12 @@ module.exports= {
         t47:{id:'t47',name:'冰霜通道(9-10)',mapId:'t36',x:26,y:25},
         t48:{id:'t48',name:'铁血之境(11-12)',mapId:'t37',x:26,y:25},
         t49:{id:'t49',name:'傲天逆境(13-?)',mapId:'t38',x:26,y:25},
-        t1000:{id:'t1000',name:'四级以下回收',levels:[1,2,3,4]},
-        t1001:{id:'t1001',name:'五级回收',levels:[5]},
-        t1002:{id:'t1002',name:'六级回收',levels:[6]},
-        t1003:{id:'t1003',name:'七级回收',levels:[7]},
-        t1004:{id:'t1004',name:'八级回收',levels:[8]},
-        t1005:{id:'t1005',name:'九级回收',levels:[9]},
+        t1000:{id:'t1000',name:'5级以下回收',levels:[1,2,3,4,5]},
+        t1001:{id:'t1001',name:'6级回收',levels:[6]},
+        t1002:{id:'t1002',name:'7级回收',levels:[7]},
+        t1003:{id:'t1003',name:'8级回收',levels:[8]},
+        t1004:{id:'t1004',name:'9级回收',levels:[9]},
+        t1005:{id:'t1005',name:'10级回收',levels:[10]},
         t2000:{id:'t2000',name:'退出门派'},
         t2001:{id:'t2001',name:'青龙堂'},
         t2002:{id:'t2002',name:'白虎堂'},
@@ -994,7 +1008,7 @@ module.exports= {
     _roleMst: {
         m0:{id:"m0",name:"战",hp:19,hpAdd:[15,28,31,34,35],defense:0,defenseAdd:0.3,hurt:3,hurtAdd:0.45,expDead:0,heal:5,healAdd:1.5,
             moveSpeed:0.4,attackSpeed:0.8,checkDistance:5,visibleDistance:8,attackDistance:0,lv:1},
-        m1:{id:"m1",name:"法",hp:16,hpAdd:[4,7,8,9,9],defense:0,defenseAdd:0.4,hurt:2,hurtAdd:0.5,expDead:0,heal:5,healAdd:2.2,
+        m1:{id:"m1",name:"法",hp:16,hpAdd:[4,7,8,9,9],defense:0,defenseAdd:0.4,hurt:2,hurtAdd:0.5,expDead:0,heal:5,healAdd:2,
             moveSpeed:0.4,attackSpeed:1.2,checkDistance:5,visibleDistance:8,attackDistance:5,lv:1},
         m2:{id:"m2",name:"道",hp:17,hpAdd:[8,17,17,16,20],defense:0,defenseAdd:0.2,hurt:5,hurtAdd:0.45,expDead:0,heal:10,healAdd:2.2,
             moveSpeed:0.4,attackSpeed:1.2,checkDistance:5,visibleDistance:8,attackDistance:5,lv:1},
@@ -1135,6 +1149,7 @@ module.exports= {
         i001021 : {id:'i001021',name:'倚天金剑',type:0,hurt:70,exclusive:[4,5],model:'ani/hum88/088',level:9},
 
         i001030 : {id:'i001030',name:'天龙之刃',type:0,hurt:80,exclusive:[0,1,2,3,4,5],model:'ani/hum112/112',level:10},
+        i001031 : {id:'i001031',name:'主宰神剑',type:0,hurt:100,exclusive:[0,1,2,3,4,5],model:'ani/hum229/229',level:11},
 
         i001100 : {id:'i001100',name:'道士头盔',type:1,defense:4,exclusive:[0,1,2,3,4,5],model:'',level:1},
         i001101 : {id:'i001101',name:'圣战头盔',type:1,hurt:1,defense:5,exclusive:[0,1],model:'',level:3},
@@ -1157,6 +1172,7 @@ module.exports= {
         i001118 : {id:'i001118',name:'神龙盔',type:1,hurt:7,defense:11,exclusive:[4,5],model:'',level:9},
         i001130 : {id:'i001130',name:'天龙头盔',type:1,hurt:8,defense:12,exclusive:[0,1,2,3,4,5],model:'',level:10},
         i001131 : {id:'i001131',name:'主宰头盔',type:1,hurt:9,defense:13,exclusive:[0,1,2,3,4,5],model:'',level:11},
+        i001132 : {id:'i001132',name:'皓月头盔',type:1,hurt:10,defense:14,exclusive:[0,1,2,3,4,5],model:'',level:12},
 
         i001200 : {id:'i001200',name:'布衣(男)',type:2,defense:1,exclusive:[0,2,4],model:'ani/hum2/002',level:1},
         i001201 : {id:'i001201',name:'布衣(女)',type:2,defense:1,exclusive:[1,3,5],model:'ani/hum3/003',level:1},
@@ -1182,6 +1198,9 @@ module.exports= {
         i001221 : {id:'i001221',name:'金龙圣甲(女)',type:2,hurt:10,defense:20,exclusive:[1,3,5],model:'ani/hum51/051',level:9},
         i001230 : {id:'i001230',name:'天龙战甲(男)',type:2,hurt:13,defense:24,exclusive:[0,2,4],model:'ani/hum113/113',level:10},
         i001231 : {id:'i001231',name:'天龙战甲(女)',type:2,hurt:13,defense:24,exclusive:[1,3,5],model:'ani/hum114/114',level:10},
+        i001232 : {id:'i001232',name:'主宰神甲(男)',type:2,hurt:15,defense:30,exclusive:[0,2,4],model:'ani/hum227/227',level:11},
+        i001233 : {id:'i001233',name:'主宰神甲(女)',type:2,hurt:15,defense:30,exclusive:[1,3,5],model:'ani/hum228/228',level:11},
+
 
         i001300 : {id:'i001300',name:'蓝色翡翠项链',type:3,hurt:3,exclusive:[0,1,2,3,4,5],model:'',level:1},
         i001301 : {id:'i001301',name:'绿色项链',type:3,hurt:6,exclusive:[0,1],model:'',level:2},
@@ -1208,6 +1227,7 @@ module.exports= {
         i001322 : {id:'i001322',name:'神龙项链',type:3,hurt:27,exclusive:[4,5],model:'',level:9},
         i001330 : {id:'i001330',name:'天龙项链',type:3,hurt:30,exclusive:[0,1,2,3,4,5],model:'',level:10},
         i001331 : {id:'i001331',name:'主宰项链',type:3,hurt:33,exclusive:[0,1,2,3,4,5],model:'',level:11},
+        i001332 : {id:'i001332',name:'皓月项链',type:3,hurt:38,exclusive:[0,1,2,3,4,5],model:'',level:12},
 
         i001400 : {id:'i001400',name:'金手镯',type:4,hurt:2,exclusive:[0,1,2,3,4,5],model:'',level:1},
         i001401 : {id:'i001401',name:'骑士手镯',type:4,hurt:4,exclusive:[0,1],model:'',level:2},
@@ -1234,6 +1254,7 @@ module.exports= {
         i001422 : {id:'i001422',name:'神龙手镯',type:4,hurt:18,exclusive:[4,5],model:'',level:9},
         i001430 : {id:'i001430',name:'天龙手镯',type:4,hurt:20,exclusive:[0,1,2,3,4,5],model:'',level:10},
         i001431 : {id:'i001431',name:'主宰手镯',type:4,hurt:22,exclusive:[0,1,2,3,4,5],model:'',level:11},
+        i001432 : {id:'i001432',name:'皓月手镯',type:4,hurt:25,exclusive:[0,1,2,3,4,5],model:'',level:12},
 
         i001500 : {id:'i001500',name:'降魔除妖戒指',type:5,hurt:2,exclusive:[0,1,2,3,4,5],model:'',level:1},
         i001501 : {id:'i001501',name:'力量戒指',type:5,hurt:4,exclusive:[0,1],model:'',level:2},
@@ -1260,27 +1281,38 @@ module.exports= {
         i001522 : {id:'i001522',name:'神龙戒指',type:5,hurt:18,exclusive:[4,5],model:'',level:9},
         i001530 : {id:'i001530',name:'天龙戒指',type:5,hurt:20,exclusive:[0,1,2,3,4,5],model:'',level:10},
         i001531 : {id:'i001531',name:'主宰戒指',type:5,hurt:22,exclusive:[0,1,2,3,4,5],model:'',level:11},
+        i001532 : {id:'i001532',name:'皓月戒指',type:5,hurt:25,exclusive:[0,1,2,3,4,5],model:'',level:12},
 
-        i001700 : {id:'i001700',name:'赤月腰带',type:7,hurt:1,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:3},
-        i001701 : {id:'i001701',name:'黄金腰带',type:7,hurt:2,defense:4,exclusive:[0,1,2,3,4,5],model:'',level:6},
-        i001702 : {id:'i001702',name:'金龙腰带',type:7,hurt:3,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:9},
+        i001700 : {id:'i001700',name:'狮蛮腰带',type:7,hurt:1,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:7},
+        i001701 : {id:'i001701',name:'狼牙腰带',type:7,hurt:2,defense:4,exclusive:[0,1,2,3,4,5],model:'',level:8},
+        i001702 : {id:'i001702',name:'七星腰带',type:7,hurt:3,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:9},
         i001730 : {id:'i001730',name:'天龙腰带',type:7,hurt:4,defense:8,exclusive:[0,1,2,3,4,5],model:'',level:10},
         i001731 : {id:'i001731',name:'主宰腰带',type:7,hurt:5,defense:10,exclusive:[0,1,2,3,4,5],model:'',level:11},
-        i001800 : {id:'i001800',name:'赤月靴',type:8,hurt:1,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:3},
-        i001801 : {id:'i001801',name:'黄金靴',type:8,hurt:2,defense:4,exclusive:[0,1,2,3,4,5],model:'',level:6},
-        i001802 : {id:'i001802',name:'金龙靴',type:8,hurt:3,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:9},
+        i001732 : {id:'i001732',name:'皓月腰带',type:7,hurt:6,defense:13,exclusive:[0,1,2,3,4,5],model:'',level:12},
+        i001800 : {id:'i001800',name:'狮蛮靴',type:8,hurt:1,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:7},
+        i001801 : {id:'i001801',name:'狼牙靴',type:8,hurt:2,defense:4,exclusive:[0,1,2,3,4,5],model:'',level:8},
+        i001802 : {id:'i001802',name:'七星靴',type:8,hurt:3,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:9},
         i001830 : {id:'i001830',name:'天龙靴',type:8,hurt:4,defense:8,exclusive:[0,1,2,3,4,5],model:'',level:10},
         i001831 : {id:'i001831',name:'主宰靴',type:8,hurt:5,defense:10,exclusive:[0,1,2,3,4,5],model:'',level:11},
-        i001900 : {id:'i001900',name:'赤月宝石',type:9,hurt:2,defense:1,exclusive:[0,1,2,3,4,5],model:'',level:3},
-        i001901 : {id:'i001901',name:'黄金宝石',type:9,hurt:4,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:6},
-        i001902 : {id:'i001902',name:'金龙宝石',type:9,hurt:6,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:9},
+        i001832 : {id:'i001832',name:'皓月靴',type:8,hurt:6,defense:13,exclusive:[0,1,2,3,4,5],model:'',level:12},
+        i001900 : {id:'i001900',name:'狮蛮宝石',type:9,hurt:2,defense:1,exclusive:[0,1,2,3,4,5],model:'',level:7},
+        i001901 : {id:'i001901',name:'狼牙宝石',type:9,hurt:4,defense:2,exclusive:[0,1,2,3,4,5],model:'',level:8},
+        i001902 : {id:'i001902',name:'七星宝石',type:9,hurt:6,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:9},
         i001930 : {id:'i001930',name:'天龙宝石',type:9,hurt:8,defense:4,exclusive:[0,1,2,3,4,5],model:'',level:10},
-        i002000 : {id:'i002000',name:'释迦摩尼盾',type:10,hurt:1,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:3},
-        i002001 : {id:'i002001',name:'唯我独尊盾',type:10,hurt:2,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:6},
+        i001931 : {id:'i001931',name:'主宰宝石',type:9,hurt:10,defense:5,exclusive:[0,1,2,3,4,5],model:'',level:11},
+        i001932 : {id:'i001932',name:'皓月宝石',type:9,hurt:13,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:12},
+        i002000 : {id:'i002000',name:'释迦摩尼盾',type:10,hurt:1,defense:3,exclusive:[0,1,2,3,4,5],model:'',level:7},
+        i002001 : {id:'i002001',name:'唯我独尊盾',type:10,hurt:2,defense:6,exclusive:[0,1,2,3,4,5],model:'',level:8},
         i002002 : {id:'i002002',name:'毁天灭地盾',type:10,hurt:3,defense:9,exclusive:[0,1,2,3,4,5],model:'',level:9},
-        i002100 : {id:'i002100',name:'赤月勋章',type:11,hurt:3,exclusive:[0,1,2,3,4,5],model:'',level:3},
-        i002101 : {id:'i002101',name:'黄金勋章',type:11,hurt:6,exclusive:[0,1,2,3,4,5],model:'',level:6},
-        i002102 : {id:'i002102',name:'金龙勋章',type:11,hurt:9,exclusive:[0,1,2,3,4,5],model:'',level:9},
-        i002130 : {id:'i002130',name:'天龙勋章',type:11,hurt:12,exclusive:[0,1,2,3,4,5],model:'',level:10},
+        i002003 : {id:'i002003',name:'天龙神盾',type:10,hurt:5,defense:10,exclusive:[0,1,2,3,4,5],model:'',level:10},
+        i002004 : {id:'i002004',name:'主宰神盾',type:10,hurt:7,defense:12,exclusive:[0,1,2,3,4,5],model:'',level:11},
+        i002005 : {id:'i002005',name:'皓月神盾',type:10,hurt:10,defense:15,exclusive:[0,1,2,3,4,5],model:'',level:12},
+        i002100 : {id:'i002100',name:'狮蛮章',type:11,hurt:3,exclusive:[0,1,2,3,4,5],model:'',level:7},
+        i002101 : {id:'i002101',name:'狼牙章',type:11,hurt:6,exclusive:[0,1,2,3,4,5],model:'',level:8},
+        i002102 : {id:'i002102',name:'七星章',type:11,hurt:9,exclusive:[0,1,2,3,4,5],model:'',level:9},
+        i002130 : {id:'i002130',name:'天龙章',type:11,hurt:12,exclusive:[0,1,2,3,4,5],model:'',level:10},
+        i002131 : {id:'i002131',name:'主宰章',type:11,hurt:17,exclusive:[0,1,2,3,4,5],model:'',level:11},
+        i002132 : {id:'i002132',name:'皓月章',type:11,hurt:21,exclusive:[0,1,2,3,4,5],model:'',level:12},
+
     },
 };

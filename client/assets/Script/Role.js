@@ -14,7 +14,6 @@ cc.Class({
     //初始化角色
     init: function (data) {
         this._data=data;
-        this.resetAllProp();
         this._equipArray = [null,null,null,null,null,null,null,null,null,null,null,null,null];//装备序列
         for(var key in ag.userInfo._itemMap){
             var data = ag.userInfo._itemMap[key]._data;
@@ -24,6 +23,7 @@ cc.Class({
                 }
             }
         }
+        this.resetAllProp();
 
 
         this._rightPos = cc.p(-1,-1);//理论上的准确位置
@@ -36,7 +36,6 @@ cc.Class({
         this._aniColor = cc.color(255,255,255);
         this.setLocation(this.getLocation());
         this.idle();
-        this.changeHP(this._data.hp);
 
 
 
@@ -165,12 +164,17 @@ cc.Class({
     resetAllProp:function(){
         var mst = this.getMst();
         if(mst){
+            var lastTotalHP = this._totalHP;
             var lv = this._data.level;
             this._totalHP = this.getTotalHPFromDataBase();
             this._totalExp = this.getTotalExpFromDataBase();
             this._heal = mst.heal+Math.floor(mst.healAdd*lv);
             this._attackSpeed = mst.attackSpeed;
             this._moveSpeed = mst.moveSpeed;
+
+            if(lastTotalHP!=this._totalHP){
+                this.changeHP(this._data.hp);
+            }
         }
     },
 
@@ -190,6 +194,13 @@ cc.Class({
                     hpex+=ag.gameConst.comeHPTaoist[come];
                 }
             }
+
+            //加上套装属性
+            var equipLv = this.getEquipLv();
+            var tempArray = ag.gameConst.equipHPWarrior;
+            if(this._data.type=='m1')tempArray = ag.gameConst.equipHPWizard;
+            else if(this._data.type=='m2')tempArray = ag.gameConst.equipHPTaoist;
+            hpex+=tempArray[equipLv];
 
             if(lv>51)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*4+mst.hpAdd[4]*(lv-51))+hpex;
             if(lv>47)return Math.floor(mst.hp+mst.hpAdd[0]*35+mst.hpAdd[1]*8+mst.hpAdd[2]*4+mst.hpAdd[3]*(lv-47))+hpex;
@@ -222,8 +233,7 @@ cc.Class({
         this._data.exp = exp;
 
         if(last != this._data.level){
-            this.resetAllProp();
-            this._data.hp = 1;//确保可以进入改血量
+            ag.gameLayer.addDirty(this._data.id);
 
             if(last < this._data.level){
                 if(this==ag.gameLayer._player) {
@@ -542,6 +552,7 @@ cc.Class({
                     var array = AGAniOffset[513000].split(',');
                     this._mofadunSrite.node.setPosition(parseInt(array[0]),parseInt(array[1]));
                     this.node.addChild(this._mofadunSrite.node,ag.gameConst.roleEffectZorder);
+                    this._mofadunSrite.node.scale = 0.8;
                 }
             }
             this.setAniColor(this._aniColor);
@@ -552,6 +563,7 @@ cc.Class({
     //无事可以做状态，可以重复进入
     idle:function(){
         if(this._state != ag.gameConst.stateIdle && this._state != ag.gameConst.stateDead){
+            this.node.stopAllActions();
             this.setLocation(this.getLocation());
             if(this.getIsPlayer() && this._state == ag.gameConst.stateAttack){
                 if(this._agAni)this._agAni.pause();
@@ -583,6 +595,7 @@ cc.Class({
 
 
         if(this._nearFlag){
+            this.node.stopAllActions();
             this.node.setPosition(this.getTruePosition(lastLocation));
             var moveSpeed = (this.getIsMonster() || this.getIsTiger()) ? 0.8:this._moveSpeed;//怪物始终是一个播放速度，走完后等待
             this.node.stopAllActions();
@@ -658,6 +671,7 @@ cc.Class({
         this._data.direction = ag.gameLayer.getDirection(this.getLocation(),locked.getLocation());
         //攻击动画
         if(this._nearFlag){
+            this.node.stopAllActions();
             this.setLocation(this.getLocation());
             if(this.getIsMonster() || this.getIsTiger()){
                 var str = 'nudeboy0'+ag.gameConst.stateAttack+this._data.direction;
@@ -722,59 +736,69 @@ cc.Class({
 
     //攻击特效
     attackEffect: function (locked) {
-        var id = this._data.id;
+        var id = this._data.id;//dddddddddd
+
+
+
         if(this._data.type=="m0"){
             if(ag.buffManager.getCDForFireCrit(this)==false){
                 if(Math.random()>0.5){
                     this.getAgAni(null,"ani/effect2/"+(502000+this._data.direction*5),5,ag.gameConst.roleEffectZorder,0.1,function(sender){
-                        ag.gameLayer.getRole(id).putAgAni(sender);
-                    });
+                        var role = ag.gameLayer.getRole(this.id);
+                        if(role)role.putAgAni(sender);
+                    }.bind({id:this._data.id}));
                 }else{
                     this.getAgAni(null,"ani/effect3/"+(503000+this._data.direction*8),8,ag.gameConst.roleEffectZorder,0.1,function(sender){
-                        ag.gameLayer.getRole(id).putAgAni(sender);
-                    });
+                        var role = ag.gameLayer.getRole(this.id);
+                        if(role)role.putAgAni(sender);
+                    }.bind({id:this._data.id}));
                 }
                 ag.buffManager.setCDForFireCrit(this,true);
                 if(this._agAni)ag.musicManager.playEffect("resources/voice/liehuo.mp3");
             }else{
                 this.getAgAni(null,"ani/effect0/"+(500000+this._data.direction*6),6,ag.gameConst.roleEffectZorder,0.1,function(sender){
-                    ag.gameLayer.getRole(id).putAgAni(sender);
-                });
+                    var role = ag.gameLayer.getRole(this.id);
+                    if(role)role.putAgAni(sender);
+                }.bind({id:this._data.id}));
                 if(this._agAni)ag.musicManager.playEffect(Math.random()>0.5?"resources/voice/cisha0.mp3":"resources/voice/cisha1.mp3");
             }
         }else if(this._data.type=="m1"){
-            var pos = locked.getTruePosition();
-            if(Math.random()>0.5){
-                this.getAgAni(null,"ani/effect4/504000",6,ag.gameConst.roleEffectUnderZorder,0.05,function(sender){
-                    ag.gameLayer.getRole(id).putAgAni(sender);
-                    var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect4/504006",13,9999999,0.05);
-                    node.setPosition(pos);
-                });
-            }else{
-                this.getAgAni(null,"ani/effect4/505000",10,ag.gameConst.roleEffectUnderZorder,0.05,function(sender){
-                    ag.gameLayer.getRole(id).putAgAni(sender);
-                    var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect4/505010",13,9999999,0.05);
-                    node.setPosition(pos);
-                    node.scale = 0.8;
-                });
-            }
+            this.getAgAni(null,"ani/effect4/504000",12,ag.gameConst.roleEffectUnderZorder,0.03,function(sender){
+                var role = ag.gameLayer.getRole(this.id);
+                if(role){
+                    role.putAgAni(sender);
+                    if(!role.magicEffectIndex)role.magicEffectIndex = 0;
+                    if(role.magicEffectIndex<=5){
+                        var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect4/505000",5,9999999,0.1);
+                        node.setPosition(this.pos);
+                    }else{
+                        var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect4/504012",9,9999999,0.08);
+                        node.setPosition(this.pos);
+                    }
+                    ++role.magicEffectIndex;
+                    if(role.magicEffectIndex>6)role.magicEffectIndex = 0;
+                }
+            }.bind({id:this._data.id,pos:locked.getTruePosition()}));
             if(this._agAni)ag.musicManager.playEffect("resources/voice/mietianhuo.mp3");
         }else if(this._data.type=="m2"){
             var pos1 = cc.pAdd(this.node.getPosition(),cc.p(0,60));
             var pos2 = cc.pAdd(locked.node.getPosition(),cc.p(0,60));
             this.getAgAni(null,"ani/effect8/509000",6,ag.gameConst.roleEffectZorder,0.05,function(sender){
-                ag.gameLayer.getRole(id).putAgAni(sender);
-                var sprite = ag.spriteCache.get(Math.random()>0.5?'ani/effect8/508000':'ani/effect8/509015');
-                sprite.node.setPosition(pos1);
-                var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(pos2,pos1))));
-                sprite.node.setRotation( 90-rotation);
-                ag.gameLayer._map.node.addChild(sprite.node,999999);
-                sprite.node.runAction(cc.sequence(cc.moveTo(cc.pDistance(pos1,pos2)/2000,pos2),cc.callFunc(function () {
-                    ag.spriteCache.put(sprite);
-                    var node = ag.jsUtil.getEffect(ag.gameLayer._map.node,"ani/effect8/509006",9,9999999,0.05);
-                    node.setPosition(pos2.x,pos2.y-60);
-                })));
-            });
+                var role = ag.gameLayer.getRole(this.id);
+                if(role) {
+                    role.putAgAni(sender);
+                    var sprite = ag.spriteCache.get(Math.random() > 0.5 ? 'ani/effect8/508000' : 'ani/effect8/509015');
+                    sprite.node.setPosition(this.pos1);
+                    var rotation = Math.round(cc.radiansToDegrees(cc.pToAngle(cc.pSub(this.pos2, this.pos1))));
+                    sprite.node.setRotation(90 - rotation);
+                    ag.gameLayer._map.node.addChild(sprite.node, 999999);
+                    sprite.node.runAction(cc.sequence(cc.moveTo(cc.pDistance(this.pos1, this.pos2) / 2000, this.pos2), cc.callFunc(function () {
+                        ag.spriteCache.put(sprite);
+                        var node = ag.jsUtil.getEffect(ag.gameLayer._map.node, "ani/effect8/509006", 9, 9999999, 0.05);
+                        node.setPosition(this.pos2.x, this.pos2.y - 60);
+                    }.bind(this))));
+                }
+            }.bind({id:this._data.id,pos1:cc.pAdd(this.node.getPosition(),cc.p(0,60)),pos2:cc.pAdd(locked.node.getPosition(),cc.p(0,60))}));
 
             ag.buffManager.setPoison(locked,this);//道士启用毒
             if(this._agAni)ag.musicManager.playEffect("resources/voice/huofu.mp3");
@@ -807,47 +831,18 @@ cc.Class({
 
 
     //飘雪动画
-    flyAnimation:function(){
-        if(!this._flyBloodFlag && this._propNode){
-            var hpStr = null;
-            var i=0;
-            for(i=0;i<ag.gameLayer._flyBloodArray.length;++i){
-                if(this._data.id==ag.gameLayer._flyBloodArray[i].id){
-                    hpStr = ag.gameLayer._flyBloodArray[i].hp;
-                    ag.gameLayer._flyBloodArray.splice(i,1);
-                    break;
-                }
-            }
-            if(hpStr){
-                this._flyBloodFlag = true;
-                var node = cc.instantiate(hpStr[0]=='+'?ag.gameLayer._labelNumAddClone:ag.gameLayer._labelNumMinuteClone);
-                var tips = node.getComponent(cc.Label);
-                node.x = 0;
-                node.y = 105;
-                tips.string = ':'+hpStr.substr(1);
-                tips.fontSize = 28;
-                this._propNode.addChild(node,30);
-                node.runAction(cc.sequence(cc.moveBy(0.5, cc.p(0,45)), cc.fadeOut(0.2),cc.callFunc(function(){
-                    node.destroy();
-                })));
-
-                var id = this._data.id;
-                ag.gameLayer.node.runAction(cc.sequence(cc.delayTime(0.2),cc.callFunc(function(){
-                    var role = ag.gameLayer.getRole(id);
-                    if(role){
-                        role._flyBloodFlag = false;
-                        role.flyAnimation();
-                    }else{
-                        for(i=ag.gameLayer._flyBloodArray.length-1;i>=0;--i){
-                            if(id==ag.gameLayer._flyBloodArray[i].id){
-                                ag.gameLayer._flyBloodArray.splice(i,1);
-                            }
-                        }
-                    }
-                })));
-            }else{
-                this._flyBloodFlag = false;
-            }
+    flyAnimation:function(hpStr){
+        if(this._propNode){
+            var node = cc.instantiate(hpStr[0]=='+'?ag.gameLayer._labelNumAddClone:ag.gameLayer._labelNumMinuteClone);
+            var tips = node.getComponent(cc.Label);
+            node.x = 0;
+            node.y = 105;
+            tips.string = ':'+hpStr.substr(1);
+            tips.fontSize = 28;
+            this._propNode.addChild(node,30);
+            node.runAction(cc.sequence(cc.moveBy(0.5, cc.p(0,45)), cc.fadeOut(0.2),cc.callFunc(function(){
+                node.destroy();
+            })));
         }
     },
 
@@ -857,12 +852,11 @@ cc.Class({
         var bVoice = this._data.hp > 0;
         if(this._data.camp==ag.gameConst.campNpc){
 
-        }else if(hp!=this._data.hp){
+        }else if(hp!=this._data.hp || hp==this._totalHP){
             if(this._nearFlag){
-                if(ag.gameLayer._flyBloodArray.length<4){
+                if(ag.gameLayer._flyBloodArray.length<10 && hp!=this._data.hp){
                     ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp)))});
                 }
-                this.flyAnimation();
                 if(hp<this._data.hp){
                     this.nameDisapper();
                 }
@@ -1154,6 +1148,10 @@ cc.Class({
         if(come>0){
             hurt+=ag.gameConst.comeHurt[come];
         }
+
+        //加上套装属性
+        var equipLv = this.getEquipLv();
+        hurt+=ag.gameConst.equipHurt[equipLv];
         return hurt;
     },
 
@@ -1182,7 +1180,28 @@ cc.Class({
         if(come>0){
             defense+=ag.gameConst.comeDefense[come];
         }
+
+        //加上套装属性
+        var equipLv = this.getEquipLv();
+        defense+=ag.gameConst.equipDefense[equipLv];
         return defense;
+    },
+
+
+    //获得套装属性
+    getEquipLv:function(){
+        var array = [];
+        for(var key in ag.userInfo._itemMap){
+            var obj = ag.userInfo._itemMap[key]._data;
+            if(obj.owner==this._data.id && obj.puton>=0){
+                array.push(ag.gameConst._itemMst[obj.mid].level);
+            }
+        }
+        var lv = 0;
+        if(array.length==13){
+            lv = Math.min(array[0],array[1],array[2],array[3],array[4],array[5],array[6],array[7],array[8],array[9],array[10],array[11],array[12]);
+        }
+        return lv;
     },
 
     // called every frame

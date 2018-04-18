@@ -158,6 +158,7 @@ cc.Class({
             var puton = ag.userInfo._itemMap[id]._data.puton;
             ag.userInfo._itemMap[id]._data.puton = ag.gameConst.putonBag;
             ag.gameLayer.itemEquipToBag(id,puton);
+            ag.gameLayer.addDirty(ag.gameLayer._player._data.id);
         }else if(label.string=='穿戴'){
             var id = this._obj._data.id;
             var mst = ag.gameConst._itemMst[this._obj._data.mid];
@@ -174,6 +175,7 @@ cc.Class({
                     ag.userInfo._itemMap[id]._data.puton = index;
                     ag.gameLayer.itemBagToEquip(id);
                     if(tempId)ag.gameLayer.addItemToBag(tempId);
+                    ag.gameLayer.addDirty(ag.gameLayer._player._data.id);
                 }else{
                     var tempArray = ['男战','女战','男法','女法','男道','女道'];
                     var str = '此装备限于：';

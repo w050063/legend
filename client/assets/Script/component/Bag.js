@@ -51,6 +51,14 @@ cc.Class({
             node.getChildByName('labelTotalExp').getComponent(cc.Label).string = '总经验：'+role._totalExp;
             node.getChildByName('labelHurt').getComponent(cc.Label).string = '攻击：'+role.getHurt();
             node.getChildByName('labelDefense').getComponent(cc.Label).string = '防御：'+role.getDefense();
+
+            var equipLv = role.getEquipLv();
+            var tempArray = ag.gameConst.equipHPWarrior;
+            if(role._data.type=='m1')tempArray = ag.gameConst.equipHPWizard;
+            else if(role._data.type=='m2')tempArray = ag.gameConst.equipHPTaoist;
+            node.getChildByName('labelEquipLv').getComponent(cc.Label).string = '全身装备到达:'+equipLv+'级';
+            node.getChildByName('labelEquipValue').getComponent(cc.Label).string = '攻击+'+ag.gameConst.equipHurt[equipLv]
+                +' 防御+'+ag.gameConst.equipDefense[equipLv]+' HP+'+tempArray[equipLv];
         }else if(index==2){
             node.getChildByName('labelCome').getComponent(cc.Label).string = '转生：'+role._data.come;
             node.getChildByName('labelPractice').getComponent(cc.Label).string = '修为：'+role._data.practice+'/'+ag.gameConst.comeArray[role._data.come];

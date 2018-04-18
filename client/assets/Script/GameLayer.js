@@ -48,7 +48,7 @@ cc.Class({
         this._deal = cc.find('Canvas/nodeDeal').getComponent(Deal);
         this._bag = cc.find('Canvas/nodeBag').getComponent(Bag);
         this._bag.init();
-        var i=0;
+        var i,key;
 
 
 
@@ -102,6 +102,8 @@ cc.Class({
 
 
         this._flyBloodArray = [];//飘血数组
+        this._flyBloodFlagArray = {};//飘血数组
+        this._dirtyRoleArray = {};//脏数据数组
         this._labelNumAddClone = cc.find('Canvas/clone/labelNumAddClone');
         this._labelNumMinuteClone = cc.find('Canvas/clone/labelNumMinuteClone');
         this._nodeRolePropClone = cc.find('Canvas/clone/nodeRolePropClone');
@@ -228,12 +230,50 @@ cc.Class({
         this.schedule(function(){
             ag.agSocket.send("verifyTime",Math.floor((new Date().getTime()-ag.userInfo._startGameTime)/1000));
         },10);
+
+        this.schedule(function(){
+            //处理脏数据
+            for(key in this._dirtyRoleArray) {
+                var role = this.getRole(key);
+                if(role){
+                    role.resetAllProp();
+                }
+                delete this._dirtyRoleArray[key];
+            }
+
+
+            //清理无效的飘雪数据
+            for(i=0;i<this._flyBloodArray.length;){
+                var id = this._flyBloodArray[i].id;
+                var role = this.getRole(id);
+                if(role){
+                    if(!this._flyBloodFlagArray[id]){
+                        role.flyAnimation(this._flyBloodArray[i].hp);
+                        this._flyBloodFlagArray[id] = true;
+                        this.node.runAction(cc.sequence(cc.delayTime(0.2),cc.callFunc(function(sender,value){
+                            delete this._flyBloodFlagArray[value];
+                        }.bind(this),this.node,id)));
+                        this._flyBloodArray.splice(i,1);
+                    }else{
+                        ++i;
+                    }
+                }else{
+                    this._flyBloodArray.splice(i,1);
+                }
+            }
+        }.bind(this),0.01);
         this.schedule(ag.spriteCache.update001.bind(ag.spriteCache),0.01);
+    },
+
+
+    addDirty:function(id){
+        this._dirtyRoleArray[id] = true;
     },
 
 
     //换地图
     changeMap:function(transferId){
+
         var lastMap = this._player._data.mapId;
         var nowMap = null;
         if(transferId){
@@ -306,6 +346,8 @@ cc.Class({
         }else{
             this._player.setLocation(ag.userInfo._data);
         }
+        this._player._ai._busy = false;
+        this._player.idle();
     },
 
 
@@ -404,6 +446,7 @@ cc.Class({
                 if(role){
                     if(data.puton>=0){
                         role.addEquip(data.id);
+                        this.addDirty(role._data.id);
                     }else if(data.puton==ag.gameConst.putonBag){
                         if(role==this._player)this.addItemToBag(data.id);
                     }
@@ -423,6 +466,7 @@ cc.Class({
                     if(data.puton>=0){
                         role.addEquip(data.id);
                         if(role==this._player)this.itemToEquip(data.id);
+                        this.addDirty(role._data.id);
                     }else if(data.puton==ag.gameConst.putonBag){
                         if(role==this._player)this.addItemToBag(data.id);
                     }else if(data.puton==ag.gameConst.putonWharehouse){
@@ -443,6 +487,7 @@ cc.Class({
             var obj = ag.userInfo._itemMap[data.id];
             if(obj && obj._data.owner && obj._data.puton>=0) {
                 this.itemEquipToGround(obj._data.id,obj._data.puton,this.getRole(obj._data.owner));
+                this.addDirty(this._player._data.id);
             }
 
 
@@ -501,6 +546,7 @@ cc.Class({
         obj._data.puton = ag.gameConst.putonBag;
         if(obj && role){
             role.delEquip(id);
+            this.addDirty(role._data.id);
         }
     },
 
@@ -793,13 +839,20 @@ cc.Class({
             this._wharehouseArray[index] = {id:id,node:node};
 
 
+
             node.off(cc.Node.EventType.TOUCH_END);
             node.on(cc.Node.EventType.TOUCH_END, function (event) {
                 ag.musicManager.playEffect("resources/voice/button.mp3");
-                cc.find('Canvas/nodeItemInfo').active = true;
-                if(cc.find('Canvas/nodeWharehouse').active){
+                if(this._auctionShop.node.active){
+                    this._auctionShop.selectItem(id);
+                }else if(cc.find('Canvas/nodeWharehouse').active){
+                    cc.find('Canvas/nodeItemInfo').active = true;
                     cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemIdByWharehouse(id);
+                }else if(cc.find('Canvas/nodeDeal').active){
+                    cc.find('Canvas/nodeItemInfo').active = true;
+                    cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemIdByDeal(id);
                 }else{
+                    cc.find('Canvas/nodeItemInfo').active = true;
                     cc.find('Canvas/nodeItemInfo').getComponent('ItemInfoNode').setItemId(id);
                 }
             }.bind(this));
@@ -1383,7 +1436,7 @@ cc.Class({
                             },function () {});
                         }else if(transferMst.id=='t4007'){
                             self._guildMember.show();
-                        }else if(npcStr=='四级以下回收' || npcStr=='五级回收' || npcStr=='六级回收' || npcStr=='七级回收' || npcStr=='八级回收' || npcStr=='九级回收'){
+                        }else if(npcStr=='5级以下回收' || npcStr=='6级回收' || npcStr=='7级回收' || npcStr=='8级回收' || npcStr=='9级回收' || npcStr=='10级回收'){
                             var curLevels = transferMst.levels;
                             var array = [];
                             for(var key in ag.userInfo._itemMap){
@@ -1728,6 +1781,7 @@ cc.Class({
                 }
             }
         }
+        this.addDirty(this._player._data.id);
     },
 
 
