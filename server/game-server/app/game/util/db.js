@@ -176,8 +176,8 @@ module.exports = ag.class.extend({
 
 
         //防止出问题，存不上
-        ag.actionManager.runAction(this,300,function(){
-            ag.actionManager.schedule(this,300,function (dt) {
+        ag.actionManager.runAction(this,600,function(){
+            ag.actionManager.schedule(this,60,function (dt) {
                 this._bDoing = false;
             }.bind(this));
         }.bind(this));

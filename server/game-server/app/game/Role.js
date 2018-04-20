@@ -290,22 +290,26 @@ module.exports = ag.class.extend({
                     this.sendRoleForCheckBack(this._data.id,temp);
                 }
             }
-        }
 
 
-        //通知其他人。
-        var array = ag.gameLayer._roleZoneMap[this._data.mapId];
-        for(var i=0;i<array.length;++i){
-            var role = ag.gameLayer._roleMap[array[i]];
-            if(role.getIsPlayer() && role._data.id!=this._data.id){
-                var temp = JSON.parse(JSON.stringify(this._data));
-                this.sendRoleForCheckBack(role._data.id,temp);
-                if(this._tiger){
-                    temp = JSON.parse(JSON.stringify(this._tiger._data));
+            //通知其他人。
+            var array = ag.gameLayer._roleZoneMap[this._data.mapId];
+            for(var i=0;i<array.length;++i){
+                var role = ag.gameLayer._roleMap[array[i]];
+                if(role.getIsPlayer() && role._data.id!=this._data.id){
+                    var temp = JSON.parse(JSON.stringify(this._data));
                     this.sendRoleForCheckBack(role._data.id,temp);
+                    if(this._tiger){
+                        temp = JSON.parse(JSON.stringify(this._tiger._data));
+                        this.sendRoleForCheckBack(role._data.id,temp);
+                    }
                 }
             }
+        }else{
+            this.sendDataForMove();
         }
+
+
 
         //发送装备情况
         if(lastMap!=nowMap) {
@@ -438,15 +442,20 @@ module.exports = ag.class.extend({
             }
         }
         this._state = ag.gameConst.stateMove;
+        this.sendDataForMove();
+    },
 
+
+    sendDataForMove:function(){
+        var key = '';
 
         //通知所有人=
+        var myData = this._data;
         var msg = {id:myData.id, x:myData.x, y:myData.y};
-        //ag.jsUtil.sendDataExcept("sMove",msg,this._data.id);
-
         var array = ag.gameLayer._roleZoneMap[this._data.mapId];
         for(var i=0;i<array.length;++i){
             var role = ag.gameLayer._roleMap[array[i]];
+            var back = array[i];
             var map = ag.userManager._roleMapBack[role._data.id];
             if(map && role._data.id!=this._data.id && role.getIsPlayer() && this.getDistance(role._data.id)<9){
                 ag.jsUtil.sendData("sMove",msg,role._data.id);
@@ -455,18 +464,26 @@ module.exports = ag.class.extend({
         }
 
         //再检测自己身边有没有假死人
-        if(this.getIsPlayer()){
-            var map = ag.userManager._roleMapBack[this._data.id];
-            if(map){
-                for(var key in map){
-                    var back = map[key];
-                    var role = ag.gameLayer.getRole(back.id);
-                    if(role){
-                        var dis = Math.max(Math.abs(this._data.x-back.x),Math.abs(this._data.y-back.y));
-                        var dis2 = this.getDistance(role._data.id);
-                        if((dis<9 || dis2<9) && back.x!=role._data.x && back.y!=role._data.y){
-                            ag.jsUtil.sendData("sMove",{id:role._data.id, x:role._data.x, y:role._data.y},this._data.id);
-                            map[key] = {id:role._data.id, x:role._data.x, y:role._data.y};
+        var map = ag.userManager._roleMapBack[this._data.id];
+        if(map){
+            for(key in map){
+                var back = map[key];
+                var role = ag.gameLayer.getRole(back.id);
+                if(role){
+                    var dis = Math.max(Math.abs(this._data.x-back.x),Math.abs(this._data.y-back.y));
+                    var dis2 = this.getDistance(role._data.id);
+                    if((dis<9 || dis2<9) && back.x!=role._data.x && back.y!=role._data.y){
+                        ag.jsUtil.sendData("sMove",{id:role._data.id, x:role._data.x, y:role._data.y},this._data.id);
+                        map[key] = {id:role._data.id, x:role._data.x, y:role._data.y};
+                    }
+
+                    var back2 = ag.userManager._roleMapBack[role._data.id];
+                    if(back2)back2 = back2[this._data.id];
+                    if(back2){
+                        var dis = Math.max(Math.abs(role._data.x-back2.x),Math.abs(role._data.y-back2.y));
+                        if(dis<9){
+                            ag.jsUtil.sendData("sMove",{id:this._data.id, x:this._data.x, y:this._data.y},role._data.id);
+                            back2 = {id:this._data.id, x:this._data.x, y:this._data.y};
                         }
                     }
                 }

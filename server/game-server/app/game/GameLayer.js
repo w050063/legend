@@ -3,7 +3,7 @@
  * 核心战斗逻辑
  */
 
-
+var fs = require('fs');
 var Role = require("./Role");
 var AIController = require("./AIController");
 var TigerAIController = require("./TigerAIController");
@@ -41,6 +41,13 @@ module.exports = {
                 break;
             }
         }
+
+
+        this._startZoneDate = JSON.parse(fs.readFileSync('./app/serverlist/serverlist.txt', 'utf8'));
+        this._startZoneDate = this._startZoneDate[index]['date'].split('.');
+        this._startZoneDate[0] = parseInt(this._startZoneDate[0]);
+        this._startZoneDate[1] = parseInt(this._startZoneDate[1])-1;
+        this._startZoneDate[2] = parseInt(this._startZoneDate[2]);
 
 
         if(index!=-1){
@@ -81,8 +88,11 @@ module.exports = {
             this._sneerLockedMap = {};
             for(var key in this._roleMap){
                 var role = this._roleMap[key];
-                if((role.getIsPlayer() || role.getIsTiger()) && role._state != ag.gameConst.stateDead){
-                    this.findLocked(role);
+                if(role._state != ag.gameConst.stateDead) {
+                    if (role.getIsPlayer() && ag.userManager.getOnline(role._data.id)) {
+                        this.findLocked(role);
+                        if (role._tiger)this.findLocked(role._tiger);
+                    }
                 }
             }
         }.bind(this));
@@ -125,7 +135,9 @@ module.exports = {
 
             //每周三或者周末启动攻城
             if((date.getDay()==0 || date.getDay()==3) && date.getHours()==20 && date.getMinutes()==0){
-                if(this._legendID!=5){
+                var day0 = Math.round(new Date(this._startZoneDate[0],this._startZoneDate[1],this._startZoneDate[2]).getTime() / 86400000);
+                var day1 = Math.round(date.getTime() / 86400000);
+                if(day1-day0>=2){
                     ag.shabake.start(date.getTime(),60*60*1000);
                 }
             }
@@ -499,7 +511,13 @@ module.exports = {
 
     getHavelivedRole:function(mapStr){
         var array = this._roleXYMap[mapStr];
-        if(array)for(var i=0;i<array.length;++i)if(array[i]._state!=ag.gameConst.stateDead)return true;
+        if(array)for(var i=0;i<array.length;++i){
+            var role = array[i];
+            if(role._master)role = role._master;
+            if(role._state!=ag.gameConst.stateDead && role.getIsPlayer() && ag.userManager.getOnline(array[i]._data.id)){
+                return true;
+            }
+        }
         return false;
     },
 

@@ -5,6 +5,7 @@
          "port": 4070,
          "name": "五区*王者荣耀(新区)",
          "open": true,
+		"date": "2018.4.16",
          "descript": ""
      },
      {
@@ -13,6 +14,7 @@
          "port": 4070,
          "name": "四区*君临天下",
          "open": true,
+		"date": "2018.4.1",
          "descript": ""
      },
 	{
@@ -21,6 +23,7 @@
 		"port": 4070,
 		"name": "三区*逐鹿中原",
 		"open": true,
+		"date": "2018.4.1",
 		"descript": ""
 	},
 	{
@@ -29,6 +32,7 @@
 		"port": 4070,
 		"name": "二区*风起云涌",
 		"open": true,
+		"date": "2018.4.1",
 		"descript": ""
 	},
 	{
@@ -37,6 +41,7 @@
 		"port": 4070,
 		"name": "一区*海纳百川",
 		"open": true,
+		"date": "2018.4.1",
 		"descript": ""
 	}
 ]
