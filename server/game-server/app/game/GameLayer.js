@@ -514,8 +514,14 @@ module.exports = {
         if(array)for(var i=0;i<array.length;++i){
             var role = array[i];
             if(role._master)role = role._master;
-            if(role._state!=ag.gameConst.stateDead && role.getIsPlayer() && ag.userManager.getOnline(array[i]._data.id)){
-                return true;
+            if(role._state!=ag.gameConst.stateDead){
+                if(role.getIsPlayer()){
+                    if(ag.userManager.getOnline(role._data.id)){
+                        return true;
+                    }
+                }else{
+                    return true;
+                }
             }
         }
         return false;
