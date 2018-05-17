@@ -103,6 +103,7 @@ module.exports={
     //启动战斗中网络
     onBattleEvent:function(){
         pomelo.on('onData',function(data) {
+            cc.log(data);
             for(var key in data){
                 var array = data[key];
                 for(var i=0;i<array.length;++i){
@@ -163,7 +164,7 @@ module.exports={
             }else if(obj.key=='sHPArray'){
                 var player =  ag.gameLayer.getRole(obj.value.id);
                 if(player){
-                    player.changeHP(obj.value.hp);
+                    player.changeHP(obj.value.hp?obj.value.hp:0,obj.value.type?obj.value.type:0);
                 }
             }else if(obj.key=='sRoleArray'){
                 ag.gameLayer.addRole(obj.value);
@@ -341,6 +342,17 @@ module.exports={
                 ag.gameLayer.delItemFormBag(obj.value);
                 delete ag.userInfo._itemMap[obj.value];
                 delete ag.userInfo._itemMapBack[obj.value];
+            }else if(obj.key=='sSpiritArray') {
+                var player = ag.gameLayer.getRole(obj.value.id);
+                if (player && player.getIsPlayer()) {
+                    player._data.spirit = obj.value.spirit;
+                    player._data.level = obj.value.level;
+                    ag.gameLayer.addDirty(player._data.id);
+                    player.addExp(obj.value.level, obj.value.exp);
+                    if (ag.gameLayer._bag._selectIndex == 4) {
+                        ag.gameLayer._bag.showPanel(4);
+                    }
+                }
             }
         }
         this._dataArray = [];

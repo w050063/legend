@@ -356,7 +356,7 @@ cc.Class({
                     this._propNode._spriteOffice.node.y = 155;
                     this._propNode._spriteOffice.node.scale = 1.5;
                     this._propNode.addChild(this._propNode._spriteOffice.node);
-                    if(index>10)index = 10;
+                    //if(index>10)index = 10;
                     cc.loader.loadRes('office/' + index, cc.SpriteFrame, function (err, spriteFrame) {
                         if (this._propNode && this._propNode._spriteOffice && cc.isValid(this._propNode._spriteOffice)) {
                             this._propNode._spriteOffice.spriteFrame = spriteFrame;
@@ -830,32 +830,60 @@ cc.Class({
     },
 
 
+
     //飘雪动画
-    flyAnimation:function(hpStr){
+    flyAnimation:function(hpStr,type){
         if(this._propNode){
-            var node = cc.instantiate(hpStr[0]=='+'?ag.gameLayer._labelNumAddClone:ag.gameLayer._labelNumMinuteClone);
-            var tips = node.getComponent(cc.Label);
-            node.x = 0;
-            node.y = 105;
-            tips.string = ':'+hpStr.substr(1);
-            tips.fontSize = 28;
-            this._propNode.addChild(node,30);
-            node.runAction(cc.sequence(cc.moveBy(0.5, cc.p(0,45)), cc.fadeOut(0.2),cc.callFunc(function(){
-                node.destroy();
-            })));
+            var node = null;
+            var node1 = null;
+            if(type==0 || type==1){
+                node = cc.instantiate(hpStr[0]=='+'?ag.gameLayer._labelNumAddClone:ag.gameLayer._labelNumMinuteClone);
+                var tips = node.getComponent(cc.Label);
+                tips.string = ':'+hpStr.substr(1);
+                this._propNode.addChild(node,30);
+                node.runAction(cc.sequence(cc.moveBy(0.5, cc.p(0,45)), cc.fadeOut(0.2),cc.callFunc(function(){
+                    node.destroy();
+                })));
+            }
+            if(type==1 || type==2){
+                node1 = cc.instantiate(type==1?ag.gameLayer._spriteBaojiClone:ag.gameLayer._spriteshanbiClone);
+                node1.x = 0;
+                node1.y = 105;
+                this._propNode.addChild(node1,30);
+                node1.runAction(cc.sequence(cc.moveBy(0.5, cc.p(0,45)), cc.fadeOut(0.2),cc.callFunc(function(){
+                    node1.destroy();
+                })));
+            }
+
+            if(type==0){
+                node.x = 0;
+                node.y = 105;
+            }else if(type==1){
+                node.x = node1.width*node1.scale/2;
+                node.y = 105;
+                node1.x = -node.width/2;
+                node1.y = 105;
+            }else if(type==1){
+                node1.x = 0;
+                node1.y = 105;
+            }
         }
     },
 
 
     //血量变化
-    changeHP:function(hp){
+    changeHP:function(hp,type){
         var bVoice = this._data.hp > 0;
         if(this._data.camp==ag.gameConst.campNpc){
 
+        }else if(type==2){
+            if(this._nearFlag && ag.gameLayer._flyBloodArray.length<10){
+                ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:0,type:2});
+            }
         }else if(hp!=this._data.hp || hp==this._totalHP){
             if(this._nearFlag){
                 if(ag.gameLayer._flyBloodArray.length<10 && hp!=this._data.hp){
-                    ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp)))});
+                    ag.gameLayer._flyBloodArray.push({id:this._data.id,hp:(hp>this._data.hp?("+"+(hp-this._data.hp)):(""+(hp-this._data.hp))),type:type});
                 }
                 if(hp<this._data.hp){
                     this.nameDisapper();
@@ -865,9 +893,9 @@ cc.Class({
                     if(this._propNode._labelHP)this._propNode._labelHP.string = ""+hp+"/"+this._totalHP+" Lv:"+(this.getIsMonster()?this.getMst().lv:this._data.level);
                 }
             }
-
             this._data.hp = hp;
         }
+
         if(this._data.hp<=0){//判断死亡
             this.dead(bVoice);
         }
@@ -1111,6 +1139,23 @@ cc.Class({
         return wing;
     },
 
+    //获得当前的翅膀索引
+    getSpiritIndex:function(){
+        var index = 0;
+        for(var i=0;i<ag.gameConst.spiritArray.length;++i){
+            if(ag.gameConst.spiritArray[i]<=this._data.spirit){
+                index = i;
+            }
+        }
+        return index;
+    },
+
+    //获得当前的翅膀索引
+    getSpiritProgress:function(){
+        var index = this.getSpiritIndex();
+        return ''+(this._data.spirit - ag.gameConst.spiritArray[index])+'/'+(ag.gameConst.spiritArray[index+1] - ag.gameConst.spiritArray[index]);
+    },
+
 
     //是否在安全区
     isInSafe:function(){
@@ -1149,6 +1194,12 @@ cc.Class({
             hurt+=ag.gameConst.comeHurt[come];
         }
 
+        //加上元神属性
+        var spirit = this.getSpiritIndex();
+        if(spirit>0){
+            hurt+=ag.gameConst.spiritHurt[spirit];
+        }
+
         //加上套装属性
         var equipLv = this.getEquipLv();
         hurt+=ag.gameConst.equipHurt[equipLv];
@@ -1179,6 +1230,12 @@ cc.Class({
         var come = this._data.come;
         if(come>0){
             defense+=ag.gameConst.comeDefense[come];
+        }
+
+        //加上元神属性
+        var spirit = this.getSpiritIndex();
+        if(spirit>0){
+            defense+=ag.gameConst.spiritDefense[spirit];
         }
 
         //加上套装属性

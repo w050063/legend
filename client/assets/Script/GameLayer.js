@@ -106,6 +106,8 @@ cc.Class({
         this._dirtyRoleArray = {};//脏数据数组
         this._labelNumAddClone = cc.find('Canvas/clone/labelNumAddClone');
         this._labelNumMinuteClone = cc.find('Canvas/clone/labelNumMinuteClone');
+        this._spriteBaojiClone = cc.find('Canvas/clone/spriteBaojiClone');
+        this._spriteshanbiClone = cc.find('Canvas/clone/spriteshanbiClone');
         this._nodeRolePropClone = cc.find('Canvas/clone/nodeRolePropClone');
         this._nodeRoleName = this._nodeRolePropClone.getChildByName('labelName');
         this._nodeRoleHPLabel = this._nodeRolePropClone.getChildByName('labelHP');
@@ -242,13 +244,14 @@ cc.Class({
             }
 
 
+
             //清理无效的飘雪数据
             for(i=0;i<this._flyBloodArray.length;){
                 var id = this._flyBloodArray[i].id;
                 var role = this.getRole(id);
                 if(role){
                     if(!this._flyBloodFlagArray[id]){
-                        role.flyAnimation(this._flyBloodArray[i].hp);
+                        role.flyAnimation(this._flyBloodArray[i].hp,this._flyBloodArray[i].type);
                         this._flyBloodFlagArray[id] = true;
                         this.node.runAction(cc.sequence(cc.delayTime(0.2),cc.callFunc(function(sender,value){
                             delete this._flyBloodFlagArray[value];
@@ -1648,6 +1651,36 @@ cc.Class({
             }.bind(this));
         }else{
             ag.jsUtil.showText(this.node,'转生需要51级以上！');
+        }
+    },
+
+
+    //元神事件
+    buttonEventSpirit:function(event){
+        ag.musicManager.playEffect("resources/voice/button.mp3");
+        if(this._player._data.level>=50){
+            var rate = 1;
+            if(this._player._data.level>=65)rate = 4;
+            else if(this._player._data.level>=60)rate = 3;
+            else if(this._player._data.level>=55)rate = 2;
+            ag.jsUtil.alertOKCancel(this.node,'确认要使用'+(4*rate)+'万经验换取'+(10*rate)+'点元神进度？',function(){
+                ag.jsUtil.request(this.node,'spirit','exp',function (data) {
+                    if(data.code==0){
+                        this.systemNotify('兑换成功！');
+                    }else if(data.code==1){
+                        this.systemNotify('元神需要50级以上！');
+                    }else if(data.code==2){
+                        this.systemNotify('每天顶多元神三次！');
+                    }else if(data.code==3){
+                        this.systemNotify('您元神已经到达顶级！');
+                    }else if(data.code==4){
+                        this.systemNotify('未知错误！');
+                    }
+                }.bind(this));
+            }.bind(this),function(){
+            }.bind(this));
+        }else{
+            ag.jsUtil.showText(this.node,'元神需要50级以上！');
         }
     },
 

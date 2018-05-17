@@ -15,7 +15,7 @@ cc.Class({
     init:function(){
         this._tabArray = [];
         this._panelArray = [];
-        for(var i =0;i<4;++i){
+        for(var i =0;i<5;++i){
             this._tabArray.push(cc.find('Canvas/nodeBag/nodePanel/buttonTab'+i));
             this._panelArray.push(cc.find('Canvas/nodeBag/nodePanel/equip'+i));
         }
@@ -36,7 +36,7 @@ cc.Class({
         var node = this._panelArray[index];
         var role = ag.gameLayer._player;
 
-        for(var i=0;i<4;++i){
+        for(var i=0;i<5;++i){
             this._tabArray[i].color = i==index?cc.color(255,255,255):cc.color(120,120,120);
             this._panelArray[i].active = i==index;
         }
@@ -79,6 +79,14 @@ cc.Class({
             var all = 0;
             if(wing+1<ag.gameConst.wingProgress.length)all = ag.gameConst.wingProgress[wing+1];
             node.getChildByName('labelExp').getComponent(cc.Label).string = '当前进度：'+role._data.wing+'/'+all;
+        }else if(index==4){
+            var lvIndex = role.getSpiritIndex();
+            node.getChildByName('labelSpirit').getComponent(cc.Label).string = '元神：'+ lvIndex;
+            node.getChildByName('labelSpiritProgress').getComponent(cc.Label).string = '进度：'+role.getSpiritProgress();
+            node.getChildByName('labelHurt').getComponent(cc.Label).string = '攻击：'+ag.gameConst.spiritHurt[lvIndex];
+            node.getChildByName('labelDefense').getComponent(cc.Label).string = '防御：'+ag.gameConst.spiritDefense[lvIndex];
+            node.getChildByName('labelCrit').getComponent(cc.Label).string = '暴击：'+ag.gameConst.spiritCrit[lvIndex];
+            node.getChildByName('labelOffsetCrit').getComponent(cc.Label).string = '韧性：'+(ag.gameConst.spiritCrit[lvIndex]/2).toFixed(1);
         }
     },
 });
