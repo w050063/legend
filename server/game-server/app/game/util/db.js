@@ -15,6 +15,7 @@ module.exports = ag.class.extend({
         this._cardMap = {};
         this._bDoing = false;
         this._bFirstReadOver = false;
+        this._errorMsg = "";
 
         this._pool = mysql.createPool({
             host: '127.0.0.1',
@@ -65,10 +66,16 @@ module.exports = ag.class.extend({
             for(var i=0;i<rows.length;++i){
                 var data = rows[i];
                 if(data.camp==ag.gameConst.campNpc || data.camp==ag.gameConst.campMonster)data.camp=ag.gameConst.campPlayerNone;//防错处理
-                ag.gameLayer.addPlayer(data.id,data.map_id,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,data.exp,data.gold,data.office,data.wing,data.come,data.practice);
+                ag.gameLayer.addPlayer(data.id,data.map_id,data.x,data.y,data.type,data.camp,data.sex,data.direction
+                    ,data.level,data.exp,data.gold,data.office,data.wing,data.come,data.practice,data.spirit);
             }
         });
         this.getItems(function(rows){
+            var roleItemMap = {};
+            for(var key in ag.gameLayer._roleMap){
+                roleItemMap[key] = [];
+            }
+
             for(var i=0;i<rows.length;++i){
                 var data = rows[i];
                 if(ag.gameConst._itemMst[data.mid]){
@@ -77,9 +84,15 @@ module.exports = ag.class.extend({
                         var item = new Item(data.mid,undefined,undefined,data.id);
                         item._duration = 0;
                         item._data.owner = data.owner;
-                        item._data.puton = data.puton;
-                        if(this.existSamePuton(role._data.id,data.puton)){
-                            item._data.puton = ag.gameConst.putonBag;
+                        if(data.puton>=0){
+                            if(roleItemMap[data.owner].indexOf(data.puton)!=-1){
+                                item._data.puton = ag.gameConst.putonBag;
+                            }else{
+                                item._data.puton = data.puton;
+                                roleItemMap[data.owner].push(data.puton);
+                            }
+                        }else{
+                            item._data.puton = data.puton;
                         }
                         ag.itemManager._itemMap.add(item);
                         if(item._data.puton==ag.gameConst.putonBag){
@@ -138,6 +151,7 @@ module.exports = ag.class.extend({
             }
             if(!ag.db._customData.come)ag.db._customData.come = {};
             if(!ag.db._customData.wing)ag.db._customData.wing = {};
+            if(!ag.db._customData.spirit)ag.db._customData.spirit = {};
         }.bind(this));
 
 
@@ -181,21 +195,6 @@ module.exports = ag.class.extend({
                 this._bDoing = false;
             }.bind(this));
         }.bind(this));
-    },
-
-
-
-    existSamePuton:function (id,puton){
-        if(puton>=0){
-            var map = ag.itemManager._itemMap.getMap();
-            for (var key in map) {
-                var obj = map[key]._data;
-                if (obj.owner == id && obj.puton==puton) {
-                    return true;
-                }
-            }
-        }
-        return false;
     },
 
 
@@ -338,11 +337,11 @@ module.exports = ag.class.extend({
     },
 
 
-    insertRole:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,wing,come,practice,callback){
+    insertRole:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,wing,come,practice,spirit,callback){
         if(id && map_id){
-            var sql = 'INSERT INTO t_roles(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,wing,come,practice) VALUES("'
+            var sql = 'INSERT INTO t_roles(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,wing,come,practice,spirit) VALUES("'
                 + id + '","' + map_id+'",' + x+',' + y+',"' + type+'",' + camp+',' + sex+',' + direction
-                +',' + level+',' + exp+',' + gold+',' + office +',' + wing +',' + come+',' + practice + ')';
+                +',' + level+',' + exp+',' + gold+',' + office +',' + wing +',' + come+',' + practice +',' + spirit + ')';
             this.query(sql, function(err, rows) {
                 if (err) {
                     if(err.code == 'ER_DUP_ENTRY'){
@@ -375,23 +374,92 @@ module.exports = ag.class.extend({
                 var base = roleMap[data.id];
                 if(data.mapId!=base.mapId || data.x!=base.x || data.y!=base.y || data.level!=base.level
                     || role._exp!=base.exp || data.gold!=base.gold || data.office!=base.office || data.wing!=base.wing
-                    || data.come!=base.come || data.practice!=base.practice)
-                var sql = 'UPDATE t_roles SET map_id = "' + data.mapId
-                    + '", x = ' + data.x
-                    + ', y = ' + data.y
-                    + ', type = "' + data.type
-                    + '", camp = ' + data.camp
-                    + ', sex = ' + data.sex
-                    + ', direction = ' + data.direction
-                    + ', level = ' + data.level
-                    + ', exp = ' + role._exp
-                    + ', gold = ' + data.gold
-                    + ', office = ' + data.office
-                    + ', wing = ' + data.wing
-                    + ', come = ' + data.come
-                    + ', practice = ' + data.practice
-                    + ' WHERE id = "' + data.id + '";';
-                allSql = allSql+sql;
+                    || data.come!=base.come || data.practice!=base.practice
+                    || data.spirit!=base.spirit){
+
+
+
+                    //防错处理
+                    if(typeof data.mapId != 'string'){
+                        this._errorMsg += ""+data.id+",mapId:"+data.mapId;
+                        data.mapId = "t0";
+                    }
+                    if(!ag.jsUtil.isNum(data.x)){
+                        this._errorMsg += ""+data.id+",x:"+data.x;
+                        data.x = 0;
+                    }
+                    if(!ag.jsUtil.isNum(data.y)){
+                        this._errorMsg += ""+data.id+",y:"+data.y;
+                        data.y = 0;
+                    }
+                    if(typeof data.type != 'string'){
+                        this._errorMsg += ""+data.id+",type:"+data.type;
+                        data.type = "m0";
+                    }
+                    if(!ag.jsUtil.isNum(data.camp)){
+                        this._errorMsg += ""+data.id+",camp:"+data.camp;
+                        data.camp = 0;
+                    }
+                    if(!ag.jsUtil.isNum(data.sex)){
+                        this._errorMsg += ""+data.id+",sex:"+data.sex;
+                        data.sex = 0;
+                    }
+                    if(!ag.jsUtil.isNum(data.direction)){
+                        this._errorMsg += ""+data.id+",direction:"+data.direction;
+                        data.direction = 0;
+                    }
+                    if(!ag.jsUtil.isNum(data.level)){
+                        this._errorMsg += ""+data.id+",level:"+data.level;
+                        data.level = 50;
+                    }
+                    if(!ag.jsUtil.isNum(role._exp)){
+                        this._errorMsg += ""+data.id+",_exp:"+role._exp;
+                        role._exp = 0;
+                    }
+                    if(!ag.jsUtil.isNum(data.gold)){
+                        this._errorMsg += ""+data.id+",gold:"+data.gold;
+                        data.gold = 0;
+                    }
+                    if(!ag.jsUtil.isNum(data.office)){
+                        this._errorMsg += ""+data.id+",office:"+data.office;
+                        data.office = 0;
+                    }
+                    if(!ag.jsUtil.isNum(data.wing)){
+                        this._errorMsg += ""+data.id+",wing:"+data.wing;
+                        data.wing = 0;
+                    }
+                    if(!ag.jsUtil.isNum(data.come)){
+                        this._errorMsg += ""+data.id+",come:"+data.come;
+                        data.come = 0;
+                    }
+                    if(!ag.jsUtil.isNum(data.practice)){
+                        this._errorMsg += ""+data.id+",practice:"+data.practice;
+                        data.practice = 0;
+                    }
+                    if(!ag.jsUtil.isNum(data.spirit)){
+                        this._errorMsg += ""+data.id+",spirit:"+data.spirit;
+                        data.spirit = 0;
+                    }
+
+
+                    var sql = 'UPDATE t_roles SET map_id = "' + data.mapId
+                        + '", x = ' + data.x
+                        + ', y = ' + data.y
+                        + ', type = "' + data.type
+                        + '", camp = ' + data.camp
+                        + ', sex = ' + data.sex
+                        + ', direction = ' + data.direction
+                        + ', level = ' + data.level
+                        + ', exp = ' + role._exp
+                        + ', gold = ' + data.gold
+                        + ', office = ' + data.office
+                        + ', wing = ' + data.wing
+                        + ', come = ' + data.come
+                        + ', practice = ' + data.practice
+                        + ', spirit = ' + data.spirit
+                        + ' WHERE id = "' + data.id + '";';
+                    allSql = allSql+sql;
+                }
             }
             if(allSql.length>0){
                 this.query(allSql, function(err, rows) {

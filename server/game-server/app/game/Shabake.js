@@ -47,7 +47,7 @@ module.exports = ag.class.extend({
                     if(this._guildWinId){
                         var role = ag.gameLayer.getRole(this._guildWinId);
                         if(role){
-                            role.addGold(20000);
+                            role.addGold(40000);
                         }
                     }
                 }.bind(this),duration2);

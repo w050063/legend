@@ -128,3 +128,4 @@ alter table t_roles add column office int(8) NOT NULL DEFAULT 0;
 alter table t_roles add column come int(8) NOT NULL DEFAULT 0;
 alter table t_roles add column practice int(8) NOT NULL DEFAULT 0;
 alter table t_roles add column wing int(8) NOT NULL DEFAULT 0;
+ALTER TABLE t_roles ADD COLUMN spirit INT(8) not null DEFAULT 0;

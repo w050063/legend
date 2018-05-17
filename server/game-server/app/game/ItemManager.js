@@ -169,37 +169,37 @@ module.exports = ag.class.extend({
 
 
         //6级以上boss必爆圣战铜域系列装备1个
-        if(lv>=6){
-            var tempArray = ['i001101','i001102','i001103','i001104','i001105','i001106',
-                'i001304','i001305','i001306','i001307','i001308','i001309',
-                'i001404','i001405','i001406','i001407','i001408','i001409',
-                'i001504','i001505','i001506','i001507','i001508','i001509'];
-            var rand = Math.floor(Math.random()*tempArray.length);
-            //var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-            //pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
-            var item = new Item(tempArray[rand],mapId,this.getDropPos(mapId,location));
-            item._data.owner = '';
-            item._data.puton = ag.gameConst.putonGround;
-            item._duration = ag.gameConst.itemDuration;
-            item._their = rid;
-            this._itemMap.add(item);
-            ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
-        }else if(lv>=4){
-            var tempArray = ['i001101','i001102','i001103',
-                'i001301','i001302','i001303',
-                'i001401','i001402','i001403',
-                'i001501','i001502','i001503'];
-            var rand = Math.floor(Math.random()*tempArray.length);
-            //var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
-            //pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
-            var item = new Item(tempArray[rand],mapId,this.getDropPos(mapId,location));
-            item._data.owner = '';
-            item._data.puton = ag.gameConst.putonGround;
-            item._duration = ag.gameConst.itemDuration;
-            item._their = rid;
-            this._itemMap.add(item);
-            ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
-        }
+        //if(lv>=6){
+        //    var tempArray = ['i001101','i001102','i001103','i001104','i001105','i001106',
+        //        'i001304','i001305','i001306','i001307','i001308','i001309',
+        //        'i001404','i001405','i001406','i001407','i001408','i001409',
+        //        'i001504','i001505','i001506','i001507','i001508','i001509'];
+        //    var rand = Math.floor(Math.random()*tempArray.length);
+        //    //var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+        //    //pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+        //    var item = new Item(tempArray[rand],mapId,this.getDropPos(mapId,location));
+        //    item._data.owner = '';
+        //    item._data.puton = ag.gameConst.putonGround;
+        //    item._duration = ag.gameConst.itemDuration;
+        //    item._their = rid;
+        //    this._itemMap.add(item);
+        //    ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
+        //}else if(lv>=4){
+        //    var tempArray = ['i001101','i001102','i001103',
+        //        'i001301','i001302','i001303',
+        //        'i001401','i001402','i001403',
+        //        'i001501','i001502','i001503'];
+        //    var rand = Math.floor(Math.random()*tempArray.length);
+        //    //var pos = ag.jsUtil.p(location.x+Math.floor(Math.random()*3)-1,location.y+Math.floor(Math.random()*3)-1);
+        //    //pos = ag.gameLayer.getStandLocation(mapId,pos.x,pos.y);
+        //    var item = new Item(tempArray[rand],mapId,this.getDropPos(mapId,location));
+        //    item._data.owner = '';
+        //    item._data.puton = ag.gameConst.putonGround;
+        //    item._duration = ag.gameConst.itemDuration;
+        //    item._their = rid;
+        //    this._itemMap.add(item);
+        //    ag.jsUtil.sendDataAll("sDrop",JSON.parse(JSON.stringify(item._data)),item._data.mapId);
+        //}
     },
 
 

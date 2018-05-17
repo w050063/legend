@@ -15,7 +15,8 @@
   },
   "message sHP": {
     "required string id": 1,
-    "required int32 hp": 2
+    "optional int32 hp": 2,
+    "optional int32 type": 3
   },
   "message sMoveForce": {
     "required string id": 1,
@@ -67,7 +68,8 @@
     "optional int32 attackMode": 14,
     "optional int32 come": 15,
     "optional int32 practice": 16,
-    "optional int32 wing": 17
+    "optional int32 wing": 17,
+    "optional int32 spirit": 18
   },
   "message sRelife": {
     "required string id": 1,
@@ -93,6 +95,12 @@
     "optional string id": 1,
     "optional int32 come": 2,
     "optional int32 practice": 3,
+    "required int32 level": 4,
+    "required int32 exp": 5
+  },
+  "message sSpirit": {
+    "optional string id": 1,
+    "optional int32 spirit": 2,
     "required int32 level": 4,
     "required int32 exp": 5
   },
@@ -151,6 +159,7 @@
     "repeated string sDealAddItemArray": 40,
     "repeated int32 sDealAddGoldArray": 41,
     "repeated string sChangeSexArray": 42,
-    "repeated string itemDelFromBagArray": 43
+    "repeated string itemDelFromBagArray": 43,
+    "repeated sSpirit sSpiritArray": 44
   }
 }

@@ -9,6 +9,11 @@ module.exports = {
     dataChannel:"dataChannel",
 
 
+    isNum:function(x){
+        var re = /^\d+$/;
+        return typeof x=="number" && !isNaN(x) && re.test(x);
+    },
+
     sendByUids : function(route,msg,uids){
         //发送信息
         var channelService = pomelo.app.get('channelService');

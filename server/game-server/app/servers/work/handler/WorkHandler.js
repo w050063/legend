@@ -19,6 +19,12 @@ var Handler = cc.Class.extend({
     },
 
 
+    isNum:function(x){
+        var re = /^\d+$/;
+        return typeof x=="number" && !isNaN(x) && re.test(x);
+    },
+
+
     getOnlinePlayer:function(msg, session, next) {
         var code = 1;
         var result = '';
@@ -40,6 +46,7 @@ var Handler = cc.Class.extend({
                         result = result+map[key]._data.id+','+map[key]._data.name+'\n';
                     }
                 }
+                result = result+"\n"+ag.db._errorMsg;
                 code = 0;
             }
         }catch(e){}
@@ -99,7 +106,7 @@ var Handler = cc.Class.extend({
         var code = 1;
         if(role){
             try{
-                if(msg.secretKey==this._secretKey){
+                if(msg.secretKey==this._secretKey && typeof msg.gold=="number" && !isNaN(msg.gold)){
                     role.addGold(msg.gold);
                     code = 0;
                 }
@@ -372,7 +379,8 @@ var Handler = cc.Class.extend({
                 if(!exist){
                     role = ag.gameLayer.getRole(id);
                     var data = role._data;
-                    ag.db.insertRole(data.id,data.mapId,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,role._exp,data.gold,data.office,data.wing,data.come,data.practice);
+                    ag.db.insertRole(data.id,data.mapId,data.x,data.y,data.type,data.camp,data.sex,data.direction,data.level,role._exp
+                        ,data.gold,data.office,data.wing,data.come,data.practice,data.spirit);
                 }
 
                 //记录玩家进入游戏时间
@@ -409,7 +417,7 @@ var Handler = cc.Class.extend({
     move:function(msg, session, next) {
         try{
             var id = ag.userManager.getAccountByUid(session.uid);
-            if(id){
+            if(id && this.isNum(msg.x) && this.isNum(msg.y)){
                 var player =  ag.gameLayer.getRole(id);
                 if(player){
                     player.move({x:msg.x,y:msg.y});
@@ -467,7 +475,7 @@ var Handler = cc.Class.extend({
     bagItemToEquip:function (msg, session, next) {
         try{
             var id = ag.userManager.getAccountByUid(session.uid);
-            if(id) {
+            if(id && this.isNum(msg.puton)) {
                 ag.itemManager.bagItemToEquip(msg.id, msg.puton, id);
             }
         }catch(e){}
@@ -786,9 +794,9 @@ var Handler = cc.Class.extend({
     setAttackMode:function (msg, session, next) {
         try{
             var id = ag.userManager.getAccountByUid(session.uid);
-            if(id) {
+            if(id && this.isNum(msg.no)) {
                 var player = ag.gameLayer.getRole(id);
-                if (player && typeof msg.no == 'number' && msg.no >= ag.gameConst.attackModeAll && msg.no <= ag.gameConst.attackModeTeam) {
+                if (player && msg.no >= ag.gameConst.attackModeAll && msg.no <= ag.gameConst.attackModeTeam) {
                     player._data.attackMode = msg.no;
                     ag.jsUtil.sendData("sSystemNotify", "71%" + ag.gameConst.attackModeTextArray[msg.no] + "%72", id);
                 }
@@ -858,11 +866,61 @@ var Handler = cc.Class.extend({
     },
 
 
+
+    //增加修为,0正常1等级不到50,2经验换取超过3次，3,到达上线，4未知错误
+    spirit:function(msg, session, next) {
+        var id = ag.userManager.getAccountByUid(session.uid);
+        if(id) {
+            var role = ag.gameLayer.getRole(id);
+            if (role) {
+                if (msg == 'exp') {
+                    if (!ag.db._customData.spirit[id])ag.db._customData.spirit[id] = 0;
+                    if (role._data.level < 50) {
+                        next(null, {code: 1});
+                        return;
+                    }
+                    if (ag.db._customData.spirit[id] >= 3) {
+                        next(null, {code: 2});
+                        return;
+                    }
+
+
+                    try {
+                        var rate = 1;
+                        if(role._data.level>=65)rate = 4;
+                        else if(role._data.level>=60)rate = 3;
+                        else if(role._data.level>=55)rate = 2;
+
+                        ++ag.db._customData.spirit[id];
+                        role._data.spirit += 10*rate;
+                        role._exp -= 40000*rate;
+                        while(role._exp < 0) {
+                            role._data.level -= 1;
+                            role._exp += role.getTotalExpFromDataBase(role._data.level);
+                        }
+                        ag.gameLayer.addDirty(role._data.id);
+                        ag.jsUtil.sendDataAll("sSpirit", {
+                            id: role._data.id,
+                            spirit: role._data.spirit,
+                            level: role._data.level,
+                            exp: role._exp
+                        }, role._data.mapId);
+                    } catch (e) {
+                    }
+                    next(null, {code: 0});
+                    return;
+                }
+            }
+        }
+        next(null, {code: 4});
+    },
+
+
     //增加修为,0正常,1换取超过1次，2,到达上线，3未知错误
     daily:function(msg, session, next) {
         try{
             var id = ag.userManager.getAccountByUid(session.uid);
-            if(id) {
+            if(id && this.isNum(msg.index) && msg.index>=0 && msg.index<ag.gameConst.dailyPriceArray.length) {
                 var role = ag.gameLayer.getRole(id);
                 if (role) {
                     var price = ag.gameConst.dailyPriceArray[msg.index];
@@ -922,7 +980,7 @@ var Handler = cc.Class.extend({
             var id = ag.userManager.getAccountByUid(session.uid);
             if(id) {
                 var role = ag.gameLayer.getRole(id);
-                if (role && msg.index >= 0 && msg.index <= 2) {
+                if (role && this.isNum(msg.index) && msg.index >= 0 && msg.index <= 2) {
                     var price = ag.gameConst.shopPriceArray[msg.index];
                     if (role._data.gold >= price) {
                         role.addGold(-price);
@@ -981,7 +1039,7 @@ var Handler = cc.Class.extend({
     sellToAuctionShop:function(msg, session, next){
         try{
             var id = ag.userManager.getAccountByUid(session.uid);
-            if(id) {
+            if(id && this.isNum(msg.price) && msg.price>=0 && msg.price<500000) {
                 var role = ag.gameLayer.getRole(id);
                 if (role) {
                     ag.auctionShop.sellToAuctionShop(msg.id, id, msg.price);
@@ -1124,7 +1182,7 @@ var Handler = cc.Class.extend({
     dealAddGold:function(msg, session, next){
         try{
             var id = ag.userManager.getAccountByUid(session.uid);
-            if(id) {
+            if(id && this.isNum(msg.gold) && msg.gold>=0 && msg.gold<=1000000) {
                 var role = ag.gameLayer.getRole(id);
                 if (role) {
                     ag.deal.dealAddGold(id, msg.gold);

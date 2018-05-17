@@ -33,7 +33,7 @@ module.exports = {
         }
 
 
-        var serverZoneArray = [[1,2,3],[4],[5]];
+        var serverZoneArray = [[1,2,3,4,5],[6],[7]];
         var index = -1;
         for(var i=0;i<serverZoneArray.length;++i){
             if(serverZoneArray[i].indexOf(parseInt(legendID))!=-1){
@@ -117,6 +117,7 @@ module.exports = {
                 ag.db._customData.comeDate = now;
                 ag.db._customData.come = {};
                 ag.db._customData.wing = {};
+                ag.db._customData.spirit = {};
             }
 
 
@@ -146,15 +147,23 @@ module.exports = {
 
 
         //防止出问题，存不上
-        //ag.actionManager.runAction(this,300,function(){
+        //ag.actionManager.runAction(this,60,function(){
+        //    if(this._legendID==4){
         //        for(var key in this._roleMap){
         //            var role = this._roleMap[key];
-        //            if(role.getIsPlayer() && role._data.level>=50){
-        //                role.addGold(2000);
-        //                role.addExp(300000);
-        //                role.addOffice(1000);
+        //            if(role.getIsPlayer() && role._data.level>=40){
+        //                //role.addGold(3000);
+        //                role.addExp(3000000);
+        //                //role.addOffice(7000);
+        //                //role._data.practice += 300;
+        //                //while (role._data.practice >= ag.gameConst.comeArray[role._data.come]) {
+        //                //    role._data.practice -= ag.gameConst.comeArray[role._data.come];
+        //                //    ++role._data.come;
+        //                //}
+        //                //role.addWing(300);
         //            }
         //        }
+        //    }
         //}.bind(this));
 	},
 
@@ -261,7 +270,7 @@ module.exports = {
 	
 	
 	//增加一个玩家
-    addPlayer:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,wing,come,practice){
+    addPlayer:function(id,map_id,x,y,type,camp,sex,direction,level,exp,gold,office,wing,come,practice,spirit){
         var name = ag.userManager.getName(id);
 		var player = this._roleMap[id];
 		if(!player){
@@ -272,6 +281,7 @@ module.exports = {
             player._data.office = office?office:0;
             player._data.come = come?come:0;
             player._data.practice = practice?practice:0;
+            player._data.spirit = spirit?spirit:0;
             player._data.wing = wing?wing:0;
             player._data.id = id;
             player._data.type = type;

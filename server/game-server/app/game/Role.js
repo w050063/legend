@@ -27,6 +27,7 @@ module.exports = ag.class.extend({
         this._heal = this.getIsPlayer()?(mst.heal+Math.floor(mst.healAdd*lv)):mst.heal;
         this._attackSpeed = mst.attackSpeed;
         this._moveSpeed = mst.moveSpeed;
+        this._cirt = 0;
 
 
         this._totalHP = this.getTotalHPFromDataBase();
@@ -60,6 +61,15 @@ module.exports = ag.class.extend({
             if(come>0){
                 hurt+=ag.gameConst.comeHurt[come];
                 defense+=ag.gameConst.comeDefense[come];
+            }
+
+
+            //加上元神属性
+            var spirit = this.getSpiritIndex();
+            if(spirit>0){
+                hurt+=ag.gameConst.spiritHurt[spirit];
+                defense+=ag.gameConst.spiritDefense[spirit];
+                this._cirt += ag.gameConst.spiritCrit[spirit];
             }
 
 
@@ -163,6 +173,19 @@ module.exports = ag.class.extend({
         }
         return wingIndex;
     },
+
+
+    //获得当前的翅膀索引
+    getSpiritIndex:function(){
+        var index = 0;
+        for(var i=0;i<ag.gameConst.spiritArray.length;++i){
+            if(ag.gameConst.spiritArray[i]<=this._data.spirit){
+                index = i;
+            }
+        }
+        return index;
+    },
+
 
     getTypeNum:function(){
         if(this._data.type=='m0')return this._data.sex==ag.gameConst.sexBoy?0:1;
@@ -492,8 +515,15 @@ module.exports = ag.class.extend({
     },
 
 
-    sendHP:function(){
-        var msg = {id:this._data.id,hp:this._data.hp};
+    sendHP:function(type){
+        var msg = null;
+        if(type==1){//正常，暴击，未命中
+            msg = {id:this._data.id,hp:this._data.hp,type:1};
+        }else if(type==2){
+            msg = {id:this._data.id,type:2};
+        }else{
+            msg = {id:this._data.id,hp:this._data.hp};
+        }
         if(this._data.hp<=0){
             var array = ag.gameLayer._roleZoneMap[this._data.mapId];
             for(var i=0;i<array.length;++i){
@@ -517,30 +547,34 @@ module.exports = ag.class.extend({
     //掉血
     changeHPByHurt:function(attacker,hurt,bCisha){
         var rate = 0.9+Math.random()*0.2;
-        var array = [1,(this.getIsPlayer()?0.8:0.5),0];
+        var array = [1,(this.getIsPlayer()?0.8:0.5),0.03];
         if(!bCisha)bCisha = 0;
         var deDefense = this._defense*array[bCisha];
         var correct = (1+((this.getIsPlayer() && attacker.getIsPlayer())?0.02:0.03)*deDefense);
+        var bCrit = Math.random()*100<(attacker._cirt-this._cirt/2);
+        var value = 0;
+
         if(this.getIsMonster() && this.getMst().lv==11){
-            this._data.hp -= Math.round(hurt*0.3/correct*rate);
+            value = Math.round(hurt*0.3/correct*rate);
         }else if(this.getIsMonster() && this.getMst().lv==10){
-            this._data.hp -= Math.round(hurt*0.4/correct*rate);
+            value = Math.round(hurt*0.4/correct*rate);
         }else if(this.getIsMonster() && this.getMst().lv==9){
-            this._data.hp -= Math.round(hurt*0.5/correct*rate);
+            value = Math.round(hurt*0.5/correct*rate);
         }else if(this._data.type=='m1'){
             if(attacker._data.type=='m1'){
-                this._data.hp -= Math.round(hurt*0.75/correct*rate);
+                value = Math.round(hurt*0.75/correct*rate);
             }if(bCisha==ag.gameConst.fighterAttackFar){
-                this._data.hp -= Math.round(hurt*0.55/correct*rate);
+                value = Math.round(hurt*0.55/correct*rate);
             }else{
-                this._data.hp -= Math.round(hurt*0.32/correct*rate);
+                value = Math.round(hurt*0.32/correct*rate);
             }
         }else{
-            this._data.hp -=  Math.round(hurt/correct*rate);
+            value =  Math.round(hurt/correct*rate);
         }
-
+        if(value<0)value = 0;
+        this._data.hp -= value*(bCrit?1.5:1);
         if(this._data.hp<0)this._data.hp = 0;
-        this.sendHP();
+        this.sendHP(bCrit?1:0);
 
         if(ag.gameLayer.isEnemyForAttack(attacker,this)) {
             if (attacker._tiger && attacker._tiger != this && attacker._tiger._state != ag.gameConst.stateDead && !attacker._tiger._ai._locked)attacker._tiger._ai._locked = this;//如果有老虎，操作老虎攻击敌人。
@@ -630,7 +664,7 @@ module.exports = ag.class.extend({
                 for(var k=0;k<array.length;++k){
                     var tempRole = array[k];
                     if(ag.gameLayer.isEnemyForAttack(this,tempRole)){
-                        tempRole.changeHPByHurt(this,this._hurt*2.2);
+                        tempRole.changeHPByHurt(this,this._hurt*2);
                         sendArray.push({id:tempRole._data.id,hp:tempRole._data.hp});
                     }
                 }

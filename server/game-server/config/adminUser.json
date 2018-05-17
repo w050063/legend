@@ -1,17 +1,17 @@
 [{
     "id": "user-1",
     "username": "admin",
-    "password": "admin",
+    "password": "att135811",
     "level": 1
 }, {
     "id": "user-2",
     "username": "monitor",
-    "password": "monitor",
+    "password": "att135811",
     "level": 2
 },{
     "id": "user-3",
     "username": "test",
-    "password": "test",
+    "password": "att135811",
     "level": 2
 }
 ]

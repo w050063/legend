@@ -4,7 +4,7 @@ var pomelo = require('pomelo');
  */
 var app = pomelo.createApp();
 app.set('name', 'server');
-var serverZoneArray = [[1,2,3],[4],[5]];
+var serverZoneArray = [[1,2,3,4,5],[6],[7]];
 
 // app configuration
 app.configure('production|development', 'conn', function(){

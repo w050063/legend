@@ -82,9 +82,9 @@ module.exports = ag.class.extend({
                 this.delPoison(key);
             }
             var tag = ++this._baseTag;
-            var value = Math.round(role._data.defense*0.5);
+            var value = Math.round(role._defense*0.3);
             this._poisonMap[key] = {id:attacker._data.id,value:value,tag:tag};
-            role._data.defense -=value;
+            role._defense -=value;
             ag.actionManager.runAction(role,30,function(){
                 this.delPoison(key);
             }.bind(this),tag);
@@ -105,7 +105,7 @@ module.exports = ag.class.extend({
         if(this._poisonMap[key]){
             ag.actionManager.stopActionByTag(this._poisonMap[key].tag);
             var role = ag.gameLayer.getRole(key);
-            if(role)role._data.defense += this._poisonMap[key].value;
+            if(role)role._defense += this._poisonMap[key].value;
             delete this._poisonMap[key];
         }
     },
